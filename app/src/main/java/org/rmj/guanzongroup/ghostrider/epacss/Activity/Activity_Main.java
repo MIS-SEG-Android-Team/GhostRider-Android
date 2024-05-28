@@ -109,18 +109,25 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
 
     private void InitUserFeatures(){
         mViewModel.getEmployeeRole().observe(this, roles -> {
+
             try{
                 mViewModel.getChildRoles().observe(this, childMenus -> {
+
                     poParentLst.clear();
                     poChild.clear();
+
                     for(int x = 0; x < roles.size(); x++){
                         EEmployeeRole loRole = roles.get(x);
                         ParentObject loParent = new ParentObject(loRole.getObjectNm(), loRole.getHasChild());
+
                         poParentLst.add(loParent);
                         poChildLst = new ArrayList<>();
+
                         for (int i = 0; i < childMenus.size(); i++){
+
                             EEmployeeRole loChild = childMenus.get(i);
                             String lsParent = loRole.getObjectNm();
+
                             if(lsParent.equalsIgnoreCase(loChild.getParentxx())){
                                 if("selfie log".equalsIgnoreCase(loChild.getObjectNm().toLowerCase(Locale.ROOT))) {
                                     if(cSlfiex || loChild.getRecdStat().equalsIgnoreCase("1")) {

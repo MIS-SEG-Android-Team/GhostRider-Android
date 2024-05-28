@@ -82,6 +82,7 @@ public class Activity_SplashScreen extends AppCompatActivity {
         Log.e(TAG, "Firebase messaging service started.");
 
         InitializeAppContentDisclosure();
+
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {

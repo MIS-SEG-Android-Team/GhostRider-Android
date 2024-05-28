@@ -293,7 +293,6 @@ public class VMSelfieLog extends AndroidViewModel {
                 callback.OnLogin();
 
             }
-
             @Override
             public Object DoInBackground(Object args) {
                 try{
@@ -324,7 +323,6 @@ public class VMSelfieLog extends AndroidViewModel {
                     return 0;
                 }
             }
-
             @Override
             public void OnPostExecute(Object object) {
                 int lnResult = (int) object;

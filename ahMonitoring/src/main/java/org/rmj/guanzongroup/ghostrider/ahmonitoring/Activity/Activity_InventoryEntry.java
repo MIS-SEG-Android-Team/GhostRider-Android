@@ -63,10 +63,13 @@ public class Activity_InventoryEntry extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_entry);
         initWidgets();
+
         mViewModel = new ViewModelProvider(Activity_InventoryEntry.this).get(VMInventoryEntry.class);
+
         String lsTransNox = getIntent().getStringExtra("transno");
         String lsPartIDxx = getIntent().getStringExtra("partID");
         String lsBarCodex = getIntent().getStringExtra("barcode");
+
         mViewModel.getInventoryItemDetail(lsTransNox, lsPartIDxx, lsBarCodex).observe(Activity_InventoryEntry.this, item -> {
             try{
                 poItem = new RandomItem(item.getTransNox(), item.getPartsIDx(), item.getBarrCode());
@@ -79,6 +82,7 @@ public class Activity_InventoryEntry extends AppCompatActivity {
                 txtWareHouse.setText(item.getWHouseNm());
                 txtSection.setText(item.getSectnNme());
                 txtBin.setText(item.getBinNamex());
+
                 if(item.getTranStat().equalsIgnoreCase("1")){
                     txtActualQty.setText(String.valueOf(item.getActCtr01()));
                     txtRemarks1.setText(item.getRemarksx());
@@ -87,6 +91,7 @@ public class Activity_InventoryEntry extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+
         btnSave.setOnClickListener(v -> {
             if(!Objects.requireNonNull(txtActualQty.getText()).toString().isEmpty()) {
                 poItem.setItemQtyx(Integer.parseInt(txtActualQty.getText().toString()));
@@ -116,6 +121,7 @@ public class Activity_InventoryEntry extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Inventory");
+
         lblTransNox = findViewById(R.id.lbl_invTransNox);
         lblItemxx = findViewById(R.id.lbl_inventoryItem);
         lblBarcode = findViewById(R.id.lbl_itemBarcode);

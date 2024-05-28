@@ -37,9 +37,10 @@ public class Activity_Inquiries extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(VMInquiry.class);
         setContentView(R.layout.activity_inquiries);
         intWidgets();
+
+        mViewModel = new ViewModelProvider(this).get(VMInquiry.class);
 
         poLoad = new LoadDialog(Activity_Inquiries.this);
         poMessage = new MessageBox(Activity_Inquiries.this);
@@ -85,11 +86,6 @@ public class Activity_Inquiries extends AppCompatActivity {
                             }
                         });
                         dHistory.show();
-//                        Intent intent = new Intent(Activity_Inquiries.this, Activity_ProductSelection.class);
-//                        intent.putExtra("TransNox",TransNox);
-//                        startActivity(intent);
-//                        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
-//                        finish();
                     }
 
                 });

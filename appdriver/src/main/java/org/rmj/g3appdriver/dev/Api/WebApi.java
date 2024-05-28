@@ -21,7 +21,7 @@ public abstract class WebApi {
 
     private final AppConfigPreference poConfig;
 
-    protected static final String LOCAL = "http://192.168.10.68:8080/";
+    protected static final String LOCAL = "http://192.168.10.68:8080/GMC SEG Folder - PHP/eclipse-workspace/apps/";
 
     private static final String PRIMARY_LIVE = "https://restgk.guanzongroup.com.ph/";
     private static final String SECONDARY_LIVE = "https://restgk1.guanzongroup.com.ph/";

@@ -194,7 +194,6 @@ public class Activity_Inventory extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     @Override
     public void onBackPressed() {
         poMessage.initDialog();
@@ -276,9 +275,12 @@ public class Activity_Inventory extends AppCompatActivity {
 
                     String lsTransNo = master.getTransNox();
                     mViewModel.GetInventoryItems(lsTransNo).observe(Activity_Inventory.this, details -> {
+
                         lblCountx.setText("Updated Inventory Items : " + details.size());
+
                         LinearLayoutManager manager = new LinearLayoutManager(Activity_Inventory.this);
                         manager.setOrientation(RecyclerView.VERTICAL);
+
                         recyclerView.setLayoutManager(manager);
                         recyclerView.setAdapter(new InventoryItemAdapter(details, (TransNox, PartID, BarCode, isUpdated, args) -> {
                             if(!isUpdated) {

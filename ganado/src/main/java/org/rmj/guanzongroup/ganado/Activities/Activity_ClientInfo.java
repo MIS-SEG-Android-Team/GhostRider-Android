@@ -53,7 +53,9 @@ public class Activity_ClientInfo extends AppCompatActivity {
 
         poMessage = new MessageBox(Activity_ClientInfo.this);
         poDialogx = new LoadDialog(Activity_ClientInfo.this);
+
         mViewModel.InitializeApplication(getIntent());
+
         mViewModel.InitLocation();
 
         mViewModel.getRelation().observe(Activity_ClientInfo.this, eRelations->{
@@ -74,6 +76,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
             }
         });
         spinner_relation.setOnItemClickListener(new Activity_ClientInfo.OnItemClickListener(spinner_relation));
+
         mViewModel.GetTownProvinceList().observe(Activity_ClientInfo.this, new Observer<List<DTownInfo.TownProvinceInfo>>() {
             @Override
             public void onChanged(List<DTownInfo.TownProvinceInfo> loList) {
@@ -147,6 +150,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
             StartTime.getDatePicker().setMaxDate(new Date().getTime());
             StartTime.show();
         });
+
         rgGender.setOnCheckedChangeListener((radioGroup, i) -> {
             if (i == R.id.rb_male) {
                 mViewModel.getModel().setGenderCd("0");
@@ -167,44 +171,52 @@ public class Activity_ClientInfo extends AppCompatActivity {
             mViewModel.getModel().setEmailAdd(txtEmailAdd.getText().toString());
             mViewModel.getModel().setMobileNo(txtMobileNo.getText().toString());
 
-            mViewModel.SaveData(new VMPersonalInfo.OnSaveInquiry() {
-                @Override
-                public void OnSave() {
-                    poDialogx.initDialog("BENTA", "Saving inquiry. Please wait...", false);
-                    poDialogx.show();
-                }
+            if (!mViewModel.InitLocation()){
+                poMessage.initDialog();
+                poMessage.setTitle("BENTA");
+                poMessage.setMessage(mViewModel.GetMessage());
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                    dialog.dismiss();
+                });
+                poMessage.show();
+            }else {
+                mViewModel.SaveData(new VMPersonalInfo.OnSaveInquiry() {
+                    @Override
+                    public void OnSave() {
+                        poDialogx.initDialog("BENTA", "Saving inquiry. Please wait...", false);
+                        poDialogx.show();
+                    }
+                    @Override
+                    public void OnSuccess(String args) {
+                        poDialogx.dismiss();
 
-                @Override
-                public void OnSuccess(String args) {
-                    poDialogx.dismiss();
-                    poMessage.initDialog();
-                    poMessage.setTitle("BENTA");
-                    poMessage.setMessage(args);
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                        dialog.dismiss();
-                        Intent loIntent = new Intent(Activity_ClientInfo.this, Activity_BrandSelection.class);
-                        loIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        poMessage.initDialog();
+                        poMessage.setTitle("BENTA");
+                        poMessage.setMessage(args);
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                            dialog.dismiss();
+                            Intent loIntent = new Intent(Activity_ClientInfo.this, Activity_Inquiries.class);
+                            loIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        startActivity(loIntent);
-                        overridePendingTransition(org.rmj.g3appdriver.R.anim.anim_intent_slide_in_right, org.rmj.g3appdriver.R.anim.anim_intent_slide_out_left);
+                            startActivity(loIntent);
+                            overridePendingTransition(org.rmj.g3appdriver.R.anim.anim_intent_slide_in_right, org.rmj.g3appdriver.R.anim.anim_intent_slide_out_left);
 
-                        finish();
-                    });
-                    poMessage.show();
-                }
+                            finish();
+                        });
+                        poMessage.show();
+                    }
+                    @Override
+                    public void OnFailed(String message) {
+                        poDialogx.dismiss();
 
-
-                @Override
-                public void OnFailed(String message) {
-                    poDialogx.dismiss();
-
-                    poMessage.initDialog();
-                    poMessage.setTitle("BENTA");
-                    poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                }
-            });
+                        poMessage.initDialog();
+                        poMessage.setTitle("BENTA");
+                        poMessage.setMessage(message);
+                        poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                        poMessage.show();
+                    }
+                });
+            }
         });
     }
     private void initWidgets() {

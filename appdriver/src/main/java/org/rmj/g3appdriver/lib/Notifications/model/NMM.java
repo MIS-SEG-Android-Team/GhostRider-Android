@@ -1,6 +1,7 @@
 package org.rmj.g3appdriver.lib.Notifications.model;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -26,6 +27,7 @@ public class NMM {
 
     public iNotification getInstance(RemoteMessage remoteMessage){
         String lsSysMon = new RemoteMessageParser(remoteMessage).getValueOf("msgmon");
+
         switch (lsSysMon){
             case "00000":
                 return new NMM_Regular(instance);

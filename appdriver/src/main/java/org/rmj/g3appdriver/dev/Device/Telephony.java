@@ -100,7 +100,6 @@ public class Telephony {
             }
             else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 mSubscriptionManager = (SubscriptionManager) mContext.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
-                Log.d("MOBILE", mSubscriptionManager.getPhoneNumber(mSubscriptionManager.DEFAULT_SUBSCRIPTION_ID));
                 return mSubscriptionManager.getPhoneNumber(mSubscriptionManager.DEFAULT_SUBSCRIPTION_ID);
             }else {
                 TelephonyManager poManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);

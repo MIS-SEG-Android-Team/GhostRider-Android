@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,8 +99,11 @@ public class Fragment_SelfieLog extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(this).get(VMSelfieLog.class);
+
         View view =  inflater.inflate(R.layout.fragment_selfie_log, container, false);
+
+        mViewModel = new ViewModelProvider(this).get(VMSelfieLog.class);
+
         InitActivityResultLaunchers();
         initWidgets(view);
 
@@ -211,7 +215,9 @@ public class Fragment_SelfieLog extends Fragment {
                             @Override
                             public void OnSuccess() {
                                 poLoad.dismiss();
+
                                 poSelfie.setBranchCode(BranchCode);
+
                                 mViewModel.getBranchInfo(BranchCode).observe(getViewLifecycleOwner(), eBranchInfo -> {
                                     try{
                                         lblBranch.setText(eBranchInfo.getBranchNm());
@@ -224,6 +230,7 @@ public class Fragment_SelfieLog extends Fragment {
                             @Override
                             public void OnFailed(String message) {
                                 poLoad.dismiss();
+
                                 poMessage.initDialog();
                                 poMessage.setTitle("Selfie Login");
                                 poMessage.setMessage(message);
@@ -246,7 +253,6 @@ public class Fragment_SelfieLog extends Fragment {
                 poLoad.dismiss();
             }
         }));
-
         btnCamera.setOnClickListener(v -> {
             if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -260,6 +266,7 @@ public class Fragment_SelfieLog extends Fragment {
                 validateSelfieLog();
             }
         });
+
         return view;
     }
 

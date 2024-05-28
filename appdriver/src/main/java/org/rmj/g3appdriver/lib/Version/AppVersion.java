@@ -42,7 +42,6 @@ public class AppVersion {
     public String getMessage() {
         return message;
     }
-
     public boolean SubmitUserAppVersion(){
         try{
             EEmployeeInfo loUser = poUser.getUserNonLiveData();
@@ -81,7 +80,6 @@ public class AppVersion {
             return false;
         }
     }
-
     public List<VersionInfo> GetVersionInfo(){
         try{
             List<VersionInfo> loVersion = new ArrayList<>();
@@ -132,7 +130,6 @@ public class AppVersion {
             return null;
         }
     }
-
     public VersionInfo CheckUpdate(){
         try{
             VersionInfo loVersion = new VersionInfo();
@@ -185,9 +182,5 @@ public class AppVersion {
             message = getLocalMessage(e);
             return null;
         }
-    }
-
-    public String GetVersionName(){
-        return poConfig.getVersionName();
     }
 }
