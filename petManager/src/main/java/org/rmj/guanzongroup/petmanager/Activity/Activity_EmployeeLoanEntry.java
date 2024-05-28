@@ -58,7 +58,7 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
 
         /*TOOL BAR*/
         setSupportActionBar(toolbar); //set object toolbar as default action bar for activity
-        getSupportActionBar().setTitle(""); //set default title for action bar
+        getSupportActionBar().setTitle("Payroll, Employee and Time Management"); //set default title for action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //set back button to toolbar
         getSupportActionBar().setDisplayShowHomeEnabled(true); //enable the back button set on toolbar
 

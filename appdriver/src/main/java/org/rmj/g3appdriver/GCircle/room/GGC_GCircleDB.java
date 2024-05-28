@@ -44,6 +44,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCreditOnlineApplicatio
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DDCPCollectionDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DDCP_Remittance;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeLeave;
@@ -109,6 +110,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ECreditOnlineApplicationCI;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCP_Remittance;
+import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeLeave;
@@ -212,7 +214,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EPacitaEvaluation.class,
         ELoanTerm.class,
         EGanadoOnline.class,
-        EMCModelCashPrice.class}, version = 40, exportSchema = false)
+        EMCModelCashPrice.class,
+        EEmpLoan.class}, version = 40, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -283,6 +286,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DNotification notificationDao();
     public abstract DPacita pacitaDao();
     public abstract DGanadoOnline ganadoDao();
+    public abstract DEmpLoan emploanDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
