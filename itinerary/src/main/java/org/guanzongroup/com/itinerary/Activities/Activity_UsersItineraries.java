@@ -71,7 +71,7 @@ public class Activity_UsersItineraries extends AppCompatActivity {
         psThru = lsDateThru;
 
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Employee Itinerary");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         lblUser = findViewById(R.id.lbl_username);

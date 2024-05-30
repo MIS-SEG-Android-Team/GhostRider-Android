@@ -81,7 +81,7 @@ public class Activity_TransactionDetail extends AppCompatActivity {
 
         ViewPager viewPager = findViewById(R.id.viewpager_transaction);
 
-        getSupportActionBar().setTitle("Guanzon Circle");
+        getSupportActionBar().setTitle("");
 
         viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), getTransactionFragment(remCodex)));
     }

@@ -337,7 +337,7 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
         lblAddrss = findViewById(R.id.lbl_headerAddress);
 
         toolbar = findViewById(R.id.toolbar_collectionRemit);
-        toolbar.setTitle("Collection Remittance");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 

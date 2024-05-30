@@ -351,7 +351,7 @@ public class Activity_ResidenceInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_ResidenceInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Residence Info");
+        getSupportActionBar().setTitle("");
 
         cbOneAddress = findViewById(R.id.cb_oneAddress);
 

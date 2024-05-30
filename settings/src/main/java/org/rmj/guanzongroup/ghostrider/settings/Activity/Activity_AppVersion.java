@@ -79,7 +79,7 @@ public class Activity_AppVersion extends AppCompatActivity {
         rec_updatedFixedConcerns = findViewById(R.id.rec_updatedFixedConcerns);
 
         //set toolbar and action
-        toolbar.setTitle("System Update");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

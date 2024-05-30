@@ -156,7 +156,7 @@ public class Activity_Properties extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_Properties);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Properties Info");
+        getSupportActionBar().setTitle("");
 
         txtLot1 = findViewById(R.id.tie_cap_propertyLot1);
         txtLot2 = findViewById(R.id.tie_cap_propertyLot2);

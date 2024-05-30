@@ -286,7 +286,7 @@ public class Activity_LogCollection extends AppCompatActivity {
 
     private void initWidgets(){
         MaterialToolbar toolbar = findViewById(R.id.toolbar_collectionLog);
-        toolbar.setTitle("Daily Collection Plan");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 

@@ -162,7 +162,7 @@ public class Activity_EmploymentInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_EmploymentInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Employment Info");
+        getSupportActionBar().setTitle("");
 
         rgSectorx = findViewById(R.id.rg_sector);
 

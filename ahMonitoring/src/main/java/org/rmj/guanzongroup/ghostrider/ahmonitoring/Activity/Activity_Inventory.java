@@ -91,7 +91,7 @@ public class Activity_Inventory extends AppCompatActivity {
                 public void OnFailed(String message) {
                     poDialog.dismiss();
                     poMessage.initDialog();
-                    poMessage.setTitle("Cash Count");
+                    poMessage.setTitle("");
                     poMessage.setMessage(message);
                     poMessage.setPositiveButton("Okay", (view, dialog) -> {
                         dialog.dismiss();

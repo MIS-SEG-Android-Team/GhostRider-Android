@@ -8,11 +8,9 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/GhostRiderMaterialTheme.PopupOverlay" />
+        android:layout_height="wrap_content"
+        android:elevation="1dp"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.imageview.ShapeableImageView
         style="@style/Activity_HeaderBackground"
@@ -24,248 +22,270 @@
         app:layout_constraintHeight_percent=".3"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="0dp"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:cardUseCompatPadding="true"
-        app:cardCornerRadius="15dp"
-        app:cardPreventCornerOverlap="true"
-        android:layout_marginTop="70dp"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@+id/shapeableImageView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHeight_percent=".8"
+        app:layout_constraintVertical_bias="2">
 
-        <ScrollView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="match_parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="10dp">
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_loan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:cardUseCompatPadding="true"
+                app:cardCornerRadius="15dp"
+                app:cardPreventCornerOverlap="true"
+                android:layout_marginHorizontal="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/txtview_loandet"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:text="Employee Loan Info"
-                    android:textSize="18sp"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="10dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.050"/>
-
-                <View
-                    android:id="@+id/line_view"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/colorPrimaryLight"
-                    android:layout_marginHorizontal="5dp"
-                    android:layout_marginVertical="10dp"
-                    app:layout_constraintTop_toBottomOf="@+id/txtview_loandet"/>
+                    android:layout_height="match_parent"
+                    android:padding="10dp">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/CustomDropDownDialogStyle"
-                    android:id="@+id/layout_spnamt"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Select Loan Type"
-                    app:layout_constraintTop_toBottomOf="@id/line_view"
-                    app:layout_constraintStart_toStartOf="@+id/line_view"
-                    app:layout_constraintEnd_toEndOf="@+id/line_view">
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/txtview_loandet"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:text="Loan Info"
+                        android:gravity="center_vertical"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="@+id/line_view"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHeight_percent="0.050"/>
 
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/spn_loantype"
+                    <View
+                        android:id="@+id/line_view"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:clickable="false"
-                        android:cursorVisible="false"
-                        android:focusable="true"
-                        android:inputType="none"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="1dp"
+                        android:background="@color/colorPrimaryLight"
+                        android:layout_marginHorizontal="5dp"
+                        android:layout_marginVertical="10dp"
+                        app:layout_constraintTop_toBottomOf="@+id/txtview_loandet"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/TextInputStyle"
-                    android:id="@+id/layout_loanamt"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Loan Amount"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_spnamt"
-                    app:layout_constraintStart_toStartOf="@+id/line_view"
-                    app:layout_constraintEnd_toEndOf="@+id/line_view">
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/CustomDropDownDialogStyle"
+                        android:id="@+id/layout_spnamt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Select Loan Type"
+                        app:layout_constraintTop_toBottomOf="@id/line_view"
+                        app:layout_constraintStart_toStartOf="@+id/line_view"
+                        app:layout_constraintEnd_toEndOf="@+id/line_view">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/txt_loanamt"
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/spn_loantype"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="false"
+                            android:cursorVisible="false"
+                            android:focusable="true"
+                            android:inputType="none"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/TextInputStyle"
+                        android:id="@+id/layout_loanamt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Loan Amount"
+                        app:layout_constraintTop_toBottomOf="@+id/layout_spnamt"
+                        app:layout_constraintStart_toStartOf="@+id/line_view"
+                        app:layout_constraintEnd_toEndOf="@+id/line_view">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/txt_loanamt"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="15sp"
+                            android:imeOptions="actionNext"
+                            android:inputType="numberDecimal|none"
+                            android:maxLength="20"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/CustomDropDownDialogStyle"
+                        android:id="@+id/layout_terms"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Terms"
+                        app:layout_constraintTop_toBottomOf="@+id/layout_loanamt"
+                        app:layout_constraintStart_toStartOf="@+id/line_view"
+                        app:layout_constraintWidth_percent="0.35">
+
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/spn_terms"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="false"
+                            android:cursorVisible="false"
+                            android:focusable="true"
+                            android:inputType="none"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Months"
+                        android:layout_marginStart="10dp"
+                        app:layout_constraintTop_toBottomOf="@+id/layout_loanamt"
+                        app:layout_constraintBottom_toTopOf="@+id/layout_purpose"
+                        app:layout_constraintStart_toEndOf="@+id/layout_terms"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/TextInputStyle"
+                        android:id="@+id/layout_purpose"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Purpose"
+                        app:layout_constraintTop_toBottomOf="@+id/layout_terms"
+                        app:layout_constraintStart_toStartOf="@+id/line_view"
+                        app:layout_constraintEnd_toEndOf="@+id/line_view">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/txt_purpose"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="15sp"
+                            android:imeOptions="actionNext"
+                            android:inputType="textMultiLine"
+                            android:lines="3"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/installment_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textSize="15sp"
-                        android:imeOptions="actionNext"
-                        android:inputType="numberDecimal|none"
-                        android:maxLength="20"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:visibility="gone"
+                        app:layout_constraintTop_toBottomOf="@+id/layout_purpose">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/CustomDropDownDialogStyle"
-                    android:id="@+id/layout_terms"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Terms"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_loanamt"
-                    app:layout_constraintStart_toStartOf="@+id/line_view"
-                    app:layout_constraintEnd_toEndOf="@+id/line_view">
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/txtview_loaninfo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Installment Info"
+                            android:layout_marginTop="25dp"
+                            android:gravity="center_vertical"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/line_view2"
+                            app:layout_constraintEnd_toEndOf="parent"/>
 
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/spn_terms"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:clickable="false"
-                        android:cursorVisible="false"
-                        android:focusable="true"
-                        android:inputType="none"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        <View
+                            android:id="@+id/line_view2"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/colorPrimaryLight"
+                            android:layout_marginHorizontal="5dp"
+                            android:layout_marginVertical="10dp"
+                            app:layout_constraintTop_toBottomOf="@+id/txtview_loaninfo"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/TextInputStyle"
-                    android:id="@+id/layout_purpose"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Purpose"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_terms"
-                    app:layout_constraintStart_toStartOf="@+id/line_view"
-                    app:layout_constraintEnd_toEndOf="@+id/line_view">
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/TextInputStyle"
+                            android:id="@+id/layout_firstpay"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:hint="First Payment"
+                            app:layout_constraintTop_toBottomOf="@+id/line_view2"
+                            app:layout_constraintStart_toStartOf="@+id/line_view2"
+                            app:layout_constraintEnd_toEndOf="@+id/line_view2">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/txt_purpose"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textSize="15sp"
-                        android:imeOptions="actionNext"
-                        android:inputType="textMultiLine"
-                        android:lines="3"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/txt_firstpay"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:textSize="15sp"
+                                android:imeOptions="actionNext"
+                                android:inputType="none"/>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/txtview_loaninfo"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:text="Installment Info"
-                    android:textSize="18sp"
-                    android:gravity="center_vertical"
-                    android:paddingLeft="10dp"
-                    android:layout_marginVertical="25dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_purpose"
-                    app:layout_constraintHeight_percent="0.050"/>
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/TextInputStyle"
+                            android:id="@+id/layout_monthlypay"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:hint="Monthly Payment"
+                            app:layout_constraintTop_toBottomOf="@+id/layout_firstpay"
+                            app:layout_constraintStart_toStartOf="@+id/layout_firstpay"
+                            app:layout_constraintEnd_toStartOf="@+id/layout_totalintrst">
 
-                <View
-                    android:id="@+id/line_view2"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/colorPrimaryLight"
-                    android:layout_marginHorizontal="5dp"
-                    android:layout_marginVertical="10dp"
-                    app:layout_constraintTop_toBottomOf="@+id/txtview_loaninfo"/>
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/txt_monthlypay"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:textSize="15sp"
+                                android:imeOptions="actionNext"
+                                android:inputType="numberDecimal|none"
+                                android:maxLength="20"
+                                android:enabled="false"/>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/TextInputStyle"
-                    android:id="@+id/layout_firstpay"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="First Payment"
-                    app:layout_constraintTop_toBottomOf="@+id/line_view2"
-                    app:layout_constraintStart_toStartOf="@+id/line_view2"
-                    app:layout_constraintEnd_toEndOf="@+id/line_view2">
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/TextInputStyle"
+                            android:id="@+id/layout_totalintrst"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:hint="Interest"
+                            app:layout_constraintTop_toBottomOf="@+id/layout_firstpay"
+                            app:layout_constraintEnd_toEndOf="@+id/layout_firstpay"
+                            app:layout_constraintStart_toEndOf="@+id/layout_monthlypay">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/txt_firstpay"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textSize="15sp"
-                        android:imeOptions="actionNext"
-                        android:inputType="none"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/txt_totalintrst"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:enabled="false"
+                                android:imeOptions="actionNext"
+                                android:inputType="numberDecimal|none"
+                                android:maxLength="20"
+                                android:textSize="15sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/TextInputStyle"
-                    android:id="@+id/layout_monthlypay"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Monthly Payment"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_firstpay"
-                    app:layout_constraintStart_toStartOf="@+id/layout_firstpay"
-                    app:layout_constraintEnd_toStartOf="@+id/layout_totalintrst">
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/TextInputStyle"
+                            android:id="@+id/layout_remarks"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:hint="Remarks"
+                            app:layout_constraintTop_toBottomOf="@+id/layout_totalintrst"
+                            app:layout_constraintStart_toStartOf="@+id/layout_firstpay"
+                            app:layout_constraintEnd_toEndOf="@+id/layout_firstpay">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/txt_monthlypay"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textSize="15sp"
-                        android:imeOptions="actionNext"
-                        android:inputType="numberDecimal|none"
-                        android:maxLength="20"
-                        android:enabled="false"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/txt_remarks"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:textSize="15sp"
+                                android:imeOptions="actionNext"
+                                android:inputType="textMultiLine"
+                                android:lines="3"/>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/TextInputStyle"
-                    android:id="@+id/layout_totalintrst"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Interest"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_firstpay"
-                    app:layout_constraintEnd_toEndOf="@+id/layout_firstpay"
-                    app:layout_constraintStart_toEndOf="@+id/layout_monthlypay">
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/txt_totalintrst"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:enabled="false"
-                        android:imeOptions="actionNext"
-                        android:inputType="numberDecimal|none"
-                        android:maxLength="20"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_saveloanentry"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="SUBMIT"
+                android:layout_marginVertical="20dp"
+                android:layout_marginHorizontal="10dp"
+                app:cornerRadius="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/mcv_loan"
+                app:layout_constraintStart_toStartOf="@+id/mcv_loan"
+                app:layout_constraintEnd_toEndOf="@+id/mcv_loan"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/TextInputStyle"
-                    android:id="@+id/layout_remarks"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Remarks"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_totalintrst"
-                    app:layout_constraintStart_toStartOf="@+id/layout_firstpay"
-                    app:layout_constraintEnd_toEndOf="@+id/layout_firstpay">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/txt_remarks"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:textSize="15sp"
-                        android:imeOptions="actionNext"
-                        android:inputType="textMultiLine"
-                        android:lines="3"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_saveloanentry"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="SUBMIT"
-                    android:layout_marginVertical="20dp"
-                    app:cornerRadius="10dp"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_remarks"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </ScrollView>
-    </com.google.android.material.card.MaterialCardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

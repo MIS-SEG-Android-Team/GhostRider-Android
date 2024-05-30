@@ -120,7 +120,7 @@ public class Activity_InventoryEntry extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_inventory_transaction);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Inventory");
+        getSupportActionBar().setTitle("");
 
         lblTransNox = findViewById(R.id.lbl_invTransNox);
         lblItemxx = findViewById(R.id.lbl_inventoryItem);

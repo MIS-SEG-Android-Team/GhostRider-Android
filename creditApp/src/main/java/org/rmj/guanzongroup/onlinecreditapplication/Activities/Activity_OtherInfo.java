@@ -156,7 +156,7 @@ public class Activity_OtherInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_OtherInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Other Info");
+        getSupportActionBar().setTitle("");
 
         tilOthrUser = findViewById(R.id.til_cap_otherUser);
         tilOthrPayr = findViewById(R.id.til_cap_otherPayer);

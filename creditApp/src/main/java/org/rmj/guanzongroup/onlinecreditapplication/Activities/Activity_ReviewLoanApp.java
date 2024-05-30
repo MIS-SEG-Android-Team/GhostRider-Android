@@ -86,7 +86,7 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_ReviewLoanApp);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Review Loan Info");
+        getSupportActionBar().setTitle("");
 
         lblClientNm = findViewById(R.id.lbl_clientNme);
 

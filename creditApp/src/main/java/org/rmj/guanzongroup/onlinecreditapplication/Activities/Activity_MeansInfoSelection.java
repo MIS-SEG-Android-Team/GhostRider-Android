@@ -81,7 +81,7 @@ public class Activity_MeansInfoSelection extends AppCompatActivity  {
         toolbar = findViewById(R.id.toolbar_MeansInfoSelection);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Means Info");
+        getSupportActionBar().setTitle("");
 
         rbEmployed = findViewById(R.id.rb_employed);
         rbSEmployd = findViewById(R.id.rb_sEmployed);

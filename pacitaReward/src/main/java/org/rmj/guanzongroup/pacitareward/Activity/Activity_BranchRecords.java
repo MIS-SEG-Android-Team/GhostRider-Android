@@ -48,7 +48,7 @@ public class Activity_BranchRecords extends AppCompatActivity {
         branch_rec = findViewById(R.id.branch_rec);
 
         setSupportActionBar(toolbar); //set object toolbar as default action bar for activity
-        getSupportActionBar().setTitle("Evaluation History"); //set default title for action bar
+        getSupportActionBar().setTitle(""); //set default title for action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //set back button to toolbar
         getSupportActionBar().setDisplayShowHomeEnabled(true); //enable the back button set on toolbar
 

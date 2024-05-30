@@ -233,7 +233,7 @@ public class Activity_CollectionList extends AppCompatActivity {
 
     private void initWidgets(){
         Toolbar toolbar = findViewById(R.id.toolbar_collectionList);
-        toolbar.setTitle("Daily Collection Plan");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 

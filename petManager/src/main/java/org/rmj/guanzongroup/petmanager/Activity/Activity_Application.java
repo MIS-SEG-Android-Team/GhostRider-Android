@@ -81,7 +81,7 @@ public class Activity_Application extends AppCompatActivity {
             viewPager.setAdapter(new ApplicationPageAdapter(getSupportFragmentManager(), new Fragment_BusinessTripApproval()));
         } else {
             viewPager.setAdapter(new ApplicationPageAdapter(getSupportFragmentManager(), new Fragment_Employee_Applications()));
-            toolbar.setTitle("Approval History");
+            toolbar.setTitle("");
         }
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);

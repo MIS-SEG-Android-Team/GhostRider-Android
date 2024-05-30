@@ -336,7 +336,7 @@ public class Activity_SpouseInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpouseInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Info");
+        getSupportActionBar().setTitle("");
 
 
         txtProvince = findViewById(R.id.txt_bpProvince);

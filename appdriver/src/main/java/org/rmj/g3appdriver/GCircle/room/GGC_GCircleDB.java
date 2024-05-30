@@ -57,6 +57,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DInventoryDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DInventoryMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DItinerary;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLoanTypes;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLocatorSysLog;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcBrand;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcCategory;
@@ -123,6 +124,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EInventoryDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EInventoryMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EItinerary;
 import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTerm;
+import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTypes;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCColor;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCModelCashPrice;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMcBrand;
@@ -215,7 +217,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         ELoanTerm.class,
         EGanadoOnline.class,
         EMCModelCashPrice.class,
-        EEmpLoan.class}, version = 40, exportSchema = false)
+        EEmpLoan.class,
+        ELoanTypes.class}, version = 40, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -287,6 +290,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DPacita pacitaDao();
     public abstract DGanadoOnline ganadoDao();
     public abstract DEmpLoan emploanDao();
+    public abstract DLoanTypes loanTypesDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){

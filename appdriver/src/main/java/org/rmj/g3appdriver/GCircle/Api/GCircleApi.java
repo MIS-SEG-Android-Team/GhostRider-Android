@@ -102,6 +102,7 @@ public class GCircleApi extends WebApi {
     private static final String SUBMIT_PACITA_RESULT = "gcircle/pacita/submit_pacita_result.php";
     private static final String URL_SUBMIT_INQUIRY = "gcircle/ganado/submit_inquiry.php";
     private static final String URL_DOWNLOAD_INQUIRIES = "gcircle/ganado/import_inquiries.php";
+    private static final String URL_IMPORT_LOAN_TYPES = "integsys/param/download_loan_type.php";
 
     public GCircleApi(Application instance) {
         super(instance);
@@ -869,6 +870,15 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_INQUIRIES);
         return LIVE + URL_DOWNLOAD_INQUIRIES;
+    }
+
+    public String getDownloadLoanTypes() {
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_IMPORT_LOAN_TYPES);
+            return LOCAL + URL_IMPORT_LOAN_TYPES;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_IMPORT_LOAN_TYPES);
+        return LIVE + URL_IMPORT_LOAN_TYPES;
     }
 
 }

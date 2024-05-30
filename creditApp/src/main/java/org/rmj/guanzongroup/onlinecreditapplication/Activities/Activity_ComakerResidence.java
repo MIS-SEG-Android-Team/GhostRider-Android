@@ -242,7 +242,7 @@ public class Activity_ComakerResidence extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_CoMakerResidence);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Co-Maker Personal Info");
+        getSupportActionBar().setTitle("");
 
         txtLandMark = findViewById(R.id.txt_landmark);
         txtHouseNox = findViewById(R.id.txt_houseNox);

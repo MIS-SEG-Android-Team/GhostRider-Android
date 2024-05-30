@@ -111,7 +111,7 @@ public class Activity_ApplicantDocuments extends AppCompatActivity {
         poMessage = new MessageBox(Activity_ApplicantDocuments.this);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Applicant Documents");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

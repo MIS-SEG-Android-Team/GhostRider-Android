@@ -2,71 +2,70 @@ package org.rmj.g3appdriver.GCircle.room.Entities;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
+import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import javax.persistence.Table;
-
-@Table(name = "Employee_Loan")
+@Entity(tableName = "Employee_Loan")
 public class EEmpLoan{
 
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "sTransNox")
-    private String sTransNox;
+    public String sTransNox;
 
     @ColumnInfo(name = "dTransact")
-    private String dTransact;
+    public String dTransact;
 
     @ColumnInfo(name = "sEmployID")
-    private String sEmployID;
+    public String sEmployID;
 
     @ColumnInfo(name = "sLoanIDxx")
-    private String sLoanIDxx;
+    public String sLoanIDxx;
 
     @ColumnInfo(name = "nLoanAmtxx")
-    private double nLoanAmtxx;
+    public double nLoanAmtxx = 0.00;
 
     @ColumnInfo(name = "nNetAmtxx")
-    private double nNetAmtxx;
+    public double nNetAmtxx = 0.00;
 
     @ColumnInfo(name = "nActAmtxx")
-    private double nActAmtxx;
+    public double nActAmtxx = 0.00;
 
     @ColumnInfo(name = "sPurposed")
-    private String sPurposed;
+    public String sPurposed;
 
     @ColumnInfo(name = "sRemarks")
-    private String sRemarks;
+    public String sRemarks;
 
     @ColumnInfo(name = "nInterest")
-    private double nInterest;
+    public double nInterest = 0.00;
 
     @ColumnInfo(name = "nPaymTerm")
-    private double nPaymTerm;
+    public double nPaymTerm = 0.00;
 
     @ColumnInfo(name = "dLoanDate")
-    private String dLoanDate;
+    public String dLoanDate;
 
     @ColumnInfo(name = "dFirstPay")
-    private String dFirstPay;
+    public String dFirstPay;
 
     @ColumnInfo(name = "nAmort")
-    private double nAmort;
+    public double nAmort = 0.00;
 
     @ColumnInfo(name = "nBalance")
-    private double nBalance;
+    public double nBalance = 0.00;
 
     @ColumnInfo(name = "cHoldDed")
-    private String cHoldDed;
+    public String cHoldDed;
 
     @ColumnInfo(name = "cTranStat")
-    private String cTranStat;
+    public String cTranStat = "0";
 
     @ColumnInfo(name = "cSendStat")
-    private String cSendStat;
+    public String cSendStat = "0";
 
     @ColumnInfo(name = "dTimeStmp")
-    private String dTimeStmp;
+    public String dTimeStmp;
 
     @NonNull
     public String getsTransNox() {

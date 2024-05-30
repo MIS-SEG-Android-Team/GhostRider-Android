@@ -125,7 +125,7 @@ public class Activity_SpousePensionInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpousePensionInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Pension Info");
+        getSupportActionBar().setTitle("");
 
         spnSector = findViewById(R.id.spn_psnSector);
 

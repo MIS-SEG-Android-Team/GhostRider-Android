@@ -206,7 +206,7 @@ public class Activity_SpouseResidenceInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpouseResidenceInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Residence Info");
+        getSupportActionBar().setTitle("");
 
         txtLandMark = findViewById(R.id.txt_landmark);
         txtHouseNox = findViewById(R.id.txt_houseNox);

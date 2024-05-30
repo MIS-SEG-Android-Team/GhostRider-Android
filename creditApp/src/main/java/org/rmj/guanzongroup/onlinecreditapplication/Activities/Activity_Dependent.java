@@ -191,7 +191,7 @@ public class Activity_Dependent extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_Dependent);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Dependent Info");
+        getSupportActionBar().setTitle("");
 
         tieFullname = findViewById(R.id.tie_cap_dpdFullname);
         tieDpdAgexx = findViewById(R.id.tie_cap_dpdAge);

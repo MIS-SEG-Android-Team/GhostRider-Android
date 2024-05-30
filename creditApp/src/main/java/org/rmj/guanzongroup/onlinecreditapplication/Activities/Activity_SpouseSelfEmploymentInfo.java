@@ -201,7 +201,7 @@ public class Activity_SpouseSelfEmploymentInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpouseSelfEmploymentInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Self Employment Info");
+        getSupportActionBar().setTitle("");
 
         spnBizIndustry = findViewById(R.id.spn_bizIndustry);
         spnMonthOrYr = findViewById(R.id.spn_monthOrYr);

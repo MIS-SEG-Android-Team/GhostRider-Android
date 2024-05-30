@@ -53,31 +53,8 @@ public class Province {
         return message;
     }
 
-    public void insertBulkInfo(List<EProvinceInfo> provinceInfoList){
-        poDao.insertBulkData(provinceInfoList);
-    }
-
     public String getLatestDataTime(){
         return poDao.getLatestDataTime();
-    }
-
-    public LiveData<List<EProvinceInfo>> getAllProvinceInfo(){
-        return poDao.getAllProvinceInfo();
-    }
-
-    public LiveData<String[]> getAllProvinceNames(){
-        return poDao.getAllProvinceNames();
-    }
-
-    public LiveData<String> getProvinceNameFromProvID(String provID) {
-        return poDao.getProvinceNameFromProvID(provID);
-    }
-
-    public Integer GetProvinceRecordsCount(){
-        return poDao.GetProvinceRecordsCount();
-    }
-    public EProvinceInfo CheckIfExist(String fsVal){
-        return poDao.GetProvince(fsVal);
     }
 
     public boolean ImportProvince(){

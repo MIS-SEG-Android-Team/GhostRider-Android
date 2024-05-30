@@ -280,7 +280,7 @@ public class Activity_SpouseEmploymentInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpouseEmploymentInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Employment Info");
+        getSupportActionBar().setTitle("");
 
 
         rgSectorx = findViewById(R.id.rg_sector);

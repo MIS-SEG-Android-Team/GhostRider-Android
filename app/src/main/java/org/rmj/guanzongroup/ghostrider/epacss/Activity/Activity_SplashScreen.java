@@ -69,14 +69,18 @@ public class Activity_SplashScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(VMSplashScreen.class);
+
         setContentView(R.layout.activity_splash_screen);
-        InitActivityResultLaunchers();
+
+        mViewModel = new ViewModelProvider(this).get(VMSplashScreen.class);
         poDialog = new MessageBox(Activity_SplashScreen.this);
-        new TransparentToolbar(Activity_SplashScreen.this).SetupActionbar();
         prgrssBar = findViewById(R.id.progress_splashscreen);
         lblVrsion = findViewById(R.id.lbl_versionInfo);
         lblVrsion.setText(BuildConfig.VERSION_NAME);
+
+        InitActivityResultLaunchers();
+
+        new TransparentToolbar(Activity_SplashScreen.this).SetupActionbar();
 
         startService(new Intent(Activity_SplashScreen.this, GMessagingService.class));
         Log.e(TAG, "Firebase messaging service started.");

@@ -213,7 +213,7 @@ public class Activity_SelfEmployedInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SelfEmployedInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Self Employed Info");
+        getSupportActionBar().setTitle("");
 
         spnBussNtr = findViewById(R.id.spn_businessNature);
         spnBussTyp = findViewById(R.id.spn_businessType);

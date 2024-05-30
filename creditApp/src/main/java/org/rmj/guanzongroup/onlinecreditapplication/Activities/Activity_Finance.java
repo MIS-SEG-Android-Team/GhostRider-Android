@@ -162,7 +162,7 @@ public class Activity_Finance extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_Finance);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Finance Info");
+        getSupportActionBar().setTitle("");
 
 
         spnRelation = findViewById(R.id.spn_financierRelation);

@@ -52,7 +52,7 @@ public class Activity_ItineraryEntry extends AppCompatActivity {
         setContentView(R.layout.activity_itinerary_entry);
 
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Employee Itinerary");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         txtDate = findViewById(R.id.txt_schedDate);

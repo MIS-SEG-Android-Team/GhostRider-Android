@@ -23,6 +23,7 @@ import androidx.lifecycle.AndroidViewModel;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
+import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.ETokenInfo;
 import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
@@ -136,9 +137,15 @@ public class VMSplashScreen extends AndroidViewModel {
                         }
                         loTask.publishProgress(4);
 
+                        Thread.sleep(1000);
+                        if (!new EmployeeLoan(instance).ImportLoanTypes()){
+                            Log.e(TAG, "Unable to import loan types");
+                        }
+                        loTask.publishProgress(5);
+
                         LRDcp loDcp = new LRDcp(instance);
                         if(loDcp.HasCollection()){
-                            loTask.publishProgress(5);
+                            loTask.publishProgress(6);
                         }
 
                         if(!poSession.isLoggedIn()){

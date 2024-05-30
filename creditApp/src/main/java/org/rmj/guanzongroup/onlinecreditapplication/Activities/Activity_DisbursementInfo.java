@@ -158,7 +158,7 @@ public class Activity_DisbursementInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_DisbursementInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Disbursement Info");
+        getSupportActionBar().setTitle("");
 
         tieElctx = findViewById(R.id.tie_cap_dbmElectricity);
         tieWater = findViewById(R.id.tie_cap_dbmWater);

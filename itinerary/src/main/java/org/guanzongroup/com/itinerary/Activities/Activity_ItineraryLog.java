@@ -65,7 +65,7 @@ public class Activity_ItineraryLog extends AppCompatActivity {
         poDialog = new MessageBox(Activity_ItineraryLog.this);
 
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Employee Itinerary");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         lblUser = findViewById(R.id.lbl_username);

@@ -65,7 +65,7 @@ public class Activity_BrandSelection extends AppCompatActivity {
         rvc_brandlist = findViewById(R.id.rv_brands);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar_brand);
-        toolbar.setTitle("Brand Selection");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
     }

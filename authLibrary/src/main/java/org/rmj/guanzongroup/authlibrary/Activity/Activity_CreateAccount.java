@@ -54,7 +54,7 @@ public class Activity_CreateAccount extends AppCompatActivity implements CreateA
         btn_createAccount = findViewById(R.id.btn_createAccount);
 
         setSupportActionBar(toolbar); //set object toolbar as default action bar for activity
-        getSupportActionBar().setTitle("Account Info"); //set default title for action bar
+        getSupportActionBar().setTitle(""); //set default title for action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //set back button to toolbar
         getSupportActionBar().setDisplayShowHomeEnabled(true); //enable the back button set on toolbar
 
