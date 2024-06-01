@@ -1,218 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/panalo_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/panalo_title_banner"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"/>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/panalo_megaphone"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/megaphone"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:layout_constraintWidth_percent="0.2"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintTop_toTopOf="@+id/panalo_title"
+        app:layout_constraintBottom_toBottomOf="@+id/panalo_title"/>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/icon_spin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/panalo_wheel_spin"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toBottomOf="@+id/panalo_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.6"/>
 
     <com.google.android.material.textview.MaterialTextView
         style="@style/HeaderLabelBlack"
-        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Guanzon Panalo"
+        android:text="Raffle Starting . . ."
         android:textSize="18sp"
         android:textColor="?attr/colorPrimary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <LinearLayout
-                android:id="@+id/layout_numbers"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                app:layout_constraintTop_toBottomOf="@+id/title"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/layout_item1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardElevation="5dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                        <com.google.android.material.textview.MaterialTextView
-                            style="@style/PrimaryHeaderStyle"
-                            android:id="@+id/txt_item1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:text="0"
-                            android:gravity="center"
-                            android:padding="20dp"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/layout_item2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardElevation="5dp"
-                    android:layout_marginStart="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                        <com.google.android.material.textview.MaterialTextView
-                            style="@style/PrimaryHeaderStyle"
-                            android:id="@+id/txt_item2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:text="0"
-                            android:gravity="center"
-                            android:padding="20dp"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/layout_item3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardElevation="5dp"
-                    android:layout_marginStart="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                        <com.google.android.material.textview.MaterialTextView
-                            style="@style/PrimaryHeaderStyle"
-                            android:id="@+id/txt_item3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:text="0"
-                            android:gravity="center"
-                            android:padding="20dp"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/layout_item4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardElevation="5dp"
-                    android:layout_marginStart="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                        <com.google.android.material.textview.MaterialTextView
-                            style="@style/PrimaryHeaderStyle"
-                            android:id="@+id/txt_item4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:text="0"
-                            android:gravity="center"
-                            android:padding="20dp"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/layout_item5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardElevation="5dp"
-                    android:layout_marginStart="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                        <com.google.android.material.textview.MaterialTextView
-                            style="@style/PrimaryHeaderStyle"
-                            android:id="@+id/txt_item5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:text="0"
-                            android:gravity="center"
-                            android:padding="20dp"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="3dp"
-                            android:background="?attr/colorPrimary"/>
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_startdraw"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Draw"
-        android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@+id/layout_numbers"
-        app:layout_constraintTop_toBottomOf="@+id/layout_numbers"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_enddraw"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="End Draw"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="@+id/layout_numbers"
-        app:layout_constraintTop_toBottomOf="@+id/layout_numbers"/>
+        app:layout_constraintStart_toStartOf="@+id/icon_spin"
+        app:layout_constraintEnd_toEndOf="@+id/icon_spin"
+        app:layout_constraintTop_toBottomOf="@+id/icon_spin"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -221,7 +55,7 @@
         android:layout_marginHorizontal="10dp"
         android:orientation="vertical"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/btn_enddraw">
+        app:layout_constraintTop_toBottomOf="@+id/icon_spin">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
@@ -237,5 +71,4 @@
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

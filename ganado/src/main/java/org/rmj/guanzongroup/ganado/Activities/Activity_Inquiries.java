@@ -18,10 +18,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ganado.Adapter.InquiryListAdapter;
-import org.rmj.guanzongroup.ganado.Adapter.RecyclerViewAdapter_BrandSelection;
 import org.rmj.guanzongroup.ganado.Dialog.DialogInquiryHistory;
 import org.rmj.guanzongroup.ganado.R;
-import org.rmj.guanzongroup.ganado.ViewModel.VMBrandList;
 import org.rmj.guanzongroup.ganado.ViewModel.VMInquiry;
 
 import java.util.Objects;
