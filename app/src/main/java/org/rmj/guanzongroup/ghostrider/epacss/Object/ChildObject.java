@@ -72,13 +72,9 @@ public class ChildObject {
                 break;
             case "loan application":
                 loIntent = new Intent(context, Activity_IntroductoryQuestion.class);
-//                loIntent = new Intent(context, Activity_EmploymentInfo.class);
-//                loIntent.putExtra("sTransNox", "MX012300009");
-//                loIntent = new Intent(context, Activity_CreditAppHome.class);
                 break;
             case "user application list":
                 loIntent = new Intent(context, Activity_CreditApplications.class);
-//                loIntent.putExtra("app", AppConstants.INTENT_OB_APPLICATION);
                 break;
 
             case "branch application list":
@@ -87,10 +83,6 @@ public class ChildObject {
             case "document scan":
                 loIntent = new Intent(context, Activity_DocumentScan.class);
                 break;
-//            case "":
-//                loIntent = new Intent(context, DCPPhotoCapture.class);
-//                break;
-
             case "ci evaluation list":
                 loIntent = new Intent(context, Activity_CIEvaluationList.class);
                 break;
@@ -122,7 +114,6 @@ public class ChildObject {
 
             case "application approval":
                 loIntent = new Intent(context, Activity_Employee_Applications.class);
-//                loIntent.putExtra("app", AppConstants.INTENT_APPLICATION_APPROVAL);
                 break;
 
             case "application history":

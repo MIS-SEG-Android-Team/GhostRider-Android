@@ -22,6 +22,7 @@ import com.google.android.material.tabs.TabLayout;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERaffleStatus;
 import org.rmj.guanzongroup.ghostrider.Adapter.FragmentAdapter;
 import org.rmj.guanzongroup.ghostrider.Dialog.DialogMechanics;
+import org.rmj.guanzongroup.ghostrider.Dialog.DialogRaffle;
 import org.rmj.guanzongroup.ghostrider.R;
 import org.rmj.guanzongroup.ghostrider.ViewModel.VMPanaloContainer;
 
@@ -137,7 +138,12 @@ public class Fragment_PanaloContainer extends Fragment {
 
             }
         });
+
         initBtnMechanics();
+
+        DialogRaffle diagRaffle = new DialogRaffle(requireActivity());
+        diagRaffle.show();
+
         return view;
     }
 
