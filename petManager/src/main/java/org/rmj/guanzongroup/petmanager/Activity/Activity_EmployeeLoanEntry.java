@@ -30,8 +30,8 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
     private TextInputEditText txt_firstpay;
     private TextInputEditText txt_amort;
     private TextInputEditText txt_totalinterest;
+    private TextInputEditText txt_loandt;
     private MaterialButton btn_saveloanentry;
-    String terms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +48,7 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
         txt_firstpay = findViewById(R.id.txt_firstpay);
         txt_amort = findViewById(R.id.txt_monthlypay);
         txt_totalinterest = findViewById(R.id.txt_totalintrst);
+        txt_loandt = findViewById(R.id.txt_loandt);
         btn_saveloanentry = findViewById(R.id.btn_saveloanentry);
 
         /*TOOL BAR*/

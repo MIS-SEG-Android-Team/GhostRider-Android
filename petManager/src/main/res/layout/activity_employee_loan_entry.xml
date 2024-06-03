@@ -93,11 +93,30 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/TextInputStyle"
+                        android:id="@+id/layout_loandt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Loan Date"
+                        app:layout_constraintTop_toBottomOf="@+id/layout_spnamt"
+                        app:layout_constraintStart_toStartOf="@+id/line_view"
+                        app:layout_constraintEnd_toEndOf="@+id/line_view">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/txt_loandt"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="15sp"
+                            android:imeOptions="actionNext"
+                            android:inputType="none"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/TextInputStyle"
                         android:id="@+id/layout_loanamt"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:hint="Loan Amount"
-                        app:layout_constraintTop_toBottomOf="@+id/layout_spnamt"
+                        app:layout_constraintTop_toBottomOf="@+id/layout_loandt"
                         app:layout_constraintStart_toStartOf="@+id/line_view"
                         app:layout_constraintEnd_toEndOf="@+id/line_view">
 

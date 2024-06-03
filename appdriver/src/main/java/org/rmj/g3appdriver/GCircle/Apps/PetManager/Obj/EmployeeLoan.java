@@ -9,7 +9,9 @@ import androidx.lifecycle.LiveData;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLoanTypes;
+import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTypes;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
@@ -24,13 +26,19 @@ public class EmployeeLoan {
     private GCircleApi loApi;
     private HttpHeaders loHeaders;
     private DLoanTypes poTypes;
+    private DEmpLoan poEmpLoan;
+    private String message;
     public EmployeeLoan(Application context){
         this.context = context;
         this.loApi = new GCircleApi(context);
         this.loHeaders = HttpHeaders.getInstance(context);
         this.poTypes = GGC_GCircleDB.getInstance(context).loanTypesDao();
+        this.poEmpLoan = GGC_GCircleDB.getInstance(context).emploanDao();
     }
 
+    public String GetMessage(){
+        return message;
+    }
     public String[] GetTermConstants(){
         String[] terms = {"36", "24", "18", "12", "6"};
         return terms;
@@ -54,7 +62,6 @@ public class EmployeeLoan {
             if (lsResult.equalsIgnoreCase("error")){
                 return false;
             }else {
-                //{"result":"success","detail":[{"sLoanIDxx":"11003","sLoanName":"CONTG LOAN","cRecdStat":"1","dTimeStmp":"2024-05-29 16:17:12"},{"sLoanIDxx":"11007","sLoanName":"PAGIBIG-MP3","cRecdStat":"1","dTimeStmp":"2024-05-29 16:17:12"},{"sLoanIDxx":"11008","sLoanName":"PAGIBIG-CAL2","cRecdStat":"1","dTimeStmp":"2024-05-29 16:17:12"},{"sLoanIDxx":"11009","sLoanName":"SSS","cRecdStat":"1","dTimeStmp":"2024-05-29 16:17:12"}]}
                 JSONArray loArray = loResult.getJSONArray("detail");
                 for (int i = 0; i < loArray.length(); i++){
                     JSONObject loObj = loArray.getJSONObject(i);
@@ -71,6 +78,37 @@ public class EmployeeLoan {
 
             return true;
         }catch (Exception e){
+            return false;
+        }
+    }
+    public Boolean SaveLoan(EEmpLoan empLoan){
+        try {
+            JSONObject loParams = new JSONObject();
+            loParams.put("sEmployID", empLoan.getsEmployID());
+            loParams.put("dTransact", empLoan.getdTransact());
+            loParams.put("dLoanDate", empLoan.getdLoanDate());
+            loParams.put("sLoanIDxx", empLoan.getsLoanIDxx());
+            loParams.put("nLoanAmtx", empLoan.getnLoanAmtxx());
+            loParams.put("sPurposed", empLoan.getsPurposed());
+
+            String lsResponse = WebClient.sendRequest(loApi.getSubmitLoanEntry(), loParams.toString(), loHeaders.getHeaders());
+            if (lsResponse.isEmpty()){
+                return false;
+            }
+
+            JSONObject loResult = new JSONObject(lsResponse);
+            String lsResult = loResult.getString("result");
+
+            if (lsResult.equalsIgnoreCase("error")){
+                message = loResult.getString("message");
+                return false;
+            }else {
+                poEmpLoan.SaveLoan(empLoan);
+            }
+
+            return true;
+        }catch (Exception e){
+            message = e.getMessage();
             return false;
         }
     }
