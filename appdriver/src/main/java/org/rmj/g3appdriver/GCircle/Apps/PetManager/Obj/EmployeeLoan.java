@@ -112,4 +112,5 @@ public class EmployeeLoan {
             return false;
         }
     }
+    public Boolean ValidateEntry(){}
 }
