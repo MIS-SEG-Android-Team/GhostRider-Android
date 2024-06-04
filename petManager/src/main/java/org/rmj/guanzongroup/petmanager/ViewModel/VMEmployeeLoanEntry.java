@@ -9,7 +9,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
+import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTypes;
+import org.rmj.g3appdriver.lib.Account.pojo.AccountInfo;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 import java.util.List;
 
@@ -17,6 +21,8 @@ public class VMEmployeeLoanEntry extends AndroidViewModel{
     private static final String TAG = VMEmployeeLoanEntry.class.getSimpleName();
     private Context context;
     private EmployeeLoan poLoan;
+    private String message;
+    private AccountInfo loAccount;
 
     public VMEmployeeLoanEntry(@NonNull Application application) {
         super(application);
@@ -28,9 +34,59 @@ public class VMEmployeeLoanEntry extends AndroidViewModel{
     public LiveData<List<ELoanTypes>> GetLoanTypes(){
         return poLoan.GetLoanTypes();
     }
+    public LiveData<EEmpLoan> GetLoanbyTransNox(String sTransNox){
+        return poLoan.GetLoanTransNox(sTransNox);
+    }
     public ArrayAdapter<String> GetTerms(){
         ArrayAdapter<String> termAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, poLoan.GetTermConstants());
         return termAdapter;
+    }
+    public String GenerateID(){
+        return poLoan.CreateUniqueID();
+    }
+    public String CurrentDate(){
+        return poLoan.CurrentDateTime();
+    }
+    public String GetEmpID(){
+        return poLoan.GetEmpID();
+    }
+    public void SaveLoanEntry(EEmpLoan foVal, OnSaveEntry callback){
+        TaskExecutor.Execute(foVal, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.onLoad("Employee Loan", "Saving entry . .");
+            }
+            @Override
+            public Object DoInBackground(Object args) {
+                EEmpLoan loVal = (EEmpLoan) args;
+
+                if (!poLoan.ValidateEntry(loVal)){
+                    message = poLoan.GetMessage();
+                    return false;
+                }else {
+                    if (poLoan.SaveLoan(loVal)){
+                        message = poLoan.GetMessage();
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            @Override
+            public void OnPostExecute(Object object) {
+                Boolean aBoolean = (Boolean) object;
+                if (!aBoolean){
+                    callback.onFailed(message);
+                }else {
+                    callback.onSuccess(message);
+                }
+            }
+        });
+    }
+    public interface OnSaveEntry{
+        void onLoad(String title, String message);
+        void onSuccess(String message);
+        void onFailed(String message);
     }
 
 }

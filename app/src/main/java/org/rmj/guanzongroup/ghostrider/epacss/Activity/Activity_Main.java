@@ -210,6 +210,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View view = navigationView.getHeaderView(0);
+
         viewPager = findViewById(R.id.viewpager);
         imgDept = view.findViewById(R.id.img_deptLogo);
         lblDept = view.findViewById(R.id.lbl_deptNme);

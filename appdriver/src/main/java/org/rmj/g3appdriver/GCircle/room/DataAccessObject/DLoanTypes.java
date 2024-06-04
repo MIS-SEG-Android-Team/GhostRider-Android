@@ -14,7 +14,9 @@ import java.util.List;
 public interface DLoanTypes {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void SaveType(ELoanTypes foType);
-
     @Query("SELECT * FROM Loan_Type")
     LiveData<List<ELoanTypes>> GetTypes();
+    @Query("SELECT sLoanName FROM loan_type WHERE sLoanIDxx = :sIDxx")
+    String GetLoanNm(String sIDxx);
+
 }

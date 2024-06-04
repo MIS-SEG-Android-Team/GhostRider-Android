@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="5dp"
+        app:cardCornerRadius="10dp"
+        app:cardBackgroundColor="@color/zxing_transparent">
+
+        <LinearLayout
+            android:id="@+id/parent_cons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_empinfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/empname"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:gravity="center_vertical"
+                    android:paddingStart="10dp"
+                    android:paddingVertical="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintWidth_percent="0.5"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/emppos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingVertical="10dp"
+                    app:layout_constraintWidth_percent="0.5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/empname" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="?attr/colorPrimary"
+                    app:layout_constraintTop_toBottomOf="@+id/emppos"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_empinstallment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/loantype"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintWidth_percent="0.5"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/loan_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/cross_red"
+                    android:paddingVertical="10dp"
+                    app:layout_constraintWidth_percent="0.5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/loantype"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/loandate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/loantype"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintWidth_percent="0.5"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/loanamt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/loan_status"
+                    app:layout_constraintStart_toEndOf="@+id/loandate"
+                    app:layout_constraintWidth_percent="0.5"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_empbuttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="View Installment"
+                    android:layout_marginHorizontal="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_approve"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_approve"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Approve"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toEndOf="@+id/btn_view"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

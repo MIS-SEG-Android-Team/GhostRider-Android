@@ -34,13 +34,8 @@ import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_C
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_LogCollection;
 import org.rmj.guanzongroup.ghostrider.samsungknox.Activity_Knox;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_BranchApplications;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_CoMaker;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_CreditApplications;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_EmploymentInfo;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_IntroductoryQuestion;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_PersonalInfo;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_SelfEmployedInfo;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_SpouseResidenceInfo;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Application;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_EmployeeLoanEntry;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Employee_Applications;
@@ -182,7 +177,6 @@ public class ChildObject {
             case "employee loan":
                 loIntent = new Intent(context, Activity_EmployeeLoanEntry.class);
                 break;
-
             case "inquiry":
                 loIntent = new Intent(context, Activity_BrandSelection.class);
                 break;

@@ -42,7 +42,6 @@ import org.rmj.guanzongroup.ghostrider.epacss.R;
 import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMAssociateDashboard;
 import org.rmj.guanzongroup.ghostrider.notifications.Adapter.AdapterAnnouncements;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Application;
-import org.rmj.guanzongroup.petmanager.Activity.Activity_Employee_Applications;
 import org.rmj.guanzongroup.petmanager.Adapter.EmployeeApplicationAdapter;
 
 import java.util.List;
@@ -81,7 +80,6 @@ public class Fragment_Associate_Dashboard extends Fragment {
         mViewModel.getEmployeeInfo().observe(getViewLifecycleOwner(), eEmployeeInfo -> {
             try {
                 lblFullNme.setText(eEmployeeInfo.getUserName());
-//                lblEmail.setText(eEmployeeInfo.getEmailAdd());
                 lblUserLvl.setText(DeptCode.parseUserLevel(eEmployeeInfo.getEmpLevID()));
                 lblDept.setText(DeptCode.getDepartmentName(eEmployeeInfo.getDeptIDxx()));
 //                imgUser.setImageResource(AppConstants.getUserIcon(eEmployeeInfo.getUserLevl()));
@@ -122,7 +120,6 @@ public class Fragment_Associate_Dashboard extends Fragment {
         rvCompnyAnouncemnt = view.findViewById(R.id.rvCompnyAnouncemnt);
         rvLeaveApp = view.findViewById(R.id.rvLeaveApp);
         rvBusTripApp = view.findViewById(R.id.rvBusTripApp);
-//        imgUser = view.findViewById(R.id.img_userLogo);
         lblVersion = view.findViewById(R.id.lbl_versionInfo);
     }
 
