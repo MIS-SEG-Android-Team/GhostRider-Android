@@ -39,6 +39,7 @@ import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_Introduc
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Application;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_EmployeeLoanEntry;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Employee_Applications;
+import org.rmj.guanzongroup.petmanager.Activity.Activity_LoanItems;
 
 public class ChildObject {
 
@@ -177,10 +178,16 @@ public class ChildObject {
             case "employee loan":
                 loIntent = new Intent(context, Activity_EmployeeLoanEntry.class);
                 break;
+            case "employee loan history":
+                loIntent = new Intent(context, Activity_LoanItems.class);
+                break;
+            case "employee loan approval":
+                loIntent = new Intent(context, Activity_LoanItems.class);
+                loIntent.putExtra("args", "loanapproval");
+                break;
             case "inquiry":
                 loIntent = new Intent(context, Activity_BrandSelection.class);
                 break;
-
             case "inquiries":
                 loIntent = new Intent(context, Activity_Inquiries.class);
                 break;
