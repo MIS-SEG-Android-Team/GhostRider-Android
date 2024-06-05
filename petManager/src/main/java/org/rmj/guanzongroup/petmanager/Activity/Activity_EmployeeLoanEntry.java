@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -89,21 +90,6 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
         setSupportActionBar(toolbar); //set object toolbar as default action bar for activity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //set back button to toolbar
 
-        String sTransNox = getIntent().getStringExtra("args");
-        if (!sTransNox.isEmpty()){
-            mViewModel.GetLoanbyTransNox(sTransNox).observe(this, new Observer<EEmpLoan>() {
-                @Override
-                public void onChanged(EEmpLoan eEmpLoan) {
-                    if (eEmpLoan != null){
-                        if (!eEmpLoan.getcTranStat().isEmpty() && !eEmpLoan.getcTranStat().equalsIgnoreCase("0")){
-                            installment_layout.setVisibility(View.VISIBLE);
-                            isApproved = true;
-                        }
-                    }
-                }
-            });
-        }
-
         mViewModel.GetLoanTypes().observe(this, new Observer<List<ELoanTypes>>() {
             @Override
             public void onChanged(List<ELoanTypes> eLoanTypes) {
@@ -112,7 +98,7 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
                     List<String> adaptString = new ArrayList<>(); //todo: this is for adapter display
 
                     for (int i = 0; i < eLoanTypes.size(); i++){
-                        poLoanType.put(eLoanTypes.get(i).getsLoanIDxx(), eLoanTypes.get(i).getsLoanNmxx());
+                        poLoanType.put(eLoanTypes.get(i).getsLoanNmxx(), eLoanTypes.get(i).getsLoanIDxx());
                         adaptString.add(eLoanTypes.get(i).getsLoanNmxx());
                     }
 
@@ -146,7 +132,7 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
                 EEmpLoan foLoan = new EEmpLoan();
                 foLoan.setsTransNox(mViewModel.GenerateID());
                 foLoan.setsEmployID(mViewModel.GetEmpID());
-                foLoan.setsLoanIDxx(poLoanType.get(spn_loantype.getText()));
+                foLoan.setsLoanIDxx(poLoanType.get(spn_loantype.getText().toString()));
                 foLoan.setdTransact(mViewModel.CurrentDate());
                 foLoan.setdLoanDate(txt_loandt.getText().toString());
                 foLoan.setnLoanAmtxx(Integer.parseInt(txt_loanamt.getText().toString()));

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
+import org.rmj.guanzongroup.petmanager.Dialog.Dialog_LoanPreview;
 import org.rmj.guanzongroup.petmanager.R;
 import org.rmj.guanzongroup.petmanager.ViewHolder.VH_LoanItems;
 
@@ -65,6 +66,33 @@ public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
             holder.layout_empinfo.setVisibility(View.GONE);
             holder.btn_approve.setVisibility(View.GONE);
         }
+
+        holder.btn_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog_LoanPreview.DialogVal params = new Dialog_LoanPreview.DialogVal();
+
+                params.setsEmpNm(poEmpLoan.GetEmpName());
+                params.setsEmpPos(poEmpLoan.GetEmpDepartment());
+                params.setsLoanType(poEmpLoan.GetLoanName(poLoans.get(position).getsLoanIDxx()));
+                params.setsLoanDate(poLoans.get(position).getdLoanDate());
+                params.setsLoanAmt(String.valueOf(poLoans.get(position).getnLoanAmtxx()));
+                params.setsLoanTerms(String.valueOf(poLoans.get(position).getnPaymTerm()));
+                params.setsLoanStat(cTranStat);
+
+                if (!cTranStat.isEmpty()){
+                    if (Integer.parseInt(cTranStat) > 0){
+                        params.setsFirstPay(poLoans.get(position).getdFirstPay());
+                        params.setsMnthlyPay(String.valueOf(poLoans.get(position).getnNetAmtxx()));
+                        params.setsMnthlyIntrst(String.valueOf(poLoans.get(position).getnInterest()));
+                    }
+                }
+
+                Dialog_LoanPreview prevDialog = new Dialog_LoanPreview(context, params);
+                prevDialog.initDialog();
+                prevDialog.show();
+            }
+        });
     }
     @Override
     public int getItemCount() {

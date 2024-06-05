@@ -1,6 +1,8 @@
 package org.rmj.guanzongroup.petmanager.ViewModel;
 
 import android.app.Application;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -18,6 +20,7 @@ public class VMLoanItems extends AndroidViewModel {
     }
 
     public LiveData<List<EEmpLoan>> GetUserHistory(){
+        Log.d("VMLoanItems", poLoans.GetEmpID());
         return poLoans.GetUserEntries(poLoans.GetEmpID());
     }
     public LiveData<List<EEmpLoan>> GetForApproval(){

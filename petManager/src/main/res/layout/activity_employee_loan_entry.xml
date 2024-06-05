@@ -57,6 +57,7 @@
                         android:layout_height="0dp"
                         android:text="Loan Info"
                         android:gravity="center_vertical"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="@+id/line_view"
                         app:layout_constraintEnd_toEndOf="parent"

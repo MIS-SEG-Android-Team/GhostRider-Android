@@ -11,6 +11,7 @@ import com.google.android.material.textview.MaterialTextView;
 import org.rmj.guanzongroup.petmanager.R;
 
 public class VH_LoanItems extends RecyclerView.ViewHolder {
+    public View view;
     public ConstraintLayout layout_empinfo;
     public MaterialTextView empname;
     public MaterialTextView emppos;
@@ -23,6 +24,7 @@ public class VH_LoanItems extends RecyclerView.ViewHolder {
     public VH_LoanItems(@NonNull View itemView) {
         super(itemView);
 
+        view = itemView;
         layout_empinfo = itemView.findViewById(R.id.layout_empinfo);
         empname = itemView.findViewById(R.id.empname);
         emppos = itemView.findViewById(R.id.emppos);
