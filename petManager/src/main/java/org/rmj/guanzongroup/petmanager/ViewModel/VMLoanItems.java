@@ -20,7 +20,6 @@ public class VMLoanItems extends AndroidViewModel {
     }
 
     public LiveData<List<EEmpLoan>> GetUserHistory(){
-        Log.d("VMLoanItems", poLoans.GetEmpID());
         return poLoans.GetUserEntries(poLoans.GetEmpID());
     }
     public LiveData<List<EEmpLoan>> GetForApproval(){

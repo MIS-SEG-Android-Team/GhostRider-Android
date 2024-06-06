@@ -15,25 +15,24 @@ import org.rmj.guanzongroup.petmanager.Dialog.Dialog_LoanPreview;
 import org.rmj.guanzongroup.petmanager.R;
 import org.rmj.guanzongroup.petmanager.ViewHolder.VH_LoanItems;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
     private Context context;
-    private List<EEmpLoan> poLoans;
     private EmployeeLoan poEmpLoan;
-    private Boolean isAH;
-    private Boolean forApproval;
-    public Adapter_LoanItems(Application context, List<EEmpLoan> poLoans, Boolean isAH, Boolean forApproval){
+    private List<EEmpLoan> poLoans;
+
+    public Adapter_LoanItems(Context context, EmployeeLoan poEmpLoan, List<EEmpLoan> poLoans){
         this.context = context;
+        this.poEmpLoan = poEmpLoan;
         this.poLoans = poLoans;
-        this.poEmpLoan = new EmployeeLoan(context);
-        this.isAH = isAH;
-        this.forApproval = forApproval;
     }
+
     @NonNull
     @Override
     public VH_LoanItems onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_loan_items, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_loan_items, parent, false);
         return new VH_LoanItems(view);
     }
     @Override
@@ -57,17 +56,7 @@ public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
             holder.loan_status.setText("No Status");
         }
 
-        if (isAH && forApproval){
-            holder.empname.setText(poEmpLoan.GetEmpName());
-            holder.emppos.setText(poEmpLoan.GetEmpDepartment());
-            holder.layout_empinfo.setVisibility(View.VISIBLE);
-            holder.btn_approve.setVisibility(View.VISIBLE);
-        }else {
-            holder.layout_empinfo.setVisibility(View.GONE);
-            holder.btn_approve.setVisibility(View.GONE);
-        }
-
-        holder.btn_view.setOnClickListener(new View.OnClickListener() {
+        holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Dialog_LoanPreview.DialogVal params = new Dialog_LoanPreview.DialogVal();

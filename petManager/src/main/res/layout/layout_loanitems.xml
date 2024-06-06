@@ -42,19 +42,39 @@
                 android:paddingVertical="10dp"
                 android:gravity="center"
                 android:elevation="5dp"
+                android:layout_marginHorizontal="15dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputStyle"
+                android:id="@+id/layout_search"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Search Entry"
+                app:layout_constraintTop_toBottomOf="@+id/view_title"
+                app:layout_constraintStart_toStartOf="@+id/view_title"
+                app:layout_constraintEnd_toEndOf="@+id/view_title">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txt_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:imeOptions="actionNext"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rec_loanitems"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintTop_toBottomOf="@+id/view_title"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:layout_marginVertical="5dp"
+                app:layout_constraintTop_toBottomOf="@+id/layout_search"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/layout_search"
+                app:layout_constraintEnd_toEndOf="@+id/layout_search"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
