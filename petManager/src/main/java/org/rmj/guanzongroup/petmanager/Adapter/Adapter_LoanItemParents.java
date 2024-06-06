@@ -2,6 +2,7 @@ package org.rmj.guanzongroup.petmanager.Adapter;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,7 @@ public class Adapter_LoanItemParents extends RecyclerView.Adapter<VH_LoanItemPar
     private Boolean forApproval;
     private HashMap<String, List< EEmpLoan>> poLoans;
     private HashMap<String, List<EEmpLoan>> poLoansFilter;
-    private final ItemFilter poFilter;
+    private ItemFilter poFilter;
     public Adapter_LoanItemParents(Application context, HashMap<String, List<EEmpLoan>> poLoans, Boolean isAH, Boolean forApproval){
         this.context = context;
         this.poLoans = poLoans;
@@ -33,7 +34,10 @@ public class Adapter_LoanItemParents extends RecyclerView.Adapter<VH_LoanItemPar
         this.poEmpLoan = new EmployeeLoan(context);
         this.isAH = isAH;
         this.forApproval = forApproval;
-        this.poFilter = new ItemFilter(this);
+        //this.poFilter = new ItemFilter(this);
+    }
+    public interface OnFilter{
+        void onFiltered(String text);
     }
     public ItemFilter getFilter(){
         return poFilter;
@@ -58,9 +62,16 @@ public class Adapter_LoanItemParents extends RecyclerView.Adapter<VH_LoanItemPar
         List<String> keySet = new ArrayList<>(poLoansFilter.keySet());
         List<EEmpLoan> foLoans = poLoansFilter.get(keySet.get(position));
 
-        Adapter_LoanItems loChildAdapter = new Adapter_LoanItems(context, poEmpLoan, foLoans);
-        holder.rec_parentitems.setAdapter(loChildAdapter);
-        holder.rec_parentitems.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+        poFilter = new ItemFilter(this, new OnFilter() {
+            @Override
+            public void onFiltered(String text) {
+                Log.d("ADAPTER TEXT", text);
+
+                Adapter_LoanItems loChildAdapter = new Adapter_LoanItems(context, text, poEmpLoan, foLoans);
+                holder.rec_parentitems.setAdapter(loChildAdapter);
+                holder.rec_parentitems.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+            }
+        });
     }
     @Override
     public int getItemCount() {
@@ -69,8 +80,10 @@ public class Adapter_LoanItemParents extends RecyclerView.Adapter<VH_LoanItemPar
 
     public class ItemFilter extends Filter{
         private final Adapter_LoanItemParents loAdapterParent;
-        public ItemFilter(Adapter_LoanItemParents loAdapterParent){
+        private OnFilter mListener;
+        public ItemFilter(Adapter_LoanItemParents loAdapterParent, OnFilter mListener){
             this.loAdapterParent = loAdapterParent;
+            this.mListener = mListener;
         }
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
@@ -97,6 +110,8 @@ public class Adapter_LoanItemParents extends RecyclerView.Adapter<VH_LoanItemPar
         }
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
+            mListener.onFiltered(constraint.toString());
+
             loAdapterParent.poLoansFilter = (HashMap<String, List<EEmpLoan>>) results.values;
             this.loAdapterParent.notifyDataSetChanged();
         }

@@ -22,9 +22,11 @@ public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
     private Context context;
     private EmployeeLoan poEmpLoan;
     private List<EEmpLoan> poLoans;
+    private String textFilter;
 
-    public Adapter_LoanItems(Context context, EmployeeLoan poEmpLoan, List<EEmpLoan> poLoans){
+    public Adapter_LoanItems(Context context, String textFilter, EmployeeLoan poEmpLoan, List<EEmpLoan> poLoans){
         this.context = context;
+        this.textFilter = textFilter;
         this.poEmpLoan = poEmpLoan;
         this.poLoans = poLoans;
     }
