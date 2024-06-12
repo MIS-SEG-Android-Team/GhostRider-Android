@@ -15,9 +15,7 @@ import com.google.android.material.textview.MaterialTextView;
 import org.rmj.guanzongroup.petmanager.R;
 
 public class Dialog_LoanPreview {
-    private Context context;
     private AlertDialog poDialogx;
-    private DialogVal loVal;
     private MaterialTextView empname;
     private MaterialTextView emppos;
     private MaterialTextView loanname;
@@ -29,13 +27,12 @@ public class Dialog_LoanPreview {
     private MaterialTextView txt_firstpay;
     private MaterialTextView txt_mnthlypay;
     private MaterialTextView txt_mnthlintrst;
-    public Dialog_LoanPreview(Context context, DialogVal loVal){
-        this.context = context;
-        this.loVal = loVal;
-    }
-    public void initDialog(){
-        AlertDialog.Builder poBuilder = new AlertDialog.Builder(context);
+    private View headline;
+    public Dialog_LoanPreview(Context context, DialogVal loVal, Boolean showEmpNm){
+
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_loanpreview, null);
+
+        AlertDialog.Builder poBuilder = new AlertDialog.Builder(context);
         poBuilder.setCancelable(false)
                 .setView(view);
         poDialogx = poBuilder.create();
@@ -52,38 +49,65 @@ public class Dialog_LoanPreview {
         txt_firstpay = view.findViewById(R.id.txt_firstpay);
         txt_mnthlypay = view.findViewById(R.id.txt_mnthlypay);
         txt_mnthlintrst = view.findViewById(R.id.txt_mnthlintrst);
+        headline = view.findViewById(R.id.headline);
 
-        empname.setText(loVal.getsEmpNm());
-        emppos.setText(loVal.getsEmpPos());
         loanname.setText(loVal.getsLoanType());
         loandate.setText(loVal.getsLoanDate());
         loanamt.setText(loVal.getsLoanAmt());
         loanterms.setText(loVal.getsLoanTerms() + " Month/s");
 
-        if (!loVal.getsLoanStat().isEmpty()){
-            if (Integer.parseInt(loVal.getsLoanStat()) > 0){
-                loanstat.setText("Approved");
-                loanstat.setTextColor(Color.GREEN);
+        if (showEmpNm){
+            empname.setVisibility(View.VISIBLE);
+            emppos.setVisibility(View.VISIBLE);
+            headline.setVisibility(View.VISIBLE);
 
-                //todo: show computed details for installment, if loan approved
-                layout_installment.setVisibility(View.VISIBLE);
-                
-                txt_firstpay.setText(loVal.getsFirstPay());
-                txt_mnthlypay.setText(loVal.getsMnthlyPay());
-                txt_mnthlintrst.setText(loVal.getsMnthlyIntrst());
+            empname.setText(loVal.getsEmpNm());
+            emppos.setText(loVal.getsEmpPos());
+        }else {
+            empname.setVisibility(View.GONE);
+            emppos.setVisibility(View.GONE);
+            headline.setVisibility(View.GONE);
+        }
+
+        String cSendStat = loVal.getcSendStat();
+        String cTranStat = loVal.getsLoanStat();
+
+        if (!cSendStat.isEmpty()){
+            loanstat.setText("Pending for Upload");
+            loanstat.setTextColor(Color.RED);
+        }else {
+            if (Integer.parseInt(cSendStat) > 0){
+                if (!cTranStat.isEmpty()){
+                    if (Integer.parseInt(cTranStat) > 0){
+                        loanstat.setText("Approved");
+                        loanstat.setTextColor(Color.GREEN);
+
+                        //todo: show computed details for installment, if loan approved
+                        layout_installment.setVisibility(View.VISIBLE);
+
+                        txt_firstpay.setText(loVal.getsFirstPay());
+                        txt_mnthlypay.setText(loVal.getsMnthlyPay());
+                        txt_mnthlintrst.setText(loVal.getsMnthlyIntrst());
+                    }else {
+                        loanstat.setText("Waiting for Approval");
+                        loanstat.setTextColor(Color.RED);
+                    }
+                }else {
+                    loanstat.setText("Uploaded");
+                    loanstat.setTextColor(Color.GREEN);
+                }
             }else {
-                loanstat.setText("Pending");
+                loanstat.setText("Pending for Upload");
                 loanstat.setTextColor(Color.RED);
             }
-        }else {
-            loanstat.setText("Pending");
-            loanstat.setTextColor(Color.RED);
         }
     }
     public void show(){
-        poDialogx.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        poDialogx.getWindow().getAttributes().windowAnimations = org.rmj.g3appdriver.R.style.PopupAnimation;
-        poDialogx.show();
+        if (!poDialogx.isShowing()){
+            poDialogx.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            poDialogx.getWindow().getAttributes().windowAnimations = org.rmj.g3appdriver.R.style.PopupAnimation;
+            poDialogx.show();
+        }
     }
     public static class DialogVal{
         String sEmpNm;
@@ -93,6 +117,7 @@ public class Dialog_LoanPreview {
         String sLoanAmt;
         String sLoanTerms;
         String sLoanStat;
+        String cSendStat;
         String sFirstPay;
         String sMnthlyPay;
         String sMnthlyIntrst;
@@ -143,6 +168,14 @@ public class Dialog_LoanPreview {
 
         public void setsLoanTerms(String sLoanTerms) {
             this.sLoanTerms = sLoanTerms;
+        }
+
+        public String getcSendStat() {
+            return cSendStat;
+        }
+
+        public void setcSendStat(String cSendStat) {
+            this.cSendStat = cSendStat;
         }
 
         public String getsLoanStat() {

@@ -11,10 +11,9 @@ import androidx.lifecycle.LiveData;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTypes;
-import org.rmj.g3appdriver.lib.Account.pojo.AccountInfo;
+import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
-
 import java.util.List;
 
 public class VMEmployeeLoanEntry extends AndroidViewModel{
@@ -22,20 +21,18 @@ public class VMEmployeeLoanEntry extends AndroidViewModel{
     private Context context;
     private EmployeeLoan poLoan;
     private String message;
-    private AccountInfo loAccount;
+    private ConnectionUtil poConnect;
 
     public VMEmployeeLoanEntry(@NonNull Application application) {
         super(application);
 
         this.context = application;
         this.poLoan = new EmployeeLoan(application);
+        this.poConnect = new ConnectionUtil(application);
     }
 
     public LiveData<List<ELoanTypes>> GetLoanTypes(){
         return poLoan.GetLoanTypes();
-    }
-    public LiveData<EEmpLoan> GetLoanbyTransNox(String sTransNox){
-        return poLoan.GetLoanTransNox(sTransNox);
     }
     public ArrayAdapter<String> GetTerms(){
         ArrayAdapter<String> termAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, poLoan.GetTermConstants());
@@ -63,14 +60,20 @@ public class VMEmployeeLoanEntry extends AndroidViewModel{
                 if (!poLoan.ValidateEntry(loVal)){
                     message = poLoan.GetMessage();
                     return false;
-                }else {
-                    if (poLoan.SaveLoan(loVal)){
-                        message = poLoan.GetMessage();
-                        return false;
-                    }
-                }
+                }else{
+                    //todo: save to local first
+                    poLoan.SaveLoan(loVal);
 
-                return true;
+                    //todo: if connected to server, upload to server
+                    if (poConnect.isDeviceConnected()){
+                        if (!poLoan.UploadLoanEntry(loVal)){
+                            message = poLoan.GetMessage();
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
             }
             @Override
             public void OnPostExecute(Object object) {

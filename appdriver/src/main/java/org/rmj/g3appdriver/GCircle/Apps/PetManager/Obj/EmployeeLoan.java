@@ -1,7 +1,12 @@
 package org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj;
 
 import android.app.Application;
+import android.content.Context;
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
@@ -87,17 +92,54 @@ public class EmployeeLoan {
         String[] terms = {"36", "24", "18", "12", "6"};
         return terms;
     }
+    public String GetStatus(String cSendStat, String cTranStat){
+        //todo: set upload status
+        if (cSendStat.isEmpty()){
+            return "Pending for Upload";
+        }else {
+            //todo: if uploaded, set loan approval status else set send status
+            if (Integer.parseInt(cSendStat) > 0){
+                if (!cTranStat.isEmpty()){
+                    if (Integer.parseInt(cTranStat) > 0){
+                        return "Approved";
+                    }else {
+                        return "Waiting for Approval";
+                    }
+                }else {
+                    return "Uploaded";
+                }
+            }else {
+                return "Pending for Upload";
+            }
+        }
+    }
     public LiveData<List<ELoanTypes>> GetLoanTypes(){
         return poTypes.GetTypes();
-    }
-    public LiveData<EEmpLoan> GetLoanTransNox(String sTransNox){
-        return poEmpLoan.GetLoanTransnox(sTransNox);
     }
     public LiveData<List<EEmpLoan>> GetUserEntries(String sEmpID){
         return poEmpLoan.GetUserEntries(sEmpID);
     }
     public LiveData<List<EEmpLoan>> GetForApproval(){
         return poEmpLoan.GetForApproval();
+    }
+    public Boolean UploadPendingEntries(){
+        try {
+            List<EEmpLoan> offEntries =  poEmpLoan.GetOfflineEntries();
+            for (int i = 0; i < offEntries.size(); i++){
+                if (!UploadLoanEntry(offEntries.get(i))){
+                    Log.d(getClass().getSimpleName(), "Unable to send loan entry " + offEntries.get(i).getsTransNox() + ". " + message);
+                }else {
+                    Log.d(getClass().getSimpleName(), "Loan entry " + offEntries.get(i).getsTransNox() + "uploaded successfully");
+                }
+
+                Thread.sleep(1000);
+            }
+
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
     public Boolean ImportLoanTypes(){
         try {
@@ -162,11 +204,11 @@ public class EmployeeLoan {
 
         return true;
     }
-    public Boolean SaveLoan(EEmpLoan empLoan){
+    public void SaveLoan(EEmpLoan empLoan){
+        poEmpLoan.SaveLoan(empLoan);
+    }
+    public Boolean UploadLoanEntry(EEmpLoan empLoan){
         try {
-
-            poEmpLoan.SaveLoan(empLoan);
-
             JSONObject loParams = new JSONObject();
             loParams.put("sEmployID", empLoan.getsEmployID());
             loParams.put("dTransact", empLoan.getdTransact());
@@ -180,9 +222,11 @@ public class EmployeeLoan {
                 return false;
             }
 
-            JSONObject loResult = new JSONObject(lsResponse);
-            String lsResult = loResult.getString("result");
+            Log.d("TAG SAVE LOAN", lsResponse);
 
+            JSONObject loResult = new JSONObject(lsResponse);
+
+            String lsResult = loResult.getString("result");
             if (lsResult.equalsIgnoreCase("error")){
                 message = loResult.getString("message");
                 return false;

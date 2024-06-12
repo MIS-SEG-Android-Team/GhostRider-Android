@@ -45,12 +45,9 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 public class Activity_Browser extends AppCompatActivity {
     private static final String TAG = Activity_Browser.class.getSimpleName();
-
     private MaterialToolbar toolbar;
     private ProgressBar progressBar;
     private WebView wbBrowser;
-    private EmployeeSession poSession;
-
     private String mCM;
     private ValueCallback<Uri> mUM;
     private ValueCallback<Uri[]> mUMA;
@@ -62,15 +59,16 @@ public class Activity_Browser extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browser);
+
         toolbar = findViewById(R.id.toolbar_gBrowser);
         progressBar = findViewById(R.id.progress_gBrowser);
         wbBrowser = findViewById(R.id.webview_gBrowser);
-        poSession = EmployeeSession.getInstance(Activity_Browser.this);
         toolbar.setTitle("");
+
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        ConfigureAppBrowser();
 
+        ConfigureAppBrowser();
         LoadLink();
     }
 
@@ -85,7 +83,7 @@ public class Activity_Browser extends AppCompatActivity {
         if(item.getItemId() == android.R.id.home){
             MessageBox loMessage = new MessageBox(Activity_Browser.this);
             loMessage.initDialog();
-            loMessage.setTitle("Health Checklist");
+            loMessage.setTitle("App Browser");
             loMessage.setMessage("Are you sure you want to exit?");
             loMessage.setPositiveButton("Exit", (view, dialog) -> {
                 dialog.dismiss();
@@ -102,11 +100,14 @@ public class Activity_Browser extends AppCompatActivity {
         WebSettings webSettings = wbBrowser.getSettings();
         webSettings.setBuiltInZoomControls(true);
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setLoadWithOverviewMode(true);
+        webSettings.setUseWideViewPort(true);
     }
 
-
     private void LoadLink(){
-        wbBrowser.loadUrl("https://restgk.guanzongroup.com.ph/system/health_checklist/checklist_entry.php?brc="+poSession.getBranchCode());
+        String url = getIntent().getStringExtra("url_link");
+
+        wbBrowser.loadUrl(url);
         wbBrowser.setWebViewClient(new AppBrowserWebViewClient());
         wbBrowser.setWebChromeClient(new AppBrowserChromeClient());
     }
@@ -114,19 +115,20 @@ public class Activity_Browser extends AppCompatActivity {
     class AppBrowserWebViewClient extends android.webkit.WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            wbBrowser.loadUrl(getIntent().getStringExtra("url_link"));
             return super.shouldOverrideUrlLoading(view, request);
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            progressBar.setVisibility(View.VISIBLE);
             super.onPageStarted(view, url, favicon);
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            urlClipBoard = url;
             super.onPageFinished(view, url);
+            urlClipBoard = url;
         }
     }
 

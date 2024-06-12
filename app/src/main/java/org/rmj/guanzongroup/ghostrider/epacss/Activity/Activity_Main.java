@@ -30,7 +30,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
@@ -77,7 +77,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     private ExpandableListDrawerAdapter listAdapter;
     private ExpandableListView expListView;
     private DrawerLayout drawer;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
 
     private final List<ParentObject> poParentLst = new ArrayList<>();
     private List<ChildObject> poChildLst;
@@ -86,9 +86,12 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+
         mViewModel = new ViewModelProvider(this).get(VMMainActivity.class);
         poNetRecvr = mViewModel.getInternetReceiver();
-        setContentView(R.layout.activity_main);
+
         initWidgets();
         InitUserFeatures();
         initReceiver();
@@ -99,8 +102,13 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 imgDept.setImageResource(AppDeptIcon.getIcon(eEmployeeInfo.getDeptIDxx()));
                 lblDept.setText(DeptCode.getDepartmentName(eEmployeeInfo.getDeptIDxx()));
                 cSlfiex = eEmployeeInfo.getSlfieLog().equalsIgnoreCase("1");
+
                 Fragment[] loFragment = new Fragment[]{mViewModel.GetUserFragments(eEmployeeInfo)};
-                viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), loFragment));
+
+                FragmentAdapter loAdapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
+                loAdapter.initFragments(loFragment);
+
+                viewPager.setAdapter(loAdapter);
             } catch (Exception e){
                 e.printStackTrace();
             }

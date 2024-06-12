@@ -19,6 +19,7 @@ import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
 import org.rmj.guanzongroup.petmanager.Adapter.Adapter_LoanItemParents;
 import org.rmj.guanzongroup.petmanager.Adapter.Adapter_LoanItems;
+import org.rmj.guanzongroup.petmanager.Dialog.Dialog_LoanPreview;
 import org.rmj.guanzongroup.petmanager.R;
 import org.rmj.guanzongroup.petmanager.ViewModel.VMLoanItems;
 
@@ -80,7 +81,13 @@ public class Activity_LoanItems extends AppCompatActivity {
                                     }
                                 }
 
-                                rcvAdapter = new Adapter_LoanItemParents(getApplication(), mapVal, true, true);
+                                rcvAdapter = new Adapter_LoanItemParents(getApplication(), mapVal, true, true, new Adapter_LoanItemParents.onDisplayPreview() {
+                                    @Override
+                                    public void onDisplay(Dialog_LoanPreview.DialogVal loDetails, Boolean showEmpNm) {
+                                        Dialog_LoanPreview prevDialog = new Dialog_LoanPreview(Activity_LoanItems.this, loDetails, showEmpNm);
+                                        prevDialog.show();
+                                    }
+                                });
 
                                 rcvAdapter.notifyDataSetChanged();
                                 rec_loanitems.setAdapter(rcvAdapter);
@@ -115,13 +122,25 @@ public class Activity_LoanItems extends AppCompatActivity {
                         }
 
                         if (Integer.parseInt(mViewModel.GetUserLevel()) > DeptCode.LEVEL_RANK_FILE){
-                            rcvAdapter = new Adapter_LoanItemParents(getApplication(), mapVal, true, false);
+                            rcvAdapter = new Adapter_LoanItemParents(getApplication(), mapVal, true, false, new Adapter_LoanItemParents.onDisplayPreview() {
+                                @Override
+                                public void onDisplay(Dialog_LoanPreview.DialogVal loDetails, Boolean showEmpNm) {
+                                    Dialog_LoanPreview prevDialog = new Dialog_LoanPreview(Activity_LoanItems.this, loDetails, showEmpNm);
+                                    prevDialog.show();
+                                }
+                            });
 
                             rcvAdapter.notifyDataSetChanged();
                             rec_loanitems.setAdapter(rcvAdapter);
                             rec_loanitems.setLayoutManager(new LinearLayoutManager(Activity_LoanItems.this, LinearLayoutManager.VERTICAL, false));
                         }else {
-                            rcvAdapter = new Adapter_LoanItemParents(getApplication(), mapVal, false, false);
+                            rcvAdapter = new Adapter_LoanItemParents(getApplication(), mapVal, false, false, new Adapter_LoanItemParents.onDisplayPreview() {
+                                @Override
+                                public void onDisplay(Dialog_LoanPreview.DialogVal loDetails, Boolean showEmpNm) {
+                                    Dialog_LoanPreview prevDialog = new Dialog_LoanPreview(Activity_LoanItems.this, loDetails, showEmpNm);
+                                    prevDialog.show();
+                                }
+                            });
 
                             rcvAdapter.notifyDataSetChanged();
                             rec_loanitems.setAdapter(rcvAdapter);
@@ -136,13 +155,11 @@ public class Activity_LoanItems extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 try{
-                    if(s != null) {
-                        if (!s.toString().trim().isEmpty()) {
-                            String query = s.toString();
-                            rcvAdapter.getFilter().filter(query);
-                            rcvAdapter.notifyDataSetChanged();
-                        }
-                    }
+
+                    String query = s.toString();
+                    rcvAdapter.getFilter().filter(query);
+                    rcvAdapter.notifyDataSetChanged();
+
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -150,13 +167,9 @@ public class Activity_LoanItems extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try{
-                    if(s != null) {
-                        if (!s.toString().trim().isEmpty()) {
-                            String query = s.toString();
-                            rcvAdapter.getFilter().filter(query);
-                            rcvAdapter.notifyDataSetChanged();
-                        }
-                    }
+                    String query = s.toString();
+                    rcvAdapter.getFilter().filter(query);
+                    rcvAdapter.notifyDataSetChanged();
                 } catch (Exception e){
                     e.printStackTrace();
                 }

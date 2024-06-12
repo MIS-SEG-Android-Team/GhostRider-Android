@@ -2,27 +2,22 @@ package org.rmj.guanzongroup.pacitareward.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
-
+import androidx.viewpager2.widget.ViewPager2;
 import android.os.Bundle;
 import android.view.View;
-
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textview.MaterialTextView;
-
 import org.rmj.guanzongroup.pacitareward.Adapter.Fragment_BranchListAdapter;
 import org.rmj.guanzongroup.pacitareward.Fragments.Fragment_BranchList;
 import org.rmj.guanzongroup.pacitareward.Fragments.Fragment_HistoryEval;
 import org.rmj.guanzongroup.pacitareward.R;
-
-import java.util.List;
 import java.util.Objects;
 
 public class Activity_BranchList extends AppCompatActivity {
     private MaterialToolbar toolbar;
     private TabLayout tabLayout;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
     private MaterialTextView title;
 
     @Override
@@ -52,11 +47,13 @@ public class Activity_BranchList extends AppCompatActivity {
             }
         });
 
-        viewPager.setAdapter(new Fragment_BranchListAdapter(getSupportFragmentManager(), fragments));
-        tabLayout.setupWithViewPager(viewPager, true);
-
         Objects.requireNonNull(tabLayout.getTabAt(0)).setIcon(R.drawable.baseline_view_list_24);
         Objects.requireNonNull(tabLayout.getTabAt(1)).setIcon(R.drawable.baseline_history_24);
+
+        Fragment_BranchListAdapter loAdapter = new Fragment_BranchListAdapter(getSupportFragmentManager(), getLifecycle());
+        loAdapter.initFragments(fragments);
+
+        viewPager.setAdapter(loAdapter);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -66,6 +63,8 @@ public class Activity_BranchList extends AppCompatActivity {
                 } else if (tab.getPosition() == 1) {
                     title.setText("Evaluation History");
                 }
+
+                viewPager.setCurrentItem(tab.getPosition());
             }
 
             @Override

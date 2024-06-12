@@ -13,14 +13,11 @@ package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_Log_Client_Detail;
@@ -29,19 +26,7 @@ import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_Lo
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_Log_Paid_Transaction;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_Log_PromiseToPay;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
-
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.android.material.divider.MaterialDivider;
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.imageview.ShapeableImageView;
-import  com.google.android.material.checkbox.MaterialCheckBox;
 
 import java.util.Objects;
 
@@ -59,7 +44,9 @@ public class Activity_TransactionDetail extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_transactionlog);
+
         instance = this;
         transNox = getIntent().getStringExtra("sTransNox");
         acctNox = getIntent().getStringExtra("acctNox");
@@ -76,14 +63,13 @@ public class Activity_TransactionDetail extends AppCompatActivity {
 
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar_transaction);
+        ViewPager2 viewPager = findViewById(R.id.viewpager_transaction);
+
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
-        ViewPager viewPager = findViewById(R.id.viewpager_transaction);
-
         getSupportActionBar().setTitle("");
 
-        viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), getTransactionFragment(remCodex)));
+        viewPager.setAdapter(new FragmentAdapter(getTransactionFragment(remCodex)));
     }
 
     @Override
@@ -99,22 +85,21 @@ public class Activity_TransactionDetail extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static class FragmentAdapter extends FragmentStatePagerAdapter {
+    public static class FragmentAdapter extends FragmentStateAdapter {
         private final Fragment fragment;
+        public FragmentAdapter(@NonNull Fragment fragment) {
+            super(fragment);
 
-        public FragmentAdapter(@NonNull FragmentManager fm, Fragment fragment) {
-            super(fm);
             this.fragment = fragment;
         }
 
         @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             return fragment;
         }
-
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return 1;
         }
     }

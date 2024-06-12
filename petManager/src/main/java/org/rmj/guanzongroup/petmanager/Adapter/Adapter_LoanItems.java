@@ -1,34 +1,33 @@
 package org.rmj.guanzongroup.petmanager.Adapter;
 
-import android.app.Application;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
 import org.rmj.guanzongroup.petmanager.Dialog.Dialog_LoanPreview;
 import org.rmj.guanzongroup.petmanager.R;
 import org.rmj.guanzongroup.petmanager.ViewHolder.VH_LoanItems;
-
-import java.util.HashMap;
 import java.util.List;
 
 public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
     private Context context;
     private EmployeeLoan poEmpLoan;
     private List<EEmpLoan> poLoans;
-    private String textFilter;
+    private onSelectDetails callBack;
+    public interface onSelectDetails{
+        void onSelectData(Dialog_LoanPreview.DialogVal loVal);
+    }
 
-    public Adapter_LoanItems(Context context, String textFilter, EmployeeLoan poEmpLoan, List<EEmpLoan> poLoans){
+    public Adapter_LoanItems(Context context, EmployeeLoan poEmpLoan, List<EEmpLoan> poLoans, onSelectDetails callBack){
         this.context = context;
-        this.textFilter = textFilter;
         this.poEmpLoan = poEmpLoan;
         this.poLoans = poLoans;
+        this.callBack = callBack;
     }
 
     @NonNull
@@ -40,7 +39,9 @@ public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
     @Override
     public void onBindViewHolder(@NonNull VH_LoanItems holder, int position) {
         String loanNm = poEmpLoan.GetLoanName(poLoans.get(position).getsLoanIDxx());
+        String cSendStat = poLoans.get(position).getcSendStat();
         String cTranStat = poLoans.get(position).getcTranStat();
+        String loanStat = poEmpLoan.GetStatus(cSendStat, cTranStat);
         String loanDt = poLoans.get(position).getdLoanDate();
         String loanAmt = String.valueOf(poLoans.get(position).getnLoanAmtxx());
 
@@ -48,14 +49,24 @@ public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
         holder.loandate.setText(loanDt);
         holder.loanamt.setText(loanAmt);
 
-        if (!cTranStat.isEmpty()){
-            if (Integer.parseInt(cTranStat) > 0){
-                holder.loan_status.setText("Approved");
-            }else {
-                holder.loan_status.setText("Pending");
-            }
+        holder.loan_status.setText(loanStat);
+        if (cSendStat.isEmpty()){
+            holder.loan_status.setTextColor(Color.RED);
         }else {
-            holder.loan_status.setText("No Status");
+            //todo: if uploaded, set loan approval status else set send status
+            if (Integer.parseInt(cSendStat) > 0){
+                if (!cTranStat.isEmpty()){
+                    if (Integer.parseInt(cTranStat) > 0){ //APPROVED
+                        holder.loan_status.setTextColor(Color.GREEN);
+                    }else { //PENDING
+                        holder.loan_status.setTextColor(Color.RED);
+                    }
+                }else { //UPLOADED
+                    holder.loan_status.setTextColor(Color.GREEN);
+                }
+            }else {
+                holder.loan_status.setTextColor(Color.RED);
+            }
         }
 
         holder.view.setOnClickListener(new View.OnClickListener() {
@@ -63,12 +74,11 @@ public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
             public void onClick(View v) {
                 Dialog_LoanPreview.DialogVal params = new Dialog_LoanPreview.DialogVal();
 
-                params.setsEmpNm(poEmpLoan.GetEmpName());
-                params.setsEmpPos(poEmpLoan.GetEmpDepartment());
                 params.setsLoanType(poEmpLoan.GetLoanName(poLoans.get(position).getsLoanIDxx()));
                 params.setsLoanDate(poLoans.get(position).getdLoanDate());
                 params.setsLoanAmt(String.valueOf(poLoans.get(position).getnLoanAmtxx()));
                 params.setsLoanTerms(String.valueOf(poLoans.get(position).getnPaymTerm()));
+                params.setcSendStat(cSendStat);
                 params.setsLoanStat(cTranStat);
 
                 if (!cTranStat.isEmpty()){
@@ -79,9 +89,8 @@ public class Adapter_LoanItems extends RecyclerView.Adapter<VH_LoanItems> {
                     }
                 }
 
-                Dialog_LoanPreview prevDialog = new Dialog_LoanPreview(context, params);
-                prevDialog.initDialog();
-                prevDialog.show();
+                //TODO: PASS DETAILS ON LISTENER TO DISPLAY ON DIALOG
+                callBack.onSelectData(params);
             }
         });
     }

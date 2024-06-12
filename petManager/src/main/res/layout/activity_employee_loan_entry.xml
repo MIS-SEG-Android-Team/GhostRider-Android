@@ -108,7 +108,10 @@
                             android:layout_height="match_parent"
                             android:textSize="15sp"
                             android:imeOptions="actionNext"
-                            android:inputType="none"/>
+                            android:inputType="none"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusedByDefault="false"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -224,7 +227,8 @@
                                 android:layout_height="match_parent"
                                 android:textSize="15sp"
                                 android:imeOptions="actionNext"
-                                android:inputType="none"/>
+                                android:inputType="none"
+                                android:enabled="false"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout

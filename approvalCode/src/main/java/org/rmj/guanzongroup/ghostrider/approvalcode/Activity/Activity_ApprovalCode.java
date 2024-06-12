@@ -13,11 +13,11 @@ package org.rmj.guanzongroup.ghostrider.approvalcode.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -26,18 +26,7 @@ import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_ApprovalEn
 import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_CreditAppApproval;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_ManualLog;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
-
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.android.material.divider.MaterialDivider;
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +38,6 @@ public class Activity_ApprovalCode extends AppCompatActivity {
     public static Activity_ApprovalCode getInstance(){
         return instance;
     }
-
-    private String psSysCode;
     private String psSystemType;
     private String psSystemCode;
     private String psSCATypexxx;
@@ -71,19 +58,25 @@ public class Activity_ApprovalCode extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_approval_code);
-        instance = this;
+
         String psSysCode = getIntent().getStringExtra("sysCode");
+
+        instance = this;
         psSystemType = getIntent().getStringExtra("systype");
         psSystemCode = getIntent().getStringExtra("sSystemCd");
         psSCATypexxx = getIntent().getStringExtra("sSCATypex");
+
         MaterialToolbar toolbar = findViewById(R.id.toolbar_approvalEntry);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        ViewPager viewPager = findViewById(R.id.viewpager_approvalEntry);
-        viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), getFragmentUI(psSysCode)));
-    }
+        ViewPager2 viewPager = findViewById(R.id.viewpager_approvalEntry);
 
+        FragmentAdapter loAdapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
+        loAdapter.initFragments(getFragmentUI(psSysCode));
+
+        viewPager.setAdapter(loAdapter);
+    }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){
@@ -91,25 +84,30 @@ public class Activity_ApprovalCode extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
+    }
 
-    private static class FragmentAdapter extends FragmentStatePagerAdapter{
-
+    private static class FragmentAdapter extends FragmentStateAdapter {
         List<Fragment> fragmentList = new ArrayList<>();
 
-        public FragmentAdapter(@NonNull FragmentManager fm, Fragment fragment) {
-            super(fm);
+        public FragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+            super(fragmentManager, lifecycle);
+        }
+
+        public void initFragments(Fragment fragment){
             this.fragmentList.add(fragment);
         }
 
-
         @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             return fragmentList.get(position);
         }
-
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return fragmentList.size();
         }
     }
@@ -123,11 +121,4 @@ public class Activity_ApprovalCode extends AppCompatActivity {
             return new Fragment_ManualLog();
         }
     }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
-    }
-
 }

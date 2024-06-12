@@ -104,13 +104,9 @@ public class Fragment_BranchList extends Fragment {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 try{
-                    if(s != null) {
-                        if (!s.toString().trim().isEmpty()) {
-                            String query = s.toString();
-                            rec_branchList.getFilter().filter(query);
-                            rec_branchList.notifyDataSetChanged();
-                        }
-                    }
+                    String query = s.toString();
+                    rec_branchList.getFilter().filter(query);
+                    rec_branchList.notifyDataSetChanged();
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -119,13 +115,9 @@ public class Fragment_BranchList extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try{
-                    if(s != null) {
-                        if (!s.toString().trim().isEmpty()) {
-                            String query = s.toString();
-                            rec_branchList.getFilter().filter(query);
-                            rec_branchList.notifyDataSetChanged();
-                        }
-                    }
+                    String query = s.toString();
+                    rec_branchList.getFilter().filter(query);
+                    rec_branchList.notifyDataSetChanged();
                 } catch (Exception e){
                     e.printStackTrace();
                 }

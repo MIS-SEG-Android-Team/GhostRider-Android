@@ -14,8 +14,7 @@ package org.rmj.guanzongroup.ghostrider.epacss.Object;
 import android.content.Context;
 import android.content.Intent;
 
-import org.rmj.guanzongroup.ganado.Activities.Activity_CategorySelection;
-import org.rmj.guanzongroup.ganado.Activities.Activity_ProductInquiry;
+import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_Browser;
 import org.rmj.guanzongroup.ghostrider.dataChecker.Activity.Activity_DB_Explorer;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
@@ -90,8 +89,11 @@ public class ParentObject {
         Intent loIntent;
         switch (psObjName.toLowerCase()){
             case "health checklist":
+                EmployeeSession poSession = EmployeeSession.getInstance(context);
+
                 loIntent = new Intent(context, Activity_Browser.class);
-                loIntent.putExtra("url_link", "https://www.google.com/webhp?hl=ceb&sa=X&ved=0ahUKEwj0ne24tI7xAhV8yIsBHbQ7Az0QPAgI");
+                //loIntent.putExtra("url_link", "https://www.google.com/webhp?hl=ceb&sa=X&ved=0ahUKEwj0ne24tI7xAhV8yIsBHbQ7Az0QPAgI");
+                loIntent.putExtra("url_link", "https://restgk.guanzongroup.com.ph/system/health_checklist/checklist_entry.php?brc=" + poSession.getBranchCode());
                 loIntent.putExtra("syscode", "2");
                 break;
 

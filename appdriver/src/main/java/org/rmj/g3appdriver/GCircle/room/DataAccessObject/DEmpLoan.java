@@ -18,8 +18,8 @@ public interface DEmpLoan {
     void UpdateSendStat(String oldTransNox, String newTransNox);
     @Query("UPDATE Employee_Loan SET cTranStat = '1' WHERE sTransNox = :sTransNox")
     void ApproveLoanEntry(String sTransNox);
-    @Query("SELECT * FROM Employee_Loan WHERE sTransNox = :sTransNox ")
-    LiveData<EEmpLoan> GetLoanTransnox(String sTransNox);
+    @Query("SELECT * FROM Employee_Loan WHERE cSendStat IS NULL OR cSendStat = '0'")
+    List<EEmpLoan> GetOfflineEntries();
     @Query("SELECT * FROM Employee_Loan WHERE sEmployID = :sEmpID ORDER BY sLoanIDxx ASC, dLoanDate DESC")
     LiveData<List<EEmpLoan>> GetUserEntries(String sEmpID);
     @Query("SELECT * FROM Employee_Loan WHERE cTranStat = '0' OR cTranStat IS NULL OR cTranStat = '' ORDER BY sEmployID ASC, sLoanIDxx ASC, dLoanDate DESC")

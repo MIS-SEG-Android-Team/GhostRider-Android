@@ -18,14 +18,14 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -40,30 +40,26 @@ import org.rmj.guanzongroup.petmanager.ViewModel.VMEmployeeApplications;
 import java.util.Objects;
 
 public class Activity_Employee_Applications extends AppCompatActivity implements VMEmployeeApplications.OnDownloadApplicationListener {
-
     private VMEmployeeApplications mViewModel;
-
     private final String[] tabHeaders = {"Leave Applications",
             "Business Trip Applications"};
-
     private TextView lblBrnchNm, lblBrnchAd, lblHeaderx;
     private Toolbar toolbar;
     private TabLayout tabLayout;
-    private ViewPager viewPager;
-
+    private ViewPager2 viewPager;
     private MessageBox poMessage;
     private LoadDialog poDialog;
-
     private boolean forViewing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee_applications);
-        mViewModel = new ViewModelProvider(this).get(VMEmployeeApplications.class);
-        setupWidgets();
 
+        mViewModel = new ViewModelProvider(this).get(VMEmployeeApplications.class);
         forViewing = getIntent().getBooleanExtra("type", false);
+
+        setupWidgets();
 
         mViewModel.getUserBranchInfo().observe(Activity_Employee_Applications.this, eBranchInfo -> {
             try{
@@ -86,8 +82,6 @@ public class Activity_Employee_Applications extends AppCompatActivity implements
 
     private void setupWidgets(){
         toolbar = findViewById(R.id.toolbar_application);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         tabLayout = findViewById(R.id.tablayout_approval_list);
         viewPager = findViewById(R.id.viewpager_approvals);
         lblHeaderx = findViewById(R.id.lbl_application);
@@ -97,19 +91,24 @@ public class Activity_Employee_Applications extends AppCompatActivity implements
         poMessage = new MessageBox(Activity_Employee_Applications.this);
         poDialog = new LoadDialog(Activity_Employee_Applications.this);
 
-        viewPager.setAdapter(new ApplicationsPageAdapter(getSupportFragmentManager()));
-        tabLayout.setupWithViewPager(viewPager);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        tabLayout.addTab(tabLayout.newTab().setText(tabHeaders[0]));
+        tabLayout.addTab(tabLayout.newTab().setText(tabHeaders[1]));
+
+        ApplicationsPageAdapter loAdapter = new ApplicationsPageAdapter(getSupportFragmentManager(), getLifecycle());
+        viewPager.setAdapter(loAdapter);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 lblHeaderx.setText(tabHeaders[tab.getPosition()]);
+                viewPager.setCurrentItem(tab.getPosition());
             }
-
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
             }
-
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
 
@@ -170,33 +169,22 @@ public class Activity_Employee_Applications extends AppCompatActivity implements
         showDialogMessage(message);
     }
 
-    private static class ApplicationsPageAdapter extends FragmentStatePagerAdapter {
-
+    private static class ApplicationsPageAdapter extends FragmentStateAdapter {
         private final Fragment[] fragments = {new Fragment_LeaveList(),
                 new Fragment_BusinessTripList()};
 
-        private final String[] tabHeaders = {"Leave Applications",
-                "Business Trip Applications"};
-
-        public ApplicationsPageAdapter(@NonNull FragmentManager fm) {
-            super(fm);
+        public ApplicationsPageAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+            super(fragmentManager, lifecycle);
         }
 
         @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             return fragments[position];
         }
-
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return fragments.length;
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return tabHeaders[position];
         }
     }
 

@@ -13,34 +13,18 @@ package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_CustomerNotAround;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_IncTransaction;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_LoanUnit;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_PaidTransaction;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_PromiseToPay;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
-
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.android.material.divider.MaterialDivider;
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.imageview.ShapeableImageView;
-import  com.google.android.material.checkbox.MaterialCheckBox;
 
 
 import java.util.Objects;
@@ -76,7 +60,9 @@ public class Activity_Transaction extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_transaction);
+
         instance = this;
         try {
             Remarksx = getIntent().getStringExtra("remarksx");
@@ -88,19 +74,20 @@ public class Activity_Transaction extends AppCompatActivity {
         } catch (RuntimeException r) {
             r.printStackTrace();
         }
+
         MaterialToolbar toolbar = findViewById(R.id.toolbar_transaction);
+        ViewPager2 viewPager = findViewById(R.id.viewpager_transaction);
+
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        ViewPager viewPager = findViewById(R.id.viewpager_transaction);
-        viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), getTransactionFragment(Remarksx)));
+        viewPager.setAdapter(new FragmentAdapter(getTransactionFragment(Remarksx)));
     }
 
     @Override
     public void onBackPressed() {
         finish();
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){
@@ -108,33 +95,30 @@ public class Activity_Transaction extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    public static class FragmentAdapter extends FragmentStatePagerAdapter {
-        private final Fragment fragment;
-
-        public FragmentAdapter(@NonNull FragmentManager fm, Fragment fragment) {
-            super(fm);
-            this.fragment = fragment;
-        }
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return 1;
-        }
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         getViewModelStore().clear();
     }
 
+    public static class FragmentAdapter extends FragmentStateAdapter {
+        private final Fragment fragment;
+        public FragmentAdapter(@NonNull Fragment fragment) {
+            super(fragment);
+
+            this.fragment = fragment;
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return fragment;
+        }
+        @Override
+        public int getItemCount() {
+            return 1;
+        }
+    }
     private Fragment getTransactionFragment(String transaction){
         if(transaction.equalsIgnoreCase("Paid")){
             return new Fragment_PaidTransaction();

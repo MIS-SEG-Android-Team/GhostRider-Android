@@ -120,52 +120,65 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
                 setDateTimePicker(txt_loandt);
             }
         });
-        txt_firstpay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setDateTimePicker(txt_firstpay);
-            }
-        });
         btn_saveloanentry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EEmpLoan foLoan = new EEmpLoan();
-                foLoan.setsTransNox(mViewModel.GenerateID());
-                foLoan.setsEmployID(mViewModel.GetEmpID());
-                foLoan.setsLoanIDxx(poLoanType.get(spn_loantype.getText().toString()));
-                foLoan.setdTransact(mViewModel.CurrentDate());
-                foLoan.setdLoanDate(txt_loandt.getText().toString());
-                foLoan.setnLoanAmtxx(Integer.parseInt(txt_loanamt.getText().toString()));
-                foLoan.setnPaymTerm(Integer.parseInt(spn_terms.getText().toString()));
-                foLoan.setsPurposed(txt_purpose.getText().toString());
+                try {
+                    EEmpLoan foLoan = new EEmpLoan();
+                    foLoan.setsTransNox(mViewModel.GenerateID());
+                    foLoan.setsEmployID(mViewModel.GetEmpID());
+                    foLoan.setsLoanIDxx(poLoanType.get(spn_loantype.getText().toString()));
+                    foLoan.setdTransact(mViewModel.CurrentDate());
 
-                if (isApproved){
-                    foLoan.setdFirstPay(txt_firstpay.getText().toString());
+                    SimpleDateFormat sSavedFormat = new SimpleDateFormat("MMMM dd, yyyy");
+                    SimpleDateFormat sNewFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+                    Date dLoanDt = sSavedFormat.parse(txt_loandt.getText().toString());
+                    foLoan.setdLoanDate(sNewFormat.format(dLoanDt));
+
+                    foLoan.setnLoanAmtxx(Integer.parseInt(txt_loanamt.getText().toString()));
+                    foLoan.setnPaymTerm(Integer.parseInt(spn_terms.getText().toString()));
+                    foLoan.setsPurposed(txt_purpose.getText().toString());
+
+                    if (isApproved){
+                        Date dFirstPayDt = sSavedFormat.parse(txt_firstpay.getText().toString());
+                        foLoan.setdFirstPay(sNewFormat.format(dFirstPayDt));
+                    }
+
+                    mViewModel.SaveLoanEntry(foLoan, new VMEmployeeLoanEntry.OnSaveEntry() {
+                        @Override
+                        public void onLoad(String title, String message) {
+                            poDialog.initDialog(title, message, false);
+                            poDialog.show();
+                        }
+                        @Override
+                        public void onSuccess(String message) {
+                            poDialog.dismiss();
+                            clearForms();
+
+                            poMessage.setMessage("Loan saved");
+                            poMessage.show();
+                        }
+                        @Override
+                        public void onFailed(String message) {
+                            poDialog.dismiss();
+
+                            poMessage.setMessage(message);
+                            poMessage.show();
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-
-                mViewModel.SaveLoanEntry(foLoan, new VMEmployeeLoanEntry.OnSaveEntry() {
-                    @Override
-                    public void onLoad(String title, String message) {
-                        poDialog.initDialog(title, message, false);
-                        poDialog.show();
-                    }
-                    @Override
-                    public void onSuccess(String message) {
-                        poDialog.dismiss();
-
-                        poMessage.setMessage("Loan saved");
-                        poMessage.show();
-                    }
-                    @Override
-                    public void onFailed(String message) {
-                        poDialog.dismiss();
-
-                        poMessage.setMessage(message);
-                        poMessage.show();
-                    }
-                });
             }
         });
+    }
+    public void clearForms(){
+        spn_loantype.setText("");
+        txt_loandt.setText("");
+        txt_loanamt.setText("");
+        spn_terms.setText("");
+        txt_purpose.setText("");
     }
     public void setDateTimePicker(TextInputEditText dtHolder){
         final Calendar newCalendar = Calendar.getInstance();
