@@ -13,22 +13,10 @@ package org.rmj.guanzongroup.ghostrider.approvalcode.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.android.material.divider.MaterialDivider;
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.imageview.ShapeableImageView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -47,7 +35,8 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_approval_selection);
-        mViewModel = ViewModelProviders.of(this).get(VMApprovalSelection.class);
+
+        mViewModel = new ViewModelProvider(this).get(VMApprovalSelection.class);
 
         String lsSysType = getIntent().getStringExtra("sysCode");
         MaterialToolbar toolbar = findViewById(R.id.toolbar_approvalSelection);

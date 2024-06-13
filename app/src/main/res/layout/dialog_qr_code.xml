@@ -22,44 +22,28 @@
     app:cardElevation="5dp"
     app:cardUseCompatPadding="true"
     app:cardMaxElevation="10dp">
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center">
-        
+
         <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/img_qr"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            android:src="@drawable/img_qr_code"
             android:layout_margin="15dp"/>
 
-        <TextClock
-            android:id="@+id/lbl_dialogTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:format12Hour="hh:mm:ss a"
-            android:fontFamily="@font/roboto_medium"
-            tools:ignore="NewApi" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/lbl_dialogLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_regular"
-            android:layout_marginBottom="30dp"/>
-
         <com.google.android.material.button.MaterialButton
+            style="@style/MaterialButtonAccent"
             android:id="@+id/btn_dialogClose"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Close"
-            style="@style/MaterialButtonAccent"/>
-        
+            android:text="Close"/>
+
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

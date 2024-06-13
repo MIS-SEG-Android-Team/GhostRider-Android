@@ -12,6 +12,8 @@
 package org.rmj.guanzongroup.ghostrider.epacss.ViewModel;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -31,6 +33,7 @@ import org.rmj.guanzongroup.ghostrider.epacss.ui.Dashboard.Fragment_BHDashboard;
 import org.rmj.guanzongroup.ghostrider.epacss.ui.Dashboard.Fragment_Dashboard;
 import org.rmj.guanzongroup.ghostrider.epacss.ui.Dashboard.Fragment_Eng_Dashboard;
 
+import java.net.URL;
 import java.util.List;
 
 public class VMMainActivity extends AndroidViewModel {
@@ -39,6 +42,7 @@ public class VMMainActivity extends AndroidViewModel {
     private final DataSyncService poNetRecvr;
     private final EmployeeMaster poUser;
     private final ILOVEMYJOB poPanalo;
+    private Bitmap bmp;
     private String message;
 
     public VMMainActivity(@NonNull Application application) {
@@ -88,7 +92,6 @@ public class VMMainActivity extends AndroidViewModel {
     }
 
     public void ResetRaffleStatus() {
-//        new ResetPanaloStatusTask().execute();
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
@@ -105,18 +108,45 @@ public class VMMainActivity extends AndroidViewModel {
             }
         });
     }
+    public void DisplayURLImage(String urlink, onDownload callback){
+        TaskExecutor.Execute(urlink, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.onLoad("Employee QR", "Downloading QR");
+            }
+            @Override
+            public Object DoInBackground(Object args) {
+                try {
+                    URL url = new URL(args.toString());
+                    bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+
+                    if (bmp != null){
+                        return true;
+                    }else {
+                        message = "No generated QR for employee";
+                        return false;
+                    }
+
+                }catch (Exception e){
+                    message = "No generated QR for employee";
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+            @Override
+            public void OnPostExecute(Object object) {
+                Boolean aBoolean = (Boolean) object;
+                if(aBoolean){
+                    callback.onDisplay(bmp);
+                }else {
+                    callback.onFailed(message);
+                }
+            }
+        });
+    }
+    public interface onDownload{
+        void onLoad(String title, String message);
+        void onDisplay(Bitmap loImg);
+        void onFailed(String message);
+    }
 }
-//    private class ResetPanaloStatusTask extends AsyncTask<Void, Void, Boolean>{
-//
-//        private String message;
-//
-//        @Override
-//        protected Boolean doInBackground(Void... voids) {
-//            if(!poPanalo.ResetRaffleStatus()){
-//                message = poPanalo.getMessage();
-//                return false;
-//            }
-//            return true;
-//        }
-//    }
-//}

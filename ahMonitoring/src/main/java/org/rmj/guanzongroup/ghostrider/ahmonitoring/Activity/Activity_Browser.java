@@ -11,6 +11,9 @@
 
 package org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -52,8 +55,8 @@ public class Activity_Browser extends AppCompatActivity {
     private ValueCallback<Uri> mUM;
     private ValueCallback<Uri[]> mUMA;
     private final static int FCR=1;
-
     private String urlClipBoard = "";
+    private ActivityResultLauncher<Intent> poLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +80,6 @@ public class Activity_Browser extends AppCompatActivity {
         super.finish();
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){
@@ -111,7 +113,6 @@ public class Activity_Browser extends AppCompatActivity {
         wbBrowser.setWebViewClient(new AppBrowserWebViewClient());
         wbBrowser.setWebChromeClient(new AppBrowserChromeClient());
     }
-
     class AppBrowserWebViewClient extends android.webkit.WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -131,7 +132,6 @@ public class Activity_Browser extends AppCompatActivity {
             urlClipBoard = url;
         }
     }
-
     class AppBrowserChromeClient extends WebChromeClient {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
@@ -140,32 +140,6 @@ public class Activity_Browser extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
             }
             super.onProgressChanged(view, newProgress);
-        }
-
-        public void openFileChooser(ValueCallback<Uri> uploadMsg){
-            mUM = uploadMsg;
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("*/*");
-            Activity_Browser.this.startActivityForResult(Intent.createChooser(i,"File Chooser"), FCR);
-        }
-
-        public void openFileChooser(ValueCallback uploadMsg, String acceptType){
-            mUM = uploadMsg;
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("*/*");
-            Activity_Browser.this.startActivityForResult(
-                    Intent.createChooser(i, "File Browser"),
-                    FCR);
-        }
-
-        public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture){
-            mUM = uploadMsg;
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("*/*");
-            Activity_Browser.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), Activity_Browser.FCR);
         }
 
         public boolean onShowFileChooser(
@@ -201,16 +175,20 @@ public class Activity_Browser extends AppCompatActivity {
                 intentArray = new Intent[0];
             }
 
+            poLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                Log.d(TAG, String.valueOf(result));
+            });
+
             Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
             chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
             chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-            startActivityForResult(chooserIntent, FCR);
+
+            poLauncher.launch(chooserIntent);
+
             return true;
         }
     }
-
-    // Create an image file
     private File createImageFile() throws IOException {
         @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "img_"+timeStamp+"_";

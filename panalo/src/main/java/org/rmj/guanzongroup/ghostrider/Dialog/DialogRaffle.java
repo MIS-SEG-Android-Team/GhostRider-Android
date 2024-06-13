@@ -1,27 +1,15 @@
 package org.rmj.guanzongroup.ghostrider.Dialog;
 
-import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
-
 import org.rmj.guanzongroup.ghostrider.R;
-
-import java.util.Random;
 
 public class DialogRaffle {
     private Context context;

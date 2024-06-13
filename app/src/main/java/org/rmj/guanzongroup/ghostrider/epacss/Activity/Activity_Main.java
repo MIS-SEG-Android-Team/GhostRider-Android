@@ -13,6 +13,7 @@ package org.rmj.guanzongroup.ghostrider.epacss.Activity;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -33,9 +34,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeRole;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
@@ -47,6 +50,7 @@ import org.rmj.g3appdriver.GCircle.ImportData.ImportEmployeeRole;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Etc.FragmentAdapter;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_LogCollection;
+import org.rmj.guanzongroup.ghostrider.epacss.Dialog.DialogQrCode;
 import org.rmj.guanzongroup.ghostrider.epacss.Object.ChildObject;
 import org.rmj.guanzongroup.ghostrider.epacss.Object.ParentObject;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
@@ -72,6 +76,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     private Intent loIntent;
     private boolean cSlfiex;
 
+    private ShapeableImageView img_banner;
     private ImageView imgDept;
     private MaterialTextView lblDept;
     private ExpandableListDrawerAdapter listAdapter;
@@ -220,8 +225,10 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
         View view = navigationView.getHeaderView(0);
 
         viewPager = findViewById(R.id.viewpager);
+        img_banner = view.findViewById(R.id.img_banner);
         imgDept = view.findViewById(R.id.img_deptLogo);
         lblDept = view.findViewById(R.id.lbl_deptNme);
+
         lblDept.setOnClickListener(v -> {
             ImportEmployeeRole loImport = new ImportEmployeeRole(getApplication());
             loImport.RefreshEmployeeRole(new ImportEmployeeRole.OnImportEmployeeRoleCallback() {
@@ -246,6 +253,41 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                     loMessage.show();
                 }
             });
+        });
+        img_banner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmployeeSession poSession = EmployeeSession.getInstance(Activity_Main.this);
+                String imgLink = "https://webfsgk.guanzongroup.com.ph/empid/" + poSession.getEmployeeID() + ".png";
+
+                mViewModel.DisplayURLImage(imgLink, new VMMainActivity.onDownload() {
+                    @Override
+                    public void onLoad(String title, String message) {
+                        poDialog.initDialog(title, message, true);
+                        poDialog.show();
+                    }
+                    @Override
+                    public void onDisplay(Bitmap loImg) {
+                        poDialog.dismiss();
+
+                        DialogQrCode qrDialog = new DialogQrCode(Activity_Main.this);
+                        qrDialog.setBitmap(loImg);
+
+                        qrDialog.show();
+                    }
+                    @Override
+                    public void onFailed(String message) {
+                        poDialog.dismiss();
+
+                        loMessage.initDialog();
+                        loMessage.setTitle("Employee QR");
+                        loMessage.setMessage(message);
+                        loMessage.setPositiveButton("Close", (view1, dialog) -> dialog.dismiss());
+
+                        loMessage.show();
+                    }
+                });
+            }
         });
     }
 
@@ -331,8 +373,10 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         Log.e("request code:", String.valueOf(requestCode));
         Log.e("result code:", String.valueOf(resultCode));
+
         if(requestCode == AppConstants.INTENT_SELFIE_LOGIN && resultCode == RESULT_OK){
             Intent intent = new Intent(Activity_Main.this, Activity_Application.class);
             intent.putExtra("app", AppConstants.INTENT_SELFIE_LOGIN);
