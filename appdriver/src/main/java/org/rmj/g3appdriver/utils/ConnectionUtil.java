@@ -18,8 +18,15 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.StrictMode;
+
+import androidx.annotation.NonNull;
+
+import com.huawei.wisesecurity.ucs.credential.outer.NetworkCapability;
 
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 
@@ -192,7 +199,7 @@ public class ConnectionUtil {
     public boolean isWifiConnected(){
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return mWifi.isConnected();
 
+        return mWifi.isConnected();
     }
 }

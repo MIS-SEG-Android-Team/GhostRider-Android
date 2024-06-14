@@ -27,10 +27,8 @@ import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMProperties;
 import java.util.Objects;
 
 public class Activity_Properties extends AppCompatActivity {
-
     private VMProperties mViewModel;
     private MessageBox poMessage;
-
     private TextInputEditText txtLot1, txtLot2, txtLot3;
     private MaterialCheckBox cb4Wheels, cb3Wheels, cb2Wheels, cbAircon, cbRefxx, cbTelevsn;
     private MaterialButton btnPrvs, btnNext;
@@ -41,10 +39,14 @@ public class Activity_Properties extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_properties);
+
         mViewModel = new ViewModelProvider(Activity_Properties.this).get(VMProperties.class);
         poMessage = new MessageBox(Activity_Properties.this);
-        setContentView(R.layout.activity_properties);
+
         initWidgets();
+
         mViewModel.InitializeApplication(getIntent());
         mViewModel.GetApplication().observe(Activity_Properties.this, app -> {
             try {
