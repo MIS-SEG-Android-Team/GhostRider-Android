@@ -11,6 +11,7 @@
 
 package org.rmj.guanzongroup.ghostrider.settings.Fragment;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -22,6 +23,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
@@ -66,9 +68,10 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
     private LoadDialog poDialog;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-//        themePreference = getPreferenceManager().findPreference("themePrefs");
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        //        themePreference = getPreferenceManager().findPreference("themePrefs");
         cameraPref = getPreferenceManager().findPreference("cameraPrefs");
         locationPref = getPreferenceManager().findPreference("locationPrefs");
         phonePref = getPreferenceManager().findPreference("phonePrefs");
@@ -115,7 +118,7 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                     });
                 }else {
                     loMessage.initDialog();
-                    loMessage.setNegativeButton("Okay", (view, dialog) -> dialog.dismiss());
+                    loMessage.setNegativeButton("Okay", (v, dialog) -> dialog.dismiss());
                     loMessage.setTitle("GhostRider Permissions");
                     loMessage.setMessage("You have already granted this permission.");
                     loMessage.show();
@@ -141,7 +144,7 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                 }else {
 
                     loMessage.initDialog();
-                    loMessage.setNegativeButton("Okay", (view, dialog) -> dialog.dismiss());
+                    loMessage.setNegativeButton("Okay", (v, dialog) -> dialog.dismiss());
                     loMessage.setTitle("GhostRider Permissions");
                     loMessage.setMessage("You have already granted this permission.");
                     loMessage.show();
@@ -150,9 +153,9 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
             });
         }
         if (exportPref != null) {
-           exportPref.setOnPreferenceClickListener(preference -> {
-               try {
-                   dbExport.export();
+            exportPref.setOnPreferenceClickListener(preference -> {
+                try {
+                    dbExport.export();
 //                   mViewModel.isStoragePermissionGranted().observe(getViewLifecycleOwner(), isGranted -> {
 //                      if (!isGranted){
 //                          mViewModel.getStoragePermission().observe(getViewLifecycleOwner(), strings -> {
@@ -162,15 +165,15 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
 //                      }
 //                   });
 
-               }catch (SecurityException e){
-                   Log.e("Security Exception " , e.getMessage());
-               }
-               catch (Exception e){
-                   Log.e("Exception " , e.getMessage());
-               }
+                }catch (SecurityException e){
+                    Log.e("Security Exception " , e.getMessage());
+                }
+                catch (Exception e){
+                    Log.e("Exception " , e.getMessage());
+                }
 
-               return false;
-           });
+                return false;
+            });
         }
 
         if(localData != null){
@@ -244,8 +247,8 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                 return false;
             });
         }
-
     }
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);

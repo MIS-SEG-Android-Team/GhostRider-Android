@@ -78,15 +78,14 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
         return v;
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         try {
             mViewModel = new ViewModelProvider(this).get(VMForgotPassword.class);
             lblVersion.setText(poConfigx.getVersionInfo());
-            btnSendEmail.setOnClickListener(view -> {
+            btnSendEmail.setOnClickListener(v -> {
                 String email = Objects.requireNonNull(tieEmail.getText()).toString().trim();
                 //mViewModel.RequestPassword(email, Fragment_ForgotPassword.this);
                 mViewModel.RequestPassword(email, new VMForgotPassword.RequestPasswordCallback() {
