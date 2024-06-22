@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_CustomerNotAround;
@@ -81,7 +83,9 @@ public class Activity_Transaction extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        viewPager.setAdapter(new FragmentAdapter(getTransactionFragment(Remarksx)));
+        FragmentAdapter loAdapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
+        loAdapter.initFragment(getTransactionFragment(Remarksx));
+        viewPager.setAdapter(loAdapter);
     }
 
     @Override
@@ -102,13 +106,16 @@ public class Activity_Transaction extends AppCompatActivity {
     }
 
     public static class FragmentAdapter extends FragmentStateAdapter {
-        private final Fragment fragment;
-        public FragmentAdapter(@NonNull Fragment fragment) {
-            super(fragment);
 
-            this.fragment = fragment;
+        private Fragment fragment;
+
+        public FragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+            super(fragmentManager, lifecycle);
         }
 
+        public void initFragment(Fragment fragment){
+            this.fragment = fragment;
+        }
         @NonNull
         @Override
         public Fragment createFragment(int position) {
