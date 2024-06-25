@@ -188,7 +188,7 @@ public class DownloadCI {
         params.put("sRcmdtnx2", "sample");
         params.put("cTranStat", "2");
         params.put("sApproved", "M00117000702");
-        params.put("dApproved", AppConstants.CURRENT_DATE);
+        params.put("dApproved", AppConstants.CURRENT_DATE());
 
         String lsResponse = WebClient.sendRequest(SUBMIT_EVALUATION_RESULT,
                 params.toString(), (HashMap<String, String>) headers);

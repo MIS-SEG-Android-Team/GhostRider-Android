@@ -41,7 +41,7 @@ public class VMAppCodeParamsTest extends TestCase {
 
     @Test
     public void testGetBranchNameList() {
-        mViewModel.GetBranchNamesList().observeForever(strings -> assertNotNull(strings));
+        mViewModel.GetAllBranchInfo().observeForever(strings -> assertNotNull(strings));
     }
 
     @Test
