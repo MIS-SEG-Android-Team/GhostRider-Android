@@ -15,6 +15,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -22,7 +26,18 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest {
     @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+    public void gettimediff() {
+        try {
+            SimpleDateFormat sFormat = new SimpleDateFormat("hh:mm:ss a");
+            Date currentTime = Calendar.getInstance().getTime();
+
+            String currentTimestr = sFormat.format(currentTime);
+            String endTime = "01:25:00 PM";
+
+            long difference = sFormat.parse(endTime).getTime() - sFormat.parse(currentTimestr).getTime();
+            System.out.println(difference);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }

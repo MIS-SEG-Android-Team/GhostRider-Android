@@ -12,14 +12,23 @@
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.rmj.g3appdriver.etc.AppConstants;
+import org.rmj.g3appdriver.utils.ServiceScheduler;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Service.GLocatorService;
 
 import static org.junit.Assert.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -29,9 +38,30 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
     @Test
-    public void useAppContext() {
+    public void TestDCPService() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("org.rmj.guanzongroup.ghostrider.dailycollectionplan.test", appContext.getPackageName());
+
+        //ServiceScheduler.scheduleJob(appContext, GLocatorService.class, GetServiceInterval(), AppConstants.GLocatorServiceID);
+        if (ServiceScheduler.isJobRunning(AppConstants.GLocatorServiceID)){
+            System.out.println("DCP Location is running...");
+        }else {
+            System.out.println("DCP Location stoppped...");
+        }
+    }
+
+    private long GetServiceInterval(){
+        try {
+            SimpleDateFormat sFormat = new SimpleDateFormat("hh:mm:ss a");
+            Date currentTime = Calendar.getInstance().getTime();
+
+            String currentTimestr = sFormat.format(currentTime);
+            String endTime = "11:30:00 AM";
+
+            long interval = sFormat.parse(endTime).getTime() - sFormat.parse(currentTimestr).getTime();
+            return interval;
+        }catch (Exception e){
+            return 0000000;
+        }
     }
 }

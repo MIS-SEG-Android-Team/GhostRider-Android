@@ -32,7 +32,7 @@ public interface DPayslip {
             "FROM Notification_Info_Master a " +
             "LEFT JOIN Notification_Info_Recepient b ON a.sMesgIDxx = b.sTransNox " +
             "WHERE a.sMsgTypex = '00000' " +
-            "AND a.sAppSrcex = 'IntegSys' " +
+            "AND a.sAppSrcex IN ('gRider', 'IntegSys') " +
             "AND a.sMsgTitle LIKE 'PAYSLIP%' " +
             "AND b.sRecpntID = (SELECT sUserIDxx FROM User_Info_Master) " +
             "ORDER BY dCreatedx ASC")

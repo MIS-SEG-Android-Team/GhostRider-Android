@@ -1,6 +1,7 @@
 package org.rmj.guanzongroup.ghostrider.notifications.Adapter;
 
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class AdapterPayslip extends RecyclerView.Adapter<AdapterPayslip.VHPaySli
                 holder.lnBadge.setVisibility(View.VISIBLE);
             }
 
+            Log.d("FORMAT DATE PAYSLIP", loPaySlip.dReceived);
             holder.lblTimeStamp.setText(FormatUIText.getParseDateTime(loPaySlip.dReceived));
 
             holder.btnDownload.setOnClickListener(v -> {

@@ -143,11 +143,6 @@ public class VMSplashScreen extends AndroidViewModel {
                         }
                         loTask.publishProgress(5);
 
-                        LRDcp loDcp = new LRDcp(instance);
-                        if(loDcp.HasCollection()){
-                            loTask.publishProgress(6);
-                        }
-
                         if(!poSession.isLoggedIn()){
                             return 2;
                         }
@@ -183,8 +178,6 @@ public class VMSplashScreen extends AndroidViewModel {
                 }
                 if(progress < 5) {
                     mListener.OnProgress(lsArgs, progress);
-                } else {
-                    mListener.OnHasDCP();
                 }
             }
 
@@ -209,7 +202,6 @@ public class VMSplashScreen extends AndroidViewModel {
 
     public interface OnInitializeCallback {
         void OnProgress(String args, int progress);
-        void OnHasDCP();
         void OnSuccess();
         void OnNoSession();
         void OnFailed(String message);

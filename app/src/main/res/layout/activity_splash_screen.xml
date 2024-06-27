@@ -42,7 +42,7 @@
         android:id="@+id/progress_splashscreen"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:max="6"
+        android:max="5"
         app:layout_constraintWidth_percent=".8"
         app:layout_constraintBottom_toTopOf="@+id/tvCompany"
         app:layout_constraintEnd_toEndOf="parent"

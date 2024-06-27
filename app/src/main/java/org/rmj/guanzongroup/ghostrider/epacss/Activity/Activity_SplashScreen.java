@@ -15,7 +15,6 @@ import static org.rmj.g3appdriver.utils.ServiceScheduler.FIFTEEN_MINUTE_PERIODIC
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -41,7 +40,6 @@ import org.rmj.g3appdriver.etc.TransparentToolbar;
 import org.rmj.g3appdriver.utils.AppDirectoryCreator;
 import org.rmj.g3appdriver.utils.ServiceScheduler;
 import org.rmj.guanzongroup.authlibrary.Activity.Activity_Login;
-import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Service.GLocatorService;
 import org.rmj.guanzongroup.ghostrider.epacss.BuildConfig;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
 import org.rmj.guanzongroup.ghostrider.epacss.Service.DataDownloadService;
@@ -65,6 +63,8 @@ public class Activity_SplashScreen extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> poLogin;
 
+    private ServiceScheduler loSched;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +77,7 @@ public class Activity_SplashScreen extends AppCompatActivity {
         prgrssBar = findViewById(R.id.progress_splashscreen);
         lblVrsion = findViewById(R.id.lbl_versionInfo);
         lblVrsion.setText(BuildConfig.VERSION_NAME);
+        loSched = new ServiceScheduler(this);
 
         InitActivityResultLaunchers();
 
@@ -165,6 +166,10 @@ public class Activity_SplashScreen extends AppCompatActivity {
             if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
                 lsPermissions.add(Manifest.permission.POST_NOTIFICATIONS);
             }
+
+            if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED){
+                lsPermissions.add(Manifest.permission.FOREGROUND_SERVICE);
+            }
         }
         poRequest.launch(lsPermissions.toArray(new String[0]));
     }
@@ -174,12 +179,6 @@ public class Activity_SplashScreen extends AppCompatActivity {
             @Override
             public void OnProgress(String args, int progress) {
                 prgrssBar.setProgress(progress);
-            }
-
-            @Override
-            public void OnHasDCP() {
-                startService(new Intent(Activity_SplashScreen.this, GLocatorService.class));
-                Log.d(TAG, "Location tracking service started.");
             }
 
             @Override
@@ -216,7 +215,8 @@ public class Activity_SplashScreen extends AppCompatActivity {
             Log.d(TAG, String.valueOf(result.getResultCode()));
             if (result.getResultCode() == RESULT_OK) {
                 startActivity(new Intent(Activity_SplashScreen.this, Activity_Main.class));
-                ServiceScheduler.scheduleJob(Activity_SplashScreen.this, DataDownloadService.class, FIFTEEN_MINUTE_PERIODIC, AppConstants.DataServiceID);
+
+                loSched.scheduleJob(Activity_SplashScreen.this, DataDownloadService.class, FIFTEEN_MINUTE_PERIODIC, AppConstants.DataServiceID);
                 finish();
             } else if (result.getResultCode() == RESULT_CANCELED) {
                 finish();

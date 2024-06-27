@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,6 +50,7 @@ import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.ImportParams;
+import org.rmj.g3appdriver.utils.ServiceScheduler;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Adapter.CollectionAdapter;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogAccountDetail;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogAddCollection;
@@ -61,15 +63,14 @@ import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.VMCollectio
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class Activity_CollectionList extends AppCompatActivity {
     private static final String TAG = Activity_CollectionList.class.getSimpleName();
-
-    private static final int MOBILE_DIALER = 104;
-    private static final int PICK_TEXT_FILE = 105;
-    private static final int EXPORT_TEXT_FILE = 106;
 
     private LoadDialog poDialogx;
     private MessageBox poMessage;
@@ -87,16 +88,21 @@ public class Activity_CollectionList extends AppCompatActivity {
     private LinearLayout lnImportPanel, lnPosted;
     private MaterialTextView lblNoName;
 
+    private ServiceScheduler loScheduler;
+
     private String FILENAME;
+
+    private static final int MOBILE_DIALER = 104;
+    private static final int PICK_TEXT_FILE = 105;
+    private static final int EXPORT_TEXT_FILE = 106;
+
     private final String FILE_TYPE = "-mob.txt";
     private String fileContent= "";
-
-    private JSONObject poDcpData;
 
     private final ActivityResultLauncher<Intent> poImport = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if(result.getResultCode() == RESULT_OK){
             Intent loIntent = result.getData();
-            Uri uri = loIntent.getData();
+//            Uri uri = loIntent.getData();
 //            importDataFromFile(uri);
         }
     });
@@ -116,17 +122,19 @@ public class Activity_CollectionList extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> poDialer = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if(result.getResultCode() == RESULT_OK){
 
-        } else {
-
         }
     });
 
-//    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collection_list);
+
         mViewModel = new ViewModelProvider(this).get(VMCollectionList.class);
+        loScheduler = new ServiceScheduler(this);
+
+        loScheduler.scheduleJob(Activity_CollectionList.this, GLocatorService.class, GetServiceInterval(), AppConstants.GLocatorServiceID);
+
         initWidgets();
 
         mViewModel.GetUserInfo().observe(Activity_CollectionList.this, user -> {
@@ -481,7 +489,10 @@ public class Activity_CollectionList extends AppCompatActivity {
             @Override
             public void OnSuccess() {
                 poDialogx.dismiss();
-                startService(new Intent(Activity_CollectionList.this, GLocatorService.class));
+
+                if (!loScheduler.isJobRunning(AppConstants.GLocatorServiceID)){
+                    loScheduler.scheduleJob(Activity_CollectionList.this, GLocatorService.class, GetServiceInterval(), AppConstants.GLocatorServiceID);
+                }
             }
 
             @Override
@@ -511,7 +522,13 @@ public class Activity_CollectionList extends AppCompatActivity {
                 poMessage.initDialog();
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage("Dcp posted successfully.");
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                    dialog.dismiss();
+
+                    if (loScheduler.isJobRunning(AppConstants.GLocatorServiceID)){
+                        loScheduler.stopSchedule(AppConstants.GLocatorServiceID);
+                    }
+                });
                 poMessage.show();
             }
 
@@ -564,5 +581,25 @@ public class Activity_CollectionList extends AppCompatActivity {
         });
         poMessage.setNegativeButton("Cancel", (view, dialog) -> dialog.dismiss());
         poMessage.show();
+    }
+
+    private long GetServiceInterval(){
+        try {
+            SimpleDateFormat sFormat = new SimpleDateFormat("hh:mm:ss a");
+            Date currentTime = Calendar.getInstance().getTime();
+
+            String currentTimestr = sFormat.format(currentTime);
+            String endTime = "06:20:00 PM";
+
+            long interval = sFormat.parse(endTime).getTime() - sFormat.parse(currentTimestr).getTime();
+            if (interval > 000000){
+                return interval;
+            }else {
+                return 000000;
+            }
+        }catch (Exception e){
+            Log.d(TAG, e.getMessage());
+            return 0000000;
+        }
     }
 }

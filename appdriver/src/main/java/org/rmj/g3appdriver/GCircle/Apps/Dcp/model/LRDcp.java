@@ -603,6 +603,7 @@ public class LRDcp {
      */
     public boolean HasCollection(){
         EDCPCollectionMaster loMaster = poDao.GetColletionMasterForPosting();
+        Log.d(TAG + "has collection", String.valueOf(loMaster != null));
         return loMaster != null;
     }
 

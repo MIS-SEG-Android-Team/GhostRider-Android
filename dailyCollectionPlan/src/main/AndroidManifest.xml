@@ -34,6 +34,10 @@
             android:exported="true"
             android:screenOrientation="userPortrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
+
+        <service android:name=".Service.GLocatorService"
+            android:foregroundServiceType="location"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>
