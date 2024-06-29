@@ -30,6 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -39,6 +40,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
+import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeRole;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
@@ -88,6 +90,8 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     private List<ChildObject> poChildLst;
     private final HashMap<ParentObject, List<ChildObject>> poChild = new HashMap<>();
 
+    private AppConfigPreference loConfig;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,10 +100,12 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
 
         mViewModel = new ViewModelProvider(this).get(VMMainActivity.class);
         poNetRecvr = mViewModel.getInternetReceiver();
+        loConfig = AppConfigPreference.getInstance(this);
 
         initWidgets();
         InitUserFeatures();
         initReceiver();
+        initPostedDCP();
 
         mViewModel.getEmployeeInfo().observe(this, eEmployeeInfo -> {
             try{
@@ -304,6 +310,47 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
         registerReceiver(poNetRecvr, loFilter);
         AppConfigPreference.getInstance(Activity_Main.this).setIsMainActive(true);
         Log.e(TAG, "Internet status receiver has been registered.");
+    }
+
+    private void initPostedDCP(){
+        mViewModel.getLatestPostedDCP().observe(this, new Observer<EDCPCollectionMaster>() {
+            @Override
+            public void onChanged(EDCPCollectionMaster edcpCollectionMaster) {
+                if (edcpCollectionMaster != null){
+
+                    if (edcpCollectionMaster.getTranStat() != null){
+                        if (edcpCollectionMaster.getTranStat().equals("2")){
+
+                            if (edcpCollectionMaster.getSendStat() != null){
+
+                                if (edcpCollectionMaster.getSendStat().equals("1")){
+                                    //todo: set dcp status to posted
+                                    loConfig.setDCPStatus(true);
+                                }else {
+                                    //todo: set dcp status for posting
+                                    loConfig.setDCPStatus(false);
+                                }
+
+                            }else {
+                                //todo: set dcp status for posting
+                                loConfig.setDCPStatus(false);
+                            }
+
+                        }else {
+                            //todo: set dcp status for posting
+                            loConfig.setDCPStatus(false);
+                        }
+
+                    }else {
+                        //todo: set dcp status for posting
+                        loConfig.setDCPStatus(false);
+                    }
+                }else {
+                    //todo: set dcp status for posting
+                    loConfig.setDCPStatus(false);
+                }
+            }
+        });
     }
 
     @Override

@@ -16,30 +16,25 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.job.JobParameters;
-import android.app.job.JobService;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-
-import org.rmj.g3appdriver.GCircle.room.Repositories.RSysConfig;
 import org.rmj.g3appdriver.lib.Location.LocationRetriever;
+import org.rmj.g3appdriver.utils.Task.ScheduleTask;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
 
+import java.util.concurrent.TimeUnit;
+
 @SuppressLint("SpecifyJobSchedulerIdRange")
-public class GLocatorService extends JobService {
+public class GLocatorService extends Service {
     private static final String TAG = GLocatorService.class.getSimpleName();
     private NotificationCompat.Builder loNotif;
-    private RSysConfig poConfig;
 
     @SuppressLint("NewApi")
     private void createServiceNotification(){
@@ -48,15 +43,19 @@ public class GLocatorService extends JobService {
         loManager.createNotificationChannel(loChannel);
     }
 
-    @SuppressLint("NewApi")
+    @Nullable
     @Override
-    public boolean onStartJob(JobParameters jobParameters) {
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        ScheduleTask.scheduleJob(15, 15, TimeUnit.MINUTES, new ScheduleTask.onSchedule() {
             @Override
-            public void run() {
+            public void onStart() {
                 Intent loIntent = new Intent(GLocatorService.this, Activity_CollectionList.class);
                 PendingIntent loPending  = PendingIntent.getActivities(GLocatorService.this, 34, new Intent[]{loIntent}, PendingIntent.FLAG_IMMUTABLE);
-                poConfig = new RSysConfig(getApplication());
 
                 new LocationRetriever(getApplication()).GetLocationOnBackgroud();
 
@@ -76,19 +75,24 @@ public class GLocatorService extends JobService {
                 } else {
                     startForeground(1, loNotif.build());
                 }
-
                 Log.d("SERVICE START", "DCP LOCATION STARTED");
             }
-        },1000);
 
-        return true;
+            @Override
+            public void onEnd() {
+                stopSelf();
+            }
+        });
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @SuppressLint("NewApi")
     @Override
-    public boolean onStopJob(JobParameters jobParameters) {
+    public void onDestroy() {
+        super.onDestroy();
+
         stopForeground(STOP_FOREGROUND_REMOVE);
         Log.d("SERVICE STOP", "DCP LOCATION STOP");
-        return true;
     }
 }

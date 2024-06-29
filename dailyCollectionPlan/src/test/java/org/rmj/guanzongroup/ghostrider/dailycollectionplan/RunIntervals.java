@@ -1,21 +1,22 @@
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan;
 
-import android.os.Handler;
 import org.junit.Test;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class RunIntervals {
     @Test
     public void TestRun(){
-        Handler handler = new Handler();
+        ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
 
-        Runnable thread = new Runnable() {
-            @Override
+        // This schedule a runnable task every 2 minutes
+        scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
             public void run() {
-                handler.postDelayed(this, 60000);
-                System.out.println("HEllo world");
+                while (true){
+                    System.out.println("UMAAWIT MULA KUSINA, HANGGANG SA SALA");
+                }
             }
-        };
-
-        handler.postDelayed(thread, 60000);
+        }, 0, 2, TimeUnit.SECONDS);
     }
 }

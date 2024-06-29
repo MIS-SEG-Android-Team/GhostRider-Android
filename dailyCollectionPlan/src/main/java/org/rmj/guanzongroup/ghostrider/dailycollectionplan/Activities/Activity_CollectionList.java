@@ -11,6 +11,7 @@
 
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
@@ -46,11 +47,13 @@ import com.google.android.material.textview.MaterialTextView;
 
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
+import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.ImportParams;
 import org.rmj.g3appdriver.utils.ServiceScheduler;
+import org.rmj.g3appdriver.utils.Task.ScheduleTask;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Adapter.CollectionAdapter;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogAccountDetail;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogAddCollection;
@@ -63,11 +66,10 @@ import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.VMCollectio
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import javax.xml.transform.sax.SAXResult;
 
 public class Activity_CollectionList extends AppCompatActivity {
     private static final String TAG = Activity_CollectionList.class.getSimpleName();
@@ -88,7 +90,9 @@ public class Activity_CollectionList extends AppCompatActivity {
     private LinearLayout lnImportPanel, lnPosted;
     private MaterialTextView lblNoName;
 
-    private ServiceScheduler loScheduler;
+    private Intent loService;
+    private String serviceName;
+    private AppConfigPreference poConfig;
 
     private String FILENAME;
 
@@ -125,17 +129,19 @@ public class Activity_CollectionList extends AppCompatActivity {
         }
     });
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collection_list);
 
         mViewModel = new ViewModelProvider(this).get(VMCollectionList.class);
-        loScheduler = new ServiceScheduler(this);
-
-        loScheduler.scheduleJob(Activity_CollectionList.this, GLocatorService.class, GetServiceInterval(), AppConstants.GLocatorServiceID);
+        loService = new Intent(Activity_CollectionList.this, GLocatorService.class);
+        serviceName = GLocatorService.class.getPackageName() + "."+ GLocatorService.class.getSimpleName();
+        poConfig = AppConfigPreference.getInstance(this);
 
         initWidgets();
+        initDCPService();
 
         mViewModel.GetUserInfo().observe(Activity_CollectionList.this, user -> {
             try {
@@ -237,32 +243,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
-    }
 
-    private void initWidgets(){
-        Toolbar toolbar = findViewById(R.id.toolbar_collectionList);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
-        txtSearch = findViewById(R.id.txt_collectionSearch);
-        tilSearch = findViewById(R.id.til_collectionSearch);
-
-        btnDownload = findViewById(R.id.btn_download);
-        btnImport = findViewById(R.id.btn_import);
-        lnImportPanel = findViewById(R.id.ln_import_panel);
-        lblNoName = findViewById(R.id.txt_no_name);
-
-        recyclerView = findViewById(R.id.recyclerview_collectionList);
-        layoutManager = new LinearLayoutManager(Activity_CollectionList.this);
-        layoutManager.setOrientation(RecyclerView.VERTICAL);
-
-        lblBranch = findViewById(R.id.lbl_headerBranch);
-        lblAddxx = findViewById(R.id.lbl_headerAddress);
-        lblDate = findViewById(R.id.lbl_headerDate);
-
-        poDialogx = new LoadDialog(Activity_CollectionList.this);
-        poMessage = new MessageBox(Activity_CollectionList.this);
     }
 
     @Override
@@ -302,6 +283,153 @@ public class Activity_CollectionList extends AppCompatActivity {
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
+    }
+
+    private void initWidgets(){
+        Toolbar toolbar = findViewById(R.id.toolbar_collectionList);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        txtSearch = findViewById(R.id.txt_collectionSearch);
+        tilSearch = findViewById(R.id.til_collectionSearch);
+
+        btnDownload = findViewById(R.id.btn_download);
+        btnImport = findViewById(R.id.btn_import);
+        lnImportPanel = findViewById(R.id.ln_import_panel);
+        lblNoName = findViewById(R.id.txt_no_name);
+
+        recyclerView = findViewById(R.id.recyclerview_collectionList);
+        layoutManager = new LinearLayoutManager(Activity_CollectionList.this);
+        layoutManager.setOrientation(RecyclerView.VERTICAL);
+
+        lblBranch = findViewById(R.id.lbl_headerBranch);
+        lblAddxx = findViewById(R.id.lbl_headerAddress);
+        lblDate = findViewById(R.id.lbl_headerDate);
+
+        poDialogx = new LoadDialog(Activity_CollectionList.this);
+        poMessage = new MessageBox(Activity_CollectionList.this);
+    }
+
+    private void initDCPService(){
+        //todo: stop dcp location service, if latest collection data is posted, else, start service
+        if (poConfig.getDCPStatus()){
+            if (ScheduleTask.isServiceRunning(this, serviceName)){
+                stopService(loService);
+            }
+        }else {
+            //todo: run if not started
+            if (!ScheduleTask.isServiceRunning(this, serviceName)){
+                startService(loService);
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private void DownloadDCP(ImportParams foVal){
+        mViewModel.DownloadDCP(foVal, new VMCollectionList.OnActionCallback() {
+            @Override
+            public void OnLoad() {
+                poDialogx.initDialog("Daily Collection Plan",
+                        "Download DCP List ... Please wait.", false);
+                poDialogx.show();
+            }
+
+            @Override
+            public void OnSuccess() {
+                poDialogx.dismiss();
+
+                if (!ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
+                    startService(loService);
+                }
+            }
+
+            @Override
+            public void OnFailed(String message) {
+                poDialogx.dismiss();
+                poMessage.initDialog();
+                poMessage.setTitle("Daily Collection Plan");
+                poMessage.setMessage(message);
+                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.show();
+            }
+        });
+    }
+
+    private void PostCollection(String fsVal){
+        mViewModel.PostCollectionList(fsVal, new VMCollectionList.OnActionCallback() {
+            @Override
+            public void OnLoad() {
+                poDialogx.initDialog("Daily Collection Plan",
+                        "Posting collection details. Please wait...", false);
+                poDialogx.show();
+            }
+
+            @Override
+            public void OnSuccess() {
+                poDialogx.dismiss();
+                poMessage.initDialog();
+                poMessage.setTitle("Daily Collection Plan");
+                poMessage.setMessage("Dcp posted successfully.");
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                    dialog.dismiss();
+
+                    if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
+                        stopService(loService);
+                    }
+                });
+                poMessage.show();
+            }
+
+            @Override
+            public void OnFailed(String message) {
+                poDialogx.dismiss();
+                poMessage.initDialog();
+                poMessage.setTitle("Daily Collection Plan");
+                poMessage.setMessage(message);
+                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.show();
+            }
+        });
+    }
+
+    private void ClearDCPRecords(){
+        poMessage.initDialog();
+        poMessage.setTitle("Daily Collection Plan");
+        poMessage.setMessage("WARNING, Clearing dcp records will erase your all your daily collection plan and collection remittance records on this device. \nClear records?");
+        poMessage.setPositiveButton("Clear", (view, dialog) -> {
+            dialog.dismiss();
+            mViewModel.ClearDCPRecords(new VMCollectionList.OnActionCallback() {
+                @Override
+                public void OnLoad() {
+                    poDialogx.initDialog("Daily Collection Plan",
+                            "Clearing records. Please wait...", false);
+                    poDialogx.show();
+                }
+
+                @Override
+                public void OnSuccess() {
+                    poDialogx.dismiss();
+                    poMessage.initDialog();
+                    poMessage.setTitle("Daily Collection Plan");
+                    poMessage.setMessage("Records cleared successfully.");
+                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                    poMessage.show();
+                }
+
+                @Override
+                public void OnFailed(String message) {
+                    poDialogx.dismiss();
+                    poMessage.initDialog();
+                    poMessage.setTitle("Daily Collection Plan");
+                    poMessage.setMessage(message);
+                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                    poMessage.show();
+                }
+            });
+        });
+        poMessage.setNegativeButton("Cancel", (view, dialog) -> dialog.dismiss());
+        poMessage.show();
     }
 
     public void showPostCollection(){
@@ -474,132 +602,6 @@ public class Activity_CollectionList extends AppCompatActivity {
             loDebug.show();
         } else {
             DownloadDCP(null);
-        }
-    }
-
-    private void DownloadDCP(ImportParams foVal){
-        mViewModel.DownloadDCP(foVal, new VMCollectionList.OnActionCallback() {
-            @Override
-            public void OnLoad() {
-                poDialogx.initDialog("Daily Collection Plan",
-                        "Download DCP List ... Please wait.", false);
-                poDialogx.show();
-            }
-
-            @Override
-            public void OnSuccess() {
-                poDialogx.dismiss();
-
-                if (!loScheduler.isJobRunning(AppConstants.GLocatorServiceID)){
-                    loScheduler.scheduleJob(Activity_CollectionList.this, GLocatorService.class, GetServiceInterval(), AppConstants.GLocatorServiceID);
-                }
-            }
-
-            @Override
-            public void OnFailed(String message) {
-                poDialogx.dismiss();
-                poMessage.initDialog();
-                poMessage.setTitle("Daily Collection Plan");
-                poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                poMessage.show();
-            }
-        });
-    }
-
-    private void PostCollection(String fsVal){
-        mViewModel.PostCollectionList(fsVal, new VMCollectionList.OnActionCallback() {
-            @Override
-            public void OnLoad() {
-                poDialogx.initDialog("Daily Collection Plan",
-                        "Posting collection details. Please wait...", false);
-                poDialogx.show();
-            }
-
-            @Override
-            public void OnSuccess() {
-                poDialogx.dismiss();
-                poMessage.initDialog();
-                poMessage.setTitle("Daily Collection Plan");
-                poMessage.setMessage("Dcp posted successfully.");
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                    dialog.dismiss();
-
-                    if (loScheduler.isJobRunning(AppConstants.GLocatorServiceID)){
-                        loScheduler.stopSchedule(AppConstants.GLocatorServiceID);
-                    }
-                });
-                poMessage.show();
-            }
-
-            @Override
-            public void OnFailed(String message) {
-                poDialogx.dismiss();
-                poMessage.initDialog();
-                poMessage.setTitle("Daily Collection Plan");
-                poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                poMessage.show();
-            }
-        });
-    }
-
-    private void ClearDCPRecords(){
-        poMessage.initDialog();
-        poMessage.setTitle("Daily Collection Plan");
-        poMessage.setMessage("WARNING, Clearing dcp records will erase your all your daily collection plan and collection remittance records on this device. \nClear records?");
-        poMessage.setPositiveButton("Clear", (view, dialog) -> {
-            dialog.dismiss();
-            mViewModel.ClearDCPRecords(new VMCollectionList.OnActionCallback() {
-                @Override
-                public void OnLoad() {
-                    poDialogx.initDialog("Daily Collection Plan",
-                            "Clearing records. Please wait...", false);
-                    poDialogx.show();
-                }
-
-                @Override
-                public void OnSuccess() {
-                    poDialogx.dismiss();
-                    poMessage.initDialog();
-                    poMessage.setTitle("Daily Collection Plan");
-                    poMessage.setMessage("Records cleared successfully.");
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                }
-
-                @Override
-                public void OnFailed(String message) {
-                    poDialogx.dismiss();
-                    poMessage.initDialog();
-                    poMessage.setTitle("Daily Collection Plan");
-                    poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                }
-            });
-        });
-        poMessage.setNegativeButton("Cancel", (view, dialog) -> dialog.dismiss());
-        poMessage.show();
-    }
-
-    private long GetServiceInterval(){
-        try {
-            SimpleDateFormat sFormat = new SimpleDateFormat("hh:mm:ss a");
-            Date currentTime = Calendar.getInstance().getTime();
-
-            String currentTimestr = sFormat.format(currentTime);
-            String endTime = "06:20:00 PM";
-
-            long interval = sFormat.parse(endTime).getTime() - sFormat.parse(currentTimestr).getTime();
-            if (interval > 000000){
-                return interval;
-            }else {
-                return 000000;
-            }
-        }catch (Exception e){
-            Log.d(TAG, e.getMessage());
-            return 0000000;
         }
     }
 }

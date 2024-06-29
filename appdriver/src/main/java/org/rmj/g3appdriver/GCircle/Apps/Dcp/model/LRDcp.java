@@ -78,6 +78,7 @@ public class LRDcp {
     protected final RClientUpdate poClient;
     protected final DCPFileManager poReader;
     protected final RCollectionRemittance poRemit;
+    protected final DLRDcp poDCP;
 
     protected String message;
 
@@ -98,6 +99,7 @@ public class LRDcp {
         this.poClient = new RClientUpdate(instance);
         this.poReader = new DCPFileManager(instance);
         this.poRemit = new RCollectionRemittance(instance);
+        this.poDCP = GGC_GCircleDB.getInstance(instance).DcpDao();
         this.CURRENT_DATE = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
     }
 
@@ -107,6 +109,10 @@ public class LRDcp {
 
     public LiveData<DEmployeeInfo.EmployeeBranch> GetUserInfo(){
         return poUser.GetEmployeeBranch();
+    }
+
+    public LiveData<EDCPCollectionMaster> GetPostedDCP(){
+        return poDCP.GetLatestPostedDcp();
     }
 
     public boolean SaveTransaction(Object args){
