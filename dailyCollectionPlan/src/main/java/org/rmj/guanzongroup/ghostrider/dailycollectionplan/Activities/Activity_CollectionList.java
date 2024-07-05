@@ -11,11 +11,14 @@
 
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
@@ -34,6 +37,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,6 +62,7 @@ import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Adapter.CollectionAda
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogAccountDetail;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogAddCollection;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogConfirmPost;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogDCPDisclosure;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.Dialog_ClientSearch;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.Dialog_DebugEntry;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
@@ -66,7 +71,9 @@ import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.VMCollectio
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.transform.sax.SAXResult;
@@ -93,6 +100,7 @@ public class Activity_CollectionList extends AppCompatActivity {
     private Intent loService;
     private String serviceName;
     private AppConfigPreference poConfig;
+    private DialogDCPDisclosure dialogDisclosure;
 
     private String FILENAME;
 
@@ -102,6 +110,8 @@ public class Activity_CollectionList extends AppCompatActivity {
 
     private final String FILE_TYPE = "-mob.txt";
     private String fileContent= "";
+
+    private ActivityResultLauncher<String[]> poRequest;
 
     private final ActivityResultLauncher<Intent> poImport = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if(result.getResultCode() == RESULT_OK){
@@ -139,9 +149,10 @@ public class Activity_CollectionList extends AppCompatActivity {
         loService = new Intent(Activity_CollectionList.this, GLocatorService.class);
         serviceName = GLocatorService.class.getPackageName() + "."+ GLocatorService.class.getSimpleName();
         poConfig = AppConfigPreference.getInstance(this);
+        dialogDisclosure = new DialogDCPDisclosure(this);
 
         initWidgets();
-        initDCPService();
+        initPermission();
 
         mViewModel.GetUserInfo().observe(Activity_CollectionList.this, user -> {
             try {
@@ -166,7 +177,13 @@ public class Activity_CollectionList extends AppCompatActivity {
 
                     lnImportPanel.setVisibility(View.VISIBLE);
                     btnDownload.setOnClickListener(v -> {
-                        showDownloadDcp();
+                        if(ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                                || ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+                            showDCPDisclosure();
+                        }else {
+                            showDownloadDcp();
+                        }
                     });
 
                     btnImport.setOnClickListener(v -> {
@@ -276,12 +293,21 @@ public class Activity_CollectionList extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         getViewModelStore().clear();
+        if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
+            stopService(loService);
+        }
     }
 
     @Override
     public void finish() {
         super.finish();
+
+        if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
+            stopService(loService);
+        }
+
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
 
@@ -311,18 +337,18 @@ public class Activity_CollectionList extends AppCompatActivity {
         poMessage = new MessageBox(Activity_CollectionList.this);
     }
 
-    private void initDCPService(){
-        //todo: stop dcp location service, if latest collection data is posted, else, start service
-        if (poConfig.getDCPStatus()){
-            if (ScheduleTask.isServiceRunning(this, serviceName)){
-                stopService(loService);
+    private void initPermission(){
+        poRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+            Log.d("PERMISSION RESULT", result.toString());
+
+            if(ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+
+                showDownloadDcp();
+            } else {
+                showDCPDisclosure();
             }
-        }else {
-            //todo: run if not started
-            if (!ScheduleTask.isServiceRunning(this, serviceName)){
-                startService(loService);
-            }
-        }
+        });
     }
 
     @SuppressLint("NewApi")
@@ -603,5 +629,46 @@ public class Activity_CollectionList extends AppCompatActivity {
         } else {
             DownloadDCP(null);
         }
+    }
+
+    public void showDCPDisclosure(){
+        dialogDisclosure.initDialog(new DialogDCPDisclosure.onDisclosure() {
+            @Override
+            public void onAccept() {
+                dialogDisclosure.dismiss();
+
+                List<String> lsPermissions = new ArrayList<>();
+
+                if(ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                    lsPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+                }
+                if(ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                    lsPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+                }
+
+                poRequest.launch(lsPermissions.toArray(new String[0]));
+            }
+
+            @Override
+            public void onDecline() {
+                dialogDisclosure.dismiss();
+
+                MessageBox loMessage = new MessageBox(Activity_CollectionList.this);
+                loMessage.initDialog();
+                loMessage.setTitle("Disclosure");
+                loMessage.setMessage("Disclosure denied. Download cancelled.");
+                loMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                    }
+                });
+
+                loMessage.show();
+            }
+        });
+
+        dialogDisclosure.setMessage("Guanzon Circle collects location data to enable downloading of DCP information when the app is in use.");
+        dialogDisclosure.show();
     }
 }

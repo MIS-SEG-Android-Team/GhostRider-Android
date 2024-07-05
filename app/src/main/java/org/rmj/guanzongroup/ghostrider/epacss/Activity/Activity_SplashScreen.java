@@ -156,19 +156,9 @@ public class Activity_SplashScreen extends AppCompatActivity {
         if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             lsPermissions.add(Manifest.permission.CAMERA);
         }
-        if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            lsPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        }
-        if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            lsPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
                 lsPermissions.add(Manifest.permission.POST_NOTIFICATIONS);
-            }
-
-            if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED){
-                lsPermissions.add(Manifest.permission.FOREGROUND_SERVICE);
             }
         }
         poRequest.launch(lsPermissions.toArray(new String[0]));

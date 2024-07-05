@@ -47,7 +47,6 @@ public class VMSplashScreen extends AndroidViewModel {
     private final AppConfigPreference poConfig;
     private final EmployeeMaster poUser;
     private final EmployeeSession poSession;
-    private Ganado poGanado;
 
     private String message;
 

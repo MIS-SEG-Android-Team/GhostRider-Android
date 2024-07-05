@@ -48,7 +48,7 @@ public class ConnectionUtil {
     private final Context context;
     private String message;
 
-    private static final String LOCAL = "http://192.168.10.68:8080";
+    private static final String LOCAL = "http://192.168.10.68:8080/GMC%20SEG%20Folder%20-%20PHP/eclipse-workspace/apps/";
     private static final String PRIMARY_LIVE = "https://restgk.guanzongroup.com.ph";
 //    private static final String SECONDARY_LIVE = "restgk1.guanzongroup.com.ph";
 
