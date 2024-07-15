@@ -62,6 +62,7 @@ public class Fragment_BranchList extends Fragment {
                 if (eBranchInfos.size() <= 0){
                     loadDialog.show();
                 }
+
                 rec_branchList = new RecyclerViewAdapter_BranchList(eBranchInfos, new RecyclerViewAdapter_BranchList.OnBranchSelectListener() {
                     @Override
                     public void OnSelect(String BranchCode, String BranchName) {

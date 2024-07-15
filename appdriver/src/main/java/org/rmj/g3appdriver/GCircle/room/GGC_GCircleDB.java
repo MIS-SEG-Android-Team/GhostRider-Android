@@ -12,6 +12,7 @@
 package org.rmj.g3appdriver.GCircle.room;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -83,6 +84,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRaffleStatus;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRawDao;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRelation;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRemittanceAccounts;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSelfieLog;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSysConfig;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DToken;
@@ -147,6 +149,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ERaffleInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERaffleStatus;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERelation;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERemittanceAccounts;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESelfieLog;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESysConfig;
@@ -218,7 +221,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EGanadoOnline.class,
         EMCModelCashPrice.class,
         EEmpLoan.class,
-        ELoanTypes.class}, version = 40, exportSchema = false)
+        ELoanTypes.class,
+        ESCARqstEmp.class}, version = 41, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -291,6 +295,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DGanadoOnline ganadoDao();
     public abstract DEmpLoan emploanDao();
     public abstract DLoanTypes loanTypesDao();
+    public abstract DSCARqstEmp scaRqstEmpDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
@@ -298,7 +303,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                      GGC_GCircleDB.class, "GGC_ISysDBF.db")
                     .allowMainThreadQueries()
                     .addCallback(roomCallBack)
-                    .addMigrations(MIGRATION_V40)
+                    .addMigrations(MIGRATION_V41)
                     .build();
         }
         return instance;
@@ -312,7 +317,28 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
         }
     };
 
-    static final Migration MIGRATION_V40 = new Migration(39, 40) {
+    private static Boolean CheckColumnExists(SupportSQLiteDatabase database, String tablename, String columnName){
+        Cursor cursor = null;
+        try {
+            cursor = database.query("SELECT * FROM " + tablename + " LIMIT 0");
+            int index = cursor.getColumnIndex(columnName);
+
+            if (index < 0){
+                cursor.close();
+                return false;
+            }else {
+                cursor.close();
+                return true;
+            }
+
+        }catch (Exception e){
+            cursor.close();
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    static final Migration MIGRATION_V41 = new Migration(40, 41) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             // Add the new column
@@ -323,8 +349,18 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                     "`sBrandIDx` TEXT, `sMCCatIDx` TEXT, " +
                     "PRIMARY KEY(`sModelIDx`, `sMCCatNme`, `sModelNme`))");
 
-            database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");
-            database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN dPricexxx TEXT");
+            // Add the new column
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SCA_Rqst_Emp` " +
+                    "(`sSCACodex` TEXT NOT NULL, `sEmployIDx` TEXT NOT NULL, " +
+                    "`sRecdStat` TEXT, `dTimeStmpx` TEXT, " +
+                    "PRIMARY KEY(`sSCACodex`, `sEmployIDx`))");
+
+            if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
+                database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");
+            }
+            if (!CheckColumnExists(database, "Ganado_Online", "dPricexxx")){
+                database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN dPricexxx TEXT");
+            }
         }
     };
 }

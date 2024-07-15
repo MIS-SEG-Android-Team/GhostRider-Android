@@ -47,8 +47,6 @@ public class RecyclerViewAdapter_BranchList extends RecyclerView.Adapter<Recycle
         holder.item_branch.setText(loBranch.getBranchNm());
         holder.item_branchcode.setText(loBranch.getBranchCd());
         holder.item_branchloc.setText(loBranch.getAddressx());
-
-        //holder.itemView.setOnClickListener(v -> listener.OnSelect(loBranch.getBranchCd(), loBranch.getBranchNm()));
         holder.view.setOnClickListener(v -> listener.OnSelect(loBranch.getBranchCd(), loBranch.getBranchNm()));
     }
     @Override

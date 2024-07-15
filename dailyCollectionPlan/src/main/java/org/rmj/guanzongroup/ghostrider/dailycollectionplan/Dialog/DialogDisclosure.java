@@ -12,13 +12,13 @@ import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
 
-public class DialogDCPDisclosure {
+public class DialogDisclosure {
 
     private AlertDialog poDialogx;
     private Context context;
     private MaterialTextView mtv_message;
 
-    public DialogDCPDisclosure(Context context){
+    public DialogDisclosure(Context context){
         this.context = context;
     }
 

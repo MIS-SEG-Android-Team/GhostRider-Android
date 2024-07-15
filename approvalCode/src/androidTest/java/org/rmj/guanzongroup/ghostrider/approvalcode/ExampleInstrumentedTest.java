@@ -13,11 +13,16 @@ package org.rmj.guanzongroup.ghostrider.approvalcode;
 
 import android.content.Context;
 
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.dev.Api.HttpHeaders;
+import org.rmj.g3appdriver.dev.Api.WebClient;
 
 import static org.junit.Assert.*;
 
@@ -29,9 +34,20 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
     @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("org.rmj.guanzongroup.ghostrider.approvalcode.test", appContext.getPackageName());
+    public void ImportSCAEmpRequest() {
+        try {
+            GCircleApi poApi = new GCircleApi(ApplicationProvider.getApplicationContext());
+            HttpHeaders poHeaders = HttpHeaders.getInstance(ApplicationProvider.getApplicationContext());
+
+            JSONObject params = new JSONObject();
+            params.put("descript", "all");
+            params.put("timestamp", "");
+
+            String lsResponse = WebClient.sendRequest(poApi.getDownloadSCARqstEmp(), params.toString(), poHeaders.getHeaders());
+
+            System.out.println(lsResponse);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }

@@ -35,4 +35,8 @@ public class VMApprovalSelection extends AndroidViewModel {
     public LiveData<List<ESCA_Request>> getReferenceAuthList(String Type){
         return poSys.getAuthorizedFeatures(Type);
     }
+
+    public String getLatestStamp(){
+        return poSys.getLatestStamp();
+    }
 }

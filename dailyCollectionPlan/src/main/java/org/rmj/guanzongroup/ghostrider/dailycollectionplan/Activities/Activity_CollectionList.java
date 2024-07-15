@@ -18,7 +18,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
@@ -56,13 +55,12 @@ import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.ImportParams;
-import org.rmj.g3appdriver.utils.ServiceScheduler;
 import org.rmj.g3appdriver.utils.Task.ScheduleTask;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Adapter.CollectionAdapter;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogAccountDetail;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogAddCollection;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogConfirmPost;
-import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogDCPDisclosure;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogDisclosure;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.Dialog_ClientSearch;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.Dialog_DebugEntry;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
@@ -73,10 +71,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-
-import javax.xml.transform.sax.SAXResult;
 
 public class Activity_CollectionList extends AppCompatActivity {
     private static final String TAG = Activity_CollectionList.class.getSimpleName();
@@ -100,7 +95,7 @@ public class Activity_CollectionList extends AppCompatActivity {
     private Intent loService;
     private String serviceName;
     private AppConfigPreference poConfig;
-    private DialogDCPDisclosure dialogDisclosure;
+    private DialogDisclosure dialogDisclosure;
 
     private String FILENAME;
 
@@ -149,7 +144,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         loService = new Intent(Activity_CollectionList.this, GLocatorService.class);
         serviceName = GLocatorService.class.getPackageName() + "."+ GLocatorService.class.getSimpleName();
         poConfig = AppConfigPreference.getInstance(this);
-        dialogDisclosure = new DialogDCPDisclosure(this);
+        dialogDisclosure = new DialogDisclosure(this);
 
         initWidgets();
         initPermission();
@@ -632,7 +627,7 @@ public class Activity_CollectionList extends AppCompatActivity {
     }
 
     public void showDCPDisclosure(){
-        dialogDisclosure.initDialog(new DialogDCPDisclosure.onDisclosure() {
+        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
             @Override
             public void onAccept() {
                 dialogDisclosure.dismiss();

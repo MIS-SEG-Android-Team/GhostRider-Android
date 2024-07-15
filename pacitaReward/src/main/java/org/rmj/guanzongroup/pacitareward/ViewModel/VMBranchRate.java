@@ -54,6 +54,7 @@ public class VMBranchRate extends AndroidViewModel {
                     }
                 }catch (Exception e){
                     message = e.getMessage();
+                    return null;
                 }
                 return lsResult;
             }
@@ -74,45 +75,6 @@ public class VMBranchRate extends AndroidViewModel {
     public LiveData<List<EPacitaRule>> GetCriteria(){
         return poSys.GetPacitaRules();
     }
-    /*private class InitializeEvluationTask extends AsyncTask<String, Void, String>{
-        private final OnInitializeBranchEvaluationListener mListener;
-        public InitializeEvluationTask(OnInitializeBranchEvaluationListener mListener) {
-            this.mListener = mListener;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            message = "Loading Evaluations. Please wait . . .";
-            mListener.onInitialize(message);
-        }
-
-        @Override
-        protected String doInBackground(String... branchcd) {
-            String lsResult = poSys.InitializePacitaEvaluation(branchcd[0]);
-            try{
-                message = poSys.getMessage();
-
-                if(lsResult == null){
-                    message = poSys.getMessage();
-                    return null;
-                }
-            }catch (Exception e){
-                message = getLocalMessage(e);
-            }
-            return lsResult;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if(result == null){
-                mListener.OnError(message);
-            } else {
-                mListener.OnSuccess(result, message);
-            }
-        }
-    }*/
 
     public void setEvaluationResult(String TransNox, String EntryNox, String Result){
         String[] argList = {TransNox,EntryNox,Result};
@@ -139,20 +101,6 @@ public class VMBranchRate extends AndroidViewModel {
             }
         });
     }
-    /*public class SetEvaluationResultTask extends AsyncTask<String, Void, Boolean>{
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            String sTransNo = strings[0];
-            String EntryNox = strings[1];
-            String Result = strings[2];
-
-            if(!poSys.UpdateBranchRate(sTransNo, Integer.parseInt(EntryNox), Result)){
-                message = poSys.getMessage();
-                return false;
-            }
-            return true;
-        }
-    }*/
 
     public interface BranchRatingsCallback{
         void onSave(String title, String message);
@@ -196,46 +144,4 @@ public class VMBranchRate extends AndroidViewModel {
             }
         });
     }
-    /*public class SaveBranchRatings extends AsyncTask<String, Void, Boolean>{
-        private final BranchRatingsCallback callback;
-        private String TransNox;
-        public SaveBranchRatings(String TransNox, BranchRatingsCallback callback){
-            this.TransNox = TransNox;
-            this.callback = callback;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            callback.onSave("Pacita Reward", "Saving your Evaluation. Please Wait . . . ");
-        }
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            try {
-                if(!poConnection.isDeviceConnected()){
-                    message = poConnection.getMessage();
-                    return false;
-                }
-                if(!poSys.SaveBranchRatings(strings[0])){
-                    message = poSys.getMessage();
-                    return  false;
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            if(aBoolean){
-                callback.onSuccess("Successfully Saved Branch Evaluation");
-            } else {
-                callback.onFailed(message);
-            }
-        }
-    }*/
 }

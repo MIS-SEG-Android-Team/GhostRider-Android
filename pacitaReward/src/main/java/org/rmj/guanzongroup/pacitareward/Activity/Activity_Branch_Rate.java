@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -38,6 +40,7 @@ public class Activity_Branch_Rate extends AppCompatActivity {
     private String intentDataBranchcd;
     private String intentDataBranchName;
     private MaterialButton btn_submit;
+    private RecyclerViewAdapter_BranchRate loAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,18 +85,6 @@ public class Activity_Branch_Rate extends AppCompatActivity {
             public void OnSuccess(String transactNo, String message) {
                 poLoad.dismiss();
 
-                RecyclerViewAdapter_BranchRate loAdapter = new RecyclerViewAdapter_BranchRate(new RecyclerViewAdapter_BranchRate.onSelect() {
-                    @Override
-                    public void onItemSelect(String EntryNox, String result) {
-                        mViewModel.setEvaluationResult(transactNo, EntryNox, result);
-                    }
-                });
-
-                LinearLayoutManager loManager = new LinearLayoutManager(Activity_Branch_Rate.this);
-                loManager.setOrientation(RecyclerView.VERTICAL);
-                rate_list.setLayoutManager(loManager);
-                rate_list.setAdapter(loAdapter);
-
                 mViewModel.getBranchEvaluation(transactNo).observe(Activity_Branch_Rate.this, new Observer<EPacitaEvaluation>() {
                     @Override
                     public void onChanged(EPacitaEvaluation ePacitaEvaluation) {
@@ -103,23 +94,35 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                         ePacitaEvaluation.setTransNox(transactNo);
 
                         mViewModel.GetCriteria().observe(Activity_Branch_Rate.this, new Observer<List<EPacitaRule>>() {
+                            @SuppressLint("NotifyDataSetChanged")
                             @Override
                             public void onChanged(List<EPacitaRule> ePacitaRules) {
                                 if(ePacitaRules == null){
                                     return;
                                 }
-                                if(ePacitaRules.size() == 0){
+                                if(ePacitaRules.size() <= 0){
                                     return;
                                 }
 
                                 String lsPayload = ePacitaEvaluation.getPayloadx();
                                 List<BranchRate> loRate = PacitaRule.ParseBranchRate(lsPayload, ePacitaRules);
-                                loAdapter.setItems(loRate);
+
+                                loAdapter = new RecyclerViewAdapter_BranchRate(Activity_Branch_Rate.this, loRate, new RecyclerViewAdapter_BranchRate.onSelect() {
+                                    @Override
+                                    public void onItemSelect(String EntryNox, String result) {
+                                        mViewModel.setEvaluationResult(transactNo, EntryNox, result);
+                                    }
+                                });
+
                                 loAdapter.notifyDataSetChanged();
+
+                                rate_list.setAdapter(loAdapter);
+                                rate_list.setLayoutManager(new LinearLayoutManager(Activity_Branch_Rate.this, LinearLayoutManager.VERTICAL, false));
                             }
                         });
                     }
                 });
+
                 btn_submit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

@@ -25,8 +25,7 @@ import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ganado.Adapter.RecyclerViewAdapter_BrandSelection;
 import org.rmj.guanzongroup.ganado.R;
 import org.rmj.guanzongroup.ganado.ViewModel.VMBrandList;
-import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
-import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogDCPDisclosure;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogDisclosure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ import java.util.Objects;
 public class Activity_BrandSelection extends AppCompatActivity {
 
     private ActivityResultLauncher<String[]> poRequest;
-    private DialogDCPDisclosure dialogDisclosure;
+    private DialogDisclosure dialogDisclosure;
     private VMBrandList mViewModel;
     private RecyclerView rvc_brandlist;
     private RecyclerViewAdapter_BrandSelection rec_brandList;
@@ -49,7 +48,7 @@ public class Activity_BrandSelection extends AppCompatActivity {
         setContentView(R.layout.activity_brand_selection);
 
         mViewModel = new ViewModelProvider(this).get(VMBrandList.class);
-        dialogDisclosure = new DialogDCPDisclosure(this);
+        dialogDisclosure = new DialogDisclosure(this);
 
         intWidgets();
 
@@ -61,7 +60,7 @@ public class Activity_BrandSelection extends AppCompatActivity {
 
                 initBrandList();
             } else {
-                showDCPDisclosure();
+                showDisclosure();
             }
         });
     }
@@ -97,9 +96,9 @@ public class Activity_BrandSelection extends AppCompatActivity {
         });
     }
 
-    public void showDCPDisclosure(){
+    public void showDisclosure(){
 
-        dialogDisclosure.initDialog(new DialogDCPDisclosure.onDisclosure() {
+        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
             @Override
             public void onAccept() {
                 dialogDisclosure.dismiss();
@@ -147,7 +146,7 @@ public class Activity_BrandSelection extends AppCompatActivity {
         if(ActivityCompat.checkSelfPermission(Activity_BrandSelection.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(Activity_BrandSelection.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
-            showDCPDisclosure();
+            showDisclosure();
         }else {
             initBrandList();
         }
