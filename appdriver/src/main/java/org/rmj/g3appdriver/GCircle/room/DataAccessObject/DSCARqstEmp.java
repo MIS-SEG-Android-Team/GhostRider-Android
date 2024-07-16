@@ -16,4 +16,7 @@ public interface DSCARqstEmp {
 
     @Query("SELECT dTimeStmpx FROM SCA_Rqst_Emp ORDER BY dTimeStmpx DESC LIMIT 1")
     String GetLatestStamp();
+
+    @Query("SELECT COUNT(*) FROM SCA_Rqst_Emp")
+    int CountSCARequest();
 }

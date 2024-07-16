@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_SCARequest;
 import org.rmj.g3appdriver.GCircle.ImportData.model.ImportDataCallback;
@@ -72,9 +73,6 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
             @Override
             public void OnSuccessImportData() {
                 poDialog.dismiss();
-
-                poMessage.setMessage("Approval codes downloaded successfully.");
-                poMessage.show();
             }
 
             @Override
@@ -111,6 +109,7 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
                     }));
 
                     recyclerView.setLayoutManager(manager);
+
                 });
             }
         });
