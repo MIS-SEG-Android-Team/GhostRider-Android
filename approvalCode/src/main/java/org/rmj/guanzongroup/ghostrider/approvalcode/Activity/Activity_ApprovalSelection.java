@@ -17,27 +17,24 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.appbar.MaterialToolbar;
-
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
-import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_SCARequest;
-import org.rmj.g3appdriver.GCircle.ImportData.model.ImportDataCallback;
-import org.rmj.g3appdriver.etc.LoadDialog;
-import org.rmj.g3appdriver.etc.MessageBox;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Etc.AdapterApprovalAuth;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
 import org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel.VMApprovalSelection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Activity_ApprovalSelection extends AppCompatActivity {
     public static final String TAG = Activity_ApprovalSelection.class.getSimpleName();
     private VMApprovalSelection mViewModel;
-    private MessageBox poMessage;
-    private LoadDialog poDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,71 +42,61 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
         setContentView(R.layout.activity_approval_selection);
 
         mViewModel = new ViewModelProvider(this).get(VMApprovalSelection.class);
-        poMessage = new MessageBox(this);
-        poDialog = new LoadDialog(this);
 
-        String lsSysType = getIntent().getStringExtra("sysCode");
         MaterialToolbar toolbar = findViewById(R.id.toolbar_approvalSelection);
-        RecyclerView recyclerView = findViewById(R.id.recyclerview_approvalAuth);
-        Import_SCARequest importScaRequest = new Import_SCARequest(getApplication());
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        poMessage.initDialog();
-        poMessage.setTitle("Guanzon Circle");
-
-        String latestStampRqst = mViewModel.getLatestStamp();
-        if (latestStampRqst != null){
-            if (!latestStampRqst.isEmpty()){
-                importScaRequest.setTimeStamp(latestStampRqst);
-            }
-        }
-
-        poDialog.initDialog("Guanzon Circle", "Downloading data . .", false);
-        poDialog.show();
-
-        importScaRequest.ImportData(new ImportDataCallback() {
+        mViewModel.getApprovalCodes(mViewModel.getLatestStamp(), new VMApprovalSelection.onDownload() {
             @Override
-            public void OnSuccessImportData() {
-                poDialog.dismiss();
-            }
+            public void onFinished(String message) {
+                Toast.makeText(Activity_ApprovalSelection.this, message, Toast.LENGTH_LONG).show();
 
-            @Override
-            public void OnFailedImportData(String message) {
-                poDialog.dismiss();
-
-                poMessage.setMessage(message);
-                poMessage.show();
-            }
-        });
-
-        poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
-            @Override
-            public void OnButtonClick(View view, AlertDialog dialog) {
-                dialog.dismiss();
+                String lsSysType = getIntent().getStringExtra("sysCode");
+                RecyclerView recyclerView = findViewById(R.id.recyclerview_approvalAuth);
 
                 mViewModel.getReferenceAuthList(lsSysType).observe(Activity_ApprovalSelection.this, requestList -> {
+                    if (requestList != null){
+                        List<ESCA_Request> rqstList = new ArrayList<>();
 
-                    LinearLayoutManager manager = new LinearLayoutManager(Activity_ApprovalSelection.this);
-                    manager.setOrientation(RecyclerView.VERTICAL);
+                        if (requestList.size() > 0){
 
-                    recyclerView.setAdapter(new AdapterApprovalAuth(requestList, (SystemCode, SCAType) -> {
-                        Intent loIntentx = new Intent(Activity_ApprovalSelection.this, Activity_ApprovalCode.class);
-                        if(SystemCode.equalsIgnoreCase("CA")) {
-                            loIntentx.putExtra("sysCode", "1");
-                        } else{
-                            loIntentx.putExtra("sysCode", "0");
+                            for (int i = 0; i < requestList.size(); i++){
+                                ESCA_Request loRqst = requestList.get(i);
+                                String sSCACodex = loRqst.getSCACodex();
+
+                                ESCARqstEmp loVal = mViewModel.getRqstEmp(sSCACodex);
+                                //todo: add to filter approval list if:
+                                if (loVal != null){ //todo: has rows from table sca_emp_request
+                                    rqstList.add(loRqst);
+                                }else { //todo: by default, add approval list not existing on table sca_emp_request
+                                    if (mViewModel.getRqstExst(sSCACodex) == null){
+                                        rqstList.add(loRqst);
+                                    }
+                                }
+                            }
                         }
-                        loIntentx.putExtra("systype", lsSysType);
-                        loIntentx.putExtra("sSystemCd", SystemCode);
-                        loIntentx.putExtra("sSCATypex", SCAType);
-                        startActivity(loIntentx);
-                        overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
-                    }));
 
-                    recyclerView.setLayoutManager(manager);
+                        LinearLayoutManager manager = new LinearLayoutManager(Activity_ApprovalSelection.this);
+                        manager.setOrientation(RecyclerView.VERTICAL);
 
+                        recyclerView.setAdapter(new AdapterApprovalAuth(rqstList, (SystemCode, SCAType) -> {
+                            Intent loIntentx = new Intent(Activity_ApprovalSelection.this, Activity_ApprovalCode.class);
+                            if(SystemCode.equalsIgnoreCase("CA")) {
+                                loIntentx.putExtra("sysCode", "1");
+                            } else{
+                                loIntentx.putExtra("sysCode", "0");
+                            }
+                            loIntentx.putExtra("systype", lsSysType);
+                            loIntentx.putExtra("sSystemCd", SystemCode);
+                            loIntentx.putExtra("sSCATypex", SCAType);
+                            startActivity(loIntentx);
+                            overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+                        }));
+
+                        recyclerView.setLayoutManager(manager);
+                    }
                 });
             }
         });

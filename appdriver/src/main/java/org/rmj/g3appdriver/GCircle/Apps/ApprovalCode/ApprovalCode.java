@@ -49,7 +49,7 @@ public class ApprovalCode {
 
     private final DApprovalCode poDao;
 
-    private final DSCARqstEmp poDaoRstEmp;;
+    private final DSCARqstEmp poDaoRstEmp;
 
     public final Application instance;
 
@@ -306,19 +306,11 @@ public class ApprovalCode {
             }
         }
 
-        int scarqstCount = poDaoRstEmp.CountSCARequest();
-
-        if (scarqstCount > 0){
-            String lsQuery = "SELECT a.* FROM xxxSCA_Request a LEFT JOIN SCA_Rqst_Emp b " +
-                    "ON a.sSCACodex = b.sSCACodex AND b.sEmployIDx = '" + loUser.getEmployID() + "'";
-
-            return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsQuery));
-        }else {
-            if (!lsCondition.isEmpty()){
-                lsSqlQryxx = MiscUtil.addCondition(lsSqlQryxx, lsCondition);
-            }
-            return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
+        if (!lsCondition.isEmpty()){
+            lsSqlQryxx = MiscUtil.addCondition(lsSqlQryxx, lsCondition);
         }
+
+        return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
     }
 
     public String getLatestStamp(){
