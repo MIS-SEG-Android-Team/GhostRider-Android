@@ -29,6 +29,9 @@ import org.rmj.g3appdriver.utils.Task.ScheduleTask;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @SuppressLint("SpecifyJobSchedulerIdRange")
@@ -43,6 +46,21 @@ public class GLocatorService extends Service {
         loManager.createNotificationChannel(loChannel);
     }
 
+    private int GetIntervalMinutes(){
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
+
+            Date currentTime = simpleDateFormat.parse(simpleDateFormat.format(Calendar.getInstance().getTime()));
+            Date endTime = simpleDateFormat.parse("04:40 PM");
+
+            int interval = (int) (endTime.getTime() - currentTime.getTime());
+
+            return interval  / (1000 * 60);
+        }catch (Exception e){
+            return 0000000;
+        }
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -51,7 +69,7 @@ public class GLocatorService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        ScheduleTask.scheduleJob(15, 15, TimeUnit.MINUTES, new ScheduleTask.onSchedule() {
+        ScheduleTask.scheduleJob(GetIntervalMinutes(), GetIntervalMinutes(), TimeUnit.MINUTES, new ScheduleTask.onSchedule() {
             @Override
             public void onStart() {
                 Intent loIntent = new Intent(GLocatorService.this, Activity_CollectionList.class);
@@ -75,7 +93,7 @@ public class GLocatorService extends Service {
                 } else {
                     startForeground(1, loNotif.build());
                 }
-                Log.d("SERVICE START", "DCP LOCATION STARTED");
+                Log.d("SERVICE START", "DCP LOCATION STARTED WITHIN " + GetIntervalMinutes());
             }
 
             @Override

@@ -290,18 +290,11 @@ public class Activity_CollectionList extends AppCompatActivity {
         super.onDestroy();
 
         getViewModelStore().clear();
-        if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
-            stopService(loService);
-        }
     }
 
     @Override
     public void finish() {
         super.finish();
-
-        if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
-            stopService(loService);
-        }
 
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
@@ -330,6 +323,10 @@ public class Activity_CollectionList extends AppCompatActivity {
 
         poDialogx = new LoadDialog(Activity_CollectionList.this);
         poMessage = new MessageBox(Activity_CollectionList.this);
+
+        if (!ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
+            startService(loService);
+        }
     }
 
     private void initPermission(){
