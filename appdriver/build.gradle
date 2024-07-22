@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:23.1.2'
     implementation 'com.google.firebase:firebase-crashlytics:18.3.7'
     implementation 'com.google.firebase:firebase-storage:20.2.0'
+    implementation files('C:\\Users\\User\\AndroidStudioProjects\\GhostRider\\appdriver\\libs\\appdriver-mob.jar')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -79,7 +80,6 @@ dependencies {
 
     //Local Libraries
     implementation files('libs/appdriver.jar')
-    implementation files('libs/appdriver-mob.jar')
     implementation files('libs/json-simple-1.1.1.jar')
     implementation files('libs/commons-codec-1.11.jar')
     implementation files('libs/gocas.jar')

@@ -44,7 +44,7 @@ import java.util.Objects;
 public class Activity_ProductInquiry extends AppCompatActivity {
     private VMProductInquiry mViewModel;
     private MessageBox poMessage;
-    private MaterialTextView txtBranchNm, txtBrandNm, txtModelNm, txtModelCd;
+    private MaterialTextView txtBrandNm, txtModelNm, txtModelCd, txtyourmnmdp;
     private TextInputEditText txtCashPrce, txtDownPymnt, txtAmort, txtDTarget;
     private MaterialAutoCompleteTextView spn_color, spnPayment, spnAcctTerm;
     private MaterialButton btnContinue,btnCalculate;
@@ -124,6 +124,8 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
                         mViewModel.getModel().setDownPaym(String.valueOf(loResult.getMinimumDownpayment()));
                         txtDownPymnt.setText(String.valueOf(loResult.getMinimumDownpayment()));
+                        txtyourmnmdp.setText("The required Minimum Down Payment is at least " + String.valueOf(loResult.getMinimumDownpayment()));
+
                         mViewModel.getModel().setMonthAmr(String.valueOf(loResult.getMonthlyAmortization()));
                         txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(loResult.getMonthlyAmortization())));
                     }
@@ -139,6 +141,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+
         txtDTarget.setOnClickListener(v -> {
             final Calendar newCalendar = Calendar.getInstance();
             @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
@@ -174,6 +177,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
             StartTime.show();
         });
+
         spnPayment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -187,6 +191,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 }
             }
         });
+
         btnCalculate.setOnClickListener(view -> {
             String lsInput = txtDownPymnt.getText().toString().trim();
             Double lnInput = FormatUIText.getParseDouble(lsInput);
@@ -202,6 +207,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
             }
 
             mViewModel.getModel().setDownPaym(String.valueOf(lnInput));
+
             mViewModel.CalculateNewDownpayment(lsModelID, Integer.parseInt(mViewModel.getModel().getTermIDxx()), lnInput, new VMProductInquiry.OnCalculateNewDownpayment() {
                 @Override
                 public void OnCalculate(double lnResult) {
@@ -221,6 +227,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 }
             });
         });
+
         btnContinue.setOnClickListener(view ->{
             String lsInput = txtDownPymnt.getText().toString().trim();
             Double lnInput = FormatUIText.getParseDouble(lsInput);
@@ -236,6 +243,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
             }
 
             mViewModel.getModel().setDownPaym(String.valueOf(lnInput));
+
             mViewModel.CalculateNewDownpayment(lsModelID, Integer.parseInt(mViewModel.getModel().getTermIDxx()), lnInput, new VMProductInquiry.OnCalculateNewDownpayment() {
                 @Override
                 public void OnCalculate(double lnResult) {
@@ -294,6 +302,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
         spnAcctTerm = findViewById(R.id.spn_installmentTerm);
         spn_color = findViewById(R.id.spn_color);
         imgMC = findViewById(R.id.imgMC);
+        txtyourmnmdp = findViewById(R.id.txtyourmnmdp);
 
         btnContinue = findViewById(R.id.btnContinue);
         btnCalculate = findViewById(R.id.btnCalculate);
