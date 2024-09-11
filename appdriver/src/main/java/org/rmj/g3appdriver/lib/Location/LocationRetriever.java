@@ -23,11 +23,6 @@ public class LocationRetriever {
     boolean isSuccess;
     int lnResult = 0;
 
-    public interface LocationRetrieveCallback{
-        void OnRetrieve(String message, double latitude, double longitude);
-        void OnFailed(String message);
-    }
-
     public LocationRetriever(Application application, Activity activity) {
         this.instance = application;
         this.activity = activity;
@@ -132,7 +127,10 @@ public class LocationRetriever {
                     lsService = "0";
                     lsRemarks = "Location service is not enabled.";
                 }
+
                 loSys.saveCurrentLocation(args, args1, lsService, lsRemarks);
+
+                Log.d(TAG, loSys.getMessage());
             });
         } catch (Exception e){
             e.printStackTrace();

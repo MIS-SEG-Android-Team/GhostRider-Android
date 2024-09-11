@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import org.json.JSONArray;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPacitaEvaluation;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPacitaRule;
 import org.rmj.g3appdriver.GCircle.Apps.GawadPacita.Obj.Pacita;
@@ -76,8 +77,8 @@ public class VMBranchRate extends AndroidViewModel {
         return poSys.GetPacitaRules();
     }
 
-    public void setEvaluationResult(String TransNox, String EntryNox, String Result){
-        String[] argList = {TransNox,EntryNox,Result};
+    public void setEvaluationResult(String TransNox, String loPayloadx){
+        String[] argList = {TransNox,loPayloadx};
 
         TaskExecutor.Execute(argList, new OnDoBackgroundTaskListener() {
             @Override
@@ -85,10 +86,9 @@ public class VMBranchRate extends AndroidViewModel {
                 String[] array = (String[]) args;
 
                 String sTransNo = array[0];
-                String EntryNox = array[1];
-                String Result = array[2];
+                String sPayloadx = array[1];
 
-                if(!poSys.UpdateBranchRate(sTransNo, Integer.parseInt(EntryNox), Result)){
+                if(!poSys.UpdateBranchRate(sTransNo, sPayloadx)){
                     message = poSys.getMessage();
                     return false;
                 }

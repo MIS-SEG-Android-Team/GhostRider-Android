@@ -27,7 +27,7 @@ public class ScheduleTask {
         return isRunning;
     }
 
-    public static void scheduleJob(int startInterval, int endInterval, TimeUnit intervalUnit, onSchedule callback){
+    public static void scheduleJob(long frstDelay, long scndInterval, TimeUnit intervalUnit, onSchedule callback){
 
         callback.onStart(); //todo: start task
 
@@ -39,7 +39,7 @@ public class ScheduleTask {
                 callback.onEnd();
                 thread.shutdown();
             }
-        }, startInterval, endInterval, intervalUnit);
+        }, frstDelay, scndInterval, intervalUnit);
     }
 
     public interface onSchedule{

@@ -79,10 +79,12 @@ public class Fragment_IncTransaction extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         mViewModel = new ViewModelProvider(this).get(VMIncompleteTransaction.class);
         poDialog = new LoadDialog(requireActivity());
         poMessage = new MessageBox(requireActivity());
         poRem = new OtherRemCode();
+
         View view = inflater.inflate(R.layout.fragment_inc_transaction, container, false);
         initWidgets(view);
         initActivityResultLaunchers();

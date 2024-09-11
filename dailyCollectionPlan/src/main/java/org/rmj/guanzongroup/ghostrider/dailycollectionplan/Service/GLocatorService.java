@@ -19,7 +19,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -28,10 +30,11 @@ import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.utils.Task.ScheduleTask;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @SuppressLint("SpecifyJobSchedulerIdRange")
@@ -51,7 +54,7 @@ public class GLocatorService extends Service {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
 
             Date currentTime = simpleDateFormat.parse(simpleDateFormat.format(Calendar.getInstance().getTime()));
-            Date endTime = simpleDateFormat.parse("04:40 PM");
+            Date endTime = simpleDateFormat.parse("6:00 PM");
 
             int interval = (int) (endTime.getTime() - currentTime.getTime());
 
@@ -69,39 +72,58 @@ public class GLocatorService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        ScheduleTask.scheduleJob(GetIntervalMinutes(), GetIntervalMinutes(), TimeUnit.MINUTES, new ScheduleTask.onSchedule() {
-            @Override
-            public void onStart() {
-                Intent loIntent = new Intent(GLocatorService.this, Activity_CollectionList.class);
-                PendingIntent loPending  = PendingIntent.getActivities(GLocatorService.this, 34, new Intent[]{loIntent}, PendingIntent.FLAG_IMMUTABLE);
+        if (GetIntervalMinutes() > 0){
 
-                new LocationRetriever(getApplication()).GetLocationOnBackgroud();
+            //todo: internal thread reference, for handling event inside main thread
+            ScheduledExecutorService runInterval = Executors.newSingleThreadScheduledExecutor();
 
-                createServiceNotification();
+            ScheduleTask.scheduleJob(GetIntervalMinutes(), GetIntervalMinutes(), TimeUnit.MINUTES, new ScheduleTask.onSchedule() {
+                @Override
+                public void onStart() {
+                    Intent loIntent = new Intent(GLocatorService.this, Activity_CollectionList.class);
+                    PendingIntent loPending  = PendingIntent.getActivities(GLocatorService.this, 34, new Intent[]{loIntent}, PendingIntent.FLAG_IMMUTABLE);
 
-                loNotif = new NotificationCompat.Builder(GLocatorService.this, "gRiderLocator");
-                loNotif.setContentTitle("Daily Collection Plan");
-                loNotif.setDefaults(NotificationCompat.DEFAULT_ALL);
-                loNotif.setSmallIcon(R.drawable.ic_location_tracker);
-                loNotif.setContentText("DCP location service is running...");
-                loNotif.setContentIntent(loPending);
-                loNotif.setAutoCancel(false);
-                loNotif.setPriority(NotificationCompat.PRIORITY_MAX);
+                    createServiceNotification();
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    startForeground(1, loNotif.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
-                } else {
-                    startForeground(1, loNotif.build());
+                    loNotif = new NotificationCompat.Builder(GLocatorService.this, "gRiderLocator");
+                    loNotif.setContentTitle("Daily Collection Plan");
+                    loNotif.setDefaults(NotificationCompat.DEFAULT_ALL);
+                    loNotif.setSmallIcon(R.drawable.ic_location_tracker);
+                    loNotif.setContentText("DCP location service is running...");
+                    loNotif.setContentIntent(loPending);
+                    loNotif.setAutoCancel(false);
+                    loNotif.setPriority(NotificationCompat.PRIORITY_MAX);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        startForeground(1, loNotif.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+                    } else {
+                        startForeground(1, loNotif.build());
+                    }
+
+                    //todo: ui thread handler, runs the sub thread on main interface
+                    Handler handler = new Handler(Looper.getMainLooper());
+
+                    //todo: internal thread, saving location per minute
+                    runInterval.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.post(() -> {
+                                LocationRetriever poLocation = new LocationRetriever(getApplication());
+                                poLocation.GetLocationOnBackgroud();
+                            });
+                        }
+                    },2, TimeUnit.MINUTES);
+
+                    Log.d("SERVICE START", "DCP LOCATION STARTED WITHIN " + GetIntervalMinutes());
                 }
-                Log.d("SERVICE START", "DCP LOCATION STARTED WITHIN " + GetIntervalMinutes());
-            }
 
-            @Override
-            public void onEnd() {
-                stopSelf();
-            }
-        });
-
+                @Override
+                public void onEnd() {
+                    runInterval.shutdown();
+                    stopSelf();
+                }
+            });
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 

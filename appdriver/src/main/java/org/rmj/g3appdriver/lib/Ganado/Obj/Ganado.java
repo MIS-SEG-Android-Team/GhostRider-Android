@@ -26,11 +26,9 @@ import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.etc.LocationInfo;
 import org.rmj.g3appdriver.lib.Etc.Relation;
 import org.rmj.g3appdriver.lib.Ganado.pojo.ClientInfo;
 import org.rmj.g3appdriver.lib.Ganado.pojo.InquiryInfo;
-import org.rmj.g3appdriver.utils.GeoLocator;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

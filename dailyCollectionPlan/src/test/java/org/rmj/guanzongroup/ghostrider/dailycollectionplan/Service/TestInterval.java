@@ -35,7 +35,7 @@ public class TestInterval {
     private long GetIntervalMinutes(){
         try {
             Date date1 = simpleDateFormat.parse(simpleDateFormat.format(Calendar.getInstance().getTime()));
-            Date date2 = simpleDateFormat.parse("2:25 PM");
+            Date date2 = simpleDateFormat.parse("10:23 AM");
 
             long interval = date2.getTime() - date1.getTime();
 

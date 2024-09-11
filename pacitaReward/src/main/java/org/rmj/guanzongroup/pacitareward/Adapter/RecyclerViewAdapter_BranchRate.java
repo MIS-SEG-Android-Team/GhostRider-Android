@@ -41,11 +41,11 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder_BranchRate holder, int position) {
         BranchRate loRate = poRatings.get(position);
-        String ratePos = String.valueOf(position + 1);
 
         Log.d(TAG, loRate.getsRateName());
 
         holder.item_question.setText(loRate.getsRateName());
+
         holder.pass_btn.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ResourceAsColor")
             @Override

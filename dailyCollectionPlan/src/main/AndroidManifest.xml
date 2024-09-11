@@ -36,7 +36,7 @@
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
 
         <service android:name=".Service.GLocatorService"
-            android:foregroundServiceType="location"/>
+            android:foregroundServiceType="location" />
     </application>
 
 </manifest>

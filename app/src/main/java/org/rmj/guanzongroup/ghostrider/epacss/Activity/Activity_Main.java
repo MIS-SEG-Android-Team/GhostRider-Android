@@ -308,6 +308,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     private void initReceiver(){
         IntentFilter loFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(poNetRecvr, loFilter);
+        
         AppConfigPreference.getInstance(Activity_Main.this).setIsMainActive(true);
         Log.e(TAG, "Internet status receiver has been registered.");
     }

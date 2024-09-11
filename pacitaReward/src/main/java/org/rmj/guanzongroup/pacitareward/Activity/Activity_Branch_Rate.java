@@ -17,6 +17,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPacitaEvaluation;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPacitaRule;
 import org.rmj.g3appdriver.etc.LoadDialog;
@@ -40,6 +42,7 @@ public class Activity_Branch_Rate extends AppCompatActivity {
     private String intentDataBranchcd;
     private String intentDataBranchName;
     private MaterialButton btn_submit;
+    private String lsPayload;
     private RecyclerViewAdapter_BranchRate loAdapter;
 
     @Override
@@ -104,13 +107,36 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                                     return;
                                 }
 
-                                String lsPayload = ePacitaEvaluation.getPayloadx();
+                                lsPayload = ePacitaEvaluation.getPayloadx();
                                 List<BranchRate> loRate = PacitaRule.ParseBranchRate(lsPayload, ePacitaRules);
 
                                 loAdapter = new RecyclerViewAdapter_BranchRate(Activity_Branch_Rate.this, loRate, new RecyclerViewAdapter_BranchRate.onSelect() {
                                     @Override
                                     public void onItemSelect(String EntryNox, String result) {
-                                        mViewModel.setEvaluationResult(transactNo, EntryNox, result);
+                                        try {
+
+                                            JSONArray loArray = new JSONArray(lsPayload);
+                                            for (int x = 0; x < loArray.length(); x++){
+
+                                                int lnEntryNo = loArray.getJSONObject(x).getInt("nEntryNox");
+
+                                                if(Integer.parseInt(EntryNox) == lnEntryNo){
+
+                                                    loArray.getJSONObject(x).put("xRatingxx", result);
+
+                                                }
+
+                                            }
+
+                                            //todo: collection of ratings result
+                                            lsPayload = loArray.toString();
+
+
+                                            //mViewModel.setEvaluationResult(transactNo, EntryNox, result);
+
+                                        }catch (JSONException e){
+                                            e.printStackTrace();
+                                        }
                                     }
                                 });
 
@@ -127,6 +153,9 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         if (!transactNo.isEmpty()){
+
+                            mViewModel.setEvaluationResult(transactNo, lsPayload);
+
                             mViewModel.saveBranchRatings(transactNo, new VMBranchRate.BranchRatingsCallback() {
                                 @Override
                                 public void onSave(String title, String message) {

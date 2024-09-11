@@ -142,7 +142,7 @@ public class Activity_CollectionList extends AppCompatActivity {
 
         mViewModel = new ViewModelProvider(this).get(VMCollectionList.class);
         loService = new Intent(Activity_CollectionList.this, GLocatorService.class);
-        serviceName = GLocatorService.class.getPackageName() + "."+ GLocatorService.class.getSimpleName();
+        serviceName = Objects.requireNonNull(GLocatorService.class.getPackage()).getName() + "."+ GLocatorService.class.getSimpleName();
         poConfig = AppConfigPreference.getInstance(this);
         dialogDisclosure = new DialogDisclosure(this);
 
@@ -296,6 +296,7 @@ public class Activity_CollectionList extends AppCompatActivity {
     public void finish() {
         super.finish();
 
+        getViewModelStore().clear();
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
 
@@ -323,10 +324,6 @@ public class Activity_CollectionList extends AppCompatActivity {
 
         poDialogx = new LoadDialog(Activity_CollectionList.this);
         poMessage = new MessageBox(Activity_CollectionList.this);
-
-        if (!ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
-            startService(loService);
-        }
     }
 
     private void initPermission(){
