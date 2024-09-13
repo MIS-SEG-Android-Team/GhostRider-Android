@@ -28,9 +28,9 @@ android {
         resources.merges.add("core.properties")
     }
 }
-configurations.implementation {
+/*configurations.implementation {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
-}
+}*/
 
 dependencies {
 

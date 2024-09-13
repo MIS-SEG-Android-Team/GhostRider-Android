@@ -22,8 +22,8 @@ android {
         applicationId "org.rmj.guanzongroup.ghostrider.epacss"
         minSdk 24
         targetSdk 34
-        versionCode 81
-        versionName "Guanzon Circle v4.22.062.081 s"
+        versionCode 82
+        versionName "Guanzon Circle v4.23.062.081 s"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -58,9 +58,9 @@ allprojects {
         google()
     }
 }
-configurations.implementation {
+/*configurations.implementation {
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
-}
+}*/
 
 dependencies {
 
