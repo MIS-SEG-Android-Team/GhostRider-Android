@@ -35,6 +35,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -54,11 +55,13 @@ import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCounter;
 import org.rmj.guanzongroup.petmanager.Adapter.TimeLogAdapter;
 import org.rmj.guanzongroup.petmanager.Dialog.DialogBranchSelection;
+import org.rmj.guanzongroup.petmanager.Dialog.DialogDisclosure;
 import org.rmj.guanzongroup.petmanager.Dialog.DialogSelfieLogRemarks;
 import org.rmj.guanzongroup.petmanager.R;
 import org.rmj.guanzongroup.petmanager.ViewModel.VMSelfieLog;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -78,6 +81,8 @@ public class Fragment_SelfieLog extends Fragment {
 
     private LoadDialog poLoad;
     private MessageBox poMessage;
+
+    private DialogDisclosure dialogDisclosure;
 
     private ActivityResultLauncher<Intent> poCamera;
 
@@ -104,6 +109,8 @@ public class Fragment_SelfieLog extends Fragment {
 
         mViewModel = new ViewModelProvider(this).get(VMSelfieLog.class);
 
+        dialogDisclosure = new DialogDisclosure(requireActivity());
+
         InitActivityResultLaunchers();
         initWidgets(view);
 
@@ -119,6 +126,7 @@ public class Fragment_SelfieLog extends Fragment {
         });
 
         txtDate.setText(new AppConstants().CURRENT_DATE_WORD);
+
         txtDate.setOnClickListener(v -> {
             final Calendar newCalendar = Calendar.getInstance();
             @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
@@ -253,15 +261,14 @@ public class Fragment_SelfieLog extends Fragment {
                 poLoad.dismiss();
             }
         }));
+
         btnCamera.setOnClickListener(v -> {
-            if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                poRequest.launch(new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.CAMERA
-                });
+
+                showDCPDisclosure();
+
             } else {
                 validateSelfieLog();
             }
@@ -451,6 +458,50 @@ public class Fragment_SelfieLog extends Fragment {
         });
     }
 
+    public void showDCPDisclosure(){
+        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
+            @Override
+            public void onAccept() {
+                dialogDisclosure.dismiss();
+
+                List<String> lsPermissions = new ArrayList<>();
+
+                if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                    lsPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+                }
+                if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                    lsPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+                }
+                if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    lsPermissions.add(Manifest.permission.CAMERA);
+                }
+
+                poRequest.launch(lsPermissions.toArray(new String[0]));
+            }
+
+            @Override
+            public void onDecline() {
+                dialogDisclosure.dismiss();
+
+                MessageBox loMessage = new MessageBox(requireActivity());
+                loMessage.initDialog();
+                loMessage.setTitle("Disclosure");
+                loMessage.setMessage("Disclosure denied. Selfie log cancelled.");
+                loMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                    }
+                });
+
+                loMessage.show();
+            }
+        });
+
+        dialogDisclosure.setMessage("Guanzon Circle requires location and camera permission to take selfie log when the app is in use.");
+        dialogDisclosure.show();
+    }
+
     private void InitActivityResultLaunchers(){
         poCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
@@ -497,32 +548,14 @@ public class Fragment_SelfieLog extends Fragment {
         poRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
             @Override
             public void onActivityResult(Map<String, Boolean> result) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    Boolean fineLoct = result.getOrDefault(
-                            Manifest.permission.ACCESS_FINE_LOCATION, false);
-                    Boolean coarseL = result.getOrDefault(
-                            Manifest.permission.ACCESS_COARSE_LOCATION, false);
-                    Boolean camerax = result.getOrDefault(
-                            Manifest.permission.CAMERA, false);
-                    if(Boolean.FALSE.equals(camerax)){
-                        Toast.makeText(requireActivity(), "Please allow camera permission to proceed.", Toast.LENGTH_SHORT).show();
-                    } else if(Boolean.FALSE.equals(fineLoct)){
-                        Toast.makeText(requireActivity(), "Please allow permission to get device location.", Toast.LENGTH_SHORT).show();
-                    } else if(Boolean.FALSE.equals(coarseL)){
-                        Toast.makeText(requireActivity(), "Please allow permission to get device location.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        validateSelfieLog();
-                    }
+                if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                        checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                        checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                    showDCPDisclosure();
+
                 } else {
-                    if(checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                        Toast.makeText(requireActivity(), "Please allow camera permission to proceed.", Toast.LENGTH_SHORT).show();
-                    } else if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                        Toast.makeText(requireActivity(), "Please allow permission to get device location.", Toast.LENGTH_SHORT).show();
-                    } else if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                        Toast.makeText(requireActivity(), "Please allow permission to get device location.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        validateSelfieLog();
-                    }
+                    validateSelfieLog();
                 }
             }
         });
