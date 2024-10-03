@@ -310,6 +310,8 @@ public class ApprovalCode {
             lsSqlQryxx = MiscUtil.addCondition(lsSqlQryxx, lsCondition);
         }
 
+        Log.d(TAG, lsSqlQryxx);
+
         return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
     }
 

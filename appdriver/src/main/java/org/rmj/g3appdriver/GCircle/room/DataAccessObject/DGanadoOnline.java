@@ -126,7 +126,6 @@ public interface DGanadoOnline {
         public String ModelIDx;
         public String ModelNme;
         public String BrandIDx;
-        public String sBrandNme;
         public String ColorIDx;
         public String ColorNme;
     }

@@ -14,12 +14,12 @@ plugins {
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         multiDexEnabled true
         minSdk 21
-        targetSdk 34
+        targetSdk 35
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
