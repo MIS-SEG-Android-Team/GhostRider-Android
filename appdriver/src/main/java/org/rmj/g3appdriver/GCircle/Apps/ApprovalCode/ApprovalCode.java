@@ -35,7 +35,6 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
-import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.Obj.LoanApproval;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.Obj.ManualLog;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.Obj.SystemCode;
