@@ -261,6 +261,25 @@
                         android:layout_marginBottom="10dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Remarks"
+                    style="@style/TextInputStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txt_remarks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="@string/free_text_restriction"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:focusedByDefault="false"
+                        android:inputType="number|none"
+                        android:maxLength="50"
+                        android:layout_marginBottom="10dp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_createCreditApp"
                     android:layout_width="wrap_content"

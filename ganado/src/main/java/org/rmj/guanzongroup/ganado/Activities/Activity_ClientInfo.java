@@ -48,7 +48,9 @@ public class Activity_ClientInfo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_client_info);
+
         initWidgets();
 
         poMessage = new MessageBox(Activity_ClientInfo.this);
@@ -105,6 +107,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
                         }
                     });
                     ArrayAdapter<String> adapters1 = new ArrayAdapter<>(Activity_ClientInfo.this, android.R.layout.simple_spinner_dropdown_item, string.toArray(new String[0]));
+
                     txtMunicipl.setAdapter(adapters1);
                     txtMunicipl.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -130,6 +133,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
                 }
             }
         });
+
         txtBirthDt.setOnClickListener(v -> {
             final Calendar newCalendar = Calendar.getInstance();
             @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
@@ -159,7 +163,9 @@ public class Activity_ClientInfo extends AppCompatActivity {
                 mViewModel.getModel().setGenderCd("1");
             }
         });
+
         btnContinue.setOnClickListener(v ->{
+
             mViewModel.InitLocation();
 
             mViewModel.getModel().setFrstName(txtFrstNm.getText().toString());
@@ -220,9 +226,11 @@ public class Activity_ClientInfo extends AppCompatActivity {
         });
     }
     private void initWidgets() {
+
         toolbar = findViewById(R.id.toolbar_PersonalInfo);
         mViewModel = new ViewModelProvider(Activity_ClientInfo.this).get(VMPersonalInfo.class);
         poMessage = new MessageBox(Activity_ClientInfo.this);
+
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -255,7 +263,9 @@ public class Activity_ClientInfo extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private class OnItemClickListener implements AdapterView.OnItemClickListener {
+
         private final View loView;
+
         public OnItemClickListener(View loView) {
             this.loView = loView;
         }
@@ -263,7 +273,9 @@ public class Activity_ClientInfo extends AppCompatActivity {
         @SuppressLint("ResourceAsColor")
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
             if(loView == spinner_relation){
+
                 mViewModel.getRelation().observe(Activity_ClientInfo.this, relations->{
                     mViewModel.getModel().setsReltionx(relations.get(i).getRelatnID());
 

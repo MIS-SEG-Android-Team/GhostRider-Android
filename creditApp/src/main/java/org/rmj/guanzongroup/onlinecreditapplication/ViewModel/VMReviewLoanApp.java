@@ -116,7 +116,7 @@ public class VMReviewLoanApp  extends AndroidViewModel {
     }
 
     public void SaveData(OnSaveCreditAppListener listener) {
-//        new SaveDetailTask(listener).execute(poInfo);
+
         TaskExecutor.Execute(poInfo, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
@@ -158,97 +158,3 @@ public class VMReviewLoanApp  extends AndroidViewModel {
         });
     }
 }
-//    private class ParseDataTask extends AsyncTask<ECreditApplicantInfo, Void, List<ReviewAppDetail>>{
-//
-//        private final OnParseListener listener;
-//
-//        public ParseDataTask(OnParseListener listener) {
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected List<ReviewAppDetail> doInBackground(ECreditApplicantInfo... app) {
-//            try {
-//                List<ReviewAppDetail> loDetail =  (List<ReviewAppDetail>) poApp.Parse(app[0]);
-//                if(loDetail == null){
-//                    message = poApp.getMessage();
-//                    return null;
-//                }
-//                return loDetail;
-//            }  catch (NullPointerException e){
-//                e.printStackTrace();
-//                message = getLocalMessage(e);
-//                return null;
-//            }catch (Exception e){
-//                e.printStackTrace();
-//                message = getLocalMessage(e);
-//                return null;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(List<ReviewAppDetail>  result) {
-//            super.onPostExecute(result);
-//            if(result == null){
-//                Log.e(TAG, message);
-//            } else {
-//                listener.OnParse(result);
-//            }
-//        }
-//    }
-
-//    private class SaveDetailTask extends AsyncTask<ECreditApplicantInfo, Void, Integer>{
-//
-//        private final OnSaveCreditAppListener listener;
-//
-//        private String message;
-//
-//        public SaveDetailTask(OnSaveCreditAppListener listener) {
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            listener.OnSave();
-//        }
-//
-//        @Override
-//        protected Integer doInBackground(ECreditApplicantInfo... eCreditApplicantInfos) {
-//            String lsResult = poApp.Save(eCreditApplicantInfos[0]);
-//            if(lsResult == null){
-//                message = poApp.getMessage();
-//                return 0;
-//            }
-//
-//            if(!poConn.isDeviceConnected()){
-//                message = "Credit application has been save to local.";
-//                return 2;
-//            }
-//
-//            if(!poCredt.UploadApplication(lsResult)){
-//                message = poCredt.getMessage();
-//                return 0;
-//            }
-//            message = "Credit application saved!";
-//            return 1;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Integer result) {
-//            super.onPostExecute(result);
-//            switch (result){
-//                case 1:
-//                    listener.OnSuccess(message);
-//                    break;
-//                case 2:
-//                    listener.OnSaveLocal(message);
-//                    break;
-//                default:
-//                    listener.OnFailed(message);
-//                    break;
-//            }
-//        }
-//    }
-//
-//}

@@ -26,7 +26,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import androidx.annotation.NonNull;
@@ -52,12 +51,13 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
     private VMIntroductoryQuestion mViewModel;
     private MessageBox poMessage;
 
-    private MaterialTextView lblBranchNm, lblBrandAdd, lblDate;
+    private MaterialTextView lblBranchNm, lblBrandAdd;
     private MaterialAutoCompleteTextView txtBranchNm, txtBrandNm, txtModelNm;
-    private TextInputLayout tilApplType;
-    private TextInputEditText txtDownPymnt, txtAmort, txtDTarget;
+    private TextInputEditText txtDownPymnt, txtAmort, txtDTarget, txt_remarks;
     private MaterialAutoCompleteTextView spnApplType, spnCustType, spnAcctTerm;
     private MaterialButton btnCreate;
+
+    private Double ldblMinDown = 0.00;
 
     public static Activity_IntroductoryQuestion newInstance() {
         return new Activity_IntroductoryQuestion();
@@ -66,9 +66,12 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_introductory_question);
+
         mViewModel = new ViewModelProvider(Activity_IntroductoryQuestion.this).get(VMIntroductoryQuestion.class);
         poMessage = new MessageBox(Activity_IntroductoryQuestion.this);
-        setContentView(R.layout.activity_introductory_question);
+
         initWidgets();
 
         mViewModel.GetUserInfo().observe(Activity_IntroductoryQuestion.this, eBranchInfo -> {
@@ -86,6 +89,7 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
         spnCustType.setText(CreditAppConstants.CUSTOMER_TYPE[0]);
         spnAcctTerm.setText(CreditAppConstants.INSTALLMENT_TERM[0]);
         spnApplType.setAdapter(CreditAppConstants.getAdapter(Activity_IntroductoryQuestion.this, CreditAppConstants.APPLICATION_TYPE));
+
         mViewModel.getModel().setAppTypex("1");
 
         spnCustType.setAdapter(CreditAppConstants.getAdapter(Activity_IntroductoryQuestion.this, CreditAppConstants.CUSTOMER_TYPE));
@@ -100,15 +104,20 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
         txtDTarget.setText(new AppConstants().CURRENT_DATE_WORD);
 
         txtDTarget.setOnClickListener(v -> {
+
             final Calendar newCalendar = Calendar.getInstance();
+
             @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
             final DatePickerDialog  StartTime = new DatePickerDialog(Activity_IntroductoryQuestion.this, (view131, year, monthOfYear, dayOfMonth) -> {
                 Calendar newDate = Calendar.getInstance();
                 newDate.set(year, monthOfYear, dayOfMonth);
                 String lsDate = dateFormatter.format(newDate.getTime());
+
                 txtDTarget.setText(lsDate);
                 mViewModel.getModel().setTargetDte(lsDate);
+
             }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+
             StartTime.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
             StartTime.show();
         });
@@ -189,21 +198,29 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
 
         mViewModel.GetModelID().observe(Activity_IntroductoryQuestion.this, modelID -> {
             try{
+
                 String lsModel = mViewModel.getModel().getModelIDxx();
                 int lnTermxx = mViewModel.getModel().getAccTermxx();
+
                 mViewModel.GetInstallmentPlanDetail(modelID).observe(Activity_IntroductoryQuestion.this, mcDPInfo -> {
                     try{
+
+                        //todo: parse data retrieved
                         if(mViewModel.InitializeTermAndDownpayment(mcDPInfo)) {
 
+                            //todo: get amortization detail
                             mViewModel.GetAmortizationDetail(lsModel, lnTermxx).observe(Activity_IntroductoryQuestion.this, mcAmortInfo -> {
 
                                 mViewModel.setModelAmortization(mcAmortInfo);
 
-                                double lnMinDp = mViewModel.GetMinimumDownpayment();
-                                mViewModel.getModel().setDownPaymt(lnMinDp);
-                                txtDownPymnt.setText(String.valueOf(lnMinDp));
+                                //todo: get minimum downpayment
+                                ldblMinDown = mViewModel.GetMinimumDownpayment();
+
+                                mViewModel.getModel().setDownPaymt(ldblMinDown);
+                                txtDownPymnt.setText(String.valueOf(ldblMinDown));
 
                                 double lnAmort = mViewModel.GetMonthlyPayment(mViewModel.getModel().getAccTermxx());
+
                                 mViewModel.getModel().setMonthlyAm(lnAmort);
                                 txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(lnAmort)));
 
@@ -264,24 +281,37 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
         });
 
         btnCreate.setOnClickListener(view -> {
-            mViewModel.SaveData(new OnSaveInfoListener() {
-                @Override
-                public void OnSave(String args) {
-                    Intent loIntent = new Intent(Activity_IntroductoryQuestion.this, Activity_PersonalInfo.class);
-                    loIntent.putExtra("sTransNox", args);
-                    startActivity(loIntent);
-                    overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
-                }
 
-                @Override
-                public void OnFailed(String message) {
-                    poMessage.initDialog();
-                    poMessage.setTitle("Credit Online Application");
-                    poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                }
-            });
+            if (ldblMinDown > mViewModel.getModel().getDownPaymt()){
+                poMessage.initDialog();
+                poMessage.setTitle("Credit Online Application");
+                poMessage.setMessage("Minimum down is not sufficient.");
+                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.show();
+
+            }else {
+
+                mViewModel.getModel().setsRemarks(Objects.requireNonNull(txt_remarks.getText()).toString());
+
+                mViewModel.SaveData(new OnSaveInfoListener() {
+                    @Override
+                    public void OnSave(String args) {
+                        Intent loIntent = new Intent(Activity_IntroductoryQuestion.this, Activity_PersonalInfo.class);
+                        loIntent.putExtra("sTransNox", args);
+                        startActivity(loIntent);
+                        overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+                    }
+
+                    @Override
+                    public void OnFailed(String message) {
+                        poMessage.initDialog();
+                        poMessage.setTitle("Credit Online Application");
+                        poMessage.setMessage(message);
+                        poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                        poMessage.show();
+                    }
+                });
+            }
         });
     }
 
@@ -292,12 +322,13 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
     }
 
     private void initWidgets(){
+
         MaterialToolbar toolbar = findViewById(R.id.toolbar_introduction);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
         lblBranchNm = findViewById(R.id.lbl_headerBranch);
         lblBrandAdd = findViewById(R.id.lbl_headerAddress);
-        lblDate = findViewById(R.id.lbl_headerDate);
         txtBranchNm = findViewById(R.id.txt_branchName);
         txtBrandNm = findViewById(R.id.txt_brandName);
         txtModelNm = findViewById(R.id.txt_modelName);
@@ -305,9 +336,9 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
         txtAmort = findViewById(R.id.txt_monthlyAmort);
         txtDTarget = findViewById(R.id.txt_dateTarget);
         spnApplType = findViewById(R.id.spn_applicationType);
-        tilApplType = findViewById(R.id.til_customerType);
         spnCustType = findViewById(R.id.spn_customerType);
         spnAcctTerm = findViewById(R.id.spn_installmentTerm);
+        txt_remarks = findViewById(R.id.txt_remarks);
 
         btnCreate = findViewById(R.id.btn_createCreditApp);
     }

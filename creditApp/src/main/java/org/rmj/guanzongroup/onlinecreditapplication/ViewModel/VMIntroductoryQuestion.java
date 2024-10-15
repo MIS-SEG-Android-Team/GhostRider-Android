@@ -128,7 +128,7 @@ public class VMIntroductoryQuestion extends AndroidViewModel implements CreditAp
 
     @Override
     public void SaveData(OnSaveInfoListener listener) {
-//        new CreateNewApplicationTask(listener).execute(poModel);
+
         TaskExecutor.Execute(poModel, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
@@ -168,47 +168,4 @@ public class VMIntroductoryQuestion extends AndroidViewModel implements CreditAp
         });
     }
 }
-//    private class CreateNewApplicationTask extends AsyncTask<LoanInfo, Void, String>{
-//
-//        private final OnSaveInfoListener listener;
-//
-//        public CreateNewApplicationTask(OnSaveInfoListener listener) {
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected String doInBackground(LoanInfo... loanInfos) {
-//            try {
-//                LoanInfo loDetail = loanInfos[0];
-//
-//                if (!loDetail.isDataValid()) {
-//                    message = loDetail.getMessage();
-//                    return null;
-//                }
-//
-//                String lsResult = poApp.CreateApplication(loDetail);
-//
-//                if (lsResult == null){
-//                    message = poApp.getMessage();
-//                    return null;
-//                }
-//
-//                return lsResult;
-//            } catch (Exception e){
-//                e.printStackTrace();
-//                message = getLocalMessage(e);
-//                return null;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            super.onPostExecute(result);
-//            if(result == null){
-//                listener.OnFailed(message);
-//            } else {
-//                listener.OnSave(result);
-//            }
-//        }
-//    }
-//}
+

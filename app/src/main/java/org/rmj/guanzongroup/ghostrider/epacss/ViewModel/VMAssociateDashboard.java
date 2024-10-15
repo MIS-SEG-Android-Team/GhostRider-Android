@@ -84,7 +84,7 @@ public class VMAssociateDashboard extends AndroidViewModel {
     }
 
     public void CheckApplicationsForApproval(OnCheckEmployeeApplicationListener listener) {
-//        new CheckApplicationForApprovalTask(listener).execute();
+
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {

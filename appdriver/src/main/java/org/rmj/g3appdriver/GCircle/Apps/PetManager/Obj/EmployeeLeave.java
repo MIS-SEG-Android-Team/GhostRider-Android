@@ -63,6 +63,8 @@ public class EmployeeLeave extends PetMngr {
                     new JSONObject().toString(),
                     poHeaders.getHeaders());
 
+            Log.d(TAG, lsResponse);
+
             if(lsResponse == null){
                 message = SERVER_NO_RESPONSE;
                 return false;
@@ -70,6 +72,7 @@ public class EmployeeLeave extends PetMngr {
 
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
+
             if (lsResult.equalsIgnoreCase("error")) {
                 JSONObject loError = loResponse.getJSONObject("error");
                 message = getErrorMessage(loError);

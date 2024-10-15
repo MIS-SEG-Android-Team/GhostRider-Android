@@ -386,6 +386,8 @@ public class CreditOnlineApplication {
             loApp.setCreatedx(AppConstants.DATE_MODIFIED());
             loApp.setTransact(AppConstants.CURRENT_DATE());
             loApp.setTranStat("0");
+            loApp.setRemarksx(foVal.getsRemarks());
+
             poDao.Save(loApp);
 
             Log.d(TAG, "New credit online application has been created.");
@@ -516,6 +518,7 @@ public class CreditOnlineApplication {
 
     public boolean InitializeMcInstallmentTerms(DMcModel.McDPInfo args){
         try{
+
             org.json.simple.JSONObject loJson = new org.json.simple.JSONObject();
             loJson.put("sModelIDx", args.ModelIDx);
             loJson.put("sModelNme", args.ModelNme);
@@ -527,6 +530,7 @@ public class CreditOnlineApplication {
             loJson.put("nLastPrce", args.LastPrce);
 
             poPrice.setModelInfo(loJson);
+
             return true;
         } catch (Exception e){
             e.printStackTrace();

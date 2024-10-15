@@ -135,10 +135,14 @@ public class Activity_Evaluation extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(VMEvaluation.class);
+
         setContentView(R.layout.activity_evaluation);
+
+        mViewModel = new ViewModelProvider(this).get(VMEvaluation.class);
+
         initWidgets();
         initIntentData();
+
         psTransNo = getIntent().getStringExtra("transno");
         mViewModel.GetApplicationDetail(psTransNo).observe(Activity_Evaluation.this, ci -> {
             try{

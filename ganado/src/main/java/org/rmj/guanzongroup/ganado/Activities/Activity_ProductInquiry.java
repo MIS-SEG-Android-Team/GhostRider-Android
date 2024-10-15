@@ -54,7 +54,9 @@ public class Activity_ProductInquiry extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_product_inquiry);
+
         initWidgets();
 
         spnPayment.setAdapter(GConstants.getAdapter(Activity_ProductInquiry.this, GConstants.PAYMENT_FORM));
@@ -84,6 +86,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+
         mViewModel.GetModelColor(lsModelID).observe(Activity_ProductInquiry.this, colorList->{
             try {
                 ArrayList<String> string = new ArrayList<>();
@@ -101,6 +104,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+
         spn_color.setOnItemClickListener(new OnItemClickListener(spn_color));
         spnAcctTerm.setOnItemClickListener(new OnItemClickListener(spnAcctTerm));
         txtDownPymnt.addTextChangedListener(new FormatUIText.CurrencyFormat(txtDownPymnt));

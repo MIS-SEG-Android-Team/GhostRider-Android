@@ -86,7 +86,7 @@ public class VMCreditApplications extends AndroidViewModel {
 //
 
     public void ResendApplication(String ars, OnResendApplicationListener listener){
-//        new ResendApplicationTask(listener).execute(ars);
+
         TaskExecutor.Execute(ars, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
