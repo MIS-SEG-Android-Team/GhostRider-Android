@@ -75,7 +75,6 @@ public class VMReviewLoanApp  extends AndroidViewModel {
     }
 
     public void ParseData(ECreditApplicantInfo args, OnParseListener listener) {
-//        new ParseDataTask(listener).execute(args);
         TaskExecutor.Execute(args, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
@@ -110,17 +109,14 @@ public class VMReviewLoanApp  extends AndroidViewModel {
         });
     }
 
-
-    public void Validate(Object args) {
-
-    }
-
     public void SaveData(OnSaveCreditAppListener listener) {
 
         TaskExecutor.Execute(poInfo, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
+
                 ECreditApplicantInfo lsInfo = (ECreditApplicantInfo) args;
+
                 String lsResult = poApp.Save(lsInfo);
                 if (lsResult == null) {
                     message = poApp.getMessage();

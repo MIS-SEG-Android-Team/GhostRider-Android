@@ -271,12 +271,10 @@
                         android:id="@+id/txt_remarks"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:digits="@string/free_text_restriction"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:focusedByDefault="false"
-                        android:inputType="number|none"
+                        android:inputType="textMultiLine|textCapWords"
                         android:maxLength="50"
+                        android:lines="3"
+                        android:maxLines="5"
                         android:layout_marginBottom="10dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 

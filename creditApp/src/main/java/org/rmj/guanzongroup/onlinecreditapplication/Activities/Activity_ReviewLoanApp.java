@@ -32,7 +32,6 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
 
     private String TransNox;
     private MaterialTextView lblClientNm;
-//    private ListView recyclerView;
     private RecyclerView recyclerView;
     private ShapeableImageView imgClient;
     private MaterialButton btnCamera;

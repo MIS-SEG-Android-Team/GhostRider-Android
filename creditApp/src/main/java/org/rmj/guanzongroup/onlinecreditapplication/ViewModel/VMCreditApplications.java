@@ -50,7 +50,6 @@ public class VMCreditApplications extends AndroidViewModel {
     }
 
     public void ImportApplications(OnImportApplicationsListener listener){
-//        new ImportApplicationsTask(listener).execute();
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -116,76 +115,3 @@ public class VMCreditApplications extends AndroidViewModel {
         });
     }
 }
-//private class ImportApplicationsTask extends AsyncTask<Void, Void, Boolean>{
-//
-//        private final OnImportApplicationsListener listener;
-//        private String message;
-//
-//        public ImportApplicationsTask(OnImportApplicationsListener listener) {
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            listener.OnImport();
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(Void... voids) {
-//            if(!poConn.isDeviceConnected()){
-//                message = poApp.getMessage();
-//                return false;
-//            }
-//
-//            if(!poApp.DownloadApplications()){
-//                message = poApp.getMessage();
-//                return false;
-//            }
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean isSuccess) {
-//            super.onPostExecute(isSuccess);
-//            if(!isSuccess){
-//                listener.OnFailed(message);
-//            } else {
-//                listener.OnSuccess();
-//            }
-//        }
-//    }
-//private class ResendApplicationTask extends AsyncTask<String, Void, Boolean> {
-//
-//    private final VMCreditApplications.OnResendApplicationListener listener;
-//
-//    private String message;
-//
-//    public ResendApplicationTask(VMCreditApplications.OnResendApplicationListener listener) {
-//        this.listener = listener;
-//    }
-//
-//    @Override
-//    protected Boolean doInBackground(String... strings) {
-//        if(!poConn.isDeviceConnected()){
-//            message = poConn.getMessage();
-//            return false;
-//        }
-//
-//        if(!poApp.UploadApplication(strings[0])){
-//            message = poApp.getMessage();
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    @Override
-//    protected void onPostExecute(Boolean isSuccess) {
-//        super.onPostExecute(isSuccess);
-//        if(!isSuccess){
-//            listener.OnFailed(message);
-//        } else {
-//            listener.OnSuccess();
-//        }
-//    }
-//}

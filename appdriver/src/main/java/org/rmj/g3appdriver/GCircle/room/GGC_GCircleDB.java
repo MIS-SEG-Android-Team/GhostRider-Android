@@ -222,7 +222,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EMCModelCashPrice.class,
         EEmpLoan.class,
         ELoanTypes.class,
-        ESCARqstEmp.class}, version = 41, exportSchema = false)
+        ESCARqstEmp.class}, version = 42, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -303,7 +303,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                      GGC_GCircleDB.class, "GGC_ISysDBF.db")
                     .allowMainThreadQueries()
                     .addCallback(roomCallBack)
-                    .addMigrations(MIGRATION_V41)
+                    .addMigrations(MIGRATION_V42)
                     .build();
         }
         return instance;
@@ -338,7 +338,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
         }
     }
 
-    static final Migration MIGRATION_V41 = new Migration(40, 41) {
+    static final Migration MIGRATION_V42 = new Migration(41, 42) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             // Add the new column
@@ -360,6 +360,9 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             }
             if (!CheckColumnExists(database, "Ganado_Online", "dPricexxx")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN dPricexxx TEXT");
+            }
+            if (!CheckColumnExists(database, "Credit_Applicant_Info", "sRemarksx")){
+                database.execSQL("ALTER TABLE Credit_Applicant_Info ADD COLUMN sRemarksx TEXT");
             }
         }
     };

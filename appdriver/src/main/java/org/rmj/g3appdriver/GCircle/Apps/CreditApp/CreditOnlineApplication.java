@@ -375,8 +375,10 @@ public class CreditOnlineApplication {
             loGocas.PurchaseInfo().setAccountTerm(foVal.getAccTermxx());
             loGocas.PurchaseInfo().setDateApplied(AppConstants.DATE_MODIFIED());
             loGocas.PurchaseInfo().setMonthlyAmortization(foVal.getMonthlyAm());
+            loGocas.PurchaseInfo().setRemarks(foVal.getsRemarks());
 
             lsTransNo = CreateUniqueIDForApplicant();
+
             ECreditApplicantInfo loApp = new ECreditApplicantInfo();
             loApp.setTransNox(lsTransNo);
             loApp.setPurchase(loGocas.PurchaseInfo().toJSONString());
@@ -386,7 +388,7 @@ public class CreditOnlineApplication {
             loApp.setCreatedx(AppConstants.DATE_MODIFIED());
             loApp.setTransact(AppConstants.CURRENT_DATE());
             loApp.setTranStat("0");
-            loApp.setRemarksx(foVal.getsRemarks());
+            loApp.setRemarksx(loGocas.PurchaseInfo().getRemarks());
 
             poDao.Save(loApp);
 

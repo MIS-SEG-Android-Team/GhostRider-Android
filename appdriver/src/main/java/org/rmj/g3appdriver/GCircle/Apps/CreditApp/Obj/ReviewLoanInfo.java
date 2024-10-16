@@ -670,9 +670,12 @@ public class ReviewLoanInfo implements CreditApp {
                     loInfo.getCreatedx());
 
             if(loExist == null) {
+
                 String lsTransNo = CreateUniqueID();
+
                 ECreditApplication loDetail = new ECreditApplication();
                 GoCasBuilder loModel = new GoCasBuilder(loInfo);
+
                 loDetail.setTransNox(lsTransNo);
                 loDetail.setBranchCd(loInfo.getBranchCd());
                 loDetail.setClientNm(loInfo.getClientNm());
@@ -686,7 +689,10 @@ public class ReviewLoanInfo implements CreditApp {
                 loDetail.setTimeStmp(AppConstants.DATE_MODIFIED());
                 loDetail.setTranStat("0");
                 loDetail.setSendStat("0");
+                loDetail.setRemarksx(loInfo.getRemarksx());
+
                 poDao.Save(loDetail);
+
                 return lsTransNo;
             }
 
