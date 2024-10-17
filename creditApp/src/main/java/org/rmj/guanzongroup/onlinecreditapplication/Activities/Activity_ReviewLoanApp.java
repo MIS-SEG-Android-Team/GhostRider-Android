@@ -33,8 +33,6 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
     private String TransNox;
     private MaterialTextView lblClientNm;
     private RecyclerView recyclerView;
-    private ShapeableImageView imgClient;
-    private MaterialButton btnCamera;
     private MaterialButton btnSave, btnPrvs;
 
     private LoadDialog poDialogx;
@@ -90,10 +88,6 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
         lblClientNm = findViewById(R.id.lbl_clientNme);
 
         recyclerView = findViewById(R.id.recyclerview_applicationInfo);
-
-        imgClient = findViewById(R.id.img_loanApplicant);
-
-        btnCamera = findViewById(R.id.btn_camera);
 
         btnSave = findViewById(R.id.btn_loanAppSave);
 
