@@ -64,7 +64,9 @@ public class Fragment_PayslipList extends Fragment {
                     AdapterPayslip loAdapter = new AdapterPayslip(payslips, new AdapterPayslip.OnDownloadPayslipListener() {
                         @Override
                         public void DownloadPayslip(String messageID, String link) {
+
                             mViewModel.SendReadResponse(messageID);
+
                             mViewModel.DownloadPaySlip(link, new VMPaySlipList.OnDownloadPayslipListener() {
                                 @Override
                                 public void OnDownload() {

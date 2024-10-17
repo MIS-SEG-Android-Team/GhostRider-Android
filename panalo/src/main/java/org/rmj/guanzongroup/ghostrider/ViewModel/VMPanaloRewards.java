@@ -36,55 +36,6 @@ public class VMPanaloRewards extends AndroidViewModel {
         new GetRewardsTask(listener).execute(fnArgs);
     }
 
-    /*private class GetRewardsTask extends AsyncTask<Integer, Void, Boolean>{
-
-        private final OnRetrieveRewardsListener listener;
-        private List<PanaloRewards> earned, claimed;
-        private String message;
-
-        public GetRewardsTask(OnRetrieveRewardsListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            listener.OnLoad("Panalo Rewards", "Checking rewards. Please wait...");
-        }
-
-        @Override
-        protected Boolean doInBackground(Integer... integers) {
-            try {
-                earned = poSys.GetRewards("0");
-                if (earned == null) {
-                    message = poSys.getMessage();
-                    Log.e(TAG, message);
-                }
-
-                Thread.sleep(1000);
-                claimed = poSys.GetRewards("1");
-                if (claimed == null) {
-                    message = poSys.getMessage();
-                    Log.e(TAG, message);
-                }
-                return true;
-            } catch (Exception e){
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess){
-                listener.OnFailed(message);
-            } else {
-                listener.OnSuccess(earned, claimed);
-            }
-        }
-    }*/
     private class GetRewardsTask{
         private final OnRetrieveRewardsListener listener;
         private List<PanaloRewards> earned, claimed;

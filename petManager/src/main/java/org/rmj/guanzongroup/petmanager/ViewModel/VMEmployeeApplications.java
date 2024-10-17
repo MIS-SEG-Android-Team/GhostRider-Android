@@ -14,7 +14,6 @@ package org.rmj.guanzongroup.petmanager.ViewModel;
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.app.Application;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;

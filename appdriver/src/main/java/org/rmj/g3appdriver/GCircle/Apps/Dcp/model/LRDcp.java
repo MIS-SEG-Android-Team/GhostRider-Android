@@ -360,16 +360,6 @@ public class LRDcp {
                 return false;
             }
 
-//
-//            ParcelFileDescriptor pfd = instance.getContentResolver().
-//                    openFileDescriptor(uri, "w");
-//            FileOutputStream fileOutputStream =
-//                    new FileOutputStream(pfd.getFileDescriptor());
-//            fileOutputStream.write(loArray.toString().getBytes());
-//            // Let the document provider know you're done by closing the stream.
-//            fileOutputStream.close();
-//            pfd.close();
-
             return true;
         } catch (Exception e){
             e.printStackTrace();

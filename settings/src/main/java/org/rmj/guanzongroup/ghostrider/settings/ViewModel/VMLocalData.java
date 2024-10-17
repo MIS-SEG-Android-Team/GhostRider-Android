@@ -45,6 +45,8 @@ import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_Occupations;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_Relation;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_SCARequest;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_SysConfig;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 import org.rmj.guanzongroup.ghostrider.settings.Objects.LocalData;
 import org.rmj.guanzongroup.ghostrider.settings.utils.DatabaseExport;
 
@@ -114,83 +116,75 @@ public class VMLocalData extends AndroidViewModel {
     }
 
     public void RefreshAllRecords(OnRefreshDataCallback callback){
-        new RefreshAllRecordsTask(instance, callback).execute();
-    }
 
-    public static class RefreshAllRecordsTask extends AsyncTask<String, Void, String>{
-        private final Application instance;
-        private final OnRefreshDataCallback callback;
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnLoad("Local Data", "Refreshing all local data. Please wait...");
+            }
 
-        private final ImportInstance[]  importInstances;
+            @Override
+            public Object DoInBackground(Object args) {
+                String result;
 
-        public RefreshAllRecordsTask(Application application, OnRefreshDataCallback callback){
-            this.instance = application;
-            this.callback = callback;
-            importInstances = new ImportInstance[]{
-                    new Import_BankList(instance),
-                    new ImportFileCode(instance),
-                    new Import_Relation(instance),
-                    new ImportBranch(instance),
-                    new ImportBrand(instance),
-                    new ImportBrandModel(instance),
-                    new ImportCategory(instance),
-                    new ImportProvinces(instance),
-                    new ImportMcModelPrice(instance),
-                    new ImportTown(instance),
-                    new ImportBarangay(instance),
-                    new ImportMcTermCategory(instance),
-                    new ImportCountry(instance),
-                    new Import_Occupations(instance),
-                    new Import_SCARequest(instance),
-                    new Import_SysConfig(instance)};
-        }
+                try {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            callback.OnLoad("Local Data", "Refreshing all local data. Please wait...");
-        }
+                    ImportInstance[] importInstances = new ImportInstance[]{
+                            new Import_BankList(instance),
+                            new ImportFileCode(instance),
+                            new Import_Relation(instance),
+                            new ImportBranch(instance),
+                            new ImportBrand(instance),
+                            new ImportBrandModel(instance),
+                            new ImportCategory(instance),
+                            new ImportProvinces(instance),
+                            new ImportMcModelPrice(instance),
+                            new ImportTown(instance),
+                            new ImportBarangay(instance),
+                            new ImportMcTermCategory(instance),
+                            new ImportCountry(instance),
+                            new Import_Occupations(instance),
+                            new Import_SCARequest(instance),
+                            new Import_SysConfig(instance)};
 
-        @Override
-        protected String doInBackground(String... strings) {
-            String result;
-            try {
-                for (int x = 0; x < importInstances.length; x++) {
-                    importInstances[x].ImportData(new ImportDataCallback() {
-                        @Override
-                        public void OnSuccessImportData() {
+                    for (int x = 0; x < importInstances.length; x++) {
+                        importInstances[x].ImportData(new ImportDataCallback() {
+                            @Override
+                            public void OnSuccessImportData() {
 
+                            }
+
+                            @Override
+                            public void OnFailedImportData(String message) {
+
+                            }
+                        });
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-
-                        @Override
-                        public void OnFailedImportData(String message) {
-
-                        }
-                    });
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
+
+                    result = "success";
+                } catch (Exception e){
+                    e.printStackTrace();
+                    result = "error";
+                }
+                return result;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if(object.toString().equalsIgnoreCase("success")) {
+                    callback.OnSuccess();
+                } else {
+                    callback.OnFailed();
                 }
 
-                result = "success";
-            } catch (Exception e){
-                e.printStackTrace();
-                result = "error";
             }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String integer) {
-            super.onPostExecute(integer);
-            if(integer.equalsIgnoreCase("success")) {
-                callback.OnSuccess();
-            } else {
-                callback.OnFailed();
-            }
-        }
+        });
     }
 
     public void ExportDatabase(){

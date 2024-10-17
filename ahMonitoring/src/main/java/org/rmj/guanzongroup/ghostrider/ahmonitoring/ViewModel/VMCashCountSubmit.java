@@ -12,7 +12,6 @@
 package org.rmj.guanzongroup.ghostrider.ahmonitoring.ViewModel;
 
 import android.app.Application;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -156,31 +155,5 @@ public class VMCashCountSubmit extends AndroidViewModel {
                 }
             }
         });
-    }
-
-    public void CheckConnectivity(OnDeviceConnectionCheck callback){
-        new ConnectionCheckTask(instance, callback).execute();
-    }
-
-    private static class ConnectionCheckTask extends AsyncTask<String, Void, Boolean>{
-
-        private final Application instance;
-        private final OnDeviceConnectionCheck callback;
-
-        public ConnectionCheckTask(Application instance, OnDeviceConnectionCheck callback) {
-            this.instance = instance;
-            this.callback = callback;
-        }
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            return new ConnectionUtil(instance).isDeviceConnected();
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isConnected) {
-            super.onPostExecute(isConnected);
-            callback.OnCheck(isConnected);
-        }
     }
 }
