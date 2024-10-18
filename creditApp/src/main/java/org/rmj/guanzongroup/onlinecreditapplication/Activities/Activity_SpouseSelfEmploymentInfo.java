@@ -49,10 +49,14 @@ public class Activity_SpouseSelfEmploymentInfo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_spouse_self_employment_info);
+
         mViewModel = new ViewModelProvider(Activity_SpouseSelfEmploymentInfo.this).get(VMSpouseBusiness.class);
         poMessage = new MessageBox(Activity_SpouseSelfEmploymentInfo.this);
-        setContentView(R.layout.activity_spouse_self_employment_info);
+
         initWidgets();
+
         mViewModel.InitializeApplication(getIntent());
         mViewModel.GetApplication().observe(Activity_SpouseSelfEmploymentInfo.this, app -> {
             try {
@@ -189,9 +193,10 @@ public class Activity_SpouseSelfEmploymentInfo extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });

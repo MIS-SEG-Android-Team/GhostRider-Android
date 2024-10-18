@@ -52,7 +52,6 @@ import static org.rmj.g3appdriver.etc.AppConstants.STORAGE_REQUEST;
 
 public class Fragment_Settings  extends PreferenceFragmentCompat {
 
-//    private SwitchPreferenceCompat themePreference;
     private Preference locationPref,
             cameraPref,
             phonePref,
@@ -71,7 +70,6 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //        themePreference = getPreferenceManager().findPreference("themePrefs");
         cameraPref = getPreferenceManager().findPreference("cameraPrefs");
         locationPref = getPreferenceManager().findPreference("locationPrefs");
         phonePref = getPreferenceManager().findPreference("phonePrefs");
@@ -98,18 +96,6 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
 
         mViewModel.getCameraSummary().observe(getViewLifecycleOwner(),s -> cameraPref.setSummary(s));
 
-//        if (themePreference != null) {
-//            themePreference.setOnPreferenceChangeListener((preference, newValue) -> {
-//                Boolean themeOption = (Boolean) newValue;
-//                if (themeOption) {
-//                    themePreference.getSummaryOn();
-//                } else {
-//                    themePreference.getSummaryOff();
-//                }
-////                ThemeHelper.applyTheme(themeOption);
-//                return true;
-//            });
-//        }
         if (cameraPref != null) {
             cameraPref.setOnPreferenceClickListener(preference -> {
                 if ((ActivityCompat.checkSelfPermission(requireActivity(), CAMERA) != PackageManager.PERMISSION_GRANTED)) {
@@ -118,7 +104,8 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                     });
                 }else {
                     loMessage.initDialog();
-                    loMessage.setNegativeButton("Okay", (v, dialog) -> dialog.dismiss());
+                    loMessage.setIcon(R.drawable.baseline_message_24);
+                    loMessage.setNegativeButton("Dismiss", (v, dialog) -> dialog.dismiss());
                     loMessage.setTitle("GhostRider Permissions");
                     loMessage.setMessage("You have already granted this permission.");
                     loMessage.show();
@@ -144,7 +131,8 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                 }else {
 
                     loMessage.initDialog();
-                    loMessage.setNegativeButton("Okay", (v, dialog) -> dialog.dismiss());
+                    loMessage.setNegativeButton("Dismiss", (v, dialog) -> dialog.dismiss());
+                    loMessage.setIcon(R.drawable.baseline_message_24);
                     loMessage.setTitle("GhostRider Permissions");
                     loMessage.setMessage("You have already granted this permission.");
                     loMessage.show();
@@ -198,9 +186,10 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                     public void OnSuccess() {
                         poDialog.dismiss();
                         loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_message_24);
                         loMessage.setTitle("Change Password");
                         loMessage.setMessage("Account updated successfully");
-                        loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                        loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                         loMessage.show();
                         dialog.dismiss();
                     }
@@ -209,9 +198,10 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                     public void OnFailed(String message) {
                         poDialog.dismiss();
                         loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_error_24);
                         loMessage.setTitle("Change Password");
                         loMessage.setMessage(message);
-                        loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                        loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                         loMessage.show();
                     }
                 }));

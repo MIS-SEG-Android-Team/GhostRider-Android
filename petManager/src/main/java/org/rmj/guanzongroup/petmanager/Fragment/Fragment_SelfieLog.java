@@ -47,7 +47,6 @@ import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.etc.GToast;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
@@ -178,10 +177,11 @@ public class Fragment_SelfieLog extends Fragment {
                                 @Override
                                 public void OnFailed(String message) {
                                     poLoad.dismiss();
+                                    poMessage.setIcon(R.drawable.baseline_error_24);
                                     poMessage.initDialog();
                                     poMessage.setTitle("Selfie Login");
                                     poMessage.setMessage(message);
-                                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                                    poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                                     poMessage.show();
                                 }
                             });
@@ -240,9 +240,10 @@ public class Fragment_SelfieLog extends Fragment {
                                 poLoad.dismiss();
 
                                 poMessage.initDialog();
+                                poMessage.setIcon(R.drawable.baseline_error_24);
                                 poMessage.setTitle("Selfie Login");
                                 poMessage.setMessage(message);
-                                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                                 poMessage.show();
                             }
                         });
@@ -329,9 +330,10 @@ public class Fragment_SelfieLog extends Fragment {
                     public void OnFailed(String message) {
                         poLoad.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Selfie Login");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                             dialog.dismiss();
                             if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
                                 requireActivity().finish();
@@ -374,6 +376,7 @@ public class Fragment_SelfieLog extends Fragment {
             public void OnFailed(String message, Intent intent, String[] args) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_contact_support_24);
                 poMessage.setTitle("Selfie Login");
                 poMessage.setMessage(message + "\n Proceed taking selfie log?");
                 poMessage.setPositiveButton("Continue", (view, dialog) -> {
@@ -413,6 +416,7 @@ public class Fragment_SelfieLog extends Fragment {
             public void OnWarning(String message) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_contact_support_24);
                 poMessage.setTitle("Selfie Login");
                 poMessage.setMessage("A Cash count entry for current branch already exist on local device. Create another entry?");
                 poMessage.setPositiveButton("Create", (view, dialog) -> {
@@ -435,9 +439,10 @@ public class Fragment_SelfieLog extends Fragment {
             public void OnFailed(String message) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Selfie Login");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                     dialog.dismiss();
                     if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
                         requireActivity().finish();
@@ -450,9 +455,10 @@ public class Fragment_SelfieLog extends Fragment {
             public void OnUnauthorize(String message) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Selfie Log");
                 poMessage.setMessage("Selfie log save.");
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -484,6 +490,7 @@ public class Fragment_SelfieLog extends Fragment {
                 dialogDisclosure.dismiss();
 
                 MessageBox loMessage = new MessageBox(requireActivity());
+                loMessage.setIcon(R.drawable.baseline_error_24);
                 loMessage.initDialog();
                 loMessage.setTitle("Disclosure");
                 loMessage.setMessage("Disclosure denied. Selfie log cancelled.");
@@ -532,9 +539,10 @@ public class Fragment_SelfieLog extends Fragment {
                             public void OnFailed(String message) {
                                 poLoad.dismiss();
                                 poMessage.initDialog();
+                                poMessage.setIcon(R.drawable.baseline_error_24);
                                 poMessage.setTitle("Selfie Log");
                                 poMessage.setMessage(message);
-                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                                 poMessage.show();
                             }
                         });

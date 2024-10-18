@@ -17,8 +17,6 @@ import android.view.MenuItem;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.rmj.g3appdriver.etc.LoadDialog;
-import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.model.CreditAppDocs;
 import org.rmj.guanzongroup.documentscanner.Activity_DocumentScan;
 import org.rmj.guanzongroup.documentscanner.xxxImageStatic;
@@ -29,9 +27,6 @@ import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMApplicantDocumen
 public class Activity_ApplicantDocuments extends AppCompatActivity {
 
     private VMApplicantDocuments mViewModel;
-
-    private LoadDialog poDialogx;
-    private MessageBox poMessage;
 
     private CreditAppDocs poDetail;
 
@@ -107,8 +102,6 @@ public class Activity_ApplicantDocuments extends AppCompatActivity {
     }
 
     public void initWidgets(){
-        poDialogx = new LoadDialog(Activity_ApplicantDocuments.this);
-        poMessage = new MessageBox(Activity_ApplicantDocuments.this);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");

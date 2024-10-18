@@ -91,9 +91,10 @@ public class Activity_CreateAccount extends AppCompatActivity implements CreateA
     public void OnSuccessRegistration() {
         dialog.dismiss();
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_message_24);
         loMessage.setTitle("Create Account");
         loMessage.setMessage("A verification email has been sent to your email account. Please check your inbox or spam folder.");
-        loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
+        loMessage.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
         loMessage.show();
     }
 
@@ -101,9 +102,10 @@ public class Activity_CreateAccount extends AppCompatActivity implements CreateA
     public void OnFailedRegistration(String message) {
         dialog.dismiss();
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setTitle("Create Account");
         loMessage.setMessage(message);
-        loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
+        loMessage.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
         loMessage.show();
     }
 }

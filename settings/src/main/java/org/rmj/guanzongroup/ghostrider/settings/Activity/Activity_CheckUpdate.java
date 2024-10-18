@@ -141,9 +141,10 @@ public class Activity_CheckUpdate extends AppCompatActivity {
                         }
                     } else {
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("System Update");
                         poMessage.setMessage("No update available.");
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 });

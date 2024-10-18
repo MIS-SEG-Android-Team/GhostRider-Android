@@ -363,9 +363,10 @@ public class Activity_CollectionList extends AppCompatActivity {
             public void OnFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -384,9 +385,10 @@ public class Activity_CollectionList extends AppCompatActivity {
             public void OnSuccess() {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage("Dcp posted successfully.");
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                     dialog.dismiss();
 
                     if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
@@ -400,9 +402,10 @@ public class Activity_CollectionList extends AppCompatActivity {
             public void OnFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -410,6 +413,7 @@ public class Activity_CollectionList extends AppCompatActivity {
 
     private void ClearDCPRecords(){
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_contact_support_24);
         poMessage.setTitle("Daily Collection Plan");
         poMessage.setMessage("WARNING, Clearing dcp records will erase your all your daily collection plan and collection remittance records on this device. \nClear records?");
         poMessage.setPositiveButton("Clear", (view, dialog) -> {
@@ -426,9 +430,10 @@ public class Activity_CollectionList extends AppCompatActivity {
                 public void OnSuccess() {
                     poDialogx.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_message_24);
                     poMessage.setTitle("Daily Collection Plan");
                     poMessage.setMessage("Records cleared successfully.");
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                     poMessage.show();
                 }
 
@@ -436,9 +441,10 @@ public class Activity_CollectionList extends AppCompatActivity {
                 public void OnFailed(String message) {
                     poDialogx.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Daily Collection Plan");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                     poMessage.show();
                 }
             });
@@ -484,9 +490,10 @@ public class Activity_CollectionList extends AppCompatActivity {
             public void OnFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -529,6 +536,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                                 public void OnSelect(AlertDialog clientList, EDCPCollectionDetail detail) {
                                     // Validation if user accidentally tap on list on
                                     poMessage.initDialog();
+                                    poMessage.setIcon(R.drawable.baseline_contact_support_24);
                                     poMessage.setTitle("Add Collection");
                                     poMessage.setMessage("Add " + detail.getFullName() + " with account number " +
                                             detail.getAcctNmbr() + " to list of collection?");
@@ -546,9 +554,10 @@ public class Activity_CollectionList extends AppCompatActivity {
                                             public void OnSuccess() {
                                                 poDialogx.dismiss();
                                                 poMessage.initDialog();
+                                                poMessage.setIcon(R.drawable.baseline_message_24);
                                                 poMessage.setTitle("Daily Collection Plan");
                                                 poMessage.setMessage( detail.getFullName() + " has been added to collection list.");
-                                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                                                 poMessage.show();
                                             }
 
@@ -556,9 +565,10 @@ public class Activity_CollectionList extends AppCompatActivity {
                                             public void OnFailed(String message) {
                                                 poDialogx.dismiss();
                                                 poMessage.initDialog();
+                                                poMessage.setIcon(R.drawable.baseline_error_24);
                                                 poMessage.setTitle("Daily Collection Plan");
                                                 poMessage.setMessage(message);
-                                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                                                 poMessage.show();
                                             }
                                         });
@@ -581,9 +591,10 @@ public class Activity_CollectionList extends AppCompatActivity {
                         public void OnFailedDownload(String message) {
                             poDialogx.dismiss();
                             poMessage.initDialog();
+                            poMessage.setIcon(R.drawable.baseline_error_24);
                             poMessage.setTitle("Daily Collection Plan");
                             poMessage.setMessage(message);
-                            poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                            poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                             poMessage.show();
                         }
                     });
@@ -644,6 +655,7 @@ public class Activity_CollectionList extends AppCompatActivity {
 
                 MessageBox loMessage = new MessageBox(Activity_CollectionList.this);
                 loMessage.initDialog();
+                loMessage.setIcon(R.drawable.baseline_error_24);
                 loMessage.setTitle("Disclosure");
                 loMessage.setMessage("Disclosure denied. Download cancelled.");
                 loMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {

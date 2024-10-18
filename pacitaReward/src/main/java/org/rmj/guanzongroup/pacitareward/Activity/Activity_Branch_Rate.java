@@ -3,7 +3,6 @@ package org.rmj.guanzongroup.pacitareward.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -167,9 +166,10 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                                 public void onSuccess(String message) {
                                     poLoad.dismiss();
                                     poMessage.initDialog();
+                                    poMessage.setIcon(R.drawable.baseline_message_24);
                                     poMessage.setTitle("Save Evaluation");
                                     poMessage.setMessage(message);
-                                    poMessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                                    poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                                         @Override
                                         public void OnButtonClick(View view, AlertDialog dialog) {
                                             dialog.dismiss();
@@ -183,9 +183,10 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                                 public void onFailed(String message) {
                                     poLoad.dismiss();
                                     poMessage.initDialog();
+                                    poMessage.setIcon(R.drawable.ic_toast_error);
                                     poMessage.setTitle("Error Saving Application");
                                     poMessage.setMessage(message);
-                                    poMessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                                    poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                                         @Override
                                         public void OnButtonClick(View view, AlertDialog dialog) {
                                             dialog.dismiss();
@@ -202,9 +203,10 @@ public class Activity_Branch_Rate extends AppCompatActivity {
             public void OnError(String message) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Transaction Result");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();

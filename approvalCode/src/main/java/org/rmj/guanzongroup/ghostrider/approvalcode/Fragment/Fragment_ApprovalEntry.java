@@ -166,6 +166,7 @@ public class Fragment_ApprovalEntry extends Fragment {
         btnCreate.setOnClickListener(view -> {
             if(!createNew){
                 poMesgBox.initDialog();
+                poMesgBox.setIcon(R.drawable.baseline_contact_support_24);
                 poMesgBox.setTitle("Approval Code");
                 poMesgBox.setMessage("Create new approval code?");
                 poMesgBox.setPositiveButton("Yes", (view13, dialog) -> {
@@ -218,7 +219,8 @@ public class Fragment_ApprovalEntry extends Fragment {
                     public void OnFailed(String message) {
                         poLoad.dismiss();
                         poMesgBox.initDialog();
-                        poMesgBox.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                        poMesgBox.setIcon(R.drawable.baseline_error_24);
+                        poMesgBox.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                         poMesgBox.setTitle("Approval Code");
                         poMesgBox.setMessage(message);
                         poMesgBox.show();

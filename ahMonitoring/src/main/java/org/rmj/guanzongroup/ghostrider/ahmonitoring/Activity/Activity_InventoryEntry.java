@@ -32,7 +32,6 @@ import com.google.android.material.divider.MaterialDivider;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.FormatUIText;
 import org.rmj.g3appdriver.etc.GToast;
-import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Model.RandomItem;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.R;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.ViewModel.VMInventoryEntry;
@@ -44,8 +43,6 @@ public class Activity_InventoryEntry extends AppCompatActivity {
 
     private VMInventoryEntry mViewModel;
     private RandomItem poItem;
-
-    private MessageBox poMessage;
 
     private MaterialTextView lblTransNox, lblItemxx, lblBarcode;
     private TextInputEditText txtDate,
@@ -134,8 +131,6 @@ public class Activity_InventoryEntry extends AppCompatActivity {
         txtSection = findViewById(R.id.txt_invSection);
         txtBin = findViewById(R.id.txt_invBin);
         btnSave = findViewById(R.id.btn_saveInventory);
-
-        poMessage = new MessageBox(Activity_InventoryEntry.this);
     }
 
     @Override

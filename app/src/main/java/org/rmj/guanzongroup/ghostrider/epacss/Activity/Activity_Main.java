@@ -171,9 +171,10 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                             loIntent = poParentLst.get(groupPosition).getIntent(Activity_Main.this);
                             if(loIntent == null){
                                 loMessage.initDialog();
+                                loMessage.setIcon(R.drawable.baseline_error_24);
                                 loMessage.setTitle("Dashboard");
                                 loMessage.setMessage("Feature not available.");
-                                loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                                loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                                 loMessage.show();
                             } else {
                                 startActivity(loIntent);
@@ -187,9 +188,10 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                         loIntent = poChild.get(poParentLst.get(groupPosition)).get(childPosition).getIntent(Activity_Main.this);
                         if(loIntent == null){
                             loMessage.initDialog();
+                            loMessage.setIcon(R.drawable.baseline_error_24);
                             loMessage.setTitle("Dashboard");
                             loMessage.setMessage("Feature not available.");
-                            loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                            loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                             loMessage.show();
                         } else {
                             startActivity(loIntent);
@@ -253,9 +255,10 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 public void OnFailed(String message) {
                     poDialog.dismiss();
                     loMessage.initDialog();
+                    loMessage.setIcon(R.drawable.baseline_error_24);
                     loMessage.setTitle("Guanzon Circle");
                     loMessage.setMessage(message);
-                    loMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                    loMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                     loMessage.show();
                 }
             });
@@ -286,9 +289,10 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                         poDialog.dismiss();
 
                         loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_error_24);
                         loMessage.setTitle("Employee QR");
                         loMessage.setMessage(message);
-                        loMessage.setPositiveButton("Close", (view1, dialog) -> dialog.dismiss());
+                        loMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
 
                         loMessage.show();
                     }
@@ -381,6 +385,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 finish();
             });
             loMessage.setNegativeButton("No", (view, dialog) -> dialog.dismiss());
+            loMessage.setIcon(R.drawable.baseline_contact_support_24);
             loMessage.setTitle("Guanzon Circle");
             loMessage.setMessage("Exit Guanzon Circle app?");
             loMessage.show();
@@ -411,6 +416,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 AppConfigPreference.getInstance(Activity_Main.this).setIsAppFirstLaunch(false);
                 startActivity(new Intent(Activity_Main.this, Activity_SplashScreen.class));
             });
+            loMessage.setIcon(R.drawable.baseline_contact_support_24);
             loMessage.setTitle("Account Session");
             loMessage.setMessage("Are you sure you want to end session/logout?");
             loMessage.show();

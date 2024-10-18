@@ -111,7 +111,7 @@ public class VMRaffleEntry extends AndroidViewModel {
 
                 try {
 
-                    response = WebClient.sendRequest(poApi.getUrlImportRaffleBasis(), new JSONObject().getString(), headers.getHeaders());
+                    response = WebClient.sendRequest(poApi.getUrlImportRaffleBasis(), new JSONObject().toString(), headers.getHeaders());
 
                     Log.e(TAG, response);
 

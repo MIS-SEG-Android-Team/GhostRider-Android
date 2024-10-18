@@ -11,7 +11,6 @@
 
 package org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -35,7 +34,6 @@ import android.webkit.WebView;
 import android.widget.ProgressBar;
 
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.R;
 
 import java.io.File;
@@ -85,6 +83,7 @@ public class Activity_Browser extends AppCompatActivity {
         if(item.getItemId() == android.R.id.home){
             MessageBox loMessage = new MessageBox(Activity_Browser.this);
             loMessage.initDialog();
+            loMessage.setIcon(R.drawable.baseline_contact_support_24);
             loMessage.setTitle("App Browser");
             loMessage.setMessage("Are you sure you want to exit?");
             loMessage.setPositiveButton("Exit", (view, dialog) -> {

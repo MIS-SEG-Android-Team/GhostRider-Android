@@ -55,6 +55,7 @@ public class DialogCashCountBranch {
         loAdapter = new AdapterInventoryBranch(poList, (BranchCode, BranchName) -> {
             try{
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_contact_support_24);
                 poMessage.setTitle("Branch Selected");
                 poMessage.setMessage("You selected " + BranchName + ". continue cash count?");
                 poMessage.setPositiveButton("Yes", (view12, dialog) -> {

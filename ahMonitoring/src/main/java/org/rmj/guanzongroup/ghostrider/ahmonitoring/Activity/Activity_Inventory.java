@@ -91,9 +91,10 @@ public class Activity_Inventory extends AppCompatActivity {
                 public void OnFailed(String message) {
                     poDialog.dismiss();
                     poMessage.initDialog();
-                    poMessage.setTitle("");
+                    poMessage.setIcon(R.drawable.baseline_error_24);
+                    poMessage.setTitle("Inventory Failed");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                         dialog.dismiss();
                         finish();
                     });
@@ -129,9 +130,10 @@ public class Activity_Inventory extends AppCompatActivity {
                         public void OnSuccess() {
                             poDialog.dismiss();
                             poMessage.initDialog();
+                            poMessage.setIcon(R.drawable.baseline_message_24);
                             poMessage.setTitle("Random Stock Inventory");
                             poMessage.setMessage("Inventory has been save. Successfully.");
-                            poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                            poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                                 dialog.dismiss();
                                 finish();
                             });
@@ -142,9 +144,10 @@ public class Activity_Inventory extends AppCompatActivity {
                         public void OnFailed(String message) {
                             poDialog.dismiss();
                             poMessage.initDialog();
+                            poMessage.setIcon(R.drawable.baseline_error_24);
                             poMessage.setTitle("Random Stock Inventory");
                             poMessage.setMessage(message);
-                            poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                            poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                                 dialog.dismiss();
                             });
                             poMessage.show();
@@ -180,6 +183,7 @@ public class Activity_Inventory extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){
             poMessage.initDialog();
+            poMessage.setIcon(R.drawable.baseline_contact_support_24);
             poMessage.setTitle("Random Stock Inventory");
             poMessage.setMessage("Exit Random Stock Inventory?");
             poMessage.setPositiveButton("Yes", (view, dialog) -> {
@@ -197,6 +201,7 @@ public class Activity_Inventory extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_contact_support_24);
         poMessage.setTitle("Random Stock Inventory");
         poMessage.setMessage("Exit Random Stock Inventory?");
         poMessage.setPositiveButton("Yes", (view, dialog) -> {
@@ -237,9 +242,10 @@ public class Activity_Inventory extends AppCompatActivity {
                     public void OnFailed(String message) {
                         poDialog.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Random Stock Inventory");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                             dialog.dismiss();
                         });
                         poMessage.show();
@@ -252,9 +258,10 @@ public class Activity_Inventory extends AppCompatActivity {
                 poDialog.dismiss();
                 poDialog.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Random Stock Inventory");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                     dialog.dismiss();
                     finish();
                 });
@@ -291,6 +298,7 @@ public class Activity_Inventory extends AppCompatActivity {
                                 startActivity(loIntent);
                             } else {
                                 poMessage.initDialog();
+                                poMessage.setIcon(R.drawable.baseline_contact_support_24);
                                 poMessage.setTitle("Random Stock Inventory");
                                 poMessage.setMessage("Update inventory details for " + args[0] + "? \n" +
                                         "\n" +

@@ -45,6 +45,7 @@ import org.rmj.guanzongroup.ghostrider.epacss.R;
 import org.rmj.guanzongroup.ghostrider.epacss.Service.DataDownloadService;
 import org.rmj.guanzongroup.ghostrider.epacss.Service.GMessagingService;
 import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMSplashScreen;
+import org.rmj.guanzongroup.petmanager.Dialog.DialogDisclosure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,21 +114,29 @@ public class Activity_SplashScreen extends AppCompatActivity {
     private void InitializeAppContentDisclosure(){
         boolean isFirstLaunch = AppConfigPreference.getInstance(Activity_SplashScreen.this).isAppFirstLaunch();
         if(isFirstLaunch) {
-            MessageBox loMessage = new MessageBox(Activity_SplashScreen.this);
-            loMessage.initDialog();
-            loMessage.setTitle("Guanzon Circle");
-            loMessage.setMessage("Guanzon Circle collects location data for Selfie Log, DCP and other major features of the app" +
+
+            DialogDisclosure dialogDisclosure = new DialogDisclosure(this);
+            dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
+                @Override
+                public void onAccept() {
+                    dialogDisclosure.dismiss();
+                    CheckPermissions();
+                }
+
+                @Override
+                public void onDecline() {
+                    dialogDisclosure.dismiss();
+                    finish();
+                }
+            });
+
+            dialogDisclosure.setMessage("Guanzon Circle collects location data for Selfie Log, DCP and other major features of the app" +
                     " even when the app is closed or not in use.");
-            loMessage.setPositiveButton("Agree", (view, dialog) -> {
-                dialog.dismiss();
-                CheckPermissions();
-            });
-            loMessage.setNegativeButton("Disagree", (view, dialog) -> {
-                dialog.dismiss();
-                finish();
-            });
-            loMessage.show();
+
+            dialogDisclosure.show();
+
             findViewById(R.id.lblFirstLaunchNotice).setVisibility(View.VISIBLE);
+
         } else {
             CheckPermissions();
         }
@@ -185,9 +194,10 @@ public class Activity_SplashScreen extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poDialog.initDialog();
+                poDialog.setIcon(R.drawable.baseline_error_24);
                 poDialog.setTitle("Guanzon Circle");
                 poDialog.setMessage(message);
-                poDialog.setPositiveButton("Okay", (view, dialog) -> {
+                poDialog.setPositiveButton("Dismiss", (view, dialog) -> {
                     dialog.dismiss();
                     finish();
                 });
