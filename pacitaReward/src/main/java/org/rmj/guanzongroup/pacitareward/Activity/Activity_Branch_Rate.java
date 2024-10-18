@@ -93,10 +93,11 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                         if(ePacitaEvaluation == null){
                             return;
                         }
+
                         ePacitaEvaluation.setTransNox(transactNo);
 
                         mViewModel.GetCriteria().observe(Activity_Branch_Rate.this, new Observer<List<EPacitaRule>>() {
-                            @SuppressLint("NotifyDataSetChanged")
+
                             @Override
                             public void onChanged(List<EPacitaRule> ePacitaRules) {
                                 if(ePacitaRules == null){
@@ -115,7 +116,8 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                                         try {
 
                                             JSONArray loArray = new JSONArray(lsPayload);
-                                            for (int x = 0; x < loArray.length(); x++){
+
+                                            for (int x = 0;  x < loArray.length(); x++){
 
                                                 int lnEntryNo = loArray.getJSONObject(x).getInt("nEntryNox");
 
@@ -130,16 +132,12 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                                             //todo: collection of ratings result
                                             lsPayload = loArray.toString();
 
-
-                                            //mViewModel.setEvaluationResult(transactNo, EntryNox, result);
-
                                         }catch (JSONException e){
                                             e.printStackTrace();
                                         }
                                     }
                                 });
 
-                                loAdapter.notifyDataSetChanged();
 
                                 rate_list.setAdapter(loAdapter);
                                 rate_list.setLayoutManager(new LinearLayoutManager(Activity_Branch_Rate.this, LinearLayoutManager.VERTICAL, false));
