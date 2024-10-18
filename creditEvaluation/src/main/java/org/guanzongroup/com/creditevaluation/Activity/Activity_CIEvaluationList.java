@@ -124,9 +124,10 @@ public class Activity_CIEvaluationList extends AppCompatActivity  implements VME
     public void onImportFailed(String message) {
         poDialogx.dismiss();
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_error_24);
         poMessage.setTitle("CI Evaluation List");
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
         poMessage.show();
     }
 
@@ -152,9 +153,10 @@ public class Activity_CIEvaluationList extends AppCompatActivity  implements VME
                                 Dialog.dismiss();
                                 poDialogx.dismiss();
                                 poMessage.initDialog();
+                                poMessage.setIcon(R.drawable.baseline_message_24);
                                 poMessage.setTitle("Add Application");
                                 poMessage.setMessage("Credit Application saved successfully");
-                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                                 poMessage.show();
                             }
 
@@ -162,9 +164,10 @@ public class Activity_CIEvaluationList extends AppCompatActivity  implements VME
                             public void OnFailedResult(String message) {
                                 poDialogx.dismiss();
                                 poMessage.initDialog();
+                                poMessage.setIcon(R.drawable.baseline_error_24);
                                 poMessage.setTitle("Add Application");
                                 poMessage.setMessage(message);
-                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                                 poMessage.show();
                             }
                         });

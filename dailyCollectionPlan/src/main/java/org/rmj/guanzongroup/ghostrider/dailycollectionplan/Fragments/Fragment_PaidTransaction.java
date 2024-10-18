@@ -316,9 +316,10 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
     public void OnSuccessResult() {
         poDialog.dismiss();
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("Transaction Success");
         poMessage.setMessage("Collection save successfully");
-        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
             dialog.dismiss();
             requireActivity().finish();
         });
@@ -329,9 +330,10 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
     public void OnFailedResult(String message) {
         poDialog.dismiss();
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_error_24);
         poMessage.setTitle("Daily Collection Plan");
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
             dialog.dismiss();
             if(message.equalsIgnoreCase("Collection info has been save.")){
                 requireActivity().finish();

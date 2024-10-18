@@ -179,6 +179,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
 
             if (!mViewModel.InitLocation()){
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("BENTA");
                 poMessage.setMessage(mViewModel.GetMessage());
                 poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
@@ -197,9 +198,10 @@ public class Activity_ClientInfo extends AppCompatActivity {
                         poDialogx.dismiss();
 
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("BENTA");
                         poMessage.setMessage(args);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                             dialog.dismiss();
                             Intent loIntent = new Intent(Activity_ClientInfo.this, Activity_Inquiries.class);
                             loIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -216,9 +218,10 @@ public class Activity_ClientInfo extends AppCompatActivity {
                         poDialogx.dismiss();
 
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("BENTA");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 });

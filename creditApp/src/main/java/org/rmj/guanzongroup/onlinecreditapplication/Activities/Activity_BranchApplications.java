@@ -76,9 +76,10 @@ public class Activity_BranchApplications extends AppCompatActivity {
             public void OnFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -106,30 +107,6 @@ public class Activity_BranchApplications extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-//
-//    @Override
-//    public void onSuccessImport() {
-//        poDialogx.dismiss();
-//    }
-//
-//
-//
-//    @Override
-//    public void onStartImport() {
-//        poDialogx.initDialog("Branch Application List", "Importing latest data. Please wait...", false);
-//        poDialogx.show();
-//    }
-//
-//    @Override
-//    public void onImportFailed(String message) {
-//        poDialogx.dismiss();
-//        poMessage.initDialog();
-//        poMessage.setTitle("Branch Applications List");
-//        poMessage.setMessage(message);
-//        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-//        poMessage.show();
-//    }
 
     public void initData(){
         mViewModel.GetBranchApplications().observe(Activity_BranchApplications.this, applications -> {

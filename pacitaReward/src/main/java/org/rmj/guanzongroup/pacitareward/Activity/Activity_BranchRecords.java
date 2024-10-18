@@ -103,9 +103,10 @@ public class Activity_BranchRecords extends AppCompatActivity {
             public void onError(String message) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Transaction Result");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();

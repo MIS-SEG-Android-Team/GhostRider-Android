@@ -202,9 +202,10 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
             if (nMinDownPay > lnInput){
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Product Inquiry");
                 poMessage.setMessage("The downpayment should not be less than the minimum required amount");
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
 
                 return;
@@ -222,9 +223,10 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 @Override
                 public void OnFailed(String message) {
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Product Inquiry");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                     poMessage.show();
                     txtAmort.setText("0");
                     mViewModel.getModel().setMonthAmr("0");
@@ -238,9 +240,10 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
             if (nMinDownPay > lnInput){
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Product Inquiry");
                 poMessage.setMessage("The downpayment should not be less than the minimum required amount");
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
 
                 return;
@@ -266,9 +269,10 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                         @Override
                         public void OnFailed(String message) {
                             poMessage.initDialog();
+                            poMessage.setIcon(R.drawable.baseline_error_24);
                             poMessage.setTitle("Product Inquiry");
                             poMessage.setMessage(message);
-                            poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                            poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                             poMessage.show();
                         }
                     });
@@ -278,9 +282,10 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 @Override
                 public void OnFailed(String message) {
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Product Inquiry");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                     poMessage.show();
                     txtAmort.setText("0");
                     mViewModel.getModel().setMonthAmr("0");
@@ -366,9 +371,10 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
                 if (nMinDownPay > lnInput){
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Product Inquiry");
                     poMessage.setMessage("The downpayment should not be less than the minimum required amount");
-                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                     poMessage.show();
 
                     return;

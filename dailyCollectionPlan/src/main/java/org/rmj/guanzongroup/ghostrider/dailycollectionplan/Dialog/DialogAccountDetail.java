@@ -219,9 +219,10 @@ public class DialogAccountDetail {
         } catch (Exception e){
             e.printStackTrace();
             poMessage.initDialog();
+            poMessage.setIcon(R.drawable.baseline_error_24);
             poMessage.setTitle("Error Report");
             poMessage.setMessage(e.getMessage());
-            poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+            poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
             poMessage.show();
         }
     }

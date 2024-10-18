@@ -156,9 +156,10 @@ public class Fragment_IncTransaction extends Fragment {
                     @Override
                     public void OnSuccessResult() {
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("Daily Collection Plan");
                         poMessage.setMessage("Collection detail has been save.");
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                             dialog.dismiss();
                             requireActivity().finish();
                         });
@@ -168,9 +169,10 @@ public class Fragment_IncTransaction extends Fragment {
                     @Override
                     public void OnFailedResult(String message) {
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Daily Collection Plan");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 });
@@ -185,9 +187,10 @@ public class Fragment_IncTransaction extends Fragment {
             return;
         }
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("Daily Collection Plan");
         poMessage.setMessage("Please take a selfie with the customer or within the area of the customer.");
-        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
             dialog.dismiss();
             mViewModel.InitCameraLaunch(requireActivity(), TransNox, new OnInitializeCameraCallback() {
                 @Override
@@ -210,6 +213,7 @@ public class Fragment_IncTransaction extends Fragment {
                 public void OnFailed(String message, Intent intent, String[] args) {
                     poDialog.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_contact_support_24);
                     poMessage.setTitle("Daily Collection Plan");
                     poMessage.setMessage(message + "\n Proceed taking selfie?");
                     poMessage.setPositiveButton("Continue", (view, dialog) -> {

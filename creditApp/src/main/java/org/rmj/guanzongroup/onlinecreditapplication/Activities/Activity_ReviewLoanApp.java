@@ -106,9 +106,10 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
             public void OnSuccess(String args) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(args);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                     dialog.dismiss();
                     startActivity(new Intent(Activity_ReviewLoanApp.this, Activity_CreditApplications.class));
                     finish();
@@ -120,9 +121,10 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
             public void OnSaveLocal(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                     dialog.dismiss();
                     startActivity(new Intent(Activity_ReviewLoanApp.this, Activity_CreditApplications.class));
                     finish();
@@ -134,9 +136,10 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
             public void OnFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         }));

@@ -190,9 +190,10 @@ public class Activity_Employee_Applications extends AppCompatActivity implements
 
     private void showDialogMessage(String message){
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("PET Manager");
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
         poMessage.show();
     }
 }

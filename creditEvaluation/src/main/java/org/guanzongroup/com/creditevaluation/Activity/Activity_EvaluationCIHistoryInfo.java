@@ -137,9 +137,10 @@ public class Activity_EvaluationCIHistoryInfo extends AppCompatActivity {
                             loading.dismiss();
                             MessageBox msgBox = new MessageBox(Activity_EvaluationCIHistoryInfo.this);
                             msgBox.initDialog();
+                            msgBox.setIcon(R.drawable.baseline_message_24);
                             msgBox.setTitle("CI Evaluation");
                             msgBox.setMessage(fsMessage);
-                            msgBox.setPositiveButton("Okay", (v, diags) -> {
+                            msgBox.setPositiveButton("Dismiss", (v, diags) -> {
                                 diags.dismiss();
                                 finish();
                             });
@@ -151,9 +152,10 @@ public class Activity_EvaluationCIHistoryInfo extends AppCompatActivity {
                             loading.dismiss();
                             MessageBox msgBox = new MessageBox(Activity_EvaluationCIHistoryInfo.this);
                             msgBox.initDialog();
+                            msgBox.setIcon(R.drawable.baseline_error_24);
                             msgBox.setTitle("CI Evaluation");
                             msgBox.setMessage(fsMessage);
-                            msgBox.setPositiveButton("Okay", (v, diags) -> {
+                            msgBox.setPositiveButton("Dismiss", (v, diags) -> {
                                 diags.dismiss();
                             });
                             msgBox.show();
