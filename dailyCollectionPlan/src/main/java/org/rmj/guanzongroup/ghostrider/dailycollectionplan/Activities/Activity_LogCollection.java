@@ -12,10 +12,8 @@
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
