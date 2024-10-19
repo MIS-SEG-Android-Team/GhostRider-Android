@@ -74,6 +74,8 @@ public class Activity_ProductInquiry extends AppCompatActivity {
         mViewModel.getModel().setModelIDx(lsModelID);
         mViewModel.getModel().setTermIDxx("36");
 
+        CheckMinimumDown();
+
         mViewModel.GetModelBrand(lsBrandID, lsModelID).observe(Activity_ProductInquiry.this, eMcModel -> {
             try {
                 txtModelCd.setText(eMcModel.getModelCde());
@@ -124,6 +126,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 mViewModel.GetMinimumDownpayment(modelID, new VMProductInquiry.OnRetrieveInstallmentInfo() {
                     @Override
                     public void OnRetrieve(InstallmentInfo loResult) {
+
                         nMinDownPay = loResult.getMinimumDownpayment();
 
                         mViewModel.getModel().setDownPaym(String.valueOf(loResult.getMinimumDownpayment()));
@@ -132,6 +135,9 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
                         mViewModel.getModel().setMonthAmr(String.valueOf(loResult.getMonthlyAmortization()));
                         txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(loResult.getMonthlyAmortization())));
+
+                        CheckMinimumDown();
+
                     }
 
                     @Override
@@ -400,6 +406,21 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                     }
                 });
             }
+        }
+    }
+
+    private void CheckMinimumDown(){
+        if (nMinDownPay != null){
+            if (nMinDownPay > 0){
+                btnCalculate.setEnabled(true);
+                btnContinue.setEnabled(true);
+            }else {
+                btnCalculate.setEnabled(false);
+                btnContinue.setEnabled(false);
+            }
+        }else {
+            btnCalculate.setEnabled(false);
+            btnContinue.setEnabled(false);
         }
     }
 }

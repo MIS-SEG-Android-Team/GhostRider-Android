@@ -23,6 +23,7 @@ import com.google.android.material.textview.MaterialTextView;
 import org.rmj.g3appdriver.R;
 
 public class LoadDialog {
+
     private AlertDialog poDialogx;
     private final Context context;
     private static boolean isShown;

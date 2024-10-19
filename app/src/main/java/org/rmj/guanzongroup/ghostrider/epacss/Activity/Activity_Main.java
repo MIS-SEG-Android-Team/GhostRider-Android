@@ -269,6 +269,8 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 EmployeeSession poSession = EmployeeSession.getInstance(Activity_Main.this);
                 String imgLink = "https://webfsgk.guanzongroup.com.ph/empid/" + poSession.getEmployeeID() + ".png";
 
+                Log.d(TAG, poSession.getEmployeeID());
+
                 mViewModel.DisplayURLImage(imgLink, new VMMainActivity.onDownload() {
                     @Override
                     public void onLoad(String title, String message) {
