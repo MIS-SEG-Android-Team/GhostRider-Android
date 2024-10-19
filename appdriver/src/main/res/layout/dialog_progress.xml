@@ -51,12 +51,13 @@
             app:layout_constraintTop_toBottomOf="@+id/lbl_dialogTitle"/>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
+            style="@style/SpinKitView.Large.DoubleBounce"
             android:id="@+id/progress_loading"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="5dp"
-            app:layout_constraintWidth_percent="0.12"
-            app:layout_constraintHeight_percent="0.45"
+            app:layout_constraintWidth_percent="0.2"
+            app:layout_constraintHeight_percent="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lbl_dialogMessage"

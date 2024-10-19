@@ -43,6 +43,7 @@ public class Activity_Branch_Rate extends AppCompatActivity {
     private MaterialButton btn_submit;
     private String lsPayload;
     private RecyclerViewAdapter_BranchRate loAdapter;
+    private EPacitaEvaluation loEvaluation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +86,7 @@ public class Activity_Branch_Rate extends AppCompatActivity {
             }
             @Override
             public void OnSuccess(String transactNo, String message) {
+
                 poLoad.dismiss();
 
                 mViewModel.getBranchEvaluation(transactNo).observe(Activity_Branch_Rate.this, new Observer<EPacitaEvaluation>() {
@@ -94,55 +96,57 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                             return;
                         }
 
-                        ePacitaEvaluation.setTransNox(transactNo);
+                        loEvaluation = ePacitaEvaluation;
+                        loEvaluation.setTransNox(transactNo);
 
-                        mViewModel.GetCriteria().observe(Activity_Branch_Rate.this, new Observer<List<EPacitaRule>>() {
+                    }
+                });
 
+                mViewModel.GetCriteria().observe(Activity_Branch_Rate.this, new Observer<List<EPacitaRule>>() {
+
+                    @Override
+                    public void onChanged(List<EPacitaRule> ePacitaRules) {
+                        if(ePacitaRules == null){
+                            return;
+                        }
+                        if(ePacitaRules.size() <= 0){
+                            return;
+                        }
+
+                        lsPayload = loEvaluation.getPayloadx();
+                        List<BranchRate> loRate = PacitaRule.ParseBranchRate(lsPayload, ePacitaRules);
+
+                        loAdapter = new RecyclerViewAdapter_BranchRate(Activity_Branch_Rate.this, loRate, new RecyclerViewAdapter_BranchRate.onSelect() {
                             @Override
-                            public void onChanged(List<EPacitaRule> ePacitaRules) {
-                                if(ePacitaRules == null){
-                                    return;
-                                }
-                                if(ePacitaRules.size() <= 0){
-                                    return;
-                                }
+                            public void onItemSelect(String EntryNox, String result) {
+                                try {
 
-                                lsPayload = ePacitaEvaluation.getPayloadx();
-                                List<BranchRate> loRate = PacitaRule.ParseBranchRate(lsPayload, ePacitaRules);
+                                    JSONArray loArray = new JSONArray(lsPayload);
 
-                                loAdapter = new RecyclerViewAdapter_BranchRate(Activity_Branch_Rate.this, loRate, new RecyclerViewAdapter_BranchRate.onSelect() {
-                                    @Override
-                                    public void onItemSelect(String EntryNox, String result) {
-                                        try {
+                                    for (int x = 0;  x < loArray.length(); x++){
 
-                                            JSONArray loArray = new JSONArray(lsPayload);
+                                        int lnEntryNo = loArray.getJSONObject(x).getInt("nEntryNox");
 
-                                            for (int x = 0;  x < loArray.length(); x++){
+                                        if(Integer.parseInt(EntryNox) == lnEntryNo){
 
-                                                int lnEntryNo = loArray.getJSONObject(x).getInt("nEntryNox");
+                                            loArray.getJSONObject(x).put("xRatingxx", result);
 
-                                                if(Integer.parseInt(EntryNox) == lnEntryNo){
-
-                                                    loArray.getJSONObject(x).put("xRatingxx", result);
-
-                                                }
-
-                                            }
-
-                                            //todo: collection of ratings result
-                                            lsPayload = loArray.toString();
-
-                                        }catch (JSONException e){
-                                            e.printStackTrace();
                                         }
+
                                     }
-                                });
 
+                                    //todo: collection of ratings result
+                                    lsPayload = loArray.toString();
 
-                                rate_list.setAdapter(loAdapter);
-                                rate_list.setLayoutManager(new LinearLayoutManager(Activity_Branch_Rate.this, LinearLayoutManager.VERTICAL, false));
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
                             }
                         });
+
+
+                        rate_list.setAdapter(loAdapter);
+                        rate_list.setLayoutManager(new LinearLayoutManager(Activity_Branch_Rate.this, LinearLayoutManager.VERTICAL, false));
                     }
                 });
 

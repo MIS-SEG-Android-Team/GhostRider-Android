@@ -62,18 +62,6 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
             }
         });
 
-        Log.d(TAG, "Entry No. " + loRate.getsRateIDxx() + ", Result: " + loRate.getcPasRatex());
-
-        if(loRate.getcPasRatex().equalsIgnoreCase("1")){
-            holder.toggleGroup.check(R.id.pass_btn);
-            holder.toggleGroup.uncheck(R.id.fail_btn);
-        } else if(loRate.getcPasRatex().equalsIgnoreCase("0")){
-            holder.toggleGroup.check(R.id.fail_btn);
-            holder.toggleGroup.uncheck(R.id.pass_btn);
-        } else {
-            holder.toggleGroup.uncheck(R.id.fail_btn);
-            holder.toggleGroup.uncheck(R.id.pass_btn);
-        }
     }
 
     @Override
