@@ -24,6 +24,15 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
     public interface onSelect{
         void onItemSelect(String EntryNox, String result);
     }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
 
     public RecyclerViewAdapter_BranchRate(Context context, List<BranchRate> foRatings, onSelect mListener){
         this.context = context;
@@ -40,9 +49,11 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder_BranchRate holder, int position) {
+        Log.i("holder", String.valueOf(position));
         BranchRate loRate = poRatings.get(position);
 
-        Log.d(TAG, loRate.getsRateName());
+        Log.i("namey", "in rate of "+ poRatings.get(position)+" "+loRate.getsRateName());
+
 
         holder.item_question.setText(loRate.getsRateName());
 
@@ -51,6 +62,8 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
             @Override
             public void onClick(View v) {
                 mListener.onItemSelect(loRate.getsRateIDxx().toString(), "1");
+                Log.i("Sample Output", loRate.getsRateIDxx().toString());
+
             }
         });
 
@@ -59,6 +72,7 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
             @Override
             public void onClick(View v) {
                 mListener.onItemSelect(loRate.getsRateIDxx().toString(), "0");
+                Log.i("Sample Output", loRate.getsRateIDxx().toString());
             }
         });
 

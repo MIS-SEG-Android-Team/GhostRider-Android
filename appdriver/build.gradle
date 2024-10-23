@@ -52,7 +52,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics:18.3.7'
     implementation 'com.google.firebase:firebase-storage:20.2.0'
 
-    implementation files('C:\\Users\\User\\AndroidStudioProjects\\GhostRider\\appdriver\\libs\\appdriver-mob.jar')
+    implementation files('C:\\Users\\User\\AndroidStudioProjects\\GhostRider-Android\\appdriver\\libs\\appdriver-mob.jar')
 
     testImplementation 'junit:junit:4.13.2'
 
@@ -95,7 +95,8 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     // Image Slider Dependencies
-    implementation 'com.github.smarteist:autoimageslider:1.4.0'
+//    implementation 'com.github.smarteist:autoimageslider:1.4.0'
+    implementation 'com.github.smarteist:Android-Image-Slider:1.4.0'
     implementation 'com.github.bumptech.glide:glide:4.13.2'
 
     //Local Libraries

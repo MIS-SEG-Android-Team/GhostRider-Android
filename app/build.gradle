@@ -103,7 +103,7 @@ dependencies {
     implementation 'androidx.work:work-runtime:2.8.0-rc01'
 
     implementation 'commons-io:commons-io:2.6'
-    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
+    implementation 'com.github.barteksc:AndroidPdfViewerV1:1.6.0'
     implementation project(path: ':authLibrary')
     implementation project(path: ':documentScanner')
     implementation project(path: ':ahMonitoring')

@@ -75,6 +75,8 @@ public class Activity_Branch_Rate extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onBackPressed();
+                Log.i("taast2", "clicked");
+
             }
         });
 
@@ -130,14 +132,13 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                                         if(Integer.parseInt(EntryNox) == lnEntryNo){
 
                                             loArray.getJSONObject(x).put("xRatingxx", result);
-
+                                            Log.i("data2",EntryNox);
                                         }
 
                                     }
 
                                     //todo: collection of ratings result
                                     lsPayload = loArray.toString();
-
                                 }catch (JSONException e){
                                     e.printStackTrace();
                                 }

@@ -45,7 +45,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -63,9 +62,12 @@ dependencies {
     testImplementation 'org.json:json:20200518'
     implementation 'commons-io:commons-io:2.6'
 
-    implementation 'com.mindorks.android:prdownloader:0.6.0'
-    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
+//    implementation 'com.mindorks.android:prdownloader:0.6.0'
+//    implementation 'com.mindorks.android:prdownloader:0.5.0'
+    implementation 'com.github.amitshekhariitbhu:PRDownloader:1.0.1'
+//    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
     implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'com.github.barteksc:AndroidPdfViewerV1:1.6.0'
 
     testImplementation 'org.robolectric:robolectric:4.8.1'
 }

@@ -1,6 +1,8 @@
 package org.rmj.guanzongroup.pacitareward.ViewHolder;
 
 import android.view.View;
+import android.widget.Button;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,7 +15,7 @@ import org.rmj.guanzongroup.pacitareward.R;
 public class RecyclerViewHolder_BranchRate extends RecyclerView.ViewHolder {
     public View view;
     public MaterialTextView item_question;
-    public MaterialButton pass_btn;
+    public Button pass_btn;
     public MaterialButton fail_btn;
     public MaterialButtonToggleGroup toggleGroup;
 
