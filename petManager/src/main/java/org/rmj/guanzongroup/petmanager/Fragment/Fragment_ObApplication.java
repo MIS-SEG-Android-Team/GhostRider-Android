@@ -201,7 +201,8 @@ public class Fragment_ObApplication extends Fragment {
                     public void onSuccess() {
                         poProgress.dismiss();
                         loMessage.initDialog();
-                        loMessage.setPositiveButton("Okay", (v, dialog) -> {
+                        loMessage.setIcon(R.drawable.baseline_message_24);
+                        loMessage.setPositiveButton("Dismiss", (v, dialog) -> {
                             dialog.dismiss();
                             txtBranchDestination.setText("");
                             txtDateFrom.setText("");
@@ -219,7 +220,8 @@ public class Fragment_ObApplication extends Fragment {
                     public void onFailed(String message) {
                         poProgress.dismiss();
                         loMessage.initDialog();
-                        loMessage.setPositiveButton("Okay", (v, dialog) -> dialog.dismiss());
+                        loMessage.setIcon(R.drawable.baseline_error_24);
+                        loMessage.setPositiveButton("Dismiss", (v, dialog) -> dialog.dismiss());
                         loMessage.setTitle("PET Manager");
                         loMessage.setMessage(message);
                         loMessage.show();

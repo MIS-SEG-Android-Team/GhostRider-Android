@@ -22,6 +22,7 @@ import androidx.sqlite.db.SupportSQLiteQuery;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ECodeApproval;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 
 import java.util.List;
@@ -31,9 +32,6 @@ public interface DApprovalCode {
 
     @Insert
     void SaveSCARequest(ESCA_Request foVal);
-
-    @Update
-    void UpdateSCARequest(ESCA_Request foVal);
 
     @Insert
     void insert(ECodeApproval codeApproval);
@@ -53,19 +51,6 @@ public interface DApprovalCode {
     @Query("SELECT * FROM System_Code_Approval WHERE sApprCode =:fsVal AND cSendxxxx != '1'")
     ECodeApproval GetCodeApproval(String fsVal);
 
-    @Query("SELECT * FROM System_Code_Approval ORDER BY dTransact DESC LIMIT 1")
-    LiveData<ECodeApproval> getCodeApprovalEntry();
-
-    @Query("SELECT * FROM xxxSCA_Request " +
-            "WHERE cSCATypex = '1' " +
-            "AND cRecdStat = '1' ORDER BY sSCATitle")
-    LiveData<List<ESCA_Request>> getSCA_AuthReference();
-
-    @Query("SELECT * FROM xxxSCA_Request " +
-            "WHERE cSCATypex = '2' " +
-            "AND cRecdStat = '1' ORDER BY sSCATitle")
-    LiveData<List<ESCA_Request>> getSCA_AuthName();
-
     @RawQuery(observedEntities = ESCA_Request.class)
     LiveData<List<ESCA_Request>> getAuthorizedFeatures(SupportSQLiteQuery sqLiteQuery);
 
@@ -77,7 +62,4 @@ public interface DApprovalCode {
 
     @Query("UPDATE System_Code_Approval SET sTransNox=:NTransNo,  cSendxxxx = '1' WHERE sTransNox =:TransNox")
     void UpdateUploaded(String TransNox, String NTransNo);
-
-    @Query("SELECT COUNT(*) FROM System_Code_Approval WHERE cSendxxxx = '0'")
-    Integer getUnpostedApprovalCode();
 }

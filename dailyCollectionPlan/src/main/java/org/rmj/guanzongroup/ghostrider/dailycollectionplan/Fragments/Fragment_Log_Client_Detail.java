@@ -16,9 +16,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.utils.widget.ImageFilterView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.view.LayoutInflater;
@@ -74,14 +76,17 @@ public class Fragment_Log_Client_Detail extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v =inflater.inflate(R.layout.fragment_client_dtl_log, container, false);
+        mViewModel = new ViewModelProvider(requireActivity()).get(VMLogClientDetail.class);
+
         initWidgets(v);
-        mViewModel = ViewModelProviders.of(this).get(VMLogClientDetail.class);
+
         return v;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         txtAcctNo.setText(Activity_TransactionDetail.acctNox);
         txtClientName.setText(Activity_TransactionDetail.fullNme);
         txtClientAddress.setText(Activity_TransactionDetail.clientAddress);
@@ -93,7 +98,7 @@ public class Fragment_Log_Client_Detail extends Fragment {
                 .observe(getViewLifecycleOwner(), eImageInfo -> {
                     try {
                         setPic(eImageInfo.getFileLoct());
-                        ivTransImage.setOnClickListener(view -> {
+                        ivTransImage.setOnClickListener(v -> {
                             poDialogx = new DialogDisplayImage(getActivity(),
                                     Activity_TransactionDetail.acctNox, eImageInfo.getFileLoct());
                             poDialogx.initDialog(dialog -> {
@@ -131,7 +136,6 @@ public class Fragment_Log_Client_Detail extends Fragment {
 //            txtRemarks.setText(clientDetl.getRemakr);
 
         });
-
     }
 
     private void initWidgets(View v) {

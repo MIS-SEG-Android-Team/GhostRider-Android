@@ -32,10 +32,7 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
 
     private String TransNox;
     private MaterialTextView lblClientNm;
-//    private ListView recyclerView;
     private RecyclerView recyclerView;
-    private ShapeableImageView imgClient;
-    private MaterialButton btnCamera;
     private MaterialButton btnSave, btnPrvs;
 
     private LoadDialog poDialogx;
@@ -86,15 +83,11 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_ReviewLoanApp);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Review Loan Info");
+        getSupportActionBar().setTitle("");
 
         lblClientNm = findViewById(R.id.lbl_clientNme);
 
         recyclerView = findViewById(R.id.recyclerview_applicationInfo);
-
-        imgClient = findViewById(R.id.img_loanApplicant);
-
-        btnCamera = findViewById(R.id.btn_camera);
 
         btnSave = findViewById(R.id.btn_loanAppSave);
 
@@ -113,9 +106,10 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
             public void OnSuccess(String args) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(args);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                     dialog.dismiss();
                     startActivity(new Intent(Activity_ReviewLoanApp.this, Activity_CreditApplications.class));
                     finish();
@@ -127,9 +121,10 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
             public void OnSaveLocal(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                     dialog.dismiss();
                     startActivity(new Intent(Activity_ReviewLoanApp.this, Activity_CreditApplications.class));
                     finish();
@@ -141,9 +136,10 @@ public class Activity_ReviewLoanApp extends AppCompatActivity {
             public void OnFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         }));

@@ -321,9 +321,10 @@ public class Activity_SpouseInfo extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -336,7 +337,7 @@ public class Activity_SpouseInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpouseInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Info");
+        getSupportActionBar().setTitle("");
 
 
         txtProvince = findViewById(R.id.txt_bpProvince);

@@ -11,6 +11,8 @@
 
 package org.rmj.guanzongroup.ghostrider.settings.Activity;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -30,9 +33,7 @@ import org.rmj.guanzongroup.ghostrider.settings.R;
 import static org.rmj.guanzongroup.ghostrider.settings.etc.SettingsConstants.GCARD_SCAN;
 
 public class Activity_DigitalGcard extends AppCompatActivity {
-
     private CodeGenerator loGenerator;
-
     private Toolbar toolbar;
     private MaterialButton btnScan;
     private TextView lblSource,
@@ -45,15 +46,15 @@ public class Activity_DigitalGcard extends AppCompatActivity {
                     lblModelx,
                     lblTransN,
                     lblTranPN;
+    private ActivityResultLauncher<Intent> poLaunch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_digital_gcard);
+
         loGenerator = new CodeGenerator();
         toolbar = findViewById(R.id.toolbar_gcard);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         btnScan = findViewById(R.id.btn_scanQrCode);
         lblSource = findViewById(R.id.lbl_codeSource);
         lblImei = findViewById(R.id.lbl_codeImei);
@@ -66,9 +67,20 @@ public class Activity_DigitalGcard extends AppCompatActivity {
         lblTransN = findViewById(R.id.lbl_codeTransNox);
         lblTranPN = findViewById(R.id.lbl_codeGetPin);
 
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        poLaunch = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if(result.getResultCode() == Activity.RESULT_OK){
+                String lsData = result.getData().getStringExtra("qrdata");
+                parseQrCodeData(lsData);
+            }
+        });
+
         btnScan.setOnClickListener(v -> {
             Intent loIntent = new Intent(Activity_DigitalGcard.this, Activity_QrCodeScanner.class);
-            startActivityForResult(loIntent, GCARD_SCAN);
+            poLaunch.launch(loIntent);
+
         });
 
     }
@@ -80,22 +92,10 @@ public class Activity_DigitalGcard extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == GCARD_SCAN &&
-                resultCode == Activity.RESULT_OK){
-            String lsData = data.getStringExtra("qrdata");
-            parseQrCodeData(lsData);
-        }
-    }
-
     @Override
     public void finish() {
         super.finish();

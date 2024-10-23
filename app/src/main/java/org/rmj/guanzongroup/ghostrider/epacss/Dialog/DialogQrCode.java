@@ -13,6 +13,7 @@ package org.rmj.guanzongroup.ghostrider.epacss.Dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -36,11 +37,12 @@ import com.google.android.material.button.MaterialButton;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
 
 public class DialogQrCode {
-
     private final AlertDialog poDialog;
-    private final MaterialTextView lblAddress;
+    private final ShapeableImageView img_qr;
+    private final MaterialButton btnClose;
 
     public DialogQrCode(Context context){
+
         AlertDialog.Builder poBuilder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_qr_code, null);
         poBuilder.setCancelable(false)
@@ -48,15 +50,15 @@ public class DialogQrCode {
         poDialog = poBuilder.create();
         poDialog.setCancelable(false);
 
-        lblAddress = view.findViewById(R.id.lbl_dialogLocation);
-        MaterialButton btnClose = view.findViewById(R.id.btn_dialogClose);
+        img_qr = view.findViewById(R.id.img_qr);
+        btnClose = view.findViewById(R.id.btn_dialogClose);
+
         btnClose.setOnClickListener(view1 -> poDialog.dismiss());
     }
 
-    public void setAddress(String Address){
-        lblAddress.setText(Address);
+    public void setBitmap(Bitmap bmp){
+        img_qr.setImageBitmap(bmp);
     }
-
     public void show(){
         poDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         poDialog.show();

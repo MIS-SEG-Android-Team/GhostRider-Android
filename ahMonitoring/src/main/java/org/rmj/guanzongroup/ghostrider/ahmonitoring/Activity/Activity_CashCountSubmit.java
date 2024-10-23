@@ -112,9 +112,10 @@ public class Activity_CashCountSubmit extends AppCompatActivity {
             public void onKwikSearchFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Cash Count");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) ->{
+                poMessage.setPositiveButton("Dismiss", (view, dialog) ->{
                     dialog.dismiss();
                 });
                 poMessage.show();
@@ -153,9 +154,10 @@ public class Activity_CashCountSubmit extends AppCompatActivity {
                     public void OnSuccess() {
                         poDialogx.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("Cast Count");
                         poMessage.setMessage("Cash count has been saved successfully.");
-                        poMessage.setPositiveButton("Okay", (view, dialog) ->{
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) ->{
                             if(BranchCd.charAt(0) == 'M') {
                                 Intent loIntent = new Intent(Activity_CashCountSubmit.this, Activity_Inventory.class);
                                 loIntent.putExtra("BranchCd", BranchCd);
@@ -176,9 +178,10 @@ public class Activity_CashCountSubmit extends AppCompatActivity {
                     public void OnSaveToLocal(String message) {
                         poDialogx.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("Cast Count");
                         poMessage.setMessage("Cash count has been saved successfully.");
-                        poMessage.setPositiveButton("Okay", (view, dialog) ->{
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) ->{
                             if(BranchCd.charAt(0) == 'M') {
                                 Intent loIntent = new Intent(Activity_CashCountSubmit.this, Activity_Inventory.class);
                                 loIntent.putExtra("BranchCd", BranchCd);
@@ -195,9 +198,10 @@ public class Activity_CashCountSubmit extends AppCompatActivity {
                     public void OnFailed(String message) {
                         poDialogx.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Cash Count");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                             dialog.dismiss();
                         });
                         poMessage.show();

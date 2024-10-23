@@ -6,12 +6,10 @@ import static org.junit.Assert.assertTrue;
 import org.guanzongroup.com.creditevaluation.Core.FindingsParser;
 import org.guanzongroup.com.creditevaluation.Core.oChildFndg;
 import org.guanzongroup.com.creditevaluation.Core.oParentFndg;
-import org.json.JSONObject;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.HashMap;

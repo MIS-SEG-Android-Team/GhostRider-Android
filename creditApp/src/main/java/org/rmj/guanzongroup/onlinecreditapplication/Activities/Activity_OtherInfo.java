@@ -41,35 +41,33 @@ import java.util.List;
 import java.util.Objects;
 
 public class Activity_OtherInfo extends AppCompatActivity {
-
     private VMOtherInfo mViewModel;
     private MessageBox poMessage;
     private ReferencesAdapter adapter;
     private Reference reference;
-
     private static final int MOBILE_DIALER = 104;
-
     private MaterialAutoCompleteTextView spnUnitUser, spnUnitPrps, spnUnitPayr, spnSourcexx, spnOthrUser, spnOthrPayr,
             tieAddProv, tieAddTown;
     private TextInputLayout tilOthrUser, tilOthrPayr, tilOtherSrc;
-
     private TextInputEditText tieOthrSrc, tieRefAdd1, tieRefName, tieRefCntc;
-
     private RecyclerView recyclerView;
     private MaterialButton btnPrevs;
     private MaterialButton btnNext;
     private MaterialToolbar toolbar;
     private MaterialButton btnAddReference;
-
     private String TransNox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_other_info);
+
         mViewModel = new ViewModelProvider(Activity_OtherInfo.this).get(VMOtherInfo.class);
         poMessage = new MessageBox(Activity_OtherInfo.this);
-        setContentView(R.layout.activity_other_info);
+
         initWidgets();
+
         mViewModel.InitializeApplication(getIntent());
         mViewModel.GetApplication().observe(Activity_OtherInfo.this, app -> {
             try {
@@ -102,15 +100,16 @@ public class Activity_OtherInfo extends AppCompatActivity {
                 @Override
                 public void onCallMobile(String fsMobileN) {
                     Intent mobileIntent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", fsMobileN, null));
-                    startActivityForResult(mobileIntent, MOBILE_DIALER);
+                    startActivity(mobileIntent);
                 }
             });
+
             recyclerView.setLayoutManager(new LinearLayoutManager(Activity_OtherInfo.this));
             recyclerView.setAdapter(adapter);
+
             adapter.notifyDataSetChanged();
         });
         btnAddReference.setOnClickListener(v -> addReference());
-
         btnPrevs.setOnClickListener(v -> {
             returnPrevious();
         });
@@ -142,21 +141,21 @@ public class Activity_OtherInfo extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
 
     }
-
     private void initWidgets() {
         reference = new Reference();
         toolbar = findViewById(R.id.toolbar_OtherInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Other Info");
+        getSupportActionBar().setTitle("");
 
         tilOthrUser = findViewById(R.id.til_cap_otherUser);
         tilOthrPayr = findViewById(R.id.til_cap_otherPayer);
@@ -242,47 +241,6 @@ public class Activity_OtherInfo extends AppCompatActivity {
 
 
     }
-
-    class SpinnerSelectionListener implements AdapterView.OnItemClickListener{
-        private final AutoCompleteTextView poView;
-        SpinnerSelectionListener(AutoCompleteTextView view){
-            this.poView = view;
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            if(spnUnitUser.equals(poView)){
-                mViewModel.getModel().setsUnitUser(String.valueOf(i));
-                if(i == 1){
-                    tilOthrUser.setVisibility(View.VISIBLE);
-                } else {
-                    mViewModel.getModel().setsUsr2Buyr(null);
-                    tilOthrUser.setVisibility(View.GONE);
-                }
-            } else if(spnUnitPayr.equals(poView)){
-                mViewModel.getModel().setsUnitPayr(String.valueOf(i));
-                if(i == 1){
-                    tilOthrPayr.setVisibility(View.VISIBLE);
-                } else {
-                    mViewModel.getModel().setsPyr2Buyr(null);
-                    tilOthrPayr.setVisibility(View.GONE);
-                }
-            } else if(spnSourcexx.equals(poView)){
-                mViewModel.getModel().setSource(spnSourcexx.getText().toString());
-                if(i == 5){
-                    tilOtherSrc.setVisibility(View.VISIBLE);
-                } else {
-                    tilOtherSrc.setVisibility(View.GONE);
-                }
-            } else if(spnUnitPrps.equals(poView)){
-                mViewModel.getModel().setsPurposex(String.valueOf(i));
-            } else if(spnOthrUser.equals(poView)){
-                mViewModel.getModel().setsUsr2Buyr(String.valueOf(i));
-            } else if(spnOthrPayr.equals(poView)){
-                mViewModel.getModel().setsPyr2Buyr(String.valueOf(i));
-            }
-        }
-    }
     private void addReference(){
         try {
             if(tieRefName.getText().toString().isEmpty()){
@@ -366,23 +324,61 @@ public class Activity_OtherInfo extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     @Override
     public void onBackPressed() {
         returnPrevious();
     }
-
     @Override
     protected void onDestroy() {
         getViewModelStore().clear();
         super.onDestroy();
     }
-
     private void returnPrevious(){
         Intent loIntent = new Intent(Activity_OtherInfo.this, Activity_Properties.class);
         loIntent.putExtra("sTransNox", TransNox);
         startActivity(loIntent);
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
         finish();
+    }
+
+    class SpinnerSelectionListener implements AdapterView.OnItemClickListener{
+        private final AutoCompleteTextView poView;
+        SpinnerSelectionListener(AutoCompleteTextView view){
+            this.poView = view;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            if(spnUnitUser.equals(poView)){
+                mViewModel.getModel().setsUnitUser(String.valueOf(i));
+                if(i == 1){
+                    tilOthrUser.setVisibility(View.VISIBLE);
+                } else {
+                    mViewModel.getModel().setsUsr2Buyr(null);
+                    tilOthrUser.setVisibility(View.GONE);
+                }
+            } else if(spnUnitPayr.equals(poView)){
+                mViewModel.getModel().setsUnitPayr(String.valueOf(i));
+                if(i == 1){
+                    tilOthrPayr.setVisibility(View.VISIBLE);
+                } else {
+                    mViewModel.getModel().setsPyr2Buyr(null);
+                    tilOthrPayr.setVisibility(View.GONE);
+                }
+            } else if(spnSourcexx.equals(poView)){
+                mViewModel.getModel().setSource(spnSourcexx.getText().toString());
+                if(i == 5){
+                    tilOtherSrc.setVisibility(View.VISIBLE);
+                } else {
+                    tilOtherSrc.setVisibility(View.GONE);
+                }
+            } else if(spnUnitPrps.equals(poView)){
+                mViewModel.getModel().setsPurposex(String.valueOf(i));
+            } else if(spnOthrUser.equals(poView)){
+                mViewModel.getModel().setsUsr2Buyr(String.valueOf(i));
+            } else if(spnOthrPayr.equals(poView)){
+                mViewModel.getModel().setsPyr2Buyr(String.valueOf(i));
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@
 package org.rmj.g3appdriver.GCircle.room;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -44,6 +45,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCreditOnlineApplicatio
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DDCPCollectionDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DDCP_Remittance;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeLeave;
@@ -56,6 +58,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DInventoryDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DInventoryMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DItinerary;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLoanTypes;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLocatorSysLog;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcBrand;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcCategory;
@@ -81,6 +84,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRaffleStatus;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRawDao;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRelation;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRemittanceAccounts;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSelfieLog;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSysConfig;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DToken;
@@ -109,6 +113,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ECreditOnlineApplicationCI;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCP_Remittance;
+import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeLeave;
@@ -121,6 +126,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EInventoryDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EInventoryMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EItinerary;
 import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTerm;
+import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTypes;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCColor;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCModelCashPrice;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMcBrand;
@@ -143,6 +149,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ERaffleInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERaffleStatus;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERelation;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERemittanceAccounts;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESelfieLog;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESysConfig;
@@ -212,7 +219,10 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EPacitaEvaluation.class,
         ELoanTerm.class,
         EGanadoOnline.class,
-        EMCModelCashPrice.class}, version = 40, exportSchema = false)
+        EMCModelCashPrice.class,
+        EEmpLoan.class,
+        ELoanTypes.class,
+        ESCARqstEmp.class}, version = 42, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -283,6 +293,9 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DNotification notificationDao();
     public abstract DPacita pacitaDao();
     public abstract DGanadoOnline ganadoDao();
+    public abstract DEmpLoan emploanDao();
+    public abstract DLoanTypes loanTypesDao();
+    public abstract DSCARqstEmp scaRqstEmpDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
@@ -290,7 +303,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                      GGC_GCircleDB.class, "GGC_ISysDBF.db")
                     .allowMainThreadQueries()
                     .addCallback(roomCallBack)
-                    .addMigrations(MIGRATION_V40)
+                    .addMigrations(MIGRATION_V42)
                     .build();
         }
         return instance;
@@ -304,7 +317,28 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
         }
     };
 
-    static final Migration MIGRATION_V40 = new Migration(39, 40) {
+    private static Boolean CheckColumnExists(SupportSQLiteDatabase database, String tablename, String columnName){
+        Cursor cursor = null;
+        try {
+            cursor = database.query("SELECT * FROM " + tablename + " LIMIT 0");
+            int index = cursor.getColumnIndex(columnName);
+
+            if (index < 0){
+                cursor.close();
+                return false;
+            }else {
+                cursor.close();
+                return true;
+            }
+
+        }catch (Exception e){
+            cursor.close();
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    static final Migration MIGRATION_V42 = new Migration(41, 42) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             // Add the new column
@@ -315,8 +349,21 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                     "`sBrandIDx` TEXT, `sMCCatIDx` TEXT, " +
                     "PRIMARY KEY(`sModelIDx`, `sMCCatNme`, `sModelNme`))");
 
-            database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");
-            database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN dPricexxx TEXT");
+            // Add the new column
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SCA_Rqst_Emp` " +
+                    "(`sSCACodex` TEXT NOT NULL, `sEmployIDx` TEXT NOT NULL, " +
+                    "`sRecdStat` TEXT, `dTimeStmpx` TEXT, " +
+                    "PRIMARY KEY(`sSCACodex`, `sEmployIDx`))");
+
+            if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
+                database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");
+            }
+            if (!CheckColumnExists(database, "Ganado_Online", "dPricexxx")){
+                database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN dPricexxx TEXT");
+            }
+            if (!CheckColumnExists(database, "Credit_Applicant_Info", "sRemarksx")){
+                database.execSQL("ALTER TABLE Credit_Applicant_Info ADD COLUMN sRemarksx TEXT");
+            }
         }
     };
 }

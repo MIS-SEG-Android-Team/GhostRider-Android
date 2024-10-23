@@ -18,10 +18,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ganado.Adapter.InquiryListAdapter;
-import org.rmj.guanzongroup.ganado.Adapter.RecyclerViewAdapter_BrandSelection;
 import org.rmj.guanzongroup.ganado.Dialog.DialogInquiryHistory;
 import org.rmj.guanzongroup.ganado.R;
-import org.rmj.guanzongroup.ganado.ViewModel.VMBrandList;
 import org.rmj.guanzongroup.ganado.ViewModel.VMInquiry;
 
 import java.util.Objects;
@@ -37,9 +35,10 @@ public class Activity_Inquiries extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(VMInquiry.class);
         setContentView(R.layout.activity_inquiries);
         intWidgets();
+
+        mViewModel = new ViewModelProvider(this).get(VMInquiry.class);
 
         poLoad = new LoadDialog(Activity_Inquiries.this);
         poMessage = new MessageBox(Activity_Inquiries.this);
@@ -60,9 +59,10 @@ public class Activity_Inquiries extends AppCompatActivity {
             public void OnFailed(String message) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Product Inquiry");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();
@@ -85,11 +85,6 @@ public class Activity_Inquiries extends AppCompatActivity {
                             }
                         });
                         dHistory.show();
-//                        Intent intent = new Intent(Activity_Inquiries.this, Activity_ProductSelection.class);
-//                        intent.putExtra("TransNox",TransNox);
-//                        startActivity(intent);
-//                        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
-//                        finish();
                     }
 
                 });

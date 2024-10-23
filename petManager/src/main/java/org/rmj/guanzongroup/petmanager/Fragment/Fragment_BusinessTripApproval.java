@@ -147,6 +147,7 @@ public class Fragment_BusinessTripApproval extends Fragment implements VMObAppro
 
         bntConfirm.setOnClickListener(v -> {
             poMessage.initDialog();
+            poMessage.setIcon(R.drawable.baseline_contact_support_24);
             poMessage.setTitle("OB Approval");
             poMessage.setMessage("Approve " + lblEmployeNm.getText().toString() + "'s business trip application?");
             poMessage.setPositiveButton("Approve", (view1, dialog) -> {
@@ -160,6 +161,7 @@ public class Fragment_BusinessTripApproval extends Fragment implements VMObAppro
 
         btnCancel.setOnClickListener(v -> {
             poMessage.initDialog();
+            poMessage.setIcon(R.drawable.baseline_contact_support_24);
             poMessage.setTitle("OB Approval");
             poMessage.setMessage("Disapprove " + lblEmployeNm.getText().toString() + "'s business trip application?");
             poMessage.setPositiveButton("Disapprove", (view1, dialog) -> {
@@ -203,9 +205,10 @@ public class Fragment_BusinessTripApproval extends Fragment implements VMObAppro
 
     public void initErrorDialog(String title, String message){
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_error_24);
         poMessage.setTitle(title);
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
         poMessage.show();
     }
 

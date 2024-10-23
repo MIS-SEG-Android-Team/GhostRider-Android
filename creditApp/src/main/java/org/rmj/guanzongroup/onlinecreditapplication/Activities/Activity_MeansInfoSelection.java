@@ -37,11 +37,14 @@ public class Activity_MeansInfoSelection extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_means_info_selection);
         initWidgets();
+
         mViewModel = new ViewModelProvider(Activity_MeansInfoSelection.this).get(VMMeasnInfo.class);
         poMessage = new MessageBox(Activity_MeansInfoSelection.this);
         mViewModel.InitializeApplication(getIntent());
+
         mViewModel.GetApplication().observe(Activity_MeansInfoSelection.this, app -> {
             try {
                 TransNox = app.getTransNox();
@@ -81,7 +84,7 @@ public class Activity_MeansInfoSelection extends AppCompatActivity  {
         toolbar = findViewById(R.id.toolbar_MeansInfoSelection);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Means Info");
+        getSupportActionBar().setTitle("");
 
         rbEmployed = findViewById(R.id.rb_employed);
         rbSEmployd = findViewById(R.id.rb_sEmployed);
@@ -118,9 +121,10 @@ public class Activity_MeansInfoSelection extends AppCompatActivity  {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });

@@ -107,11 +107,12 @@ public class Activity_LocalData extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_contact_support_24);
                 poMessage.setTitle("Manage Local Data");
                 poMessage.setMessage("Clearing your device local data can delete your current transaction details such as unposted DCP, Leave Applications, etc... \n" +
                         "\n" +
-                        "Tap okay to back up and export database before clearing local data.");
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                        "Tap Clear to back up and export database before clearing local data.");
+                poMessage.setPositiveButton("Clear", (view, dialog) -> {
                     dialog.dismiss();
                     mViewModel.ExportDatabase();
                     mViewModel.killProcessesAround(Activity_LocalData.this);
@@ -139,9 +140,10 @@ public class Activity_LocalData extends AppCompatActivity {
 
     private void showResultMessage(String message){
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("Manage Local Data");
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
         poMessage.show();
     }
 }

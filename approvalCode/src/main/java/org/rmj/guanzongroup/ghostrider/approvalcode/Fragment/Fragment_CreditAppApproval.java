@@ -93,9 +93,10 @@ public class Fragment_CreditAppApproval extends Fragment {
                 public void OnLoadFailed(String message) {
                     poDialog.dismiss();
                     poMsgBox.initDialog();
+                    poMsgBox.setIcon(R.drawable.baseline_error_24);
                     poMsgBox.setTitle("Approval Code");
                     poMsgBox.setMessage(message);
-                    poMsgBox.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                    poMsgBox.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                     poMsgBox.show();
                 }
             });
@@ -176,9 +177,10 @@ public class Fragment_CreditAppApproval extends Fragment {
             public void OnFailedResult(String message) {
                 poDialog.dismiss();
                 poMsgBox.initDialog();
+                poMsgBox.setIcon(R.drawable.baseline_error_24);
                 poMsgBox.setTitle("Approval Code");
                 poMsgBox.setMessage(message);
-                poMsgBox.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMsgBox.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                 poMsgBox.show();
             }
         });

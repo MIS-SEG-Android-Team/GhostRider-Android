@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.Dashboard.Fragment_AHDashboard">
 
-    <org.rmj.g3appdriver.etc.NonSwipeableViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewpager"
         android:layout_width="0dp"
         android:layout_height="0dp"

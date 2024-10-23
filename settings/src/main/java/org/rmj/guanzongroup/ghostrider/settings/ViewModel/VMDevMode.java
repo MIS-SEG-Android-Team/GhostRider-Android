@@ -12,7 +12,6 @@
 package org.rmj.guanzongroup.ghostrider.settings.ViewModel;
 
 import android.app.Application;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -20,11 +19,14 @@ import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.Etc.DevTools;
+import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 public class VMDevMode extends AndroidViewModel {
 
     private final Application instance;
     private final DevTools poTool;
+    private String message;
 
     public interface OnChangeListener {
         void OnChanged(String args);
@@ -41,70 +43,65 @@ public class VMDevMode extends AndroidViewModel {
     }
 
     public void SaveChanges(EEmployeeInfo args, OnChangeListener callback){
-        new SaveChangesTask(callback).execute(args);
-    }
 
-    private class SaveChangesTask extends AsyncTask<EEmployeeInfo, Void, Boolean>{
+        TaskExecutor.Execute(args, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
 
-        private final OnChangeListener callback;
+                EEmployeeInfo eEmployeeInfos = (EEmployeeInfo) args;
 
-        private String message;
+                if(!poTool.Update(eEmployeeInfos)){
+                    message = poTool.getMessage();
+                    return false;
+                }
 
-        public SaveChangesTask(OnChangeListener callback) {
-            this.callback = callback;
-        }
+                return true;
 
-        @Override
-        protected Boolean doInBackground(EEmployeeInfo... eEmployeeInfos) {
-            if(!poTool.Update(eEmployeeInfos[0])){
-                message = poTool.getMessage();
-                return false;
             }
-            return true;
-        }
 
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess){
-                callback.OnChanged(message);
-            } else {
-                callback.OnChanged("Changes Saved!");
+            @Override
+            public void OnPostExecute(Object object) {
+
+                Boolean isSuccess = (Boolean) object;
+
+                if(!isSuccess){
+                    callback.OnChanged(message);
+                } else {
+                    callback.OnChanged("Changes Saved!");
+                }
+
             }
-        }
+        });
     }
 
     public void RestoreDefault(OnChangeListener callback){
-        new RestoreSessionInfoTask(callback).execute();
+
+        TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if(!poTool.SetDefault()){
+                    message = poTool.getMessage();
+                    return false;
+                }
+
+                return true;
+
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                Boolean isSuccess = (Boolean) object;
+
+                if(!isSuccess){
+                    callback.OnChanged(message);
+                } else {
+                    callback.OnChanged("Account restored to default.");
+                }
+
+            }
+        });
     }
 
-    private class RestoreSessionInfoTask extends AsyncTask<Void, Void, Boolean>{
-
-        private final OnChangeListener callback;
-
-        private String message;
-
-        public RestoreSessionInfoTask(OnChangeListener callback){
-            this.callback = callback;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            if(!poTool.SetDefault()){
-                message = poTool.getMessage();
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess){
-                callback.OnChanged(message);
-            } else {
-                callback.OnChanged("Account restored to default.");
-            }
-        }
-    }
 }

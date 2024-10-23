@@ -79,7 +79,7 @@ public class Activity_AppVersion extends AppCompatActivity {
         rec_updatedFixedConcerns = findViewById(R.id.rec_updatedFixedConcerns);
 
         //set toolbar and action
-        toolbar.setTitle("System Update");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -134,6 +134,8 @@ public class Activity_AppVersion extends AppCompatActivity {
                 //set button text
                 btn_checkupdate.setHint("Download Updates");
 
+                pomessage.setIcon(R.drawable.baseline_message_24);
+
                 //set dialog message and button
                 pomessage.setTitle(poMsgTitle);
                 pomessage.setMessage(poMsg);
@@ -145,7 +147,7 @@ public class Activity_AppVersion extends AppCompatActivity {
                 poload.dismiss();
 
                 //set action button to close message dialog
-                pomessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                pomessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         //close dialogs upon clicking
@@ -155,6 +157,8 @@ public class Activity_AppVersion extends AppCompatActivity {
             }
             @Override
             public void onFailed(String message) {
+                pomessage.setIcon(R.drawable.baseline_error_24);
+
                 //set dialog message and button
                 pomessage.setTitle(poMsgTitle);
                 pomessage.setMessage(message);
@@ -165,7 +169,7 @@ public class Activity_AppVersion extends AppCompatActivity {
                 //close message
                 poload.dismiss();
 
-                pomessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                pomessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         //close dialogs upon clicking

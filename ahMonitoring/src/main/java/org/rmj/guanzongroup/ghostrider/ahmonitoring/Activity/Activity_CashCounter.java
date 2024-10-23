@@ -110,9 +110,10 @@ public class Activity_CashCounter extends AppCompatActivity {
                 public void OnFailed(String message) {
                     poLoad.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Cash Count");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                         dialog.dismiss();
                         finish();
                     });
@@ -374,6 +375,7 @@ public class Activity_CashCounter extends AppCompatActivity {
 
     private void ConfirmExist(){
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_contact_support_24);
         poMessage.setTitle("Cash Count");
         poMessage.setMessage("Exit cash count?");
         poMessage.setPositiveButton("Yes", (view, dialog) -> {

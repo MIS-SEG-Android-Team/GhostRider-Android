@@ -18,8 +18,15 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.StrictMode;
+
+import androidx.annotation.NonNull;
+
+import com.huawei.wisesecurity.ucs.credential.outer.NetworkCapability;
 
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 
@@ -41,7 +48,7 @@ public class ConnectionUtil {
     private final Context context;
     private String message;
 
-    private static final String LOCAL = "http://192.168.10.68:8080";
+    private static final String LOCAL = "http://192.165.10.23:8080/GMC%20SEG%20Folder%20-%20PHP/eclipse-workspace/apps/";
     private static final String PRIMARY_LIVE = "https://restgk.guanzongroup.com.ph";
 //    private static final String SECONDARY_LIVE = "restgk1.guanzongroup.com.ph";
 
@@ -192,7 +199,7 @@ public class ConnectionUtil {
     public boolean isWifiConnected(){
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return mWifi.isConnected();
 
+        return mWifi.isConnected();
     }
 }

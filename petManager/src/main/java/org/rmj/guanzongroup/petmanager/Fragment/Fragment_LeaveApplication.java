@@ -202,9 +202,10 @@ public class Fragment_LeaveApplication extends Fragment {
                     public void OnSuccess(String message) {
                         poProgress.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("Leave Application");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                             dialog.dismiss();
                             spnType.setSelection(0);
                             txtDateFrom.setText("");
@@ -220,9 +221,10 @@ public class Fragment_LeaveApplication extends Fragment {
                     public void OnFailed(String message) {
                         poProgress.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Leave Application");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 });

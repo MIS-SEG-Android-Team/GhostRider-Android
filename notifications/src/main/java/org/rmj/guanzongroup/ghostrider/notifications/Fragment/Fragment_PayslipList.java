@@ -64,7 +64,9 @@ public class Fragment_PayslipList extends Fragment {
                     AdapterPayslip loAdapter = new AdapterPayslip(payslips, new AdapterPayslip.OnDownloadPayslipListener() {
                         @Override
                         public void DownloadPayslip(String messageID, String link) {
+
                             mViewModel.SendReadResponse(messageID);
+
                             mViewModel.DownloadPaySlip(link, new VMPaySlipList.OnDownloadPayslipListener() {
                                 @Override
                                 public void OnDownload() {
@@ -85,9 +87,10 @@ public class Fragment_PayslipList extends Fragment {
                                 public void OnFailed(String message) {
                                     poLoad.dismiss();
                                     poDialog.initDialog();
+                                    poDialog.setIcon(R.drawable.baseline_error_24);
                                     poDialog.setTitle("Payslip");
                                     poDialog.setMessage(message);
-                                    poDialog.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                                    poDialog.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                                     poDialog.show();
                                 }
                             });

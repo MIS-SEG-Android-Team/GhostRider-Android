@@ -11,9 +11,16 @@
 
 package org.rmj.guanzongroup.ghostrider.approvalcode;
 
+import org.json.JSONObject;
 import org.junit.Test;
+import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.dev.Api.HttpHeaders;
+import org.rmj.g3appdriver.dev.Api.WebClient;
 
 import static org.junit.Assert.*;
+import static org.rmj.g3appdriver.dev.Api.ApiResult.SERVER_NO_RESPONSE;
+
+import androidx.test.core.app.ApplicationProvider;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -21,8 +28,5 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
-    @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
-    }
+
 }

@@ -310,9 +310,10 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                 public void OnSuccess(String message) {
                     poDialogx.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_message_24);
                     poMessage.setTitle("Collection Remittance");
                     poMessage.setMessage("Your remittance has been posted successfully.");
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
                         dialog.dismiss();
                         finish();
                     });
@@ -323,9 +324,10 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                 public void OnFailed(String message) {
                     poDialogx.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Collection Remittance");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
                     poMessage.show();
                 }
             });
@@ -337,7 +339,7 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
         lblAddrss = findViewById(R.id.lbl_headerAddress);
 
         toolbar = findViewById(R.id.toolbar_collectionRemit);
-        toolbar.setTitle("Collection Remittance");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 

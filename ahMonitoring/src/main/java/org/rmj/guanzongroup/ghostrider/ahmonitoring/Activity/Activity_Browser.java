@@ -11,6 +11,8 @@
 
 package org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,7 +34,6 @@ import android.webkit.WebView;
 import android.widget.ProgressBar;
 
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.R;
 
 import java.io.File;
@@ -45,32 +46,30 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 public class Activity_Browser extends AppCompatActivity {
     private static final String TAG = Activity_Browser.class.getSimpleName();
-
     private MaterialToolbar toolbar;
     private ProgressBar progressBar;
     private WebView wbBrowser;
-    private EmployeeSession poSession;
-
     private String mCM;
     private ValueCallback<Uri> mUM;
     private ValueCallback<Uri[]> mUMA;
     private final static int FCR=1;
-
     private String urlClipBoard = "";
+    private ActivityResultLauncher<Intent> poLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browser);
+
         toolbar = findViewById(R.id.toolbar_gBrowser);
         progressBar = findViewById(R.id.progress_gBrowser);
         wbBrowser = findViewById(R.id.webview_gBrowser);
-        poSession = EmployeeSession.getInstance(Activity_Browser.this);
-        toolbar.setTitle("Health Checklist");
+        toolbar.setTitle("");
+
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        ConfigureAppBrowser();
 
+        ConfigureAppBrowser();
         LoadLink();
     }
 
@@ -79,13 +78,13 @@ public class Activity_Browser extends AppCompatActivity {
         super.finish();
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){
             MessageBox loMessage = new MessageBox(Activity_Browser.this);
             loMessage.initDialog();
-            loMessage.setTitle("Health Checklist");
+            loMessage.setIcon(R.drawable.baseline_contact_support_24);
+            loMessage.setTitle("App Browser");
             loMessage.setMessage("Are you sure you want to exit?");
             loMessage.setPositiveButton("Exit", (view, dialog) -> {
                 dialog.dismiss();
@@ -102,34 +101,36 @@ public class Activity_Browser extends AppCompatActivity {
         WebSettings webSettings = wbBrowser.getSettings();
         webSettings.setBuiltInZoomControls(true);
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setLoadWithOverviewMode(true);
+        webSettings.setUseWideViewPort(true);
     }
 
-
     private void LoadLink(){
-        wbBrowser.loadUrl("https://restgk.guanzongroup.com.ph/system/health_checklist/checklist_entry.php?brc="+poSession.getBranchCode());
+        String url = getIntent().getStringExtra("url_link");
+
+        wbBrowser.loadUrl(url);
         wbBrowser.setWebViewClient(new AppBrowserWebViewClient());
         wbBrowser.setWebChromeClient(new AppBrowserChromeClient());
     }
-
     class AppBrowserWebViewClient extends android.webkit.WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            wbBrowser.loadUrl(getIntent().getStringExtra("url_link"));
             return super.shouldOverrideUrlLoading(view, request);
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            progressBar.setVisibility(View.VISIBLE);
             super.onPageStarted(view, url, favicon);
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            urlClipBoard = url;
             super.onPageFinished(view, url);
+            urlClipBoard = url;
         }
     }
-
     class AppBrowserChromeClient extends WebChromeClient {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
@@ -138,32 +139,6 @@ public class Activity_Browser extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
             }
             super.onProgressChanged(view, newProgress);
-        }
-
-        public void openFileChooser(ValueCallback<Uri> uploadMsg){
-            mUM = uploadMsg;
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("*/*");
-            Activity_Browser.this.startActivityForResult(Intent.createChooser(i,"File Chooser"), FCR);
-        }
-
-        public void openFileChooser(ValueCallback uploadMsg, String acceptType){
-            mUM = uploadMsg;
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("*/*");
-            Activity_Browser.this.startActivityForResult(
-                    Intent.createChooser(i, "File Browser"),
-                    FCR);
-        }
-
-        public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture){
-            mUM = uploadMsg;
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("*/*");
-            Activity_Browser.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), Activity_Browser.FCR);
         }
 
         public boolean onShowFileChooser(
@@ -199,16 +174,20 @@ public class Activity_Browser extends AppCompatActivity {
                 intentArray = new Intent[0];
             }
 
+            poLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                Log.d(TAG, String.valueOf(result));
+            });
+
             Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
             chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
             chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-            startActivityForResult(chooserIntent, FCR);
+
+            poLauncher.launch(chooserIntent);
+
             return true;
         }
     }
-
-    // Create an image file
     private File createImageFile() throws IOException {
         @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "img_"+timeStamp+"_";

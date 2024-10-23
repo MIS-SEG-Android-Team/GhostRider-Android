@@ -65,8 +65,8 @@ public class DeviceLocationRecords {
             }
 
             EGLocatorSysLog loDetail = new EGLocatorSysLog();
-
             String lsLoctID = CreateUniqueID();
+
             loDetail.setLoctnIDx(lsLoctID);
             loDetail.setUserIDxx(lsUserID);
             loDetail.setDeviceID(poDevID.getDeviceID());
@@ -76,11 +76,51 @@ public class DeviceLocationRecords {
             loDetail.setGpsEnbld(cServicex);
             loDetail.setRemarksx(sRemarksx);
             loDetail.setTimeStmp(AppConstants.DATE_MODIFIED());
+
             poDao.insertLocation(loDetail);
-            return true;
+
+            //todo: upload to server
+            JSONObject loParam = new JSONObject();
+            loParam.put("dTransact", AppConstants.DATE_MODIFIED());
+            loParam.put("nLatitude", nLatitude);
+            loParam.put("nLongitud", nLongtude);
+            loParam.put("cGPSEnbld", cServicex);
+
+            JSONArray laDetail = new JSONArray();
+            laDetail.put(loParam);
+
+            JSONObject loJson = new JSONObject();
+            loJson.put("detail", laDetail);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlSubmitLocationTrack(),
+                    loJson.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = "No server response. Tracked location will be uploaded soon.";
+
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = loError.getString("message") + ". Tracked location will be uploaded soon.";
+
+                return false;
+            }else {
+                poDao.updateSysLogStatus(AppConstants.DATE_MODIFIED(), lsLoctID);
+                message = "Tracked location sent to server.";
+
+                return true;
+            }
         } catch (Exception e){
             e.printStackTrace();
             message = e.getMessage();
+
             return false;
         }
     }
@@ -107,6 +147,7 @@ public class DeviceLocationRecords {
                 loDetail.put("nLatitude", loLocations.get(x).getLatitude());
                 loDetail.put("nLongitud", loLocations.get(x).getLongitud());
                 loDetail.put("cGPSEnbld", loLocations.get(x).getGpsEnbld());
+
                 laDetail.put(loDetail);
             }
 
@@ -116,6 +157,7 @@ public class DeviceLocationRecords {
                     poApi.getUrlSubmitLocationTrack(),
                     loJson.toString(),
                     poHeaders.getHeaders());
+
             if(lsResponse == null){
                 message = "No server response.";
                 return false;

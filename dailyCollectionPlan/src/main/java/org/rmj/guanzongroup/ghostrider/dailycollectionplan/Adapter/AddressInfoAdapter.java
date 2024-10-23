@@ -75,14 +75,16 @@ public class AddressInfoAdapter extends RecyclerView.Adapter<AddressInfoAdapter.
 
         public AddressHolder(@NonNull View itemView, OnDeleteInfoListener listener) {
             super(itemView);
+
             tvPrimary = itemView.findViewById(R.id.tvPrimary);
             tvAddressTp = itemView.findViewById(R.id.tvAddressTp);
             tvDetails = itemView.findViewById(R.id.tvDetails);
             tvAddress = itemView.findViewById(R.id.tvAddress);
+
             ImageView icDelete = itemView.findViewById(R.id.icDelete);
 
             icDelete.setOnClickListener(v -> {
-                int position = getAdapterPosition();
+                int position = getBindingAdapterPosition();
                 if(position != RecyclerView.NO_POSITION) {
                     listener.OnDelete(position);
                 }

@@ -45,7 +45,7 @@ public class Activity_ForgotPassword extends AppCompatActivity implements VMForg
         btn_log = findViewById(R.id.btn_log);
 
         setSupportActionBar(toolbar); //set object toolbar as default action bar for activity
-        getSupportActionBar().setTitle("Account Info"); //set default title for action bar
+        getSupportActionBar().setTitle(""); //set default title for action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //set back button to toolbar
         getSupportActionBar().setDisplayShowHomeEnabled(true); //enable the back button set on toolbar
 
@@ -76,9 +76,10 @@ public class Activity_ForgotPassword extends AppCompatActivity implements VMForg
                     @Override
                     public void OnSuccessRequest() {
                         poDialog.dismiss();
+                        poMsgBox.setIcon(R.drawable.baseline_message_24);
                         poMsgBox.setTitle("Result");
                         poMsgBox.setMessage("Successfully sent request.");
-                        poMsgBox.setPositiveButton("OK", new MessageBox.DialogButton() {
+                        poMsgBox.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                             @Override
                             public void OnButtonClick(View view, AlertDialog dialog) {
                                 dialog.dismiss();
@@ -91,9 +92,10 @@ public class Activity_ForgotPassword extends AppCompatActivity implements VMForg
                     @Override
                     public void OnFailedRequest(String message) {
                         poDialog.dismiss();
+                        poMsgBox.setIcon(R.drawable.baseline_error_24);
                         poMsgBox.setTitle("Result");
                         poMsgBox.setMessage("Failed to send request: " + message);
-                        poMsgBox.setPositiveButton("OK", new MessageBox.DialogButton() {
+                        poMsgBox.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                             @Override
                             public void OnButtonClick(View view, AlertDialog dialog) {
                                 dialog.dismiss();
@@ -117,9 +119,10 @@ public class Activity_ForgotPassword extends AppCompatActivity implements VMForg
     public void OnSuccessRequest() {
         poDialog.dismiss();
         poMsgBox.initDialog();
+        poMsgBox.setIcon(R.drawable.baseline_message_24);
         poMsgBox.setTitle("Forgot Password");
         poMsgBox.setMessage("You'll be receiving an email from MIS, Please check your email account");
-        poMsgBox.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
+        poMsgBox.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
         poMsgBox.show();
     }
 
@@ -127,9 +130,10 @@ public class Activity_ForgotPassword extends AppCompatActivity implements VMForg
     public void OnFailedRequest(String message) {
         poDialog.dismiss();
         poMsgBox.initDialog();
+        poMsgBox.setIcon(R.drawable.baseline_error_24);
         poMsgBox.setTitle("Forgot Password");
         poMsgBox.setMessage(message);
-        poMsgBox.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
+        poMsgBox.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
         poMsgBox.show();
     }
 }

@@ -53,6 +53,8 @@ public class AppConfigPreference {
 
     private static final String MAIN_ACTIVITY = "cMainActv";
 
+    private static final String HAS_POST_DCP = "dcpPosted";
+
     private static AppConfigPreference mAppConfigPreference;
 
     private AppConfigPreference(Context context){
@@ -292,6 +294,15 @@ public class AppConfigPreference {
         return pref.getBoolean(UPDATE_LOCALLY, false);
     }
 
+    public void setDCPStatus(boolean val){
+        editor.putBoolean(HAS_POST_DCP, val);
+        editor.commit();
+    }
+
+    public boolean getDCPStatus(){
+        return pref.getBoolean(HAS_POST_DCP, false);
+    }
+
     public void setExportedDcp(boolean val){
         editor.putBoolean(EXPORTED_DCP, val);
         editor.commit();
@@ -309,7 +320,5 @@ public class AppConfigPreference {
     public boolean hasInventory(){
         return pref.getBoolean(INVENTORY_COUNT, true);
     }
-
-
 
 }

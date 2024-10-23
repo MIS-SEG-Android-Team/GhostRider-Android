@@ -36,15 +36,12 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import  com.google.android.material.checkbox.MaterialCheckBox;
 
-
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.lib.Account.pojo.UserAuthInfo;
 import org.rmj.guanzongroup.authlibrary.R;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class Fragment_Login extends Fragment implements LoginCallback{
@@ -112,6 +109,7 @@ public class Fragment_Login extends Fragment implements LoginCallback{
     @Override
     public void OnSuccessLoginResult() {
         dialog.dismiss();
+
         Intent loIntent = new Intent();
         requireActivity().setResult(Activity.RESULT_OK, loIntent);
         requireActivity().finish();
@@ -120,11 +118,13 @@ public class Fragment_Login extends Fragment implements LoginCallback{
     @Override
     public void OnFailedLoginResult(String message) {
         dialog.dismiss();
+
         MessageBox loMessage = new MessageBox(requireActivity());
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setTitle("Guanzon Circle");
         loMessage.setMessage(message);
-        loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+        loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
         loMessage.show();
     }
 }

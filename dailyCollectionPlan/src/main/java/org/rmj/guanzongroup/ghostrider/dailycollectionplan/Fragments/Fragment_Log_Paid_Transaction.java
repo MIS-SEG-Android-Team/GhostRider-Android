@@ -17,8 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.textview.MaterialTextView;
@@ -43,14 +45,15 @@ public class Fragment_Log_Paid_Transaction extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_paid_log, container, false);
-        mViewModel = ViewModelProviders.of(this).get(VMLogPaidTransaction.class);
+        mViewModel = new ViewModelProvider(this).get(VMLogPaidTransaction.class);
         initWidgets(v);
         return v;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         // TODO: Functions
         txtAcctNo.setText(Activity_TransactionDetail.acctNox);
         txtClientName.setText(Activity_TransactionDetail.fullNme);

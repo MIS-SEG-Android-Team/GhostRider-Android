@@ -45,10 +45,14 @@ public class Activity_SpousePensionInfo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ;
+        setContentView(R.layout.activity_spouse_pension_info);
+
         mViewModel = new ViewModelProvider(Activity_SpousePensionInfo.this).get(VMSpousePensionInfo.class);
         poMessage = new MessageBox(Activity_SpousePensionInfo.this);
-        setContentView(R.layout.activity_spouse_pension_info);
+
         initWidgets();
+
         mViewModel.InitializeApplication(getIntent());
         mViewModel.GetApplication().observe(Activity_SpousePensionInfo.this, app -> {
             TransNox = app.getTransNox();
@@ -112,9 +116,10 @@ public class Activity_SpousePensionInfo extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -125,7 +130,7 @@ public class Activity_SpousePensionInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpousePensionInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Pension Info");
+        getSupportActionBar().setTitle("");
 
         spnSector = findViewById(R.id.spn_psnSector);
 

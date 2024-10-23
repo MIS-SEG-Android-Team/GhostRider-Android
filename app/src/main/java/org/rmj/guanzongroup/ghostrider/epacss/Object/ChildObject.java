@@ -21,9 +21,7 @@ import org.guanzongroup.com.itinerary.Activities.Activity_ItineraryLog;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.guanzongroup.documentscanner.Activity_DocumentScan;
 import org.rmj.guanzongroup.ganado.Activities.Activity_BrandSelection;
-import org.rmj.guanzongroup.ganado.Activities.Activity_CategorySelection;
 import org.rmj.guanzongroup.ganado.Activities.Activity_Inquiries;
-import org.rmj.guanzongroup.ganado.Activities.Activity_ProductInquiry;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_AreaPerformanceMonitoring;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCountLog;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCounter;
@@ -34,16 +32,12 @@ import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_C
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_LogCollection;
 import org.rmj.guanzongroup.ghostrider.samsungknox.Activity_Knox;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_BranchApplications;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_CoMaker;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_CreditApplications;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_EmploymentInfo;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_IntroductoryQuestion;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_PersonalInfo;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_SelfEmployedInfo;
-import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_SpouseResidenceInfo;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Application;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_EmployeeLoanEntry;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Employee_Applications;
+import org.rmj.guanzongroup.petmanager.Activity.Activity_LoanItems;
 
 public class ChildObject {
 
@@ -72,13 +66,9 @@ public class ChildObject {
                 break;
             case "loan application":
                 loIntent = new Intent(context, Activity_IntroductoryQuestion.class);
-//                loIntent = new Intent(context, Activity_EmploymentInfo.class);
-//                loIntent.putExtra("sTransNox", "MX012300009");
-//                loIntent = new Intent(context, Activity_CreditAppHome.class);
                 break;
             case "user application list":
                 loIntent = new Intent(context, Activity_CreditApplications.class);
-//                loIntent.putExtra("app", AppConstants.INTENT_OB_APPLICATION);
                 break;
 
             case "branch application list":
@@ -87,10 +77,6 @@ public class ChildObject {
             case "document scan":
                 loIntent = new Intent(context, Activity_DocumentScan.class);
                 break;
-//            case "":
-//                loIntent = new Intent(context, DCPPhotoCapture.class);
-//                break;
-
             case "ci evaluation list":
                 loIntent = new Intent(context, Activity_CIEvaluationList.class);
                 break;
@@ -122,7 +108,6 @@ public class ChildObject {
 
             case "application approval":
                 loIntent = new Intent(context, Activity_Employee_Applications.class);
-//                loIntent.putExtra("app", AppConstants.INTENT_APPLICATION_APPROVAL);
                 break;
 
             case "application history":
@@ -191,11 +176,16 @@ public class ChildObject {
             case "employee loan":
                 loIntent = new Intent(context, Activity_EmployeeLoanEntry.class);
                 break;
-
+            case "employee loan history":
+                loIntent = new Intent(context, Activity_LoanItems.class);
+                break;
+            case "employee loan approval":
+                loIntent = new Intent(context, Activity_LoanItems.class);
+                loIntent.putExtra("args", "loanapproval");
+                break;
             case "inquiry":
                 loIntent = new Intent(context, Activity_BrandSelection.class);
                 break;
-
             case "inquiries":
                 loIntent = new Intent(context, Activity_Inquiries.class);
                 break;

@@ -1,30 +1,41 @@
 package org.rmj.guanzongroup.petmanager.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
-
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
+import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTypes;
+import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.g3appdriver.GCircle.Apps.EmployeeLoan.pojo.LoanApplication;
-import org.rmj.g3appdriver.GCircle.Apps.EmployeeLoan.pojo.LoanType;
 import org.rmj.guanzongroup.petmanager.R;
 import org.rmj.guanzongroup.petmanager.ViewModel.VMEmployeeLoanEntry;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 public class Activity_EmployeeLoanEntry extends AppCompatActivity {
     private static final String TAG = Activity_EmployeeLoanEntry.class.getSimpleName();
-
     private VMEmployeeLoanEntry mViewModel;
-    private LoanApplication loApp;
     private MaterialToolbar toolbar;
     private MaterialAutoCompleteTextView spn_loantype;
     private TextInputEditText txt_loanamt;
@@ -32,8 +43,14 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
     private TextInputEditText txt_firstpay;
     private TextInputEditText txt_amort;
     private TextInputEditText txt_totalinterest;
+    private TextInputEditText txt_loandt;
+    private TextInputEditText txt_purpose;
+    private ConstraintLayout installment_layout;
     private MaterialButton btn_saveloanentry;
-    String terms;
+    private LoadDialog poDialog;
+    private MessageBox poMessage;
+    private HashMap<String, String> poLoanType; //todo: for id reference of loan type
+    private Boolean isApproved = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,138 +58,143 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
         setContentView(R.layout.activity_employee_loan_entry);
 
         mViewModel = new ViewModelProvider(this).get(VMEmployeeLoanEntry.class);
-        mViewModel.context = Activity_EmployeeLoanEntry.this;
-
-        loApp = new LoanApplication();
-        terms = String.valueOf(0);
 
         //set declared  object value by getting id object from xml file
         toolbar = findViewById(R.id.toolbar);
         spn_loantype = findViewById(R.id.spn_loantype);
+        txt_loandt = findViewById(R.id.txt_loandt);
         txt_loanamt = findViewById(R.id.txt_loanamt);
         spn_terms = findViewById(R.id.spn_terms);
+        txt_purpose = findViewById(R.id.txt_purpose);
         txt_firstpay = findViewById(R.id.txt_firstpay);
         txt_amort = findViewById(R.id.txt_monthlypay);
         txt_totalinterest = findViewById(R.id.txt_totalintrst);
+        installment_layout = findViewById(R.id.installment_layout);
         btn_saveloanentry = findViewById(R.id.btn_saveloanentry);
+
+        poDialog = new LoadDialog(this);
+        poMessage = new MessageBox(this);
+
+        poLoanType = new HashMap<String, String>();
+
+        poMessage.initDialog();
+        poMessage.setTitle("Employee Loan");
+        poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+            @Override
+            public void OnButtonClick(View view, AlertDialog dialog) {
+                dialog.dismiss();
+            }
+        });
 
         /*TOOL BAR*/
         setSupportActionBar(toolbar); //set object toolbar as default action bar for activity
-        getSupportActionBar().setTitle(""); //set default title for action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //set back button to toolbar
-        getSupportActionBar().setDisplayShowHomeEnabled(true); //enable the back button set on toolbar
 
+        mViewModel.GetLoanTypes().observe(this, new Observer<List<ELoanTypes>>() {
+            @Override
+            public void onChanged(List<ELoanTypes> eLoanTypes) {
+                if (eLoanTypes != null){
+
+                    List<String> adaptString = new ArrayList<>(); //todo: this is for adapter display
+
+                    for (int i = 0; i < eLoanTypes.size(); i++){
+                        poLoanType.put(eLoanTypes.get(i).getsLoanNmxx(), eLoanTypes.get(i).getsLoanIDxx());
+                        adaptString.add(eLoanTypes.get(i).getsLoanNmxx());
+                    }
+
+                    spn_loantype.setAdapter(new ArrayAdapter<String>(Activity_EmployeeLoanEntry.this, android.R.layout.simple_spinner_dropdown_item, adaptString));
+                }
+            }
+        });
+
+        spn_terms.setAdapter(mViewModel.GetTerms());
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
-        spn_loantype.setAdapter(mViewModel.getLoanTypeListAdapter());
-        spn_terms.setAdapter(mViewModel.getTermsListAdapter());
-        spn_loantype.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        txt_loandt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LoanType loType = mViewModel.GetLoanTypes().get(position);
-                String lsIDxx = loType.getLoanIDxx();
-                loApp.setLoanIDxx(lsIDxx);
-            }
-        });
-        spn_terms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                terms = String.valueOf(mViewModel.getTermsList().get(position).getnLoanTerm());
-                //set total interest
-                txt_totalinterest.setText(mViewModel.computeTotalAmt(txt_loanamt.getText().toString(),
-                        txt_firstpay.getText().toString(), terms, "interest"));
-                //set total amort
-                txt_amort.setText(mViewModel.computeTotalAmt(txt_loanamt.getText().toString(),
-                        txt_firstpay.getText().toString(), terms, "amort"));
-            }
-        });
-        txt_loanamt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                //set default text
-                txt_loanamt.setText(mViewModel.getDefaultText(txt_loanamt.getText().toString(),
-                        ".00", "decimal"));
-                //set total interest
-                txt_totalinterest.setText(mViewModel.computeTotalAmt(txt_loanamt.getText().toString(),
-                        txt_firstpay.getText().toString(), terms, "interest"));
-                //set total amort
-                txt_amort.setText(mViewModel.computeTotalAmt(txt_loanamt.getText().toString(),
-                        txt_firstpay.getText().toString(), terms, "amort"));
-            }
-        });
-        txt_firstpay.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                //set default text
-                txt_firstpay.setText(mViewModel.getDefaultText(txt_firstpay.getText().toString(),
-                        ".00", "decimal"));
-                //set total interest
-                txt_totalinterest.setText(mViewModel.computeTotalAmt(txt_loanamt.getText().toString(),
-                        txt_firstpay.getText().toString(), terms, "interest"));
-                //set total amort
-                txt_amort.setText(mViewModel.computeTotalAmt(txt_loanamt.getText().toString(),
-                        txt_firstpay.getText().toString(), terms, "amort"));
+            public void onClick(View v) {
+                setDateTimePicker(txt_loandt);
             }
         });
         btn_saveloanentry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //VALIDATE TEXTFIELD'S VALUE FOR AMOUNT
-                Boolean outputValid = mViewModel.validateInputAmt(Activity_EmployeeLoanEntry.this, true, new TextInputEditText[]{txt_loanamt, txt_firstpay});
-                if(outputValid.equals(false)) {
-                    return;
-                }
+                try {
+                    EEmpLoan foLoan = new EEmpLoan();
+                    foLoan.setsTransNox(mViewModel.GenerateID());
+                    foLoan.setsEmployID(mViewModel.GetEmpID());
+                    foLoan.setsLoanIDxx(poLoanType.get(spn_loantype.getText().toString()));
+                    foLoan.setdTransact(mViewModel.CurrentDate());
 
-                Boolean save = mViewModel.SaveLoanApplication(spn_loantype.getText().toString(), txt_loanamt.getText().toString()
-                        ,txt_firstpay.getText().toString(), terms, loApp);
+                    SimpleDateFormat sSavedFormat = new SimpleDateFormat("MMMM dd, yyyy");
+                    SimpleDateFormat sNewFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                if (save.equals(true)) {
+                    Date dLoanDt = sSavedFormat.parse(txt_loandt.getText().toString());
+                    foLoan.setdLoanDate(sNewFormat.format(dLoanDt));
 
-                    //initialize dialog class
-                    MessageBox messageBox = new MessageBox(Activity_EmployeeLoanEntry.this);
-                    messageBox.initDialog();
+                    foLoan.setnLoanAmtxx(Integer.parseInt(txt_loanamt.getText().toString()));
+                    foLoan.setnPaymTerm(Integer.parseInt(spn_terms.getText().toString()));
+                    foLoan.setsPurposed(txt_purpose.getText().toString());
 
-                    //set dialog title and message
-                    messageBox.setTitle("Loan Application");
-                    messageBox.setMessage("Confirm Loan Application?");
+                    if (isApproved){
+                        Date dFirstPayDt = sSavedFormat.parse(txt_firstpay.getText().toString());
+                        foLoan.setdFirstPay(sNewFormat.format(dFirstPayDt));
+                    }
 
-                    //set dialog buttons
-                    messageBox.setPositiveButton("YES", new MessageBox.DialogButton() {
+                    mViewModel.SaveLoanEntry(foLoan, new VMEmployeeLoanEntry.OnSaveEntry() {
                         @Override
-                        public void OnButtonClick(View view, AlertDialog dialog) {
-                            //loApp.setLoanType(loantype);
-                            loApp.setAmountxx(Double.parseDouble(txt_loanamt.getText().toString()));
-                            loApp.setLoanTerm(Integer.parseInt(terms));
-                            loApp.setAmountxx(Double.parseDouble(txt_firstpay.getText().toString()));
+                        public void onLoad(String title, String message) {
+                            poDialog.initDialog(title, message, false);
+                            poDialog.show();
+                        }
+                        @Override
+                        public void onSuccess(String message) {
+                            poDialog.dismiss();
+                            clearForms();
 
-                            //close dialog
-                            dialog.dismiss();
+                            poMessage.setMessage("Loan saved");
+                            poMessage.show();
+                        }
+                        @Override
+                        public void onFailed(String message) {
+                            poDialog.dismiss();
 
-                            spn_loantype.setText("");
-                            txt_loanamt.setText("");
-                            spn_terms.setText("");
-                            txt_firstpay.setText("");
-                            txt_amort.setText("");
-                            txt_totalinterest.setText("");
+                            poMessage.setMessage(message);
+                            poMessage.show();
                         }
                     });
-
-                    messageBox.setNegativeButton("NO", new MessageBox.DialogButton() {
-                        @Override
-                        public void OnButtonClick(View view, AlertDialog dialog) {
-                            dialog.dismiss();
-                            return;
-                        }
-                    });
-
-                    //show dialog
-                    messageBox.show();
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
         });
+    }
+    public void clearForms(){
+        spn_loantype.setText("");
+        txt_loandt.setText("");
+        txt_loanamt.setText("");
+        spn_terms.setText("");
+        txt_purpose.setText("");
+    }
+    public void setDateTimePicker(TextInputEditText dtHolder){
+        final Calendar newCalendar = Calendar.getInstance();
+        final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
+
+        final DatePickerDialog DialogTime = new DatePickerDialog(Activity_EmployeeLoanEntry.this,
+                android.R.style.Theme_Holo_Dialog, (view131, year, monthOfYear, dayOfMonth) -> {
+
+            Calendar selectDate = Calendar.getInstance();
+            selectDate.set(year, monthOfYear, dayOfMonth);
+
+            String lsDate = dateFormatter.format(selectDate.getTime());
+            dtHolder.setText(lsDate);
+
+        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+
+        DialogTime.show();
     }
 }

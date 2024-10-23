@@ -3,18 +3,21 @@ package org.rmj.guanzongroup.pacitareward.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPacitaEvaluation;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPacitaRule;
 import org.rmj.g3appdriver.etc.LoadDialog;
@@ -38,6 +41,9 @@ public class Activity_Branch_Rate extends AppCompatActivity {
     private String intentDataBranchcd;
     private String intentDataBranchName;
     private MaterialButton btn_submit;
+    private String lsPayload;
+    private RecyclerViewAdapter_BranchRate loAdapter;
+    private EPacitaEvaluation loEvaluation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,19 +86,8 @@ public class Activity_Branch_Rate extends AppCompatActivity {
             }
             @Override
             public void OnSuccess(String transactNo, String message) {
+
                 poLoad.dismiss();
-
-                RecyclerViewAdapter_BranchRate loAdapter = new RecyclerViewAdapter_BranchRate(new RecyclerViewAdapter_BranchRate.onSelect() {
-                    @Override
-                    public void onItemSelect(String EntryNox, String result) {
-                        mViewModel.setEvaluationResult(transactNo, EntryNox, result);
-                    }
-                });
-
-                LinearLayoutManager loManager = new LinearLayoutManager(Activity_Branch_Rate.this);
-                loManager.setOrientation(RecyclerView.VERTICAL);
-                rate_list.setLayoutManager(loManager);
-                rate_list.setAdapter(loAdapter);
 
                 mViewModel.getBranchEvaluation(transactNo).observe(Activity_Branch_Rate.this, new Observer<EPacitaEvaluation>() {
                     @Override
@@ -100,30 +95,68 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                         if(ePacitaEvaluation == null){
                             return;
                         }
-                        ePacitaEvaluation.setTransNox(transactNo);
 
-                        mViewModel.GetCriteria().observe(Activity_Branch_Rate.this, new Observer<List<EPacitaRule>>() {
-                            @Override
-                            public void onChanged(List<EPacitaRule> ePacitaRules) {
-                                if(ePacitaRules == null){
-                                    return;
-                                }
-                                if(ePacitaRules.size() == 0){
-                                    return;
-                                }
+                        loEvaluation = ePacitaEvaluation;
+                        loEvaluation.setTransNox(transactNo);
 
-                                String lsPayload = ePacitaEvaluation.getPayloadx();
-                                List<BranchRate> loRate = PacitaRule.ParseBranchRate(lsPayload, ePacitaRules);
-                                loAdapter.setItems(loRate);
-                                loAdapter.notifyDataSetChanged();
-                            }
-                        });
                     }
                 });
+
+                mViewModel.GetCriteria().observe(Activity_Branch_Rate.this, new Observer<List<EPacitaRule>>() {
+
+                    @Override
+                    public void onChanged(List<EPacitaRule> ePacitaRules) {
+                        if(ePacitaRules == null){
+                            return;
+                        }
+                        if(ePacitaRules.size() <= 0){
+                            return;
+                        }
+
+                        lsPayload = loEvaluation.getPayloadx();
+                        List<BranchRate> loRate = PacitaRule.ParseBranchRate(lsPayload, ePacitaRules);
+
+                        loAdapter = new RecyclerViewAdapter_BranchRate(Activity_Branch_Rate.this, loRate, new RecyclerViewAdapter_BranchRate.onSelect() {
+                            @Override
+                            public void onItemSelect(String EntryNox, String result) {
+                                try {
+
+                                    JSONArray loArray = new JSONArray(lsPayload);
+
+                                    for (int x = 0;  x < loArray.length(); x++){
+
+                                        int lnEntryNo = loArray.getJSONObject(x).getInt("nEntryNox");
+
+                                        if(Integer.parseInt(EntryNox) == lnEntryNo){
+
+                                            loArray.getJSONObject(x).put("xRatingxx", result);
+
+                                        }
+
+                                    }
+
+                                    //todo: collection of ratings result
+                                    lsPayload = loArray.toString();
+
+                                }catch (JSONException e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+
+                        rate_list.setAdapter(loAdapter);
+                        rate_list.setLayoutManager(new LinearLayoutManager(Activity_Branch_Rate.this, LinearLayoutManager.VERTICAL, false));
+                    }
+                });
+
                 btn_submit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (!transactNo.isEmpty()){
+
+                            mViewModel.setEvaluationResult(transactNo, lsPayload);
+
                             mViewModel.saveBranchRatings(transactNo, new VMBranchRate.BranchRatingsCallback() {
                                 @Override
                                 public void onSave(String title, String message) {
@@ -135,9 +168,10 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                                 public void onSuccess(String message) {
                                     poLoad.dismiss();
                                     poMessage.initDialog();
+                                    poMessage.setIcon(R.drawable.baseline_message_24);
                                     poMessage.setTitle("Save Evaluation");
                                     poMessage.setMessage(message);
-                                    poMessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                                    poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                                         @Override
                                         public void OnButtonClick(View view, AlertDialog dialog) {
                                             dialog.dismiss();
@@ -151,9 +185,10 @@ public class Activity_Branch_Rate extends AppCompatActivity {
                                 public void onFailed(String message) {
                                     poLoad.dismiss();
                                     poMessage.initDialog();
+                                    poMessage.setIcon(R.drawable.ic_toast_error);
                                     poMessage.setTitle("Error Saving Application");
                                     poMessage.setMessage(message);
-                                    poMessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                                    poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                                         @Override
                                         public void OnButtonClick(View view, AlertDialog dialog) {
                                             dialog.dismiss();
@@ -170,9 +205,10 @@ public class Activity_Branch_Rate extends AppCompatActivity {
             public void OnError(String message) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Transaction Result");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();

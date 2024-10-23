@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingVertical="5dp"
+    android:paddingHorizontal="5dp">
+
+    <LinearLayout
+        android:id="@+id/parent_cons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:elevation="10dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_empinfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/empname"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textStyle="bold"
+                android:paddingStart="10dp"
+                android:paddingVertical="5dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintWidth_percent="0.5"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/emppos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingVertical="5dp"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/empname" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@+id/emppos"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rec_parentitems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

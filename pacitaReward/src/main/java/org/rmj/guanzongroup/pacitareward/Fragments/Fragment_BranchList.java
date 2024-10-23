@@ -46,9 +46,10 @@ public class Fragment_BranchList extends Fragment {
 
         MessageBox loadDialog = new MessageBox(requireActivity());
         loadDialog.initDialog();
+        loadDialog.setIcon(R.drawable.baseline_error_24);
         loadDialog.setTitle("No Records");
         loadDialog.setMessage("No Branch Records Found");
-        loadDialog.setPositiveButton("OK", new MessageBox.DialogButton() {
+        loadDialog.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
             @Override
             public void OnButtonClick(View view, AlertDialog dialog) {
                 dialog.dismiss();
@@ -62,6 +63,7 @@ public class Fragment_BranchList extends Fragment {
                 if (eBranchInfos.size() <= 0){
                     loadDialog.show();
                 }
+
                 rec_branchList = new RecyclerViewAdapter_BranchList(eBranchInfos, new RecyclerViewAdapter_BranchList.OnBranchSelectListener() {
                     @Override
                     public void OnSelect(String BranchCode, String BranchName) {
@@ -104,13 +106,9 @@ public class Fragment_BranchList extends Fragment {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 try{
-                    if(s != null) {
-                        if (!s.toString().trim().isEmpty()) {
-                            String query = s.toString();
-                            rec_branchList.getFilter().filter(query);
-                            rec_branchList.notifyDataSetChanged();
-                        }
-                    }
+                    String query = s.toString();
+                    rec_branchList.getFilter().filter(query);
+                    rec_branchList.notifyDataSetChanged();
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -119,13 +117,9 @@ public class Fragment_BranchList extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try{
-                    if(s != null) {
-                        if (!s.toString().trim().isEmpty()) {
-                            String query = s.toString();
-                            rec_branchList.getFilter().filter(query);
-                            rec_branchList.notifyDataSetChanged();
-                        }
-                    }
+                    String query = s.toString();
+                    rec_branchList.getFilter().filter(query);
+                    rec_branchList.notifyDataSetChanged();
                 } catch (Exception e){
                     e.printStackTrace();
                 }

@@ -193,9 +193,10 @@ public class Activity_ComakerResidence extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();
@@ -242,7 +243,7 @@ public class Activity_ComakerResidence extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_CoMakerResidence);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Co-Maker Personal Info");
+        getSupportActionBar().setTitle("");
 
         txtLandMark = findViewById(R.id.txt_landmark);
         txtHouseNox = findViewById(R.id.txt_houseNox);

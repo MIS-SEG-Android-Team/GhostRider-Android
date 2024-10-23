@@ -10,51 +10,59 @@
   ~ project file last modified : 4/24/21 3:17 PM
   -->
 
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:theme="@style/GhostRiderMaterialTheme"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardUseCompatPadding="true"
     app:cardPreventCornerOverlap="true"
-    app:cardCornerRadius="25dp">
+    app:cardCornerRadius="10dp"
+    app:cardElevation="5dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:gravity="center"
-        android:paddingVertical="20dp"
-        android:paddingHorizontal="50dp">
+        android:padding="5dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/lbl_dialogTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Samsung Knox"
-            android:textSize="21sp"
-            android:textAlignment="center"
+            android:text="Title"
+            android:textSize="18sp"
             android:gravity="center"
-            android:fontFamily="@font/roboto_bold"/>
+            android:fontFamily="@font/roboto_bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/lbl_dialogMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Activating. Please wait..."
-            android:textAlignment="center"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/roboto"/>
+            android:textSize="15sp"
+            android:fontFamily="@font/roboto"
+            android:gravity="center"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lbl_dialogTitle"/>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
+            style="@style/SpinKitView.Large.DoubleBounce"
             android:id="@+id/progress_loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:indeterminate="true"/>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintWidth_percent="0.2"
+            app:layout_constraintHeight_percent="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lbl_dialogMessage"
+            app:SpinKit_Color="@color/guanzon_digital_orange"/>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
