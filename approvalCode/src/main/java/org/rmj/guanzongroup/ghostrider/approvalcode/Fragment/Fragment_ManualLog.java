@@ -174,7 +174,7 @@ public class Fragment_ManualLog extends Fragment {
                     poMsgBox.setIcon(R.drawable.baseline_error_24);
                     poMsgBox.setTitle("Approval Code");
                     poMsgBox.setMessage(message);
-                    poMsgBox.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                    poMsgBox.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                     poMsgBox.show();
                 }
             });

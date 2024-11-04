@@ -127,7 +127,7 @@ public class Activity_CIEvaluationList extends AppCompatActivity  implements VME
         poMessage.setIcon(R.drawable.baseline_error_24);
         poMessage.setTitle("CI Evaluation List");
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
         poMessage.show();
     }
 
@@ -156,7 +156,7 @@ public class Activity_CIEvaluationList extends AppCompatActivity  implements VME
                                 poMessage.setIcon(R.drawable.baseline_message_24);
                                 poMessage.setTitle("Add Application");
                                 poMessage.setMessage("Credit Application saved successfully");
-                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                                 poMessage.show();
                             }
 
@@ -167,7 +167,7 @@ public class Activity_CIEvaluationList extends AppCompatActivity  implements VME
                                 poMessage.setIcon(R.drawable.baseline_error_24);
                                 poMessage.setTitle("Add Application");
                                 poMessage.setMessage(message);
-                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                                 poMessage.show();
                             }
                         });

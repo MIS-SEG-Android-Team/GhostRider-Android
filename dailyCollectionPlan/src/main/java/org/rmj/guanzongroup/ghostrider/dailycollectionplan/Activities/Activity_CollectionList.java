@@ -366,7 +366,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -388,7 +388,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage("Dcp posted successfully.");
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
                     dialog.dismiss();
 
                     if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
@@ -405,7 +405,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -433,7 +433,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                     poMessage.setIcon(R.drawable.baseline_message_24);
                     poMessage.setTitle("Daily Collection Plan");
                     poMessage.setMessage("Records cleared successfully.");
-                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                     poMessage.show();
                 }
 
@@ -444,7 +444,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                     poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Daily Collection Plan");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                     poMessage.show();
                 }
             });
@@ -493,7 +493,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -557,7 +557,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                                                 poMessage.setIcon(R.drawable.baseline_message_24);
                                                 poMessage.setTitle("Daily Collection Plan");
                                                 poMessage.setMessage( detail.getFullName() + " has been added to collection list.");
-                                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                                                 poMessage.show();
                                             }
 
@@ -568,7 +568,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                                                 poMessage.setIcon(R.drawable.baseline_error_24);
                                                 poMessage.setTitle("Daily Collection Plan");
                                                 poMessage.setMessage(message);
-                                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                                                 poMessage.show();
                                             }
                                         });
@@ -594,7 +594,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                             poMessage.setIcon(R.drawable.baseline_error_24);
                             poMessage.setTitle("Daily Collection Plan");
                             poMessage.setMessage(message);
-                            poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                            poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                             poMessage.show();
                         }
                     });
@@ -658,7 +658,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                 loMessage.setIcon(R.drawable.baseline_error_24);
                 loMessage.setTitle("Disclosure");
                 loMessage.setMessage("Disclosure denied. Download cancelled.");
-                loMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();

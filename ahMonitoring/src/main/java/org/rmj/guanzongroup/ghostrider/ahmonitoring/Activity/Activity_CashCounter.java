@@ -113,7 +113,7 @@ public class Activity_CashCounter extends AppCompatActivity {
                     poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Cash Count");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                    poMessage.setPositiveButton("Okay", (view, dialog) -> {
                         dialog.dismiss();
                         finish();
                     });

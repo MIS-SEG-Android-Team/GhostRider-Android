@@ -193,7 +193,7 @@ public class Activity_Employee_Applications extends AppCompatActivity implements
         poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("PET Manager");
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
         poMessage.show();
     }
 }

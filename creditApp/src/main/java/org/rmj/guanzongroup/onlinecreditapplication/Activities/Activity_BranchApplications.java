@@ -79,7 +79,7 @@ public class Activity_BranchApplications extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });

@@ -49,11 +49,8 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder_BranchRate holder, int position) {
-        Log.i("holder", String.valueOf(position));
+
         BranchRate loRate = poRatings.get(position);
-
-        Log.i("namey", "in rate of "+ poRatings.get(position)+" "+loRate.getsRateName());
-
 
         holder.item_question.setText(loRate.getsRateName());
 
@@ -61,8 +58,8 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
             @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View v) {
+
                 mListener.onItemSelect(loRate.getsRateIDxx().toString(), "1");
-                Log.i("Sample Output", loRate.getsRateIDxx().toString());
 
             }
         });
@@ -71,8 +68,8 @@ public class RecyclerViewAdapter_BranchRate extends RecyclerView.Adapter<Recycle
             @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View v) {
+
                 mListener.onItemSelect(loRate.getsRateIDxx().toString(), "0");
-                Log.i("Sample Output", loRate.getsRateIDxx().toString());
             }
         });
 

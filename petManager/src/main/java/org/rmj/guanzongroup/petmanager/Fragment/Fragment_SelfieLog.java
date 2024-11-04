@@ -181,7 +181,7 @@ public class Fragment_SelfieLog extends Fragment {
                                     poMessage.initDialog();
                                     poMessage.setTitle("Selfie Login");
                                     poMessage.setMessage(message);
-                                    poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                                     poMessage.show();
                                 }
                             });
@@ -243,7 +243,7 @@ public class Fragment_SelfieLog extends Fragment {
                                 poMessage.setIcon(R.drawable.baseline_error_24);
                                 poMessage.setTitle("Selfie Login");
                                 poMessage.setMessage(message);
-                                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                                 poMessage.show();
                             }
                         });
@@ -333,7 +333,7 @@ public class Fragment_SelfieLog extends Fragment {
                         poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Selfie Login");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
                             dialog.dismiss();
                             if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
                                 requireActivity().finish();
@@ -442,7 +442,7 @@ public class Fragment_SelfieLog extends Fragment {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Selfie Login");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
                     dialog.dismiss();
                     if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
                         requireActivity().finish();
@@ -458,7 +458,7 @@ public class Fragment_SelfieLog extends Fragment {
                 poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Selfie Log");
                 poMessage.setMessage("Selfie log save.");
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });
@@ -494,7 +494,7 @@ public class Fragment_SelfieLog extends Fragment {
                 loMessage.initDialog();
                 loMessage.setTitle("Disclosure");
                 loMessage.setMessage("Disclosure denied. Selfie log cancelled.");
-                loMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();
@@ -542,7 +542,7 @@ public class Fragment_SelfieLog extends Fragment {
                                 poMessage.setIcon(R.drawable.baseline_error_24);
                                 poMessage.setTitle("Selfie Log");
                                 poMessage.setMessage(message);
-                                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                                 poMessage.show();
                             }
                         });

@@ -79,7 +79,7 @@ public class Activity_EmployeeLoanEntry extends AppCompatActivity {
 
         poMessage.initDialog();
         poMessage.setTitle("Employee Loan");
-        poMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+        poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
             @Override
             public void OnButtonClick(View view, AlertDialog dialog) {
                 dialog.dismiss();

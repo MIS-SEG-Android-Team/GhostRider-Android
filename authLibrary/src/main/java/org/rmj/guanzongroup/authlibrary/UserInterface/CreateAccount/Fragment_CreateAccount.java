@@ -111,7 +111,7 @@ public class Fragment_CreateAccount extends Fragment implements CreateAccountCal
         loMessage.setIcon(R.drawable.baseline_message_24);
         loMessage.setTitle("Create Account");
         loMessage.setMessage("A verification email has been sent to your email account. Please check your inbox or spam folder.");
-        loMessage.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
+        loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
         loMessage.show();
     }
 
@@ -122,7 +122,7 @@ public class Fragment_CreateAccount extends Fragment implements CreateAccountCal
         loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setTitle("Create Account");
         loMessage.setMessage(message);
-        loMessage.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
+        loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
         loMessage.show();
     }
 }

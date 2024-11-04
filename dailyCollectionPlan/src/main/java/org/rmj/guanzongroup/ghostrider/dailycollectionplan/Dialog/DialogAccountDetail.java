@@ -222,7 +222,7 @@ public class DialogAccountDetail {
             poMessage.setIcon(R.drawable.baseline_error_24);
             poMessage.setTitle("Error Report");
             poMessage.setMessage(e.getMessage());
-            poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+            poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
             poMessage.show();
         }
     }

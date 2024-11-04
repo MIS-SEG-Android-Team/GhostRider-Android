@@ -15,7 +15,7 @@ import org.rmj.guanzongroup.pacitareward.R;
 public class RecyclerViewHolder_BranchRate extends RecyclerView.ViewHolder {
     public View view;
     public MaterialTextView item_question;
-    public Button pass_btn;
+    public MaterialButton pass_btn;
     public MaterialButton fail_btn;
     public MaterialButtonToggleGroup toggleGroup;
 
@@ -27,5 +27,6 @@ public class RecyclerViewHolder_BranchRate extends RecyclerView.ViewHolder {
         toggleGroup = itemView.findViewById(R.id.materialButtonToggleGroup);
         pass_btn = itemView.findViewById(R.id.pass_btn);
         fail_btn = itemView.findViewById(R.id.fail_btn);
+
     }
 }

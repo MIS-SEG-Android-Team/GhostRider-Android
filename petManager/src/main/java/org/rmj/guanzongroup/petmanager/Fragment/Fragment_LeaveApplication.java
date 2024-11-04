@@ -205,7 +205,7 @@ public class Fragment_LeaveApplication extends Fragment {
                         poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("Leave Application");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
                             dialog.dismiss();
                             spnType.setSelection(0);
                             txtDateFrom.setText("");
@@ -224,7 +224,7 @@ public class Fragment_LeaveApplication extends Fragment {
                         poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Leave Application");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 });

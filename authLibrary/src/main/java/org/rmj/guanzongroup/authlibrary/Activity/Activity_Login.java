@@ -113,7 +113,7 @@ public class Activity_Login extends AppCompatActivity implements LoginCallback {
         loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setTitle("Guanzon Circle");
         loMessage.setMessage(message);
-        loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+        loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
         loMessage.show();
     }
 }

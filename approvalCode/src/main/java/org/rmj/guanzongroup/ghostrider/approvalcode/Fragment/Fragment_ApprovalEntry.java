@@ -220,7 +220,7 @@ public class Fragment_ApprovalEntry extends Fragment {
                         poLoad.dismiss();
                         poMesgBox.initDialog();
                         poMesgBox.setIcon(R.drawable.baseline_error_24);
-                        poMesgBox.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                        poMesgBox.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                         poMesgBox.setTitle("Approval Code");
                         poMesgBox.setMessage(message);
                         poMesgBox.show();

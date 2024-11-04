@@ -174,7 +174,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                                 loMessage.setIcon(R.drawable.baseline_error_24);
                                 loMessage.setTitle("Dashboard");
                                 loMessage.setMessage("Feature not available.");
-                                loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                                loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                                 loMessage.show();
                             } else {
                                 startActivity(loIntent);
@@ -191,7 +191,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                             loMessage.setIcon(R.drawable.baseline_error_24);
                             loMessage.setTitle("Dashboard");
                             loMessage.setMessage("Feature not available.");
-                            loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                            loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                             loMessage.show();
                         } else {
                             startActivity(loIntent);
@@ -258,7 +258,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                     loMessage.setIcon(R.drawable.baseline_error_24);
                     loMessage.setTitle("Guanzon Circle");
                     loMessage.setMessage(message);
-                    loMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                    loMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                     loMessage.show();
                 }
             });
@@ -294,7 +294,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                         loMessage.setIcon(R.drawable.baseline_error_24);
                         loMessage.setTitle("Employee QR");
                         loMessage.setMessage(message);
-                        loMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                        loMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
 
                         loMessage.show();
                     }

@@ -103,7 +103,7 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
                         poMsgBox.setIcon(R.drawable.baseline_message_24);
                         poMsgBox.setTitle("Result");
                         poMsgBox.setMessage("Successfully sent request.");
-                        poMsgBox.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                        poMsgBox.setPositiveButton("Okay", new MessageBox.DialogButton() {
                             @Override
                             public void OnButtonClick(View view, AlertDialog dialog) {
                                 dialog.dismiss();
@@ -119,7 +119,7 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
                         poMsgBox.setIcon(R.drawable.baseline_error_24);
                         poMsgBox.setTitle("Result");
                         poMsgBox.setMessage("Failed to send request: " + message);
-                        poMsgBox.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                        poMsgBox.setPositiveButton("Okay", new MessageBox.DialogButton() {
                             @Override
                             public void OnButtonClick(View view, AlertDialog dialog) {
                                 dialog.dismiss();
@@ -148,7 +148,7 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
         poMsgBox.setIcon(R.drawable.baseline_message_24);
         poMsgBox.setTitle("Forgot Password");
         poMsgBox.setMessage("You'll be receiving an email from MIS, Please check your email account");
-        poMsgBox.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
+        poMsgBox.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
         poMsgBox.show();
     }
 
@@ -159,7 +159,7 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
         poMsgBox.setIcon(R.drawable.baseline_error_24);
         poMsgBox.setTitle("Forgot Password");
         poMsgBox.setMessage(message);
-        poMsgBox.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
+        poMsgBox.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
         poMsgBox.show();
     }
 }

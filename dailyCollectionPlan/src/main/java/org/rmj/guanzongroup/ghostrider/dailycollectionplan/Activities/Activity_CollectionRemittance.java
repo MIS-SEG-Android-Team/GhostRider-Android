@@ -313,7 +313,7 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                     poMessage.setIcon(R.drawable.baseline_message_24);
                     poMessage.setTitle("Collection Remittance");
                     poMessage.setMessage("Your remittance has been posted successfully.");
-                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                    poMessage.setPositiveButton("Okay", (view, dialog) -> {
                         dialog.dismiss();
                         finish();
                     });
@@ -327,7 +327,7 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                     poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Collection Remittance");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                     poMessage.show();
                 }
             });

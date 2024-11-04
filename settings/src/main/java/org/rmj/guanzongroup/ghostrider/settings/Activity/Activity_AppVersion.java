@@ -147,7 +147,7 @@ public class Activity_AppVersion extends AppCompatActivity {
                 poload.dismiss();
 
                 //set action button to close message dialog
-                pomessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                pomessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         //close dialogs upon clicking
@@ -169,7 +169,7 @@ public class Activity_AppVersion extends AppCompatActivity {
                 //close message
                 poload.dismiss();
 
-                pomessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                pomessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         //close dialogs upon clicking

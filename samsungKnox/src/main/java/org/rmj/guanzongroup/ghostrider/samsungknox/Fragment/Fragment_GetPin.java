@@ -103,7 +103,7 @@ public class Fragment_GetPin extends Fragment implements ViewModelCallBack {
         loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setMessage(message);
         loMessage.setTitle("Knox Get PIN");
-        loMessage.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
+        loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
         loMessage.show();
     }
 }

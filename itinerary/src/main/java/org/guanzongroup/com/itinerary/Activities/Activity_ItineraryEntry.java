@@ -209,7 +209,7 @@ public class Activity_ItineraryEntry extends AppCompatActivity {
                         poDialog.setIcon(R.drawable.baseline_message_24);
                         poDialog.setTitle("Employee Itinerary");
                         poDialog.setMessage(args);
-                        poDialog.setPositiveButton("Dismiss", (view, dialog) -> {
+                        poDialog.setPositiveButton("Okay", (view, dialog) -> {
                             dialog.dismiss();
                             txtDate.setText("");
                             txtStrt.setText("");
@@ -228,7 +228,7 @@ public class Activity_ItineraryEntry extends AppCompatActivity {
                         poDialog.setIcon(R.drawable.baseline_error_24);
                         poDialog.setTitle("Employee Itinerary");
                         poDialog.setMessage(message);
-                        poDialog.setPositiveButton("Dismiss", (view, dialog) -> {
+                        poDialog.setPositiveButton("Okay", (view, dialog) -> {
                             dialog.dismiss();
                             isClicked = false;
                         });

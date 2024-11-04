@@ -343,7 +343,16 @@ public class Fragment_LeaveApproval extends Fragment implements VMLeaveApproval.
             @Override
             public void onSuccess(String message) {
                 poDialogx.dismiss();
-                initErrorDialog("PET Manager", message);
+
+                poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
+                poMessage.setTitle("Leave Approval");
+                poMessage.setMessage(message);
+                poMessage.setPositiveButton("Okay", (view1, dialog) -> {
+                    dialog.dismiss();
+                });
+
+                poMessage.show();
             }
 
             @Override
@@ -391,7 +400,7 @@ public class Fragment_LeaveApproval extends Fragment implements VMLeaveApproval.
         poMessage.setIcon(R.drawable.baseline_error_24);
         poMessage.setTitle(title);
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Dismiss", (view, dialog) ->
+        poMessage.setPositiveButton("Okay", (view, dialog) ->
                 dialog.dismiss());
         poMessage.show();
     }

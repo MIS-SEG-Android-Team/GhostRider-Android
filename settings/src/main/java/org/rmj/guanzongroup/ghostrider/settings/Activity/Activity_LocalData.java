@@ -143,7 +143,7 @@ public class Activity_LocalData extends AppCompatActivity {
         poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("Manage Local Data");
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
         poMessage.show();
     }
 }

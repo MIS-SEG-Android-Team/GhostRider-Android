@@ -208,7 +208,7 @@ public class Fragment_BusinessTripApproval extends Fragment implements VMObAppro
         poMessage.setIcon(R.drawable.baseline_error_24);
         poMessage.setTitle(title);
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
         poMessage.show();
     }
 

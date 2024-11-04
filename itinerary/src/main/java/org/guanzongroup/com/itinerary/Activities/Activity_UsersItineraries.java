@@ -207,7 +207,7 @@ public class Activity_UsersItineraries extends AppCompatActivity {
                 poDialog.setIcon(R.drawable.baseline_error_24);
                 poDialog.setTitle("Employee Itinerary");
                 poDialog.setMessage(message);
-                poDialog.setPositiveButton("Dismiss", (view, dialog) -> {
+                poDialog.setPositiveButton("Okay", (view, dialog) -> {
                     dialog.dismiss();
                 });
                 poDialog.show();

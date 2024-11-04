@@ -123,7 +123,7 @@ public class Activity_BrandSelection extends AppCompatActivity {
                 loMessage.initDialog();
                 loMessage.setTitle("Disclosure");
                 loMessage.setMessage("Disclosure denied. Unable to retrieve product brands");
-                loMessage.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();

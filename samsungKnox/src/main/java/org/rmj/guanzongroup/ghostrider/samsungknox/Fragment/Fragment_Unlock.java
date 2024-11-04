@@ -76,7 +76,7 @@ public class Fragment_Unlock extends Fragment implements ViewModelCallBack {
         loMessage.setIcon(R.drawable.baseline_message_24);
         loMessage.setMessage(args);
         loMessage.setTitle("Unlock Device");
-        loMessage.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
+        loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
         loMessage.show();
     }
 
@@ -87,7 +87,7 @@ public class Fragment_Unlock extends Fragment implements ViewModelCallBack {
         loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setMessage(message);
         loMessage.setTitle("Unlock Device");
-        loMessage.setPositiveButton("Dismiss", (view, msgDialog) -> msgDialog.dismiss());
+        loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
         loMessage.show();
     }
 }

@@ -182,7 +182,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("BENTA");
                 poMessage.setMessage(mViewModel.GetMessage());
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
                     dialog.dismiss();
                 });
                 poMessage.show();
@@ -201,7 +201,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
                         poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("BENTA");
                         poMessage.setMessage(args);
-                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
                             dialog.dismiss();
                             Intent loIntent = new Intent(Activity_ClientInfo.this, Activity_Inquiries.class);
                             loIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -221,7 +221,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
                         poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("BENTA");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 });

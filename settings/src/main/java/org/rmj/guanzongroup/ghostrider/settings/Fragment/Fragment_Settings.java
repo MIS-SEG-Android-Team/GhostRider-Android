@@ -105,7 +105,7 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                 }else {
                     loMessage.initDialog();
                     loMessage.setIcon(R.drawable.baseline_message_24);
-                    loMessage.setNegativeButton("Dismiss", (v, dialog) -> dialog.dismiss());
+                    loMessage.setNegativeButton("Okay", (v, dialog) -> dialog.dismiss());
                     loMessage.setTitle("GhostRider Permissions");
                     loMessage.setMessage("You have already granted this permission.");
                     loMessage.show();
@@ -131,7 +131,7 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                 }else {
 
                     loMessage.initDialog();
-                    loMessage.setNegativeButton("Dismiss", (v, dialog) -> dialog.dismiss());
+                    loMessage.setNegativeButton("Okay", (v, dialog) -> dialog.dismiss());
                     loMessage.setIcon(R.drawable.baseline_message_24);
                     loMessage.setTitle("GhostRider Permissions");
                     loMessage.setMessage("You have already granted this permission.");
@@ -189,7 +189,7 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                         loMessage.setIcon(R.drawable.baseline_message_24);
                         loMessage.setTitle("Change Password");
                         loMessage.setMessage("Account updated successfully");
-                        loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                        loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                         loMessage.show();
                         dialog.dismiss();
                     }
@@ -201,7 +201,7 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                         loMessage.setIcon(R.drawable.baseline_error_24);
                         loMessage.setTitle("Change Password");
                         loMessage.setMessage(message);
-                        loMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                        loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                         loMessage.show();
                     }
                 }));

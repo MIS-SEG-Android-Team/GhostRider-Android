@@ -287,7 +287,7 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage("Minimum down is not sufficient.");
-                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
 
             }else {
@@ -309,7 +309,7 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
                         poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Credit Online Application");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 });

@@ -315,7 +315,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                         poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("CI Evaluation");
                         poMessage.setMessage("CI Result uploaded successfully.");
-                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
 
@@ -326,7 +326,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                         poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("CI Evaluation List");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 }));
@@ -363,7 +363,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                         poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("CI Evaluation");
                         poMessage.setMessage("Your recommendation has been saved to server.");
-                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
                             dialog.dismiss();
                             finish();
                         });
@@ -377,7 +377,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                         poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("CI Evaluation List");
                         poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                         poMessage.show();
                     }
                 });
@@ -500,7 +500,7 @@ public class Activity_Evaluation extends AppCompatActivity {
         poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("Residence Info");
         poMessage.setMessage("Please take a picture of the applicant residence area. \n");
-        poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+        poMessage.setPositiveButton("Okay", (view, dialog) -> {
             dialog.dismiss();
             mViewModel.InitCameraLaunch(Activity_Evaluation.this, psTransNo, new OnInitializeCameraCallback() {
                 @Override

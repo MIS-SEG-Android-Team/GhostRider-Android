@@ -211,7 +211,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Product Inquiry");
                 poMessage.setMessage("The downpayment should not be less than the minimum required amount");
-                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
 
                 return;
@@ -232,7 +232,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                     poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Product Inquiry");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                     poMessage.show();
                     txtAmort.setText("0");
                     mViewModel.getModel().setMonthAmr("0");
@@ -249,7 +249,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Product Inquiry");
                 poMessage.setMessage("The downpayment should not be less than the minimum required amount");
-                poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
 
                 return;
@@ -278,7 +278,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                             poMessage.setIcon(R.drawable.baseline_error_24);
                             poMessage.setTitle("Product Inquiry");
                             poMessage.setMessage(message);
-                            poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                            poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                             poMessage.show();
                         }
                     });
@@ -291,7 +291,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                     poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Product Inquiry");
                     poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                     poMessage.show();
                     txtAmort.setText("0");
                     mViewModel.getModel().setMonthAmr("0");
@@ -380,7 +380,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                     poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Product Inquiry");
                     poMessage.setMessage("The downpayment should not be less than the minimum required amount");
-                    poMessage.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                     poMessage.show();
 
                     return;

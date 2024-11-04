@@ -306,7 +306,7 @@ public class Fragment_LoanUnit extends Fragment {
                 poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage("Collection detail has been save.");
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> {
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
                     dialog.dismiss();
                     requireActivity().finish();
                 });
@@ -319,7 +319,7 @@ public class Fragment_LoanUnit extends Fragment {
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Dismiss", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
         });

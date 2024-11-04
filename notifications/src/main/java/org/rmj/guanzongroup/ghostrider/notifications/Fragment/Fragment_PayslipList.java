@@ -90,7 +90,7 @@ public class Fragment_PayslipList extends Fragment {
                                     poDialog.setIcon(R.drawable.baseline_error_24);
                                     poDialog.setTitle("Payslip");
                                     poDialog.setMessage(message);
-                                    poDialog.setPositiveButton("Dismiss", (view1, dialog) -> dialog.dismiss());
+                                    poDialog.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                                     poDialog.show();
                                 }
                             });

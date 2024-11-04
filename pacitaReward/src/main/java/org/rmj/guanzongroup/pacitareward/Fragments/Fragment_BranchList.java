@@ -49,7 +49,7 @@ public class Fragment_BranchList extends Fragment {
         loadDialog.setIcon(R.drawable.baseline_error_24);
         loadDialog.setTitle("No Records");
         loadDialog.setMessage("No Branch Records Found");
-        loadDialog.setPositiveButton("Dismiss", new MessageBox.DialogButton() {
+        loadDialog.setPositiveButton("Okay", new MessageBox.DialogButton() {
             @Override
             public void OnButtonClick(View view, AlertDialog dialog) {
                 dialog.dismiss();
