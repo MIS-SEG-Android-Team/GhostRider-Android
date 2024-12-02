@@ -267,10 +267,17 @@ public class ApprovalCode {
         String lsDeptIDx = loUser.getDeptIDxx();
         String lsPostion = loUser.getPositnID();
 
-        if (lsEmpLvID == 4 ||
+        /*if (lsEmpLvID == 4 ||
                 lsEmpLvID == 5 ||
                 loUser.getEmployID().equalsIgnoreCase("M00112000440")){
-            lsCondition  = "cAreaHead = '1'";
+            lsCondition  = "cAreaHead = '1'";*/
+
+        //todo: replaced the old validation above as requested
+        if (lsEmpLvID == 4 || loUser.getEmployID().equalsIgnoreCase("M00105000084")) {
+            lsCondition  = "cAreaHead = '0'"; //AREA HEAD, LEXTER OCAMPO
+        } else if (lsEmpLvID == 5 || loUser.getEmployID().equalsIgnoreCase("M00112000440")
+                || loUser.getEmployID().equalsIgnoreCase("M00111005387")) {
+            lsCondition  = "cAreaHead = '9'"; //GENERAL MANAGER, GRACE PANDLAN, MICHAEL CUISON
         } else{
             switch (lsDeptIDx){
                 case "021": //hcm
