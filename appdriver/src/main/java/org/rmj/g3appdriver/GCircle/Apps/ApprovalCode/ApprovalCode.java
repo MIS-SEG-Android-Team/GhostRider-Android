@@ -275,9 +275,9 @@ public class ApprovalCode {
         //todo: replaced the old validation above as requested
         if (lsEmpLvID == 4 || loUser.getEmployID().equalsIgnoreCase("M00105000084")) {
             lsCondition  = "cAreaHead = '0'"; //AREA HEAD, LEXTER OCAMPO
-        } else if (lsEmpLvID == 5 || loUser.getEmployID().equalsIgnoreCase("M00112000440")
+        } else if (lsEmpLvID == 5 || loUser.getEmployID().equalsIgnoreCase("H00220000001")
                 || loUser.getEmployID().equalsIgnoreCase("M00111005387")) {
-            lsCondition  = "cAreaHead = '9'"; //GENERAL MANAGER, GRACE PANDLAN, MICHAEL CUISON
+            lsCondition  = "cAreaHead = '9'"; //GENERAL MANAGER, Tania Vanessa Cañete, MICHAEL CUISON
         } else{
             switch (lsDeptIDx){
                 case "021": //hcm
