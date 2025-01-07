@@ -76,6 +76,9 @@ public class LocationRetriever {
                     nLatitude = latitude;
                     nLongitde = longitude;
                     lnResult = 1;
+
+                    Log.d(TAG + " Success Longitude", nLongitde);
+                    Log.d(TAG + " Success Latitude", nLatitude);
                 }
 
                 @Override
@@ -85,6 +88,9 @@ public class LocationRetriever {
                     nLongitde = longitude;
                     message = fsMsg;
                     lnResult = 1;
+
+                    Log.d(TAG + " Failed Longitude", nLongitde);
+                    Log.d(TAG + " Failed Latitude", nLatitude);
                 }
             });
 

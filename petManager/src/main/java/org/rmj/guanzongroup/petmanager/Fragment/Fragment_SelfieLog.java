@@ -22,7 +22,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +38,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,6 +54,7 @@ import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
+import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCounter;
 import org.rmj.guanzongroup.petmanager.Adapter.TimeLogAdapter;
 import org.rmj.guanzongroup.petmanager.Dialog.DialogBranchSelection;
@@ -59,12 +63,20 @@ import org.rmj.guanzongroup.petmanager.Dialog.DialogSelfieLogRemarks;
 import org.rmj.guanzongroup.petmanager.R;
 import org.rmj.guanzongroup.petmanager.ViewModel.VMSelfieLog;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Fragment_SelfieLog extends Fragment {
     private static final String TAG = Fragment_SelfieLog.class.getSimpleName();
@@ -207,6 +219,7 @@ public class Fragment_SelfieLog extends Fragment {
             @Override
             public void OnCheck(List<EBranchInfo> area, List<EBranchInfo> all) {
                 poLoad.dismiss();
+//
 //                Prompt a dialog which will display list of branch per area or all branch
                 new DialogBranchSelection(requireActivity(), area, all).initDialog(true, new DialogBranchSelection.OnBranchSelectedCallback() {
                     @Override
@@ -349,12 +362,16 @@ public class Fragment_SelfieLog extends Fragment {
     }
 
     private void InitCamera(String args){
+
         LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
+
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             Toast.makeText(requireActivity(), "Please enable your location service.", Toast.LENGTH_SHORT).show();
             return;
         }
+
         poSelfie.setRemarksx(args);
+
         mViewModel.InitCameraLaunch(requireActivity(), new OnInitializeCameraCallback() {
             @Override
             public void OnInit() {
@@ -367,8 +384,7 @@ public class Fragment_SelfieLog extends Fragment {
                 poLoad.dismiss();
                 poSelfie.setLocation(args[0]);
                 poSelfie.setFileName(args[1]);
-                poSelfie.setLatitude(args[2]);
-                poSelfie.setLongitude(args[3]);
+
                 poCamera.launch(intent);
             }
 
@@ -381,12 +397,13 @@ public class Fragment_SelfieLog extends Fragment {
                 poMessage.setMessage(message + "\n Proceed taking selfie log?");
                 poMessage.setPositiveButton("Continue", (view, dialog) -> {
                     dialog.dismiss();
+
                     poSelfie.setLocation(args[0]);
                     poSelfie.setFileName(args[1]);
-                    poSelfie.setLatitude(args[2]);
-                    poSelfie.setLongitude(args[3]);
+
                     poCamera.launch(intent);
                 });
+
                 poMessage.setNegativeButton("Cancel", (view1, dialog) -> dialog.dismiss());
                 poMessage.show();
             }
@@ -404,9 +421,12 @@ public class Fragment_SelfieLog extends Fragment {
             @Override
             public void OnProceed(String args) {
                 poLoad.dismiss();
+
                 Intent loIntent = new Intent(requireActivity(), Activity_CashCounter.class);
                 loIntent.putExtra("BranchCd", poSelfie.getBranchCode());
+
                 requireActivity().startActivity(loIntent);
+
                 if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
                     requireActivity().finish();
                 }
@@ -418,6 +438,7 @@ public class Fragment_SelfieLog extends Fragment {
                 poMessage.initDialog();
                 poMessage.setIcon(R.drawable.baseline_contact_support_24);
                 poMessage.setTitle("Selfie Login");
+
                 poMessage.setMessage("A Cash count entry for current branch already exist on local device. Create another entry?");
                 poMessage.setPositiveButton("Create", (view, dialog) -> {
                     Intent loIntent = new Intent(requireActivity(), Activity_CashCounter.class);
@@ -427,11 +448,13 @@ public class Fragment_SelfieLog extends Fragment {
                         requireActivity().finish();
                     }
                 });
+
                 poMessage.setNegativeButton("Exit", (view, dialog) -> {
                     if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
                         requireActivity().finish();
                     }
                 });
+
                 poMessage.show();
             }
 
@@ -514,8 +537,55 @@ public class Fragment_SelfieLog extends Fragment {
             @Override
             public void onActivityResult(ActivityResult result) {
                 try{
+
                     int resultCode = result.getResultCode();
                     if(resultCode == RESULT_OK){
+
+                        //TODO: 1. GET COORDINATES OF CAPTURED IMAGE'S PROPERTIES
+                        @SuppressLint({"NewApi", "LocalSuppress"}) ExifInterface exifInterface =
+                                new ExifInterface(
+                                        Objects.requireNonNull(requireContext().getContentResolver().openInputStream(
+                                                MediaStore.setRequireOriginal(Uri.fromFile(new File(poSelfie.getFileLocation())))
+                                        ))
+                                );
+
+                        Log.d(TAG, "Longitude is " + String.valueOf(Objects.requireNonNull(exifInterface.getLatLong())[1])
+                                + " and Latitude is " + String.valueOf(exifInterface.getLatLong()[0]));
+
+                        //TODO: 2. VALIDATE CAPTURED IMAGE'S PROPERTIES
+                        if (exifInterface.getLatLong() != null){
+                            poSelfie.setLatitude(String.valueOf(exifInterface.getLatLong()[0]));
+                            poSelfie.setLongitude(String.valueOf(exifInterface.getLatLong()[1]));
+                        }else {
+
+                            //TODO: 3. IF IMAGE DOES NOT HAVE COORDINATES, GET DEVICE GPS LOCATION
+                            LocationRetriever loLrt = new LocationRetriever(requireActivity().getApplication(), requireActivity());
+
+                            //TODO: 4. IF DEVICE GPS LOCATION IS AVAILABLE, VALIDATE COORDINATES. RETURN IF NULL
+                            if (loLrt.HasLocation()){
+                                poSelfie.setLongitude(loLrt.getLongitude());
+                                poSelfie.setLatitude(loLrt.getLatitude());
+                            }else {
+
+                                poMessage.initDialog();
+                                poMessage.setTitle("Selfie Log");
+                                poMessage.setIcon(R.drawable.baseline_error_24);
+                                poMessage.setMessage("Unable to get location coordinates. Please inform your superior for this matter.");
+                                poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                                    @Override
+                                    public void OnButtonClick(View view, AlertDialog dialog) {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                                poMessage.show();
+
+                                return;
+                            }
+
+                        }
+
+                        //TODO: PROCEED TO TIME IN
                         mViewModel.TimeIn(poSelfie, new VMSelfieLog.OnLoginTimekeeperListener() {
                             @Override
                             public void OnLogin() {

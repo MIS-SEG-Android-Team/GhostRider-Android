@@ -16,8 +16,11 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -39,6 +42,7 @@ import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
+import java.io.IOException;
 import java.util.List;
 
 public class VMSelfieLog extends AndroidViewModel {
@@ -182,27 +186,18 @@ public class VMSelfieLog extends AndroidViewModel {
                 if(!loImage.IsFileCreated(true)){
                     message = loImage.getMessage();
                     return null;
-                }
+                }else {
 
-                LocationRetriever loLrt = new LocationRetriever(instance, activity);
-                if(loLrt.HasLocation()){
                     lsResult[0] = loImage.getFilePath();
                     lsResult[1] = loImage.getFileName();
-                    lsResult[2] = loLrt.getLatitude();
-                    lsResult[3] = loLrt.getLongitude();
+
                     Intent loIntent = loImage.getCameraIntent();
                     loIntent.putExtra("result", true);
+
                     return loIntent;
-                } else {
-                    lsResult[0] = loImage.getFilePath();
-                    lsResult[1] = loImage.getFileName();
-                    lsResult[2] = loLrt.getLatitude();
-                    lsResult[3] = loLrt.getLongitude();
-                    Intent loIntent = loImage.getCameraIntent();
-                    loIntent.putExtra("result", false);
-                    message = loLrt.getMessage();
-                    return loIntent;
+
                 }
+
             }
 
             @Override
@@ -297,6 +292,7 @@ public class VMSelfieLog extends AndroidViewModel {
             public Object DoInBackground(Object args) {
                 try{
                     SelfieLog.SelfieLogDetail logDetail = (SelfieLog.SelfieLogDetail) args;
+                    
                     String lsTransNo = poSys.SaveSelfieLog(logDetail);
                     if(lsTransNo == null){
                         message = poSys.getMessage();
