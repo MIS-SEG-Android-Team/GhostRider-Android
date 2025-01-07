@@ -94,9 +94,9 @@ public class LocationRetriever {
                 }
             });
 
+            //TODO: THREE TIMES CHECKING LOCATION
             while(lnResult < 1) {
                 Log.d(TAG, "waiting location result...");
-                Thread.sleep(1000);
             }
 
             return isSuccess;

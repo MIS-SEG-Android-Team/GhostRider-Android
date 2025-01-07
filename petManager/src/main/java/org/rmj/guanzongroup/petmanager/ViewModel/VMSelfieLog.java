@@ -35,14 +35,12 @@ import org.rmj.g3appdriver.etc.ImageFileCreator;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
-import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
 import org.rmj.g3appdriver.GCircle.Apps.CashCount.CashCount;
+import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
-
-import java.io.IOException;
 import java.util.List;
 
 public class VMSelfieLog extends AndroidViewModel {
@@ -188,14 +186,27 @@ public class VMSelfieLog extends AndroidViewModel {
                     return null;
                 }else {
 
+                    LocationRetriever loLrt = new LocationRetriever(instance, activity);
+
                     lsResult[0] = loImage.getFilePath();
                     lsResult[1] = loImage.getFileName();
+                    lsResult[2] = loLrt.getLongitude();
+                    lsResult[3] = loLrt.getLatitude();
 
-                    Intent loIntent = loImage.getCameraIntent();
-                    loIntent.putExtra("result", true);
+                    //TODO: VALIDATE DEVICE LOCATION
+                    if (loLrt.HasLocation()) {
 
-                    return loIntent;
+                        Intent loIntent = loImage.getCameraIntent();
+                        loIntent.putExtra("result", true);
 
+                        return loIntent;
+                    }else {
+
+                        Intent loIntent = loImage.getCameraIntent();
+                        loIntent.putExtra("result", false);
+
+                        return loIntent;
+                    }
                 }
 
             }
@@ -292,7 +303,7 @@ public class VMSelfieLog extends AndroidViewModel {
             public Object DoInBackground(Object args) {
                 try{
                     SelfieLog.SelfieLogDetail logDetail = (SelfieLog.SelfieLogDetail) args;
-                    
+
                     String lsTransNo = poSys.SaveSelfieLog(logDetail);
                     if(lsTransNo == null){
                         message = poSys.getMessage();

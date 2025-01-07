@@ -382,8 +382,14 @@ public class Fragment_SelfieLog extends Fragment {
             @Override
             public void OnSuccess(Intent intent, String[] args) {
                 poLoad.dismiss();
+
                 poSelfie.setLocation(args[0]);
                 poSelfie.setFileName(args[1]);
+                poSelfie.setLongitude(args[2]);
+                poSelfie.setLatitude(args[3]);
+
+                Log.d(TAG, "Device Longitude is " + String.valueOf(args[2])
+                        + " and Device Latitude is " + String.valueOf(args[3]));
 
                 poCamera.launch(intent);
             }
@@ -400,6 +406,8 @@ public class Fragment_SelfieLog extends Fragment {
 
                     poSelfie.setLocation(args[0]);
                     poSelfie.setFileName(args[1]);
+                    poSelfie.setLongitude(args[2]);
+                    poSelfie.setLatitude(args[3]);
 
                     poCamera.launch(intent);
                 });
@@ -549,23 +557,18 @@ public class Fragment_SelfieLog extends Fragment {
                                         ))
                                 );
 
-                        Log.d(TAG, "Longitude is " + String.valueOf(Objects.requireNonNull(exifInterface.getLatLong())[1])
-                                + " and Latitude is " + String.valueOf(exifInterface.getLatLong()[0]));
-
-                        //TODO: 2. VALIDATE CAPTURED IMAGE'S PROPERTIES
+                        //TODO: 2. VALIDATE CAPTURED IMAGE'S COORDINATES
                         if (exifInterface.getLatLong() != null){
+
+                            Log.d(TAG, "Image Longitude is " + String.valueOf(Objects.requireNonNull(exifInterface.getLatLong())[1])
+                                    + " and Image Latitude is " + String.valueOf(exifInterface.getLatLong()[0]));
+
                             poSelfie.setLatitude(String.valueOf(exifInterface.getLatLong()[0]));
                             poSelfie.setLongitude(String.valueOf(exifInterface.getLatLong()[1]));
                         }else {
 
-                            //TODO: 3. IF IMAGE DOES NOT HAVE COORDINATES, GET DEVICE GPS LOCATION
-                            LocationRetriever loLrt = new LocationRetriever(requireActivity().getApplication(), requireActivity());
-
-                            //TODO: 4. IF DEVICE GPS LOCATION IS AVAILABLE, VALIDATE COORDINATES. RETURN IF NULL
-                            if (loLrt.HasLocation()){
-                                poSelfie.setLongitude(loLrt.getLongitude());
-                                poSelfie.setLatitude(loLrt.getLatitude());
-                            }else {
+                            //TODO: 3. IF IMAGE DOES NOT HAVE COORDINATES, VALIDATE DEVICE GPS LOCATION (INITIAL LOCATION)
+                            if (poSelfie.getLongitude().isEmpty() && poSelfie.getLatitude().isEmpty()){
 
                                 poMessage.initDialog();
                                 poMessage.setTitle("Selfie Log");
@@ -585,7 +588,7 @@ public class Fragment_SelfieLog extends Fragment {
 
                         }
 
-                        //TODO: PROCEED TO TIME IN
+                        //TODO: 4. PROCEED TO TIME IN
                         mViewModel.TimeIn(poSelfie, new VMSelfieLog.OnLoginTimekeeperListener() {
                             @Override
                             public void OnLogin() {
