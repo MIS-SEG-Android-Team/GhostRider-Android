@@ -22,8 +22,8 @@ android {
         applicationId "org.rmj.guanzongroup.ghostrider.epacss"
         minSdk 24
         targetSdk 35
-        versionCode 86
-        versionName "Guanzon Circle v4.25.064.084 s"
+        versionCode 87
+        versionName "Guanzon Circle v4.25.064.085 s"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

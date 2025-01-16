@@ -209,7 +209,7 @@ public class Activity_SpouseEmploymentInfo extends AppCompatActivity {
 
                     txtJobNme.setOnItemClickListener((parent, view, position, id) -> {
                         for (int x = 0; x < loList.size(); x++) {
-                            String lsLabel = loList.get(x).getOccptnNm();
+                            String lsLabel = loList.get(x).getOccptnNm().trim();
                             String lsSlctd = txtJobNme.getText().toString().trim();
                             if (lsSlctd.equalsIgnoreCase(lsLabel)) {
                                 mViewModel.getModel().setJobTitle(loList.get(x).getOccptnID());
@@ -236,8 +236,8 @@ public class Activity_SpouseEmploymentInfo extends AppCompatActivity {
         mViewModel.getModel().setCompanyName(Objects.requireNonNull(txtCompNm.getText()).toString());
         mViewModel.getModel().setsCountryN(Objects.requireNonNull(txtCntryx.getText()).toString());
         mViewModel.getModel().setCompanyAddress(Objects.requireNonNull(txtCompAd.getText()).toString());
-        mViewModel.getModel().setJobTitle(Objects.requireNonNull(txtJobNme.getText()).toString());
-        mViewModel.getModel().setSpecificJob(Objects.requireNonNull(txtSpcfJb.getText()).toString());
+        //mViewModel.getModel().setJobTitle(Objects.requireNonNull(mViewModel.getModel().getJobTitle()));
+        //mViewModel.getModel().setSpecificJob(Objects.requireNonNull(txtSpcfJb.getText()).toString());
 
         if (txtLngthS.getText().toString().isEmpty()) {
             mViewModel.getModel().setLengthOfService(0);

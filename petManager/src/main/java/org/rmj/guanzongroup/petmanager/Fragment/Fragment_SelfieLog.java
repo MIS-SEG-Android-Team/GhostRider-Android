@@ -549,7 +549,8 @@ public class Fragment_SelfieLog extends Fragment {
                     int resultCode = result.getResultCode();
                     if(resultCode == RESULT_OK){
 
-                        //TODO: 1. GET COORDINATES OF CAPTURED IMAGE'S PROPERTIES
+                        //TODO: 1. GET COORDINATES OF CAPTURED IMAGE'S PROPERTIES,
+                        // NOTE: TO GET THIS PROPERLY. ENABLE MANUALLY THE TAG LOCATION SETTINGS ON CAMERA WITHIN THE APP
                         @SuppressLint({"NewApi", "LocalSuppress"}) ExifInterface exifInterface =
                                 new ExifInterface(
                                         Objects.requireNonNull(requireContext().getContentResolver().openInputStream(
