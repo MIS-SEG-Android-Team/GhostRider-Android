@@ -90,7 +90,10 @@ public class VMApprovalSelection extends AndroidViewModel {
 
             @Override
             public void OnPostExecute(Object object) {
-                callback.onFinished(object.toString());
+
+                if (object != null){
+                    callback.onFinished(object.toString());
+                }
             }
         });
     }

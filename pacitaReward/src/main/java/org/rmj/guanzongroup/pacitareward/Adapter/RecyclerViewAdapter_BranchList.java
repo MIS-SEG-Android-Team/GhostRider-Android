@@ -53,8 +53,11 @@ public class RecyclerViewAdapter_BranchList extends RecyclerView.Adapter<Recycle
     public int getItemCount() {
         return paBranchFilter.size();
     }
+
     public class BranchFilter extends Filter{
+
         private final RecyclerViewAdapter_BranchList poAdapter;
+
         public BranchFilter(RecyclerViewAdapter_BranchList poAdapter) {
             this.poAdapter = poAdapter;
         }

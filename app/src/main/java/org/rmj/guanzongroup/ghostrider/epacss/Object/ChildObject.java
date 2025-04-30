@@ -14,6 +14,8 @@ package org.rmj.guanzongroup.ghostrider.epacss.Object;
 import android.content.Context;
 import android.content.Intent;
 
+import com.guanzongroup.sales.Activity_MPBarcode_Scanner;
+
 import org.guanzongroup.com.creditevaluation.Activity.Activity_CIEvaluationList;
 import org.guanzongroup.com.creditevaluation.Activity.Activity_EvaluationCIHistory;
 import org.guanzongroup.com.itinerary.Activities.Activity_ItineraryEntry;
@@ -188,6 +190,9 @@ public class ChildObject {
                 break;
             case "inquiries":
                 loIntent = new Intent(context, Activity_Inquiries.class);
+                break;
+            case "mp scanner":
+                loIntent = new Intent(context, Activity_MPBarcode_Scanner.class);
                 break;
             default:
                 loIntent = null;

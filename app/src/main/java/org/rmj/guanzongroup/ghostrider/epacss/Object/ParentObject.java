@@ -77,6 +77,9 @@ public class ParentObject {
             case "product inquiry":
                 lnIcon = R.drawable.ic_product_inquiry;
                 break;
+            case "sales":
+                lnIcon = R.drawable.ic_baseline_performance_monitor;
+                break;
         }
         return lnIcon;
     }

@@ -36,6 +36,9 @@ public interface DApprovalCode {
     @Insert
     void insert(ECodeApproval codeApproval);
 
+    @Query("DELETE FROM xxxSCA_Request")
+    void clear();
+
     @Update
     void update(ECodeApproval codeApproval);
 

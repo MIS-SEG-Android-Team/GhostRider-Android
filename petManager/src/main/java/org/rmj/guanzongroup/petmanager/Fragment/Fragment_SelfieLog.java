@@ -21,10 +21,12 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Camera;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,14 +101,6 @@ public class Fragment_SelfieLog extends Fragment {
 
     private ActivityResultLauncher<String[]> poRequest;
 
-    private final ActivityResultLauncher<Intent> poSettings = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-        @Override
-        public void onActivityResult(ActivityResult result) {
-            if(result.getResultCode() == RESULT_OK){
-
-            }
-        }
-    });
 
     public static Fragment_SelfieLog newInstance() {
         return new Fragment_SelfieLog();
@@ -310,6 +304,7 @@ public class Fragment_SelfieLog extends Fragment {
             checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
                 poRequest.launch(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION});
             } else {
+
                 mViewModel.ValidateSelfieBranch(poSelfie.getBranchCode(), new VMSelfieLog.OnValidateSelfieBranch() {
                     @Override
                     public void OnValidate() {
@@ -366,7 +361,7 @@ public class Fragment_SelfieLog extends Fragment {
         LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            Toast.makeText(requireActivity(), "Please enable your location service.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireActivity(), "Please enable your location service.", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -419,6 +414,7 @@ public class Fragment_SelfieLog extends Fragment {
     }
 
     public void ValidateCashCount(){
+
         mViewModel.ValidateCashCount(poSelfie.getBranchCode(), new VMSelfieLog.OnValidateCashCount() {
             @Override
             public void OnValidate() {
@@ -541,6 +537,7 @@ public class Fragment_SelfieLog extends Fragment {
     }
 
     private void InitActivityResultLaunchers(){
+
         poCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override
             public void onActivityResult(ActivityResult result) {
@@ -558,7 +555,7 @@ public class Fragment_SelfieLog extends Fragment {
                                         ))
                                 );
 
-                        //TODO: 2. VALIDATE CAPTURED IMAGE'S COORDINATES
+                        //TODO: 2. SET IMAGE COORDINATES, IF NOT EMPTY
                         if (exifInterface.getLatLong() != null){
 
                             Log.d(TAG, "Image Longitude is " + String.valueOf(Objects.requireNonNull(exifInterface.getLatLong())[1])
@@ -566,27 +563,64 @@ public class Fragment_SelfieLog extends Fragment {
 
                             poSelfie.setLatitude(String.valueOf(exifInterface.getLatLong()[0]));
                             poSelfie.setLongitude(String.valueOf(exifInterface.getLatLong()[1]));
-                        }else {
+                        }
 
-                            //TODO: 3. IF IMAGE DOES NOT HAVE COORDINATES, VALIDATE DEVICE GPS LOCATION (INITIAL LOCATION)
-                            if (poSelfie.getLongitude().isEmpty() && poSelfie.getLatitude().isEmpty()){
+                        //TODO: 3. VALIDATE SAVED COORDINATES
 
-                                poMessage.initDialog();
-                                poMessage.setTitle("Selfie Log");
-                                poMessage.setIcon(R.drawable.baseline_error_24);
-                                poMessage.setMessage("Unable to get location coordinates. Please inform your superior for this matter.");
-                                poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
-                                    @Override
-                                    public void OnButtonClick(View view, AlertDialog dialog) {
-                                        dialog.dismiss();
-                                    }
-                                });
+                        if (poSelfie.getLongitude() == null || poSelfie.getLatitude() == null){
 
-                                poMessage.show();
+                            poMessage.initDialog();
+                            poMessage.setTitle("Selfie Log");
+                            poMessage.setIcon(R.drawable.baseline_error_24);
+                            poMessage.setMessage("Unable to get location coordinates. Please inform your superior for this matter.");
+                            poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                                @Override
+                                public void OnButtonClick(View view, AlertDialog dialog) {
+                                    dialog.dismiss();
+                                }
+                            });
 
-                                return;
-                            }
+                            poMessage.show();
 
+                            return;
+
+                        }
+
+                        if (poSelfie.getLongitude().isEmpty() || poSelfie.getLatitude().isEmpty()){
+
+                            poMessage.initDialog();
+                            poMessage.setTitle("Selfie Log");
+                            poMessage.setIcon(R.drawable.baseline_error_24);
+                            poMessage.setMessage("Unable to get location coordinates. Please inform your superior for this matter.");
+                            poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                                @Override
+                                public void OnButtonClick(View view, AlertDialog dialog) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            poMessage.show();
+
+                            return;
+                        }
+
+                        if (poSelfie.getLongitude().equalsIgnoreCase("0.00000000000") ||
+                                poSelfie.getLatitude().equalsIgnoreCase("0.00000000000")) {
+
+                            poMessage.initDialog();
+                            poMessage.setTitle("Selfie Log");
+                            poMessage.setIcon(R.drawable.baseline_error_24);
+                            poMessage.setMessage("Unable to get location coordinates. Please inform your superior for this matter.");
+                            poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                                @Override
+                                public void OnButtonClick(View view, AlertDialog dialog) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            poMessage.show();
+
+                            return;
                         }
 
                         //TODO: 4. PROCEED TO TIME IN

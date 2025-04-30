@@ -15,6 +15,9 @@ public interface DSCARqstEmp {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void SaveRqstEmp(ESCARqstEmp foRqst);
 
+    @Query("DELETE FROM SCA_Rqst_Emp")
+    void clear();
+
     @Query("SELECT dTimeStmpx FROM SCA_Rqst_Emp ORDER BY dTimeStmpx DESC LIMIT 1")
     String GetLatestStamp();
 

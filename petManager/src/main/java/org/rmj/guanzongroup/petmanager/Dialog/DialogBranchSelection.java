@@ -61,9 +61,11 @@ public class DialogBranchSelection {
         MaterialButton btnCancel = view.findViewById(R.id.btn_cancel);
         RadioGroup rgBranch = view.findViewById(R.id.rg_branchlist);
         TextInputEditText searchView = view.findViewById(R.id.txt_searchBranch);
+
         LinearLayoutManager loManager = new LinearLayoutManager(mContext);
         loManager.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(loManager);
+
         loAdapter = new AdapterInventoryBranch(area, (BranchCode, BranchName) -> {
             try{
                 poMessage.initDialog();
@@ -79,10 +81,14 @@ public class DialogBranchSelection {
                 e.printStackTrace();
             }
         });
+
         recyclerView.setAdapter(loAdapter);
+
         rgBranch.setOnCheckedChangeListener((group, checkedId) -> {
             if(checkedId == R.id.rb_area){
+
                 view.findViewById(R.id.til_searchBranch).setVisibility(View.GONE);
+
                 loAdapter = new AdapterInventoryBranch(area, (BranchCode, BranchName) -> {
                     try{
                         poMessage.initDialog();
@@ -99,7 +105,9 @@ public class DialogBranchSelection {
                     }
                 });
             } else if(checkedId == R.id.rb_allbranch){
+
                 view.findViewById(R.id.til_searchBranch).setVisibility(View.VISIBLE);
+
                 loAdapter = new AdapterInventoryBranch(all, (BranchCode, BranchName) -> {
                     try{
                         poMessage.initDialog();

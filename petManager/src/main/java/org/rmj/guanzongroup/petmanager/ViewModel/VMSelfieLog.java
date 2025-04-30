@@ -134,6 +134,7 @@ public class VMSelfieLog extends AndroidViewModel {
     }
 
     public void CheckBranchList(OnBranchCheckListener listener){
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -171,8 +172,10 @@ public class VMSelfieLog extends AndroidViewModel {
     }
 
     public void InitCameraLaunch(Activity activity, OnInitializeCameraCallback callback){
+
         ImageFileCreator loImage = new ImageFileCreator(instance, AppConstants.SUB_FOLDER_SELFIE_LOG, poSession.getUserID());
         String[] lsResult = new String[4];
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -181,6 +184,7 @@ public class VMSelfieLog extends AndroidViewModel {
 
             @Override
             public Object DoInBackground(Object args) {
+
                 if(!loImage.IsFileCreated(true)){
                     message = loImage.getMessage();
                     return null;
@@ -213,6 +217,7 @@ public class VMSelfieLog extends AndroidViewModel {
 
             @Override
             public void OnPostExecute(Object object) {
+
                 Intent loResult = (Intent) object;
                 if(loResult.getBooleanExtra("result", false)){
                     callback.OnSuccess(loResult, lsResult);

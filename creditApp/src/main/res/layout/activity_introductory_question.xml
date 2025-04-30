@@ -207,7 +207,6 @@
                         android:layout_height="wrap_content"
                         android:inputType="textCapWords|textAutoComplete"
                         style="@style/AutoCompleteStyleTheme"
-                        android:maxLength="50"
                         android:imeOptions="actionNext"
                         android:nextFocusForward="@id/txt_downpayment"/>
                 </com.google.android.material.textfield.TextInputLayout>

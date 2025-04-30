@@ -109,13 +109,18 @@ public class ApprovalCode {
             }
 
             JSONArray laJson = loResponse.getJSONArray("detail");
+
+            poDao.clear();
             for (int x = 0; x < laJson.length(); x++) {
+
                 JSONObject loJson = laJson.getJSONObject(x);
                 ESCA_Request loDetail = poDao.GetApprovalCode(loJson.getString("sSCACodex"));
 
                 if(loDetail == null){
                     if(loJson.getString("cRecdStat").equalsIgnoreCase("1")) {
+
                         ESCA_Request info = new ESCA_Request();
+
                         info.setSCACodex(loJson.getString("sSCACodex"));
                         info.setSCATitle(loJson.getString("sSCATitle"));
                         info.setSCADescx(loJson.getString("sSCADescx"));
@@ -130,6 +135,7 @@ public class ApprovalCode {
                         info.setSCMDeptx(loJson.getString("cSCMDeptx"));
                         info.setRecdStat(loJson.getString("cRecdStat"));
                         info.setTimeStmp(loJson.getString("dTimeStmp"));
+
                         poDao.SaveSCARequest(info);
                         Log.d(TAG, "SCA Request has been saved.");
                     }
@@ -163,7 +169,10 @@ public class ApprovalCode {
                 message = getErrorMessage(loError);;
                 return false;
             }else {
+
                 JSONArray laJson = loResponse.getJSONArray("detail");
+
+                poDaoRstEmp.clear();
                 for (int x = 0; x < laJson.length(); x++) {
                     JSONObject loObject = laJson.getJSONObject(x);
                     ESCARqstEmp loVal = new ESCARqstEmp();
@@ -274,10 +283,10 @@ public class ApprovalCode {
 
         //todo: replaced the old validation above as requested
         if (lsEmpLvID == 4 || loUser.getEmployID().equalsIgnoreCase("M00105000084")) {
-            lsCondition  = "cAreaHead = '0'"; //AREA HEAD, LEXTER OCAMPO
+            lsCondition  = "cAreaHead = '1'"; //AREA HEAD, LEXTER OCAMPO
         } else if (lsEmpLvID == 5 || loUser.getEmployID().equalsIgnoreCase("H00220000001")
                 || loUser.getEmployID().equalsIgnoreCase("M00111005387")) {
-            lsCondition  = "cAreaHead = '9'"; //GENERAL MANAGER, Tania Vanessa Cañete, MICHAEL CUISON
+            lsCondition  = "cAreaHead = '1'"; //GENERAL MANAGER, Tania Vanessa Cañete, MICHAEL CUISON
         } else{
             switch (lsDeptIDx){
                 case "021": //hcm

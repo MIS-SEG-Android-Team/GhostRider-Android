@@ -1,5 +1,6 @@
 package org.rmj.guanzongroup.pacitareward.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
@@ -58,6 +59,7 @@ public class Fragment_BranchList extends Fragment {
 
         mViewModel.importCriteria();
         mViewModel.getBranchlist().observe(requireActivity(), new Observer<List<EBranchInfo>>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onChanged(List<EBranchInfo> eBranchInfos) {
                 if (eBranchInfos.size() <= 0){
