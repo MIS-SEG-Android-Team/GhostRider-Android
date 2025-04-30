@@ -27,48 +27,54 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:padding="10dp"
+            android:background="@drawable/gradient_header_background"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:padding="10dp">
+            app:layout_constraintRight_toRightOf="parent">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight=".5"
-                    android:fontFamily="@font/roboto"
+                    android:fontFamily="@font/roboto_bold"
                     android:textSize="13sp"
                     android:text="Account Number: "/>
+
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txt_acctNo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto"
+                    android:fontFamily="@font/roboto_bold"
                     android:textSize="13sp"
                     android:layout_weight="1"
                     android:gravity="end"/>
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="35dp"
                 android:layout_marginBottom="3dp">
+
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txt_clientName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto"
+                    android:fontFamily="@font/roboto_bold"
                     android:textSize="20sp"/>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txt_client_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_light"
+                    android:fontFamily="@font/roboto_bold"
                     android:textSize="15sp"
                     android:layout_marginTop="3dp"/>
             </LinearLayout>

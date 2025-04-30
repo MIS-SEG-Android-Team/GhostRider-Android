@@ -22,6 +22,7 @@
         android:id="@+id/appbar_collectionLog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header_background"
         android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,7 +58,7 @@
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/roboto"
+                        android:fontFamily="@font/roboto_bold"
                         android:text="Transaction Log"
                         android:textSize="18sp" />
 
@@ -76,7 +77,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:drawablePadding="5dp"
-                        android:fontFamily="@font/roboto"
+                        android:fontFamily="@font/roboto_bold_italic"
                         android:text="Total Collection :  ₱ 0.00"
                         android:textSize="16sp" />
 
@@ -142,16 +143,20 @@
                     style="@style/TextInputStyleHeaders"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Date">
+                    android:hint="Date"
+                    android:textColorHint="@color/guanzon_text_grey">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        style="@style/TextInputStyle.Edittext"
                         android:id="@+id/txt_collectionDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
                         android:focusedByDefault="false"
-                        tools:targetApi="o" />
+                        tools:targetApi="o"
+                        android:textColor="@color/guanzon_text_grey"
+                        android:background="@color/white"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -159,16 +164,19 @@
                     style="@style/TextInputStyleHeaders"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp">
+                    android:layout_marginTop="5dp"
+                    android:hint="Search Customer's name"
+                    android:textColorHint="@color/guanzon_text_grey">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txt_collectionSearch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Search Customer's name"
                         android:imeOptions="actionSearch"
                         android:inputType="textCapWords|textPersonName"
                         android:maxLines="1"
+                        android:background="@color/white"
+                        android:textColor="@color/guanzon_text_grey"
                         android:textCursorDrawable="@drawable/white_cursor" />
                 </com.google.android.material.textfield.TextInputLayout>
 
