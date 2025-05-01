@@ -29,6 +29,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DAreaPerformance;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBankInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarangayInfo;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchOpeningMonitor;
@@ -96,6 +97,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EAppConfig;
 import org.rmj.g3appdriver.GCircle.room.Entities.EAreaPerformance;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBankInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarangayInfo;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchOpenMonitor;
@@ -222,7 +224,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EMCModelCashPrice.class,
         EEmpLoan.class,
         ELoanTypes.class,
-        ESCARqstEmp.class}, version = 42, exportSchema = false)
+        ESCARqstEmp.class,
+        EBarcode.class}, version = 43, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -296,6 +299,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DEmpLoan emploanDao();
     public abstract DLoanTypes loanTypesDao();
     public abstract DSCARqstEmp scaRqstEmpDao();
+    public abstract DBarcode barcodeDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
@@ -303,7 +307,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                      GGC_GCircleDB.class, "GGC_ISysDBF.db")
                     .allowMainThreadQueries()
                     .addCallback(roomCallBack)
-                    .addMigrations(MIGRATION_V42)
+                    .addMigrations(MIGRATION_V43)
                     .build();
         }
         return instance;
@@ -338,10 +342,11 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
         }
     }
 
-    static final Migration MIGRATION_V42 = new Migration(41, 42) {
+    static final Migration MIGRATION_V43 = new Migration(42, 43) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            // Add the new column
+
+            // Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `MC_Cash_Price` " +
                     "(`sModelIDx` TEXT NOT NULL, `sMCCatNme` TEXT NOT NULL, " +
                     "`sModelNme` TEXT NOT NULL, `sBrandNme` TEXT, `nSelPrice` REAL, " +
@@ -349,11 +354,16 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                     "`sBrandIDx` TEXT, `sMCCatIDx` TEXT, " +
                     "PRIMARY KEY(`sModelIDx`, `sMCCatNme`, `sModelNme`))");
 
-            // Add the new column
+            // Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `SCA_Rqst_Emp` " +
                     "(`sSCACodex` TEXT NOT NULL, `sEmployIDx` TEXT NOT NULL, " +
                     "`sRecdStat` TEXT, `dTimeStmpx` TEXT, " +
                     "PRIMARY KEY(`sSCACodex`, `sEmployIDx`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Barcode " +
+                    "(barcode_id TEXT NOT NULL, barcode TEXT, " +
+                    "PRIMARY KEY(barcode_id))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");

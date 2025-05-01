@@ -14,7 +14,7 @@ package org.rmj.guanzongroup.ghostrider.epacss.Object;
 import android.content.Context;
 import android.content.Intent;
 
-import com.guanzongroup.sales.Activity_MPBarcode_Scanner;
+import com.guanzongroup.sales.Activity.Activity_MPBarcode_Scanner;
 
 import org.guanzongroup.com.creditevaluation.Activity.Activity_CIEvaluationList;
 import org.guanzongroup.com.creditevaluation.Activity.Activity_EvaluationCIHistory;

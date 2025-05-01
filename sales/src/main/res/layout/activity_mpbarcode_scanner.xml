@@ -3,10 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity_MPBarcode_Scanner">
+    tools:context=".Activity.Activity_MPBarcode_Scanner">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/header"
@@ -16,18 +15,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHeight_percent="0.2">
+        app:layout_constraintHeight_percent="0.2"
+        android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay">
 
-        <LinearLayout
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/GhostRiderMaterialTheme.PopupOverlay"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -103,9 +98,11 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <ScrollView
+                    android:id="@+id/scv_details"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:fillViewport="true">
+                    android:fillViewport="true"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -118,7 +115,7 @@
                             android:layout_height="match_parent"
                             android:orientation="vertical"
                             android:padding="10dp"
-                            android:visibility="gone">
+                            android:visibility="visible">
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="wrap_content"
@@ -128,13 +125,9 @@
                                 android:layout_marginVertical="5dp"
                                 android:layout_marginStart="5dp"/>
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="2dp"
-                                android:background="@color/guanzon_digital_orange"/>
-
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/CustomDropDownTilStyle"
+                                android:id="@+id/til_paytype"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp">
@@ -206,11 +199,6 @@
                                 android:textSize="18sp"
                                 android:layout_marginVertical="5dp"
                                 android:layout_marginStart="5dp"/>
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="2dp"
-                                android:background="@color/guanzon_digital_orange"/>
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/TextInputStyle"

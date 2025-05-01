@@ -3,7 +3,7 @@
 
     <application>
         <activity
-            android:name=".Activity_MPBarcode_Scanner"
+            android:name=".Activity.Activity_MPBarcode_Scanner"
             android:exported="false" />
     </application>
 
