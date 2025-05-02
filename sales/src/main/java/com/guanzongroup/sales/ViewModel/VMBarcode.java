@@ -5,16 +5,20 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
+import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Apps.Sales.Barcode;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DTownInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
+import org.rmj.g3appdriver.lib.Etc.Town;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
@@ -25,11 +29,13 @@ public class VMBarcode extends AndroidViewModel {
     @SuppressLint("StaticFieldLeak")
     private final Context context;
     private final Barcode poBarcode;
+    private final Town poTown;
 
     public VMBarcode(@NonNull Application application) {
         super(application);
 
         this.context = application;
+        this.poTown = new Town(application);
         this.poBarcode = new Barcode(context);
     }
 
@@ -78,6 +84,10 @@ public class VMBarcode extends AndroidViewModel {
         poBarcode.saveBarcode(barcode);
     }
 
+    public void selectBarcode(String bcodeIDxx, Integer status){
+        poBarcode.selectBarcode(bcodeIDxx, status);
+    }
+
     public int countBarcode(){
         return poBarcode.countBarcode();
     }
@@ -88,6 +98,63 @@ public class VMBarcode extends AndroidViewModel {
 
     public LiveData<List<EBarcode>> observeBarcodeList(){
         return poBarcode.getBarcodeList();
+    }
+
+    public LiveData<List<EBarcode>> observeCheckedBarcodeList(){
+        return poBarcode.getCheckedBarcodeList();
+    }
+
+    public LiveData<List<DTownInfo.TownProvinceInfo>> observeTownProvinceInfo(){
+        return poTown.getTownProvinceInfo();
+    }
+
+    public void generateQR(JSONObject loData, onGenerateQR callback) throws Exception {
+
+        TaskExecutor.Execute(loData, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.onGenerating();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                try {
+
+                    JSONObject params = (JSONObject) args;
+
+                    Log.d("BARCODE", params.toString());
+                    if (poBarcode.generateQR(params) == null){
+                        return null;
+                    }else {
+                        return poBarcode.generateQR(params);
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return null;
+                }
+
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if (object != null){
+                    callback.onQRGenerated((Bitmap) object);
+                }else {
+                    callback.onQRGenerationFailed("QR failed to generate.");
+                }
+
+            }
+        });
+
+    }
+
+    public interface onGenerateQR{
+        void onGenerating();
+        void onQRGenerated(Bitmap bitmap);
+        void onQRGenerationFailed(String message);
     }
 
     public interface onCheckPermission{

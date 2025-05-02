@@ -31,6 +31,10 @@ public class Barcode {
         barcodeDao.save(barcode);
     }
 
+    public void selectBarcode(String bcodeIDxx, Integer status){
+        barcodeDao.index(bcodeIDxx, status);
+    }
+
     public int countBarcode(){
         return barcodeDao.getBarcodeCount();
     }
@@ -43,8 +47,8 @@ public class Barcode {
         return barcodeDao.getBarcodes();
     }
 
-    public List<EBarcode> getBarcodeEntries(){
-        return barcodeDao.getBarcodeList();
+    public LiveData<List<EBarcode>> getCheckedBarcodeList(){
+        return barcodeDao.getCheckedBarcodes();
     }
 
     public Bitmap generateQR(JSONObject loData) throws Exception{

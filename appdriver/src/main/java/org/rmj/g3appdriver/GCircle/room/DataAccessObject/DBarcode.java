@@ -15,16 +15,19 @@ public interface DBarcode {
     @Upsert
     void save(EBarcode barcode);
 
-    @Query("SELECT * FROM Barcode")
-    LiveData<List<EBarcode>> getBarcodes();
-
-    @Query("SELECT * FROM Barcode")
-    List<EBarcode> getBarcodeList();
-
-    @Query("SELECT COUNT(*) FROM Barcode")
-    int getBarcodeCount();
+    @Query("UPDATE Barcode SET checked = :status WHERE barcode_id = :bcodeID")
+    void index(String bcodeID, Integer status);
 
     @Query("DELETE FROM Barcode WHERE barcode_id = :bcodeID")
     void deleteBarcode(String bcodeID);
+
+    @Query("SELECT * FROM Barcode")
+    LiveData<List<EBarcode>> getBarcodes();
+
+    @Query("SELECT * FROM Barcode WHERE checked = 1")
+    LiveData<List<EBarcode>> getCheckedBarcodes();
+
+    @Query("SELECT COUNT(*) FROM Barcode")
+    int getBarcodeCount();
 
 }

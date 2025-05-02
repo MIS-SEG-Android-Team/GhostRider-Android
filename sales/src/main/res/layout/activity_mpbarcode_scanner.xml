@@ -166,45 +166,48 @@
 
                             </LinearLayout>
 
-                            <com.google.android.material.textfield.TextInputLayout
-                                style="@style/TextInputStyle"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
-
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/tie_amount"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:hint="Amount"
-                                    android:text="0.00"
-                                    android:inputType="numberDecimal"/>
-
-                            </com.google.android.material.textfield.TextInputLayout>
-
                         </LinearLayout>
 
-                        <LinearLayout
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/layout_personaldetails"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
+                            android:layout_height="match_parent"
                             android:padding="10dp"
                             android:visibility="gone">
 
-                            <com.google.android.material.textview.MaterialTextView
+                            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                                android:id="@+id/fbtn_generate"
                                 android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="20dp"
+                                android:layout_marginEnd="20dp"
+                                android:src="@drawable/baseline_qr_code_2_24"
+                                android:adjustViewBounds="true"
+                                android:scaleType="centerCrop"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/mtv_title3"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:text="Personal_Details"
                                 android:textSize="18sp"
                                 android:layout_marginVertical="5dp"
-                                android:layout_marginStart="5dp"/>
+                                android:layout_marginStart="5dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/TextInputStyle"
+                                android:id="@+id/til_lname"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
+                                android:layout_marginTop="5dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/mtv_title3">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/tie_lname"
@@ -216,9 +219,13 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/TextInputStyle"
+                                android:id="@+id/til_fname"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
+                                android:layout_marginTop="5dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/til_lname">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/tie_fname"
@@ -230,9 +237,13 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/TextInputStyle"
+                                android:id="@+id/til_mname"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
+                                android:layout_marginTop="5dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/til_fname">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/tie_mname"
@@ -244,9 +255,13 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/TextInputStyle"
+                                android:id="@+id/til_suffix"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
+                                android:layout_marginTop="5dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/til_mname">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/tie_suffix"
@@ -258,9 +273,13 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/TextInputStyle"
+                                android:id="@+id/til_mobile"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
+                                android:layout_marginTop="5dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/til_suffix">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/tie_mobile"
@@ -274,9 +293,13 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/TextInputStyle"
+                                android:id="@+id/til_address"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
+                                android:layout_marginTop="5dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/til_mobile">
 
                                 <com.google.android.material.textfield.TextInputEditText
                                     android:id="@+id/tie_address"
@@ -288,9 +311,13 @@
 
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/TextInputStyle"
+                                android:id="@+id/til_towncity"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
+                                android:layout_marginTop="5dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/til_address">
 
                                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                                     style="@style/AutoCompleteStyleTheme"
@@ -301,7 +328,7 @@
 
                             </com.google.android.material.textfield.TextInputLayout>
 
-                        </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </LinearLayout>
 

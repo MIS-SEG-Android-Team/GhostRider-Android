@@ -16,6 +16,9 @@ public class EBarcode {
     @ColumnInfo(name = "barcode")
     private String barcode;
 
+    @ColumnInfo(name = "checked")
+    private Integer checked = 0;
+
     @NonNull
     public String getBarcodeIdxx() {
         return barcodeIdxx;
@@ -31,5 +34,13 @@ public class EBarcode {
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
+    }
+
+    public Integer getChecked() {
+        return checked;
+    }
+
+    public void setChecked(Integer checked) {
+        this.checked = checked;
     }
 }

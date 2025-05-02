@@ -16,20 +16,18 @@ import com.guanzongroup.sales.R;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerView_Barcodes extends RecyclerView.Adapter<RecyclerView_Barcodes.RecyclerView_BarcodesViewHolder> {
 
     private final Context context;
     private final List<EBarcode> eBarcodes;
-    private List<String> listEntries = new ArrayList<>();
 
     private onAction callback;
 
     public interface onAction{
-        void onCheckAction(List<String> entries);
-        void onDelete(EBarcode barcode);
+        void onCheckAction(String lastIDChecked, Integer state);
+        void onDelete(String barcodeIDxx);
     }
 
     public RecyclerView_Barcodes(Context context, List<EBarcode> eBarcodes, onAction callback) {
@@ -52,28 +50,32 @@ public class RecyclerView_Barcodes extends RecyclerView.Adapter<RecyclerView_Bar
 
         holder.mtv_barcode.setText(eBarcodes.get(position).getBarcode());
 
+        switch (eBarcodes.get(position).getChecked()){
+
+            case 0:
+                holder.mcb_barcodecb.setCheckedState(MaterialCheckBox.STATE_UNCHECKED);
+                break;
+            case 1:
+                holder.mcb_barcodecb.setCheckedState(MaterialCheckBox.STATE_CHECKED);
+                break;
+        }
+
         holder.mcb_barcodecb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (isChecked){
-                    listEntries.add(eBarcodes.get(position).getBarcode());
+                    callback.onCheckAction(eBarcodes.get(position).getBarcodeIdxx(), 1);
                 }else {
-
-                    if (listEntries.size() > 0){
-                        listEntries.remove(eBarcodes.get(position).getBarcode());
-                    }
+                    callback.onCheckAction(eBarcodes.get(position).getBarcodeIdxx(), 0);
                 }
-
-                callback.onCheckAction(listEntries);
             }
         });
 
         holder.btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                callback.onDelete(eBarcodes.get(position));
+                callback.onDelete(eBarcodes.get(position).getBarcodeIdxx());
             }
         });
     }
