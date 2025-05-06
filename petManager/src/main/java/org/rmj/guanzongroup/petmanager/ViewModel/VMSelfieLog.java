@@ -37,6 +37,8 @@ import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
 import org.rmj.g3appdriver.GCircle.Apps.CashCount.CashCount;
+import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
 import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -119,10 +121,6 @@ public class VMSelfieLog extends AndroidViewModel {
         this.pdTransact.setValue(fsVal);
     }
 
-    public LiveData<List<ESelfieLog>> getAllEmployeeTimeLog(String fsVal){
-        return poSys.GetAllEmployeeTimeLog(fsVal);
-    }
-
     public LiveData<List<DSelfieLog.LogTime>> GetTimeLogForTheDay(String date){
         return poSys.GetAllTimeLog(date);
     }
@@ -190,27 +188,44 @@ public class VMSelfieLog extends AndroidViewModel {
                     return null;
                 }else {
 
-                    LocationRetriever loLrt = new LocationRetriever(instance, activity);
-
                     lsResult[0] = loImage.getFilePath();
                     lsResult[1] = loImage.getFileName();
-                    lsResult[2] = loLrt.getLongitude();
-                    lsResult[3] = loLrt.getLatitude();
 
-                    //TODO: VALIDATE DEVICE LOCATION
-                    if (loLrt.HasLocation()) {
+                    String lsCompx = android.os.Build.MANUFACTURER.toLowerCase();
+                    LocationRetriever.iLocationRetriever location;
 
-                        Intent loIntent = loImage.getCameraIntent();
-                        loIntent.putExtra("result", true);
-
-                        return loIntent;
-                    }else {
-
-                        Intent loIntent = loImage.getCameraIntent();
-                        loIntent.putExtra("result", false);
-
-                        return loIntent;
+                    if (!lsCompx.equalsIgnoreCase("huawei")) {
+                        location = new GmsLocationRetriever();
+                    } else {
+                        location = new HmsLocationRetriever();
                     }
+
+                    location.GetLocation(instance, new LocationRetriever.OnRetrieveLocationListener() {
+                        @Override
+                        public void OnRetrieve(String latitude, String longitude) {
+                            lsResult[2] = latitude;
+                            lsResult[3] = longitude;
+
+                            Intent loIntent = loImage.getCameraIntent();
+                            loIntent.putExtra("result", true);
+
+                            callback.OnSuccess(loIntent, lsResult);
+                        }
+
+                        @Override
+                        public void OnFailed(String message, String latitude, String longitude) {
+                            lsResult[2] = latitude;
+                            lsResult[3] = longitude;
+
+                            Intent loIntent = loImage.getCameraIntent();
+                            loIntent.putExtra("result", false);
+
+                            callback.OnFailed(message, loIntent, lsResult);
+                        }
+                    });
+
+                    return false;
+
                 }
 
             }
@@ -218,12 +233,6 @@ public class VMSelfieLog extends AndroidViewModel {
             @Override
             public void OnPostExecute(Object object) {
 
-                Intent loResult = (Intent) object;
-                if(loResult.getBooleanExtra("result", false)){
-                    callback.OnSuccess(loResult, lsResult);
-                } else {
-                    callback.OnFailed(message, loResult, lsResult);
-                }
             }
         });
     }
@@ -232,6 +241,7 @@ public class VMSelfieLog extends AndroidViewModel {
      *
      */
     public void ValidateSelfieBranch(String args, OnValidateSelfieBranch listener){
+
         TaskExecutor.Execute(args, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -254,14 +264,12 @@ public class VMSelfieLog extends AndroidViewModel {
                     case 0:
                         listener.OnFailed(message);
                         break;
-                    case 2:
-                    case 5:
+                    case 2, 5:
                         listener.OnRequireRemarks();
                         break;
-                    case 3:
-                    case 4:
-                    case 1:
+                    default:
                         listener.OnSuccess();
+                        break;
                 }
             }
         });
@@ -397,6 +405,7 @@ public class VMSelfieLog extends AndroidViewModel {
     }
 
     public void ValidateCashCount(String fsVal, OnValidateCashCount callback){
+
         TaskExecutor.Execute(fsVal, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -407,6 +416,7 @@ public class VMSelfieLog extends AndroidViewModel {
             public Object DoInBackground(Object args) {
                 String branchCd = (String) args;
                 int lnResult = poCash.ValidateCashCount(branchCd);
+
                 if(lnResult == 1){
                     message = branchCd;
                     return lnResult;

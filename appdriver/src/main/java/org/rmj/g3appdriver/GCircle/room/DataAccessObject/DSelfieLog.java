@@ -69,7 +69,6 @@ public interface DSelfieLog {
     ESelfieLog CheckSelfieLogIfExist(String BranchCd, String Transact);
 
     @Query("SELECT * FROM Branch_Info WHERE sBranchCd =:args")
-
     EBranchInfo GetSelfieLogBranch(String args);
 
     @Query("SELECT " +

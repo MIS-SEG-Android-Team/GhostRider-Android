@@ -13,6 +13,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ECreditOnlineApplicationCI;
 import org.rmj.g3appdriver.GCircle.room.Entities.EOccupationInfo;
 import org.rmj.g3appdriver.GCircle.room.Repositories.ROccupation;
 import org.rmj.g3appdriver.etc.AppConstants;
+import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
 import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.GCircle.Apps.CreditInvestigator.pojo.BarangayRecord;
 import org.rmj.g3appdriver.GCircle.Apps.CreditInvestigator.pojo.CIImage;
@@ -310,6 +312,7 @@ public class VMEvaluation extends AndroidViewModel {
     public void InitCameraLaunch(Activity activity, String TransNox, OnInitializeCameraCallback callback){
         ImageFileCreator loImage = new ImageFileCreator(instance, AppConstants.SUB_FOLDER_CI_ADDRESS, TransNox);
         String argsList[] = new String[4];
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -322,36 +325,52 @@ public class VMEvaluation extends AndroidViewModel {
                     message = loImage.getMessage();
                     return false;
                 } else {
-                    LocationRetriever loLrt = new LocationRetriever(instance, activity);
-                    if(loLrt.HasLocation()){
-                        argsList[0] = loImage.getFilePath();
-                        argsList[1] = loImage.getFileName();
-                        argsList[2] = loLrt.getLatitude();
-                        argsList[3] = loLrt.getLongitude();
-                        Intent loIntent = loImage.getCameraIntent();
-                        loIntent.putExtra("result", true);
-                        return loIntent;
+
+                    argsList[0] = loImage.getFilePath();
+                    argsList[1] = loImage.getFileName();
+
+                    String lsCompx = android.os.Build.MANUFACTURER.toLowerCase();
+                    LocationRetriever.iLocationRetriever location;
+
+                    if (!lsCompx.equalsIgnoreCase("huawei")) {
+                        location = new GmsLocationRetriever();
                     } else {
-                        argsList[0] = loImage.getFilePath();
-                        argsList[1] = loImage.getFileName();
-                        argsList[2] = loLrt.getLatitude();
-                        argsList[3] = loLrt.getLongitude();
-                        message = loLrt.getMessage();
-                        Intent loIntent = loImage.getCameraIntent();
-                        loIntent.putExtra("result", false);
-                        return loIntent;
+                        location = new HmsLocationRetriever();
                     }
+
+                    location.GetLocation(instance, new LocationRetriever.OnRetrieveLocationListener() {
+                        @Override
+                        public void OnRetrieve(String latitude, String longitude) {
+
+                            argsList[2] = latitude;
+                            argsList[3] = longitude;
+
+                            Intent loIntent = loImage.getCameraIntent();
+                            loIntent.putExtra("result", true);
+
+                            callback.OnSuccess(loIntent, argsList);
+                        }
+
+                        @Override
+                        public void OnFailed(String message, String latitude, String longitude) {
+
+                            argsList[2] = latitude;
+                            argsList[3] = longitude;
+
+                            Intent loIntent = loImage.getCameraIntent();
+                            loIntent.putExtra("result", false);
+
+                            callback.OnFailed(message, loIntent, argsList);
+                        }
+                    });
+
+                    return null;
                 }
             }
 
             @Override
             public void OnPostExecute(Object object) {
-                Intent loResult = (Intent) object;
-                if(loResult.getBooleanExtra("result", false)){
-                    callback.OnFailed(message, loResult, argsList);
-                    return;
-                }
-                callback.OnSuccess(loResult, argsList);
+
             }
         });
     }

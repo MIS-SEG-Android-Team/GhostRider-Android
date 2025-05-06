@@ -21,12 +21,10 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Camera;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +40,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,7 +55,7 @@ import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
-import org.rmj.g3appdriver.lib.Location.LocationRetriever;
+import org.rmj.g3appdriver.lib.Account.pojo.AccountInfo;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCounter;
 import org.rmj.guanzongroup.petmanager.Adapter.TimeLogAdapter;
 import org.rmj.guanzongroup.petmanager.Dialog.DialogBranchSelection;
@@ -66,14 +65,8 @@ import org.rmj.guanzongroup.petmanager.R;
 import org.rmj.guanzongroup.petmanager.ViewModel.VMSelfieLog;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -123,7 +116,9 @@ public class Fragment_SelfieLog extends Fragment {
 
         mViewModel.GetUserInfo().observe(getViewLifecycleOwner(), eEmployeeInfo -> {
             try {
+                //todo set user branch by default
                 lblBranch.setText(eEmployeeInfo.sBranchNm);
+                poSelfie.setBranchCode(eEmployeeInfo.sBranchCd);
 
             } catch (NullPointerException e){
                 e.printStackTrace();
@@ -137,13 +132,18 @@ public class Fragment_SelfieLog extends Fragment {
             @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
             final DatePickerDialog StartTime = new DatePickerDialog(getActivity(), (view131, year, monthOfYear, dayOfMonth) -> {
                 try {
+
                     Calendar newDate = Calendar.getInstance();
                     newDate.set(year, monthOfYear, dayOfMonth);
+
                     String lsDate = dateFormatter.format(newDate.getTime());
                     txtDate.setText(lsDate);
+
                     Date loDate = new SimpleDateFormat("MMMM dd, yyyy").parse(lsDate);
                     lsDate = new SimpleDateFormat("yyyy-MM-dd").format(loDate);
+
                     mViewModel.SetSelectedDate(lsDate);
+
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -213,7 +213,7 @@ public class Fragment_SelfieLog extends Fragment {
             @Override
             public void OnCheck(List<EBranchInfo> area, List<EBranchInfo> all) {
                 poLoad.dismiss();
-//
+
 //                Prompt a dialog which will display list of branch per area or all branch
                 new DialogBranchSelection(requireActivity(), area, all).initDialog(true, new DialogBranchSelection.OnBranchSelectedCallback() {
                     @Override
@@ -321,6 +321,7 @@ public class Fragment_SelfieLog extends Fragment {
                     @Override
                     public void OnRequireRemarks() {
                         poLoad.dismiss();
+
                         new DialogSelfieLogRemarks(requireActivity()).initDialog(new DialogSelfieLogRemarks.OnDialogRemarksEntry() {
                             @Override
                             public void OnConfirm(String args) {
@@ -413,7 +414,7 @@ public class Fragment_SelfieLog extends Fragment {
         });
     }
 
-    public void ValidateCashCount(){
+    private void ValidateCashCount(){
 
         mViewModel.ValidateCashCount(poSelfie.getBranchCode(), new VMSelfieLog.OnValidateCashCount() {
             @Override
@@ -491,7 +492,7 @@ public class Fragment_SelfieLog extends Fragment {
         });
     }
 
-    public void showDCPDisclosure(){
+    private void showDCPDisclosure(){
         dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
             @Override
             public void onAccept() {
@@ -634,12 +635,14 @@ public class Fragment_SelfieLog extends Fragment {
                             @Override
                             public void OnSuccess(String args) {
                                 poLoad.dismiss();
+
                                 ValidateCashCount();
                             }
 
                             @Override
                             public void SaveOffline(String args) {
                                 poLoad.dismiss();
+
                                 ValidateCashCount();
                             }
 

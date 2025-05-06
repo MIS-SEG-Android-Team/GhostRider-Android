@@ -67,6 +67,7 @@ public class DialogBranchSelection {
         recyclerView.setLayoutManager(loManager);
 
         loAdapter = new AdapterInventoryBranch(area, (BranchCode, BranchName) -> {
+
             try{
                 poMessage.initDialog();
                 poMessage.setTitle("Branch Selected");
@@ -80,6 +81,7 @@ public class DialogBranchSelection {
             } catch (Exception e){
                 e.printStackTrace();
             }
+
         });
 
         recyclerView.setAdapter(loAdapter);
