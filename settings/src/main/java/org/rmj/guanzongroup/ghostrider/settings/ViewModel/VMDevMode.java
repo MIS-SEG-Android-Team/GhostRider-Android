@@ -19,34 +19,39 @@ import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.Etc.DevTools;
+import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 public class VMDevMode extends AndroidViewModel {
 
     private final Application instance;
+    private final AppConfigPreference poConfig;
     private final DevTools poTool;
     private String message;
 
     public interface OnChangeListener {
-        void OnChanged(String args);
+        void OnChanged(String args, Boolean isSuccess);
     }
 
     public VMDevMode(@NonNull Application application) {
         super(application);
         this.instance = application;
         this.poTool = new DevTools(instance);
+        this.poConfig = AppConfigPreference.getInstance(application);
     }
 
     public LiveData<EEmployeeInfo> GetUserInfo(){
         return poTool.GetUserInfo();
     }
 
-    public void SaveChanges(EEmployeeInfo args, OnChangeListener callback){
+    public void SaveChanges(EEmployeeInfo args, String ipserver, OnChangeListener callback){
 
         TaskExecutor.Execute(args, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
+
+                poConfig.setAppServer(ipserver);
 
                 EEmployeeInfo eEmployeeInfos = (EEmployeeInfo) args;
 
@@ -65,20 +70,23 @@ public class VMDevMode extends AndroidViewModel {
                 Boolean isSuccess = (Boolean) object;
 
                 if(!isSuccess){
-                    callback.OnChanged(message);
+                    callback.OnChanged(message, isSuccess);
                 } else {
-                    callback.OnChanged("Changes Saved!");
+                    callback.OnChanged("Changes Saved!", isSuccess);
                 }
 
             }
         });
     }
 
-    public void RestoreDefault(OnChangeListener callback){
+    public void RestoreDefault(String ipserver, OnChangeListener callback){
 
-        TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
+        TaskExecutor.Execute(ipserver, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
+
+                String ipServer = (String) args;
+                poConfig.setAppServer(ipServer);
 
                 if(!poTool.SetDefault()){
                     message = poTool.getMessage();
@@ -95,9 +103,9 @@ public class VMDevMode extends AndroidViewModel {
                 Boolean isSuccess = (Boolean) object;
 
                 if(!isSuccess){
-                    callback.OnChanged(message);
+                    callback.OnChanged(message, isSuccess);
                 } else {
-                    callback.OnChanged("Account restored to default.");
+                    callback.OnChanged("Account restored to default.", isSuccess);
                 }
 
             }

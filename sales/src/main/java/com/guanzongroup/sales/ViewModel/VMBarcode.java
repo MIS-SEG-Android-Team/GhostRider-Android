@@ -31,12 +31,14 @@ public class VMBarcode extends AndroidViewModel {
     private final Barcode poBarcode;
     private final Town poTown;
 
+    private String message;
+
     public VMBarcode(@NonNull Application application) {
         super(application);
 
         this.context = application;
         this.poTown = new Town(application);
-        this.poBarcode = new Barcode(context);
+        this.poBarcode = new Barcode(application);
     }
 
     public void CheckPermission(onCheckPermission callback){
@@ -108,6 +110,40 @@ public class VMBarcode extends AndroidViewModel {
         return poTown.getTownProvinceInfo();
     }
 
+    public void submitBarcodes(JSONObject loData, onSubmitBarcodes callback){
+
+        TaskExecutor.Execute(loData, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.onLoad("Guanzon Circle", "Sending barcodes . .");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                JSONObject params = (JSONObject) args;
+                Boolean response = poBarcode.submitBarcodes(params, "0");
+                if (response){
+                    return true;
+                }else {
+                    message = poBarcode.getMessage();
+                    return false;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                Boolean result = (Boolean) object;
+                if (result){
+                    callback.onSuccess();
+                }else {
+                    callback.onFailed(message);
+                }
+            }
+        });
+    }
+
     public void generateQR(JSONObject loData, onGenerateQR callback) throws Exception {
 
         TaskExecutor.Execute(loData, new OnTaskExecuteListener() {
@@ -149,6 +185,12 @@ public class VMBarcode extends AndroidViewModel {
             }
         });
 
+    }
+
+    public interface onSubmitBarcodes{
+        void onLoad(String title, String message);
+        void onSuccess();
+        void onFailed(String message);
     }
 
     public interface onGenerateQR{

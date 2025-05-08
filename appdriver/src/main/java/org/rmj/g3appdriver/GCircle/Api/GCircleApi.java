@@ -107,6 +107,7 @@ public class GCircleApi extends WebApi {
     private static final String SUBMIT_PACITA_RESULT = "gcircle/pacita/submit_pacita_result.php";
     private static final String URL_SUBMIT_INQUIRY = "gcircle/ganado/submit_inquiry.php";
     private static final String URL_DOWNLOAD_INQUIRIES = "gcircle/ganado/import_inquiries.php";
+    private static final String URL_SUBMIT_BARCODE = "gcircle/general/submit_order.php";
 
     public GCircleApi(Application instance) {
         super(instance);
@@ -901,6 +902,15 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_SCARQST_EMP);
         return LIVE + URL_DOWNLOAD_SCARQST_EMP;
+    }
+
+    public String getUrlSubmitBarcode(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_SUBMIT_BARCODE);
+            return LOCAL + URL_SUBMIT_BARCODE;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_SUBMIT_BARCODE);
+        return LIVE + URL_SUBMIT_BARCODE;
     }
 
 }

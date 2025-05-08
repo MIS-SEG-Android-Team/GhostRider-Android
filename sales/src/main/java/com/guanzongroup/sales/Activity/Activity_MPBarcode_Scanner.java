@@ -316,7 +316,17 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     return;
                 }
 
-                GenerateQRInfo();
+                initMessage("Select action for your data", "SEND INFO", "GENERATE QR", 3, true, new onMessage() {
+                    @Override
+                    public void onPosBtnListener() {
+                        SubmitBarcodes();
+                    }
+
+                    @Override
+                    public void onNegBtnListener() {
+                        GenerateQRInfo();
+                    }
+                });
             }
         });
 
@@ -695,6 +705,61 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void SubmitBarcodes(){
+
+        try {
+
+            if (loIEMI != null) {
+
+                if (loIEMI.length() > 0) {
+
+                    JSONObject loQRInfo = new JSONObject();
+
+                    loQRInfo.put("sPaymInfo", ParsePaymentInfo());
+                    loQRInfo.put("sCustInfo", ParsePersonalInfo());
+
+                    loQRInfo.put("sSerialNo", loIEMI);
+
+                    mViewModel.submitBarcodes(loQRInfo, new VMBarcode.onSubmitBarcodes() {
+                        @Override
+                        public void onLoad(String title, String message) {
+                            poLoad.initDialog(title, message, false);
+                            poLoad.show();
+                        }
+
+                        @Override
+                        public void onSuccess() {
+                            poLoad.dismiss();
+
+                            initMessage("Barcodes saved successfully", "Okay", "", 1, false, new onMessage() {
+                                @Override
+                                public void onPosBtnListener() {}
+
+                                @Override
+                                public void onNegBtnListener() {}
+                            });
+                        }
+
+                        @Override
+                        public void onFailed(String message) {
+
+                            initMessage(message, "Okay", "", 2, false, new onMessage() {
+                                @Override
+                                public void onPosBtnListener() {}
+
+                                @Override
+                                public void onNegBtnListener() {}
+                            });
+                        }
+                    });
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void GenerateQRInfo(){

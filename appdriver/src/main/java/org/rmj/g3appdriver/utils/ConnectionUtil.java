@@ -23,6 +23,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.os.StrictMode;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -50,7 +51,6 @@ public class ConnectionUtil {
 
     private static final String LOCAL = "http://192.165.10.65/";
     private static final String PRIMARY_LIVE = "https://restgk.guanzongroup.com.ph";
-//    private static final String SECONDARY_LIVE = "restgk1.guanzongroup.com.ph";
 
     public ConnectionUtil(Context context){
         this.context = context;
@@ -62,13 +62,26 @@ public class ConnectionUtil {
 
     public boolean isDeviceConnected(){
         try {
+
             if (!deviceConnected()) {
                 message = NOT_CONNECTED;
                 return false;
             }
 
             String lsAddress;
+
             AppConfigPreference loConfig = AppConfigPreference.getInstance(context);
+
+            Log.d("App IP", loConfig.getAppServer());
+            if (!isReachable(loConfig.getAppServer())){
+                message = UNABLE_TO_REACH_SERVER;
+                return false;
+            }
+
+            return true;
+
+            /* TODO THIS IS REPLACED WITH CONFIGURED IP, FROM DEVELOPER SETTINGS -guillier 05/08/2024
+
             boolean isTestCase = loConfig.getTestStatus();
             if (isTestCase) {
                 lsAddress = LOCAL;
@@ -86,42 +99,8 @@ public class ConnectionUtil {
                 return false;
             }
 
-            return true;
+            return true;*/
 
-//                    boolean isBackUp = loConfig.isBackUpServer();
-//                    if (isBackUp) {
-//                        lsAddress = SECONDARY_LIVE;
-//                        if (!isReachable(lsAddress)) {
-//                            Log.e(TAG, "Unable to connect to secondary server.");
-//                            lsAddress = PRIMARY_LIVE;
-//                            if (isReachable(lsAddress)) {
-//                                Log.d(TAG, "Primary server is reachable.");
-//                                loConfig.setIfBackUpServer(false);
-//                                return true;
-//                            } else {
-//                                message = "Unable to connect to our servers.";
-//                                return false;
-//                            }
-//                        } else {
-//                            return true;
-//                        }
-//                    } else {
-//                        lsAddress = PRIMARY_LIVE;
-//                        if (!isReachable(lsAddress)) {
-//                            Log.e(TAG, "Unable to connect to primary server.");
-//                            lsAddress = SECONDARY_LIVE;
-//                            if (isReachable(lsAddress)) {
-//                                Log.d(TAG, "Secondary server is reachable.");
-//                                loConfig.setIfBackUpServer(true);
-//                                return true;
-//                            } else {
-//                                message = "Unable to connect to our servers.";
-//                                return false;
-//                            }
-//                        } else {
-//                            return true;
-//                        }
-//                    }
         } catch (Exception e){
             e.printStackTrace();
             message = e.getMessage();
@@ -154,8 +133,6 @@ public class ConnectionUtil {
             int responseCode = httpUrlConnection.getResponseCode();
 
             return responseCode == HttpURLConnection.HTTP_OK;
-//            InetAddress ipAddress = InetAddress.getByName(lsAddress);
-//            return ipAddress.isReachable(5000); // Adjust the timeout value as needed
         } catch (Exception e){
             e.printStackTrace();
             message = getLocalMessage(e);

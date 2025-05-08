@@ -42,19 +42,8 @@ public class AppConfigPreference {
     private static final String APP_DATE_RELEASE = "gRider_DateRelease";
     private static final String LAST_SYNC_DATE = "gRider_last_date_sync";
     private static final String UPDATE_LOCALLY = "gRider_local_update";
-    private static final String EXPORTED_DCP = "gRider_dcp_export_file";
-
-    private static final String INVENTORY_COUNT = "gRider_inventory_count";
-
-    private static final String HELP_LOGIN_NOTICE = "Login_Instruction_Notice";
-    private static final String HELP_DCP_DOWNLOAD_NOTICE = "DCP_Download_Instruction_Notice";
-
-    private static final String LOGIN_ATTEMPT = "gRider_Log_Attempt";
-
     private static final String MAIN_ACTIVITY = "cMainActv";
-
     private static final String HAS_POST_DCP = "dcpPosted";
-
     private static AppConfigPreference mAppConfigPreference;
 
     private AppConfigPreference(Context context){
@@ -102,10 +91,6 @@ public class AppConfigPreference {
         editor.commit();
     }
 
-    public boolean isTesting_Phase(){
-        return pref.getBoolean(IS_TESTING_PHASE, false);
-    }
-
     public void setAppServer(String LocalDataServer){
         editor.putString(APP_SERVER, LocalDataServer);
         if(editor.commit()){
@@ -120,7 +105,6 @@ public class AppConfigPreference {
      */
     public String getAppServer(){
         return pref.getString(APP_SERVER, "https://restgk.guanzongroup.com.ph/");
-//        return pref.getString(AppServer, "http://192.168.10.141/");
     }
 
     public void setProductID(String ProductID){
@@ -133,14 +117,6 @@ public class AppConfigPreference {
         return  pref.getString(APP_PRODUCT_ID,"");
     }
 
-    public void setDateLogin(String DateLogin){
-        editor.putString(APP_DATE_LOGIN, DateLogin);
-        editor.commit();
-    }
-    public String getDateLogin(){
-        return  pref.getString(APP_DATE_LOGIN, "");
-    }
-
     public void setAppToken(String AppToken){
         editor.putString(APP_FIREBASE_TOKEN, AppToken);
         editor.commit();
@@ -150,23 +126,8 @@ public class AppConfigPreference {
         return pref.getString(APP_FIREBASE_TOKEN, "");
     }
 
-    public void setDCP_CustomerRebate(String fnRebate){
-        editor.putString(DCP_CUSTOMER_REBATE, fnRebate);
-        editor.commit();
-    }
-
     public String getDCP_CustomerRebate(){
         return pref.getString(DCP_CUSTOMER_REBATE, "100");
-    }
-
-    public void setIfBackUpServer(boolean fbval){
-        if(fbval){
-            Log.e(TAG, "Backup server set as active");
-        } else {
-            Log.e(TAG, "Live server set as active");
-        }
-        editor.putBoolean(IS_SERVER_BACK_UP, fbval);
-        editor.commit();
     }
 
     public boolean isBackUpServer(){
@@ -235,32 +196,6 @@ public class AppConfigPreference {
         return pref.getString(APP_NAME_VERSION, "");
     }
 
-    //is first open help login
-    public void setIsHelpLoginNotice(boolean loginNotice){
-        editor.putBoolean(HELP_LOGIN_NOTICE, loginNotice);
-
-        editor.commit();
-
-        Log.e(TAG, "HELP_LOGIN_NOTICE first launched.");
-    }
-
-    public boolean isHelpLoginNotice(){
-        return pref.getBoolean(HELP_LOGIN_NOTICE, true);
-    }
-
-    //is first open help login
-    public void setIsHelpDownloadDCPNotice(boolean downloadNotice){
-        editor.putBoolean(HELP_DCP_DOWNLOAD_NOTICE, downloadNotice);
-
-        editor.commit();
-
-        Log.e(TAG, "HELP_LOGIN_NOTICE first launched.");
-    }
-
-    public boolean isHelpDownloadDCPNotice(){
-        return pref.getBoolean(HELP_DCP_DOWNLOAD_NOTICE, true);
-    }
-
     public void setLastSyncDate(String dReferDte){
         editor.putString(LAST_SYNC_DATE, dReferDte);
 
@@ -269,56 +204,14 @@ public class AppConfigPreference {
         Log.e(TAG, "LAST_SYNC_DATE has been set.");
     }
 
-    public String getLastSyncDate(){
-        return pref.getString(LAST_SYNC_DATE, "");
-    }
-
-    public void setLoginAttempt(int val){
-        editor.putInt(LOGIN_ATTEMPT, val);
-
-        editor.commit();
-
-        Log.e(TAG, "LOGIN_ATTEMPT has been set.");
-    }
-
-    public int getLoginAttempt(){
-        return pref.getInt(LOGIN_ATTEMPT, 2);
-    }
-
     public void setUpdateLocally(boolean val){
         editor.putBoolean(UPDATE_LOCALLY, val);
         editor.commit();
     }
 
-    public boolean getUpdateStatus(){
-        return pref.getBoolean(UPDATE_LOCALLY, false);
-    }
-
     public void setDCPStatus(boolean val){
         editor.putBoolean(HAS_POST_DCP, val);
         editor.commit();
-    }
-
-    public boolean getDCPStatus(){
-        return pref.getBoolean(HAS_POST_DCP, false);
-    }
-
-    public void setExportedDcp(boolean val){
-        editor.putBoolean(EXPORTED_DCP, val);
-        editor.commit();
-    }
-
-    public boolean isExportedDcp(){
-        return pref.getBoolean(EXPORTED_DCP, true);
-    }
-
-    public void setInventoryCount(boolean hasInventory){
-        editor.putBoolean(INVENTORY_COUNT, hasInventory);
-        editor.commit();
-    }
-
-    public boolean hasInventory(){
-        return pref.getBoolean(INVENTORY_COUNT, true);
     }
 
 }

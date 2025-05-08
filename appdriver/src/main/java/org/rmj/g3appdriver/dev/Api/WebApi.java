@@ -21,7 +21,7 @@ public abstract class WebApi {
 
     private final AppConfigPreference poConfig;
 
-    protected static final String LOCAL = "http://192.165.10.65/";
+    //protected static final String LOCAL = "http://192.165.10.65/";
 
     private static final String PRIMARY_LIVE = "https://restgk.guanzongroup.com.ph/";
     private static final String SECONDARY_LIVE = "https://restgk1.guanzongroup.com.ph/";
@@ -32,10 +32,21 @@ public abstract class WebApi {
 
     private final boolean isUnitTest;
     protected String LIVE;
+    protected String LOCAL;
 
     public WebApi(Application instance) {
+
         this.poConfig = AppConfigPreference.getInstance(instance);
         this.isUnitTest = poConfig.getTestStatus();
+
+        LIVE = poConfig.getAppServer();
+        LOCAL = poConfig.getAppServer();
+
+        Log.d(TAG, "Device connected to config server.");
+        Log.d(TAG, "LIVE: " + poConfig.getAppServer());
+        Log.d(TAG, "LOCAL: " + poConfig.getAppServer());
+
+        /* TODO THIS IS REPLACED WITH CONFIGURED IP, FROM DEVELOPER SETTINGS -guillier 05/08/2024
         boolean isLiveData = poConfig.isBackUpServer();
         if(isLiveData){
             Log.d(TAG, "Device connected to backup server.");
@@ -43,7 +54,7 @@ public abstract class WebApi {
         } else {
             Log.d(TAG, "Device connected to primary server.");
             LIVE = PRIMARY_LIVE;
-        }
+        }*/
     }
 
     protected boolean isUnitTest(){
