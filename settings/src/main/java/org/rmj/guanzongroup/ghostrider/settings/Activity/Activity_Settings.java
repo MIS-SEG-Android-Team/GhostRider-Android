@@ -62,11 +62,15 @@ public class Activity_Settings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_settings);
+
         Toolbar toolbar = findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
+
         mViewModel = new ViewModelProvider(this).get(VMSettings.class);
         loMessage = new MessageBox(Activity_Settings.this);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Log.e("instancestate", String.valueOf(savedInstanceState));
 

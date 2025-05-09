@@ -18,8 +18,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="15dp"
-    app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true"
     android:theme="@style/GhostRiderMaterialTheme"
     android:layout_marginHorizontal="25dp">
 
@@ -27,7 +25,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingVertical="5dp">
+        android:paddingHorizontal="5dp"
+        android:paddingTop="5dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/data_view"

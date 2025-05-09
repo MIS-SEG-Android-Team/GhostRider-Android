@@ -106,6 +106,9 @@ public class Barcode {
                 return false;
             }
 
+            String lsTransnox = loResponse.getString("sTransNox");
+            message = lsTransnox.substring(lsTransnox.length() - 6);
+
             return true;
         }catch (Exception e){
             e.printStackTrace();

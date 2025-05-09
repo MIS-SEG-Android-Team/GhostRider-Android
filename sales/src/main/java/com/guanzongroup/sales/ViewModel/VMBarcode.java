@@ -124,6 +124,7 @@ public class VMBarcode extends AndroidViewModel {
                 JSONObject params = (JSONObject) args;
                 Boolean response = poBarcode.submitBarcodes(params, "0");
                 if (response){
+                    message = poBarcode.getMessage();
                     return true;
                 }else {
                     message = poBarcode.getMessage();
@@ -136,7 +137,7 @@ public class VMBarcode extends AndroidViewModel {
 
                 Boolean result = (Boolean) object;
                 if (result){
-                    callback.onSuccess();
+                    callback.onSuccess(message);
                 }else {
                     callback.onFailed(message);
                 }
@@ -189,7 +190,7 @@ public class VMBarcode extends AndroidViewModel {
 
     public interface onSubmitBarcodes{
         void onLoad(String title, String message);
-        void onSuccess();
+        void onSuccess(String transNox);
         void onFailed(String message);
     }
 

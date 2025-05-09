@@ -218,12 +218,15 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
         }
 
         if(debugMode != null){
+            /*
+            TODO ALLOW TO ALL USERS TO CHANGE THEIR IP CONNECTION, INTENDED FOR MOBILE FIESTA SETUP AND APPLICATION TESTING
             EmployeeSession poUser = EmployeeSession.getInstance(requireActivity());
             if (!poUser.getDeptID().equalsIgnoreCase(DeptCode.MANAGEMENT_INFORMATION_SYSTEM)){
                 debugMode.setVisible(false);
             } else {
                 debugMode.setVisible(true);
-            }
+            }*/
+            debugMode.setVisible(true);
             debugMode.setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireActivity(), Activity_Developer.class));
                 requireActivity().overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);

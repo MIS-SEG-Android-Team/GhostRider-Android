@@ -38,6 +38,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.guanzongroup.sales.Adapter.RecyclerView_Barcodes;
+import com.guanzongroup.sales.Dialogs.Dialog_TransactionPIN;
 import com.guanzongroup.sales.R;
 import com.guanzongroup.sales.ViewModel.VMBarcode;
 
@@ -78,8 +79,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
     private TextInputEditText tie_mname;
     private TextInputEditText tie_suffix;
     private TextInputEditText tie_mobile;
-    private TextInputEditText tie_address;
-    private MaterialAutoCompleteTextView tie_towncity;
 
     private ConstraintLayout layout_buttons;
     private MaterialButton btn_previous;
@@ -252,8 +251,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         tie_mname = findViewById(R.id.tie_mname);
         tie_suffix = findViewById(R.id.tie_suffix);
         tie_mobile = findViewById(R.id.tie_mobile);
-        tie_address = findViewById(R.id.tie_address);
-        tie_towncity = findViewById(R.id.tie_towncity);
 
         //todo buttons objects
         layout_buttons = findViewById(R.id.layout_buttons);
@@ -316,10 +313,19 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     return;
                 }
 
-                initMessage("Select action for your data", "SEND INFO", "GENERATE QR", 3, true, new onMessage() {
+                initMessage("Select action for your data", "SEND DETAILS", "GENERATE QR", 3, true, new onMessage() {
                     @Override
                     public void onPosBtnListener() {
-                        SubmitBarcodes();
+
+                        initMessage("Are your details correct? Save transaction now?", "Yes", "No", 3, true, new onMessage() {
+                            @Override
+                            public void onPosBtnListener() {
+                                SubmitBarcodes();
+                            }
+
+                            @Override
+                            public void onNegBtnListener() {}
+                        });
                     }
 
                     @Override
@@ -465,26 +471,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                 }
 
                 layout_buttons.setVisibility(View.GONE);
-            }
-        });
-
-        mViewModel.observeTownProvinceInfo().observe(Activity_MPBarcode_Scanner.this, new Observer<List<DTownInfo.TownProvinceInfo>>() {
-            @Override
-            public void onChanged(List<DTownInfo.TownProvinceInfo> townProvinceInfos) {
-
-                if (townProvinceInfos == null){
-                    return;
-                }
-
-                for (DTownInfo.TownProvinceInfo loVal: townProvinceInfos){
-                    loTownMap.put(loVal.sTownIDxx, loVal.sTownName +" "+loVal.sProvName);
-                }
-
-                List<String> loTowns = new ArrayList<>(loTownMap.values());
-                ArrayAdapter<String> loAdapter = new ArrayAdapter<>(Activity_MPBarcode_Scanner.this, R.layout.support_simple_spinner_dropdown_item, loTowns);
-
-                tie_towncity.setAdapter(loAdapter);
-
             }
         });
 
@@ -678,32 +664,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             return false;
         }
 
-        if (tie_towncity.getText() == null || tie_towncity.getText().toString().isEmpty()){
-
-            initMessage("Town/City is required", "Okay", "", 2, false, new onMessage() {
-                @Override
-                public void onPosBtnListener() {}
-
-                @Override
-                public void onNegBtnListener() {}
-            });
-
-            return false;
-        }
-
-        if (getAdapterID(loTownMap, tie_towncity.getText().toString()).isEmpty()){
-
-            initMessage("Town/City is invalid", "Okay", "", 2, false, new onMessage() {
-                @Override
-                public void onPosBtnListener() {}
-
-                @Override
-                public void onNegBtnListener() {}
-            });
-
-            return false;
-        }
-
         return true;
     }
 
@@ -730,20 +690,18 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onSuccess() {
+                        public void onSuccess(String transNox) {
                             poLoad.dismiss();
 
-                            initMessage("Barcodes saved successfully", "Okay", "", 1, false, new onMessage() {
-                                @Override
-                                public void onPosBtnListener() {}
-
-                                @Override
-                                public void onNegBtnListener() {}
-                            });
+                            new Dialog_TransactionPIN(Activity_MPBarcode_Scanner.this)
+                                    .initDialog(transNox,
+                                            "Transaction PIN. \n \n Please proceed to counter and submit this reference number."
+                                    );
                         }
 
                         @Override
                         public void onFailed(String message) {
+                            poLoad.dismiss();
 
                             initMessage(message, "Okay", "", 2, false, new onMessage() {
                                 @Override
@@ -850,8 +808,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         loPersonalInfo.put("lastName", tie_lname.getText().toString());
         loPersonalInfo.put("suffixName", tie_suffix.getText().toString());
         loPersonalInfo.put("mobileNumber", tie_mobile.getText().toString());
-        loPersonalInfo.put("address", tie_address.getText().toString());
-        loPersonalInfo.put("townID", getAdapterID(loTownMap, tie_towncity.getText().toString()));
 
         return loPersonalInfo;
     }
