@@ -8,7 +8,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -50,11 +53,15 @@ import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_QrCodeScanner;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Activity_MPBarcode_Scanner extends AppCompatActivity {
@@ -63,6 +70,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     private ConstraintLayout layout_barcodelist;
     private RecyclerView rcv_barcodes;
+    private FloatingActionButton fbtn_manual;
     private FloatingActionButton fbtn_scan;
 
     private ScrollView scv_details;
@@ -88,14 +96,12 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
     private LoadDialog poLoad;
     private MessageBox poMessage;
 
-    private final HashMap<String, String> loTownMap = new HashMap<>();
     private final HashMap<String, String> laFinancer = new HashMap<>();
 
     private JSONArray loIEMI = new JSONArray();
 
     private final MutableLiveData<Integer> btnState = new MutableLiveData<>(1);
 
-    @SuppressLint("NewApi")
     private final ActivityResultLauncher<Intent> poArlBarcode =  registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -128,21 +134,11 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         if (!result.getData().getStringExtra("qrdata").isEmpty()){
 
                             //todo: show confirmation, save barcode
-                            initMessage("Save Barcode?", "Yes", "No",
+                            initMessage("Save barcode number "+ result.getData().getStringExtra("qrdata") + "?", "Yes", "No",
                                     3, true, new onMessage() {
                                         @Override
                                         public void onPosBtnListener() {
-
-                                            String barcodeid = "MX01" +
-                                                    LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")) +
-                                                    mViewModel.countBarcode() + 1;
-
-                                            EBarcode barcode = new EBarcode();
-                                            barcode.setBarcodeIdxx(barcodeid);
-                                            barcode.setBarcode(result.getData().getStringExtra("qrdata"));
-
-                                            mViewModel.saveBarcode(barcode);
-
+                                            SaveBarcodes(result.getData().getStringExtra("qrdata"));
                                             Toast.makeText(Activity_MPBarcode_Scanner.this, "Barcode saved successfully", Toast.LENGTH_LONG).show();
 
                                         }
@@ -233,6 +229,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         layout_barcodelist = findViewById(R.id.layout_barcodelist);
         rcv_barcodes = findViewById(R.id.rcv_barcodes);
         fbtn_scan = findViewById(R.id.fbtn_scan);
+        fbtn_manual = findViewById(R.id.fbtn_manual);
 
         //todo details objects
         scv_details = findViewById(R.id.scv_details);
@@ -305,6 +302,32 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             }
         });
 
+        fbtn_manual.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog_BarcodeManual dialog_barcodeManual = new Dialog_BarcodeManual();
+                dialog_barcodeManual.initDialogBarcodeManual(new Dialog_BarcodeManual.onConfirm() {
+                    @Override
+                    public void onConfirm(String serial) {
+
+                        //todo: show confirmation, save barcode
+                        initMessage("Save barcode number "+ serial + "?", "Yes", "No",
+                                3, true, new onMessage() {
+                                    @Override
+                                    public void onPosBtnListener() {
+                                        SaveBarcodes(serial);
+                                    }
+
+                                    @Override
+                                    public void onNegBtnListener() {
+                                    }
+                                });
+
+                    }
+                });
+            }
+        });
+
         fbtn_generate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -313,11 +336,16 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     return;
                 }
 
+                StringBuilder loSerials = new StringBuilder();
+                for (int i = 0; i < loIEMI.length(); i++){
+                    loSerials.append(loIEMI.optString(i)).append("\n");
+                }
+
                 initMessage("Select action for your data", "SEND DETAILS", "GENERATE QR", 3, true, new onMessage() {
                     @Override
                     public void onPosBtnListener() {
 
-                        initMessage("Are your details correct? Save transaction now?", "Yes", "No", 3, true, new onMessage() {
+                        initMessage("Is your information correct?\n\n"+loSerials+"\n\nSave transaction now?", "Yes", "No", 3, true, new onMessage() {
                             @Override
                             public void onPosBtnListener() {
                                 SubmitBarcodes();
@@ -664,7 +692,47 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             return false;
         }
 
+        if (tie_mobile.getText() != null && !tie_mobile.getText().toString().isEmpty()){
+
+            String sMobile = tie_mobile.getText().toString();
+
+            if (!sMobile.matches("[0-9]{11}")){
+
+                initMessage("Mobile must be 11 digits and contain only numbers", "Okay", "", 2, false, new onMessage() {
+                    @Override
+                    public void onPosBtnListener() {}
+
+                    @Override
+                    public void onNegBtnListener() {}
+                });
+
+                return false;
+            }
+
+        }
+
         return true;
+    }
+
+    private void SaveBarcodes(String serial){
+
+        String barcodeid = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            barcodeid = "MX01" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
+                    mViewModel.countBarcode() + 1;
+        }else {
+            barcodeid = "MX01" +
+                    new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
+                    mViewModel.countBarcode() + 1;
+        }
+
+        EBarcode barcode = new EBarcode();
+        barcode.setBarcodeIdxx(barcodeid);
+        barcode.setBarcode(serial);
+
+        mViewModel.saveBarcode(barcode);
+
     }
 
     private void SubmitBarcodes(){
@@ -907,6 +975,71 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             poDialogx.show();
 
         }
+    }
+
+    public class Dialog_BarcodeManual{
+
+        private AlertDialog poDialogx;
+
+        private TextInputEditText tie_paytype;
+        private MaterialButton btn_add;
+
+        public void initDialogBarcodeManual(onConfirm callback){
+
+            View view = LayoutInflater.from(Activity_MPBarcode_Scanner.this).inflate(R.layout.dialog_manual_barcode, null, false);
+
+            AlertDialog.Builder loBuilder =  new AlertDialog.Builder(Activity_MPBarcode_Scanner.this);
+            loBuilder.setCancelable(true)
+                    .setView(view);
+            poDialogx = loBuilder.create();
+
+            tie_paytype = view.findViewById(R.id.tie_paytype);
+            btn_add = view.findViewById(R.id.btn_add);
+
+            tie_paytype.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                        if (!s.isEmpty()){
+                            btn_add.setEnabled(true);
+                        }else {
+                            btn_add.setEnabled(false);
+                        }
+                    }else {
+                        if (s.length() > 0){
+                            btn_add.setEnabled(true);
+                        }else {
+                            btn_add.setEnabled(false);
+                        }
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+
+            btn_add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    poDialogx.dismiss();
+                    callback.onConfirm(tie_paytype.getText().toString());
+                }
+            });
+
+            poDialogx.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            poDialogx.getWindow().getAttributes().windowAnimations = org.rmj.g3appdriver.R.style.PopupAnimation;
+            poDialogx.show();
+
+        }
+
+        interface onConfirm{
+            void onConfirm(String serial);
+        }
+
     }
 
 }

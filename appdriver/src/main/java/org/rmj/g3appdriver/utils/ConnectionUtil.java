@@ -115,7 +115,7 @@ public class ConnectionUtil {
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    private boolean isReachable(String lsAddress)
+    public boolean isReachable(String lsAddress)
     {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);

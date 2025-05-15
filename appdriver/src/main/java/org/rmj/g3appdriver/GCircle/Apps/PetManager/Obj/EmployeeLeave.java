@@ -56,7 +56,6 @@ public class EmployeeLeave extends PetMngr {
     public boolean ImportApplications() {
         try{
             String lsAddress = poApi.getUrlGetLeaveApplication();
-            String lsHeaders = poHeaders.getHeaders().toString();
 
             String lsResponse = WebClient.sendRequest(
                     lsAddress,

@@ -47,7 +47,7 @@
                 android:id="@+id/mtv_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Barcode Scanner"
+                android:text="Barcode Entry"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:gravity="center"
@@ -86,11 +86,21 @@
                         android:layout_height="match_parent"/>
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fbtn_manual"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/baseline_assignment_add_24"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginEnd="20dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/fbtn_scan"/>
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/fbtn_scan"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/baseline_barcode_reader_24"
-                        android:layout_marginBottom="100dp"
+                        android:layout_marginBottom="25dp"
                         android:layout_marginEnd="20dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -213,6 +223,7 @@
                                     android:id="@+id/tie_lname"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:inputType="textCapCharacters"
                                     android:hint="Lastname"/>
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -231,6 +242,7 @@
                                     android:id="@+id/tie_fname"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:inputType="textCapCharacters"
                                     android:hint="Firstname"/>
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -249,6 +261,7 @@
                                     android:id="@+id/tie_mname"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:inputType="textCapCharacters"
                                     android:hint="Middlename"/>
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -267,6 +280,7 @@
                                     android:id="@+id/tie_suffix"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:inputType="textCapCharacters"
                                     android:hint="Suffix"/>
 
                             </com.google.android.material.textfield.TextInputLayout>

@@ -76,9 +76,6 @@ public class Activity_Developer extends AppCompatActivity {
         mViewModel = new ViewModelProvider(this).get(VMDevMode.class);
         poMessage = new MessageBox(this);
 
-        poMessage.initDialog();
-        poMessage.setTitle("Guanzon Circle");
-
         initViews();
         initAdapter();
         initListener();
@@ -146,90 +143,108 @@ public class Activity_Developer extends AppCompatActivity {
 
         btnSave.setOnClickListener(v -> {
 
-            String ipAdd = "https://restgk.guanzongroup.com.ph/";
-            if (tie_ipadd.getText() != null && !tie_ipadd.getText().toString().isEmpty()){
-                ipAdd = tie_ipadd.getText().toString();
-            }
-
-            mViewModel.SaveChanges(poInfo, ipAdd, new VMDevMode.OnChangeListener() {
+            initMessage(3, "Are you sure you want to save changes?", new onMessageButton() {
                 @Override
-                public void OnChanged(String args, Boolean isSuccess) {
+                public void onPositive() {
 
-                    Toast.makeText(Activity_Developer.this, args, Toast.LENGTH_SHORT).show();
-
-                    if (isSuccess){
-                        initMessage(1, "Changes has been saved.\nLogout to take this effect.", new onMessageButton() {
-                            @Override
-                            public void onPositive() {
-
-                                new EmployeeMaster(getApplication()).LogoutUserSession();
-                                AppConfigPreference.getInstance(getApplication()).setIsAppFirstLaunch(false);
-
-                                System.exit(0);
-                            }
-
-                            @Override
-                            public void onNegative() {
-
-                            }
-                        });
-
-                        return;
+                    String ipAdd = "https://restgk.guanzongroup.com.ph/";
+                    if (tie_ipadd.getText() != null && !tie_ipadd.getText().toString().isEmpty()){
+                        ipAdd = tie_ipadd.getText().toString();
                     }
 
-                    initMessage(2, "Changes cannot be saved", new onMessageButton() {
+                    mViewModel.SaveChanges(poInfo, ipAdd, new VMDevMode.OnChangeListener() {
                         @Override
-                        public void onPositive() {}
+                        public void OnChanged(String args, Boolean isSuccess) {
 
-                        @Override
-                        public void onNegative() {
+                            if (isSuccess){
+                                initMessage(1, "Changes has been saved.\nLogout to take this effect.", new onMessageButton() {
+                                    @Override
+                                    public void onPositive() {
+
+                                        new EmployeeMaster(getApplication()).LogoutUserSession();
+                                        AppConfigPreference.getInstance(getApplication()).setIsAppFirstLaunch(false);
+
+                                        System.exit(0);
+                                    }
+
+                                    @Override
+                                    public void onNegative() {
+
+                                    }
+                                });
+
+                                return;
+                            }
+
+                            initMessage(2, args, new onMessageButton() {
+                                @Override
+                                public void onPositive() {}
+
+                                @Override
+                                public void onNegative() {
+
+                                }
+                            });
 
                         }
                     });
 
                 }
+
+                @Override
+                public void onNegative() {}
             });
         });
 
         btnRestore.setOnClickListener(v -> {
 
-            mViewModel.RestoreDefault("https://restgk.guanzongroup.com.ph/", new VMDevMode.OnChangeListener() {
+            initMessage(3, "Restore to default settings?", new onMessageButton() {
                 @Override
-                public void OnChanged(String args, Boolean isSuccess) {
+                public void onPositive() {
 
-                    Toast.makeText(Activity_Developer.this, args, Toast.LENGTH_SHORT).show();
+                    mViewModel.RestoreDefault("https://restgk.guanzongroup.com.ph/", new VMDevMode.OnChangeListener() {
+                        @Override
+                        public void OnChanged(String args, Boolean isSuccess) {
 
-                    if (isSuccess){
-                        initMessage(1, "Changes has been saved.\nAccount will be automatically logout. Please restart the application ", new onMessageButton() {
-                            @Override
-                            public void onPositive() {
+                            Toast.makeText(Activity_Developer.this, args, Toast.LENGTH_SHORT).show();
 
-                                new EmployeeMaster(getApplication()).LogoutUserSession();
-                                AppConfigPreference.getInstance(getApplication()).setIsAppFirstLaunch(false);
+                            if (isSuccess){
+                                initMessage(1, "Changes has been saved.\nAccount will be automatically logout. Please restart the application ", new onMessageButton() {
+                                    @Override
+                                    public void onPositive() {
 
-                                System.exit(0);
+                                        new EmployeeMaster(getApplication()).LogoutUserSession();
+                                        AppConfigPreference.getInstance(getApplication()).setIsAppFirstLaunch(false);
+
+                                        System.exit(0);
+                                    }
+
+                                    @Override
+                                    public void onNegative() {
+
+                                    }
+                                });
+
+                                return;
                             }
 
-                            @Override
-                            public void onNegative() {
+                            initMessage(2, "Cannot restore default settings", new onMessageButton() {
+                                @Override
+                                public void onPositive() {}
 
-                            }
-                        });
+                                @Override
+                                public void onNegative() {
 
-                        return;
-                    }
-
-                    initMessage(2, "Cannot restore default settings", new onMessageButton() {
-                        @Override
-                        public void onPositive() {}
-
-                        @Override
-                        public void onNegative() {
+                                }
+                            });
 
                         }
                     });
 
                 }
+
+                @Override
+                public void onNegative() {}
             });
         });
 
@@ -277,6 +292,8 @@ public class Activity_Developer extends AppCompatActivity {
     }
     private void initMessage(int mode, String message, onMessageButton callback){
 
+        poMessage.initDialog();
+        poMessage.setTitle("Guanzon Circle");
         poMessage.setMessage(message);
 
         switch (mode){

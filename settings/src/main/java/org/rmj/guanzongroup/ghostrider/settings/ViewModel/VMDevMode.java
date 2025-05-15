@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.Etc.DevTools;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
+import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
@@ -28,6 +29,8 @@ public class VMDevMode extends AndroidViewModel {
     private final Application instance;
     private final AppConfigPreference poConfig;
     private final DevTools poTool;
+    private final ConnectionUtil poConnection;
+
     private String message;
 
     public interface OnChangeListener {
@@ -36,8 +39,10 @@ public class VMDevMode extends AndroidViewModel {
 
     public VMDevMode(@NonNull Application application) {
         super(application);
+
         this.instance = application;
         this.poTool = new DevTools(instance);
+        this.poConnection = new ConnectionUtil(instance);
         this.poConfig = AppConfigPreference.getInstance(application);
     }
 
@@ -50,6 +55,11 @@ public class VMDevMode extends AndroidViewModel {
         TaskExecutor.Execute(args, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
+
+                if (!poConnection.isReachable(ipserver)){
+                    message = "IP server "+ ipserver +" is not reachable";
+                    return false;
+                }
 
                 poConfig.setAppServer(ipserver);
 
