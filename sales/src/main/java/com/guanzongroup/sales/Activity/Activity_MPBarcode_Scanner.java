@@ -338,14 +338,14 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
                 StringBuilder loSerials = new StringBuilder();
                 for (int i = 0; i < loIEMI.length(); i++){
-                    loSerials.append(loIEMI.optString(i)).append("\n");
+                    loSerials.append("• "+loIEMI.optString(i)).append("\n");
                 }
 
                 initMessage("Select action for your data", "SEND DETAILS", "GENERATE QR", 3, true, new onMessage() {
                     @Override
                     public void onPosBtnListener() {
 
-                        initMessage("Is your information correct?\n\n"+loSerials+"\n\nSave transaction now?", "Yes", "No", 3, true, new onMessage() {
+                        initMessage("Is your information correct?\n"+"Here is the summarry of your selected entries\n\n"+loSerials+"\n\nSave transaction now?", "Yes", "No", 3, true, new onMessage() {
                             @Override
                             public void onPosBtnListener() {
                                 SubmitBarcodes();

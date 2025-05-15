@@ -152,6 +152,9 @@ public class Activity_Developer extends AppCompatActivity {
                         ipAdd = tie_ipadd.getText().toString();
                     }
 
+                    btnSave.setEnabled(false);
+                    btnRestore.setEnabled(false);
+
                     mViewModel.SaveChanges(poInfo, ipAdd, new VMDevMode.OnChangeListener() {
                         @Override
                         public void OnChanged(String args, Boolean isSuccess) {
@@ -165,11 +168,15 @@ public class Activity_Developer extends AppCompatActivity {
                                         AppConfigPreference.getInstance(getApplication()).setIsAppFirstLaunch(false);
 
                                         System.exit(0);
+
+                                        btnSave.setEnabled(true);
+                                        btnRestore.setEnabled(true);
                                     }
 
                                     @Override
                                     public void onNegative() {
-
+                                        btnSave.setEnabled(true);
+                                        btnRestore.setEnabled(true);
                                     }
                                 });
 
@@ -178,11 +185,15 @@ public class Activity_Developer extends AppCompatActivity {
 
                             initMessage(2, args, new onMessageButton() {
                                 @Override
-                                public void onPositive() {}
+                                public void onPositive() {
+                                    btnSave.setEnabled(true);
+                                    btnRestore.setEnabled(true);
+                                }
 
                                 @Override
                                 public void onNegative() {
-
+                                    btnSave.setEnabled(true);
+                                    btnRestore.setEnabled(true);
                                 }
                             });
 
