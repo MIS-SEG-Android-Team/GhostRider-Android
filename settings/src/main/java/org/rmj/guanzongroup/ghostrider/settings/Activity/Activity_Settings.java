@@ -62,11 +62,15 @@ public class Activity_Settings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_settings);
+
         Toolbar toolbar = findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
+
         mViewModel = new ViewModelProvider(this).get(VMSettings.class);
         loMessage = new MessageBox(Activity_Settings.this);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Log.e("instancestate", String.valueOf(savedInstanceState));
 
@@ -77,19 +81,16 @@ public class Activity_Settings extends AppCompatActivity {
                     .replace(R.id.settings, new Fragment_Settings())
                     .commit();
         }
-
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        }
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint("NewApi")
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         Log.e("Request Code", String.valueOf(requestCode));
         Log.e("Permission Code", String.valueOf(permissions));
         Log.e("grantResults", String.valueOf(grantResults));
+
         switch (requestCode){
             case CAMERA_REQUEST:{
                 for(int x = 0 ; x < grantResults.length; x++){
@@ -113,9 +114,7 @@ public class Activity_Settings extends AppCompatActivity {
                 break;
             }
             case CONTACT_REQUEST: {
-//                for(int x = 0 ; x < grantResults.length; x++){
-//                    getPermissionStatus(this,permissions[x]);
-//                }
+
                 int index = getPermissionStatus(this, READ_PHONE_STATE);
                 if (index == 0){
                     mViewModel.setCameraSummary("Phone State Permission Enabled");

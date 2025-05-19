@@ -48,7 +48,7 @@ public class Activity_BranchRecords extends AppCompatActivity {
         branch_rec = findViewById(R.id.branch_rec);
 
         setSupportActionBar(toolbar); //set object toolbar as default action bar for activity
-        getSupportActionBar().setTitle("Evaluation History"); //set default title for action bar
+        getSupportActionBar().setTitle(""); //set default title for action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //set back button to toolbar
         getSupportActionBar().setDisplayShowHomeEnabled(true); //enable the back button set on toolbar
 
@@ -103,9 +103,10 @@ public class Activity_BranchRecords extends AppCompatActivity {
             public void onError(String message) {
                 poLoad.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Transaction Result");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("OK", new MessageBox.DialogButton() {
+                poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
                     @Override
                     public void OnButtonClick(View view, AlertDialog dialog) {
                         dialog.dismiss();

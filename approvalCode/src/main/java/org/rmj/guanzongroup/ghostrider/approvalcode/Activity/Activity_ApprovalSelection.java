@@ -13,64 +13,91 @@ package org.rmj.guanzongroup.ghostrider.approvalcode.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.textview.MaterialTextView;
-import com.google.android.material.divider.MaterialDivider;
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.imageview.ShapeableImageView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Etc.AdapterApprovalAuth;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
 import org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel.VMApprovalSelection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Activity_ApprovalSelection extends AppCompatActivity {
     public static final String TAG = Activity_ApprovalSelection.class.getSimpleName();
-
     private VMApprovalSelection mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_approval_selection);
-        mViewModel = ViewModelProviders.of(this).get(VMApprovalSelection.class);
 
-        String lsSysType = getIntent().getStringExtra("sysCode");
+        mViewModel = new ViewModelProvider(this).get(VMApprovalSelection.class);
+
         MaterialToolbar toolbar = findViewById(R.id.toolbar_approvalSelection);
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        RecyclerView recyclerView = findViewById(R.id.recyclerview_approvalAuth);
-        mViewModel.getReferenceAuthList(lsSysType).observe(this, requestList -> {
-            LinearLayoutManager manager = new LinearLayoutManager(Activity_ApprovalSelection.this);
-            manager.setOrientation(RecyclerView.VERTICAL);
-            recyclerView.setAdapter(new AdapterApprovalAuth(requestList, (SystemCode, SCAType) -> {
-                Intent loIntentx = new Intent(Activity_ApprovalSelection.this, Activity_ApprovalCode.class);
-                if(SystemCode.equalsIgnoreCase("CA")) {
-                    loIntentx.putExtra("sysCode", "1");
-                } else{
-                    loIntentx.putExtra("sysCode", "0");
-                }
-                loIntentx.putExtra("systype", lsSysType);
-                loIntentx.putExtra("sSystemCd", SystemCode);
-                loIntentx.putExtra("sSCATypex", SCAType);
-                startActivity(loIntentx);
-                overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
-            }));
-            recyclerView.setLayoutManager(manager);
+
+        mViewModel.getApprovalCodes(mViewModel.getLatestStamp(), new VMApprovalSelection.onDownload() {
+            @Override
+            public void onFinished(String message) {
+                Toast.makeText(Activity_ApprovalSelection.this, message, Toast.LENGTH_LONG).show();
+
+                String lsSysType = getIntent().getStringExtra("sysCode");
+                RecyclerView recyclerView = findViewById(R.id.recyclerview_approvalAuth);
+
+                mViewModel.getReferenceAuthList(lsSysType).observe(Activity_ApprovalSelection.this, requestList -> {
+                    if (requestList != null){
+                        List<ESCA_Request> rqstList = new ArrayList<>();
+
+                        if (requestList.size() > 0){
+
+                            for (int i = 0; i < requestList.size(); i++){
+                                ESCA_Request loRqst = requestList.get(i);
+                                String sSCACodex = loRqst.getSCACodex();
+
+                                ESCARqstEmp loVal = mViewModel.getRqstEmp(sSCACodex);
+                                //todo: add to filter approval list if:
+                                if (loVal != null){ //todo: has rows from table sca_emp_request
+                                    rqstList.add(loRqst);
+                                }else { //todo: by default, add approval list not existing on table sca_emp_request
+                                    if (mViewModel.getRqstExst(sSCACodex) == null){
+                                        rqstList.add(loRqst);
+                                    }
+                                }
+                            }
+                        }
+
+                        LinearLayoutManager manager = new LinearLayoutManager(Activity_ApprovalSelection.this);
+                        manager.setOrientation(RecyclerView.VERTICAL);
+
+                        recyclerView.setAdapter(new AdapterApprovalAuth(rqstList, (SystemCode, SCAType) -> {
+                            Intent loIntentx = new Intent(Activity_ApprovalSelection.this, Activity_ApprovalCode.class);
+                            if(SystemCode.equalsIgnoreCase("CA")) {
+                                loIntentx.putExtra("sysCode", "1");
+                            } else{
+                                loIntentx.putExtra("sysCode", "0");
+                            }
+                            loIntentx.putExtra("systype", lsSysType);
+                            loIntentx.putExtra("sSystemCd", SystemCode);
+                            loIntentx.putExtra("sSCATypex", SCAType);
+                            startActivity(loIntentx);
+                            overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+                        }));
+
+                        recyclerView.setLayoutManager(manager);
+                    }
+                });
+            }
         });
     }
 

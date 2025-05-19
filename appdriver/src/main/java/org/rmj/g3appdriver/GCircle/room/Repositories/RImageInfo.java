@@ -18,7 +18,10 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 import static org.rmj.g3appdriver.lib.Firebase.CrashReportingUtil.reportException;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.lifecycle.LiveData;
 
@@ -31,6 +34,7 @@ import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.dev.Api.WebFileServer;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -156,6 +160,7 @@ public class RImageInfo {
             loImage.setLongitud(args3);
             poDao.SaveImageInfo(loImage);
             Log.d(TAG, "Selfie has been saved.");
+
             return lsTransNo;
         } catch (Exception e){
             e.printStackTrace();

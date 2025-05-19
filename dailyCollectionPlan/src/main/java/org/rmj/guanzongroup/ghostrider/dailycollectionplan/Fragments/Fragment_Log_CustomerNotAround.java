@@ -24,8 +24,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -66,14 +68,15 @@ public class Fragment_Log_CustomerNotAround extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_customer_not_around_log, container, false);
-        mViewModel = ViewModelProviders.of(this).get(VMLogCustomerNotAround.class);
+        mViewModel = new ViewModelProvider(this).get(VMLogCustomerNotAround.class);
         initWidgets(view);
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         txtAcctNo.setText(Activity_TransactionDetail.acctNox);
         txtClientName.setText(Activity_TransactionDetail.fullNme);
         txtClientAddress.setText(Activity_TransactionDetail.clientAddress);
@@ -85,7 +88,7 @@ public class Fragment_Log_CustomerNotAround extends Fragment {
                 .observe(getViewLifecycleOwner(), eImageInfo -> {
                     try {
                         setPic(eImageInfo.getFileLoct());
-                        ivTransImage.setOnClickListener(view -> {
+                        ivTransImage.setOnClickListener(v -> {
                             poDialogx = new DialogDisplayImage(getActivity(),
                                     Activity_TransactionDetail.acctNox, eImageInfo.getFileLoct());
                             poDialogx.initDialog(dialog -> {

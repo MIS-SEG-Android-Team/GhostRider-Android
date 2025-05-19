@@ -21,8 +21,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.rmj.g3appdriver.GRider.Database.Entities.EBranchInfo;
-import org.rmj.g3appdriver.GRider.Database.Entities.ECashCount;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 

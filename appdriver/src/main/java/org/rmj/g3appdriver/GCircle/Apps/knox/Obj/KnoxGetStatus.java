@@ -4,6 +4,7 @@ import static org.rmj.g3appdriver.dev.Api.ApiResult.SERVER_NO_RESPONSE;
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.app.Application;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,6 +44,9 @@ public class KnoxGetStatus extends SamsungKnox {
                                         loParam.toString(),
                                         poHeaders.getHeaders());
 
+
+            Log.d(TAG, lsResponse);
+
             if(lsResponse == null){
                 message = SERVER_NO_RESPONSE;
                 return null;
@@ -59,6 +63,7 @@ public class KnoxGetStatus extends SamsungKnox {
 
             JSONArray jsonArray = loResponse.getJSONArray("deviceLogs");
             long maxValue = (long) jsonArray.getJSONObject(jsonArray.length() - 1).get("time");
+
             for (int x = 0; x < jsonArray.length(); x++) {
                 JSONObject loJson = new JSONObject(jsonArray.getString(x));
 
@@ -69,8 +74,21 @@ public class KnoxGetStatus extends SamsungKnox {
                     psStatusxx = loJson.getString("deviceStatus");
                     psDetailsx = loJson.getString("details");
                     psdUpdatex = getReadableDateFormat(loJson.getLong("time"));
+
+                    if (x == 0){
+                        if (psStatusxx.equalsIgnoreCase("Activating")){
+
+                            if (new JSONObject(jsonArray.getString(x + 1)).get("deviceStatus").toString()
+                                    .equalsIgnoreCase("Active")){
+
+                                psStatusxx = loJson.getString("deviceStatus");
+                                break;
+                            }
+                        }
+                    }
                 }
             }
+
             return "Device status has been retrieve.";
         } catch (Exception e){
             e.printStackTrace();

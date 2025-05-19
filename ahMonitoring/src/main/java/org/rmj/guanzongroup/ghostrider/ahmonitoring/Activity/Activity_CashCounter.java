@@ -71,13 +71,17 @@ public class Activity_CashCounter extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_cash_counter);
+
         instance = Activity_CashCounter.this;
         poMessage = new MessageBox(Activity_CashCounter.this);
         poLoad = new LoadDialog(Activity_CashCounter.this);
         mViewModel = new ViewModelProvider(this).get(VMCashCounter.class);
         infoModel = new CashCountInfoModel();
-        setContentView(R.layout.activity_cash_counter);
+
         initWidgets();
+
         if(getIntent().hasExtra("BranchCd")) {
             mViewModel.setBranchCd(getIntent().getStringExtra("BranchCd"));
         } else {
@@ -91,6 +95,7 @@ public class Activity_CashCounter extends AppCompatActivity {
                 @Override
                 public void OnRetrieve(List<EBranchInfo> list) {
                     poLoad.dismiss();
+
                     DialogCashCountBranch loBranch = new DialogCashCountBranch(Activity_CashCounter.this, list);
                     loBranch.initDialog(new DialogBranchSelection.OnBranchSelectedCallback() {
                         @Override
@@ -110,6 +115,7 @@ public class Activity_CashCounter extends AppCompatActivity {
                 public void OnFailed(String message) {
                     poLoad.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_error_24);
                     poMessage.setTitle("Cash Count");
                     poMessage.setMessage(message);
                     poMessage.setPositiveButton("Okay", (view, dialog) -> {
@@ -124,7 +130,6 @@ public class Activity_CashCounter extends AppCompatActivity {
         mViewModel.GetBranchCd().observe(Activity_CashCounter.this, branchCd -> mViewModel.GetBranchForCashCount(branchCd).observe(Activity_CashCounter.this, eBranchInfo -> {
             try {
                 lblBranch.setText(eBranchInfo.getBranchNm());
-//                lblAddxx.setText(eBranchInfo.getAddressx());
 
                 if(branchCd.isEmpty()){
                     btnNext.setEnabled(false);
@@ -374,6 +379,7 @@ public class Activity_CashCounter extends AppCompatActivity {
 
     private void ConfirmExist(){
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_contact_support_24);
         poMessage.setTitle("Cash Count");
         poMessage.setMessage("Exit cash count?");
         poMessage.setPositiveButton("Yes", (view, dialog) -> {

@@ -72,6 +72,7 @@ public class GoCasBuilder {
         poGOCas.PurchaseInfo().setAccountTerm(Integer.parseInt(loPurchase.getString("nAcctTerm")));
         poGOCas.PurchaseInfo().setDateApplied(loPurchase.getString("dAppliedx"));
         poGOCas.PurchaseInfo().setMonthlyAmortization(Double.parseDouble(loPurchase.getString("nMonAmort")));
+        poGOCas.PurchaseInfo().setRemarks(loPurchase.getString("sRemarksx"));
     }
 
     private void setupApplicantInfo() throws Exception{

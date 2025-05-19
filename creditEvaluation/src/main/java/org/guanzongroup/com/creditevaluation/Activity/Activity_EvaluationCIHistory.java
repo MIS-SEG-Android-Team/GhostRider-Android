@@ -92,7 +92,7 @@ public class Activity_EvaluationCIHistory extends AppCompatActivity {
     }
     private void initWidgets() {
         Toolbar toolbar = findViewById(R.id.toolbar_creditEvalutionList);
-        toolbar.setTitle("C.I Results");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         poDialogx = new LoadDialog(Activity_EvaluationCIHistory.this);

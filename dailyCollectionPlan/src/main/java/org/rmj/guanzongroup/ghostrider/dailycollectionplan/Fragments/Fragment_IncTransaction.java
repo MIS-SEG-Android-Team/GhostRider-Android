@@ -79,10 +79,12 @@ public class Fragment_IncTransaction extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         mViewModel = new ViewModelProvider(this).get(VMIncompleteTransaction.class);
         poDialog = new LoadDialog(requireActivity());
         poMessage = new MessageBox(requireActivity());
         poRem = new OtherRemCode();
+
         View view = inflater.inflate(R.layout.fragment_inc_transaction, container, false);
         initWidgets(view);
         initActivityResultLaunchers();
@@ -154,6 +156,7 @@ public class Fragment_IncTransaction extends Fragment {
                     @Override
                     public void OnSuccessResult() {
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("Daily Collection Plan");
                         poMessage.setMessage("Collection detail has been save.");
                         poMessage.setPositiveButton("Okay", (view, dialog) -> {
@@ -166,6 +169,7 @@ public class Fragment_IncTransaction extends Fragment {
                     @Override
                     public void OnFailedResult(String message) {
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Daily Collection Plan");
                         poMessage.setMessage(message);
                         poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -183,6 +187,7 @@ public class Fragment_IncTransaction extends Fragment {
             return;
         }
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("Daily Collection Plan");
         poMessage.setMessage("Please take a selfie with the customer or within the area of the customer.");
         poMessage.setPositiveButton("Okay", (view, dialog) -> {
@@ -208,6 +213,7 @@ public class Fragment_IncTransaction extends Fragment {
                 public void OnFailed(String message, Intent intent, String[] args) {
                     poDialog.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_contact_support_24);
                     poMessage.setTitle("Daily Collection Plan");
                     poMessage.setMessage(message + "\n Proceed taking selfie?");
                     poMessage.setPositiveButton("Continue", (view, dialog) -> {

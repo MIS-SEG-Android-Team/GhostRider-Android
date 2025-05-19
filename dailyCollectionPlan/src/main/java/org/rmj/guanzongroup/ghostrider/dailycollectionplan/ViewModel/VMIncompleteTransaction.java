@@ -22,6 +22,8 @@ import androidx.lifecycle.LiveData;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.obj.OTH;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
 import org.rmj.g3appdriver.etc.AppConstants;
+import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
 import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.OtherRemCode;
@@ -52,6 +54,7 @@ public class VMIncompleteTransaction extends AndroidViewModel {
     public void InitCameraLaunch(Activity activity, String TransNox, OnInitializeCameraCallback callback){
         ImageFileCreator loImage = new ImageFileCreator(instance, AppConstants.SUB_FOLDER_SELFIE_LOG, TransNox);
         String[] lsResult = new String[4];
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -65,35 +68,49 @@ public class VMIncompleteTransaction extends AndroidViewModel {
                     return null;
                 }
 
-                LocationRetriever loLrt = new LocationRetriever(instance, activity);
-                if(loLrt.HasLocation()){
-                    lsResult[0] = loImage.getFilePath();
-                    lsResult[1] = loImage.getFileName();
-                    lsResult[2] = loLrt.getLatitude();
-                    lsResult[3] = loLrt.getLongitude();
-                    Intent loIntent = loImage.getCameraIntent();
-                    loIntent.putExtra("result", true);
-                    return loIntent;
+                lsResult[0] = loImage.getFilePath();
+                lsResult[1] = loImage.getFileName();
+
+                String lsCompx = android.os.Build.MANUFACTURER.toLowerCase();
+                LocationRetriever.iLocationRetriever location;
+
+                if (!lsCompx.equalsIgnoreCase("huawei")) {
+                    location = new GmsLocationRetriever();
                 } else {
-                    lsResult[0] = loImage.getFilePath();
-                    lsResult[1] = loImage.getFileName();
-                    lsResult[2] = loLrt.getLatitude();
-                    lsResult[3] = loLrt.getLongitude();
-                    Intent loIntent = loImage.getCameraIntent();
-                    loIntent.putExtra("result", false);
-                    message = loLrt.getMessage();
-                    return loIntent;
+                    location = new HmsLocationRetriever();
                 }
+
+                location.GetLocation(instance, new LocationRetriever.OnRetrieveLocationListener() {
+                    @Override
+                    public void OnRetrieve(String latitude, String longitude) {
+
+                        lsResult[2] = latitude;
+                        lsResult[3] = longitude;
+
+                        Intent loIntent = loImage.getCameraIntent();
+                        loIntent.putExtra("result", true);
+
+                        callback.OnSuccess(loIntent, lsResult);
+                    }
+
+                    @Override
+                    public void OnFailed(String message, String latitude, String longitude) {
+
+                        lsResult[2] = latitude;
+                        lsResult[3] = longitude;
+
+                        Intent loIntent = loImage.getCameraIntent();
+                        loIntent.putExtra("result", false);
+
+                        callback.OnFailed(message, loIntent, lsResult);
+                    }
+                });
+
+                return null;
             }
 
             @Override
             public void OnPostExecute(Object object) {
-                Intent loResult = (Intent) object;
-                if(loResult.getBooleanExtra("result", false)){
-                    callback.OnSuccess(loResult, lsResult);
-                } else {
-                    callback.OnFailed(message, loResult, lsResult);
-                }
             }
         });
     }

@@ -13,14 +13,13 @@ package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rmj.g3appdriver.GRider.Constants.AppConstants;
+import org.rmj.g3appdriver.etc.AppConstants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.junit.Assert.*;
-import static org.rmj.g3appdriver.GRider.Constants.AppConstants.*;
 
 public class Fragment_PaidTransactionTest {
 
@@ -33,8 +32,8 @@ public class Fragment_PaidTransactionTest {
     public void newInstance() {
         boolean isPass = false;
         try {
-            Date loDate = new SimpleDateFormat("yyyy-MM-dd").parse(new AppConstants().CURRENT_DATE);
-            if (new SimpleDateFormat("yyyy-MM-dd").parse(new AppConstants().CURRENT_DATE).equals(loDate)) {
+            Date loDate = new SimpleDateFormat("yyyy-MM-dd").parse(new AppConstants().CURRENT_DATE());
+            if (new SimpleDateFormat("yyyy-MM-dd").parse(new AppConstants().CURRENT_DATE()).equals(loDate)) {
                 isPass = true;
             }
         } catch (ParseException e) {

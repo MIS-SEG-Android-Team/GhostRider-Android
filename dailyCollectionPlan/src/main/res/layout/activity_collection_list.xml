@@ -23,6 +23,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header_background"
         android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -52,7 +53,8 @@
                     android:layout_height="wrap_content"
                     android:text="Collection List"
                     android:fontFamily="@font/roboto"
-                    android:textSize="22sp"/>
+                    android:textSize="22sp"
+                    android:textStyle="bold"/>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/lbl_headerBranch"
@@ -89,10 +91,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="15dp">
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_collectionSearch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColorHint="@color/guanzon_text_grey"
+                    android:hint="@string/sHint_SearchDCp"
                     style="@style/TextInputStyleHeaders">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -102,7 +107,8 @@
                         android:inputType="textCapWords|textPersonName"
                         android:imeOptions="actionSearch"
                         android:maxLines="1"
-                        android:hint="@string/sHint_SearchDCp" />
+                        android:background="@color/white"
+                        android:textColor="@color/guanzon_text_grey"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 

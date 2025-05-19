@@ -45,12 +45,6 @@ public class Fragment_TermsAndConditions extends Fragment {
         return view;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-    }
-
     private void initViews(View v) {
 
     }

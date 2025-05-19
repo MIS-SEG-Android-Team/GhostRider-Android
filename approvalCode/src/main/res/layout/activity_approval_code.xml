@@ -78,7 +78,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.05" />
 
-            <androidx.viewpager.widget.ViewPager
+            <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewpager_approvalEntry"
                 android:layout_width="0dp"
                 android:layout_height="0dp"

@@ -89,6 +89,8 @@ public class ECreditApplicantInfo {
     private double DownPaym;
     @ColumnInfo(name = "cTranStat")
     private String TranStat;
+    @ColumnInfo(name = "sRemarksx")
+    private String Remarksx;
 
     public ECreditApplicantInfo() {
     }
@@ -364,5 +366,13 @@ public class ECreditApplicantInfo {
 
     public void setSameAddx(String sameAddx) {
         SameAddx = sameAddx;
+    }
+
+    public String getRemarksx() {
+        return Remarksx;
+    }
+
+    public void setRemarksx(String remarksx) {
+        Remarksx = remarksx;
     }
 }

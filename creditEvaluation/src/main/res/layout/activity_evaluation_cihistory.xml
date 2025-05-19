@@ -22,6 +22,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header_background"
         android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -84,7 +85,8 @@
                     style="@style/TextInputStyleHeaders"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Search Loan Applicant">
+                    android:hint="Search Loan Applicant"
+                    android:textColorHint="@color/guanzon_text_grey">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txt_ci_search"
@@ -94,7 +96,9 @@
                         android:fontFamily="@font/roboto"
                         android:imeOptions="actionDone"
                         android:inputType="textCapWords"
-                        android:maxLines="1" />
+                        android:maxLines="1"
+                        android:background="@color/white"
+                        android:textColor="@color/guanzon_text_grey"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 

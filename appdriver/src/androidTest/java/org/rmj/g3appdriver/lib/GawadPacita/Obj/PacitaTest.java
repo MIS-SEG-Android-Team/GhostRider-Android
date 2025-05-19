@@ -208,7 +208,7 @@ public class PacitaTest {
                             for(int x = 0; x < loRate.size(); x++){
                                 String lsTransNo = ePacitaEvaluation.getTransNox();
                                 randomNumber = random.nextInt(2); // generates a random integer either 0 or 1
-                                poSys.UpdateBranchRate(lsTransNo, loRate.get(x).getsRateIDxx(), String.valueOf(randomNumber));
+                                //poSys.UpdateBranchRate(lsTransNo, loRate.get(x).getsRateIDxx(), String.valueOf(randomNumber));
                             }
                         }
                     });

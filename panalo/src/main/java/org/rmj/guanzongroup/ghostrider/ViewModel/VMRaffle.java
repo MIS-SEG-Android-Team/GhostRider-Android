@@ -42,44 +42,6 @@ public class VMRaffle extends AndroidViewModel {
         new VMRaffle.GetRewardsTask(listener).execute(fnArgs);
     }
 
-    /*private class GetRewardsTask extends AsyncTask<Integer, Void, List<PanaloRewards>> {
-
-        private final VMRaffle.OnRetrieveRaffleListener listener;
-
-        private String message;
-
-        public GetRewardsTask(VMRaffle.OnRetrieveRaffleListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            listener.OnLoad("Panalo Rewards", "Checking rewards. Please wait...");
-        }
-
-        @Override
-        protected List<PanaloRewards> doInBackground(Integer... integers) {
-            String lsType = String.valueOf(integers[0]);
-            List<PanaloRewards> loResult = poSys.GetRewards(lsType);
-            if(loResult == null){
-                message = poSys.getMessage();
-
-                return null;
-            }
-            return loResult;
-        }
-
-        @Override
-        protected void onPostExecute(List<PanaloRewards> result) {
-            super.onPostExecute(result);
-            if(result == null){
-                listener.OnFailed(message);
-            } else {
-                listener.OnSuccess(result);
-            }
-        }
-    }*/
     private class GetRewardsTask{
         private final VMRaffle.OnRetrieveRaffleListener listener;
         private String message;
@@ -116,9 +78,5 @@ public class VMRaffle extends AndroidViewModel {
                 }
             });
         }
-    }
-
-    public void RedeemReward(){
-
     }
 }

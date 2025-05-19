@@ -13,6 +13,7 @@ package org.rmj.guanzongroup.ghostrider.epacss.Activity;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -29,13 +30,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
+import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeRole;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
@@ -47,6 +52,7 @@ import org.rmj.g3appdriver.GCircle.ImportData.ImportEmployeeRole;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Etc.FragmentAdapter;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_LogCollection;
+import org.rmj.guanzongroup.ghostrider.epacss.Dialog.DialogQrCode;
 import org.rmj.guanzongroup.ghostrider.epacss.Object.ChildObject;
 import org.rmj.guanzongroup.ghostrider.epacss.Object.ParentObject;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
@@ -72,26 +78,34 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     private Intent loIntent;
     private boolean cSlfiex;
 
+    private ShapeableImageView img_banner;
     private ImageView imgDept;
     private MaterialTextView lblDept;
     private ExpandableListDrawerAdapter listAdapter;
     private ExpandableListView expListView;
     private DrawerLayout drawer;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
 
     private final List<ParentObject> poParentLst = new ArrayList<>();
     private List<ChildObject> poChildLst;
     private final HashMap<ParentObject, List<ChildObject>> poChild = new HashMap<>();
 
+    private AppConfigPreference loConfig;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+
         mViewModel = new ViewModelProvider(this).get(VMMainActivity.class);
         poNetRecvr = mViewModel.getInternetReceiver();
-        setContentView(R.layout.activity_main);
+        loConfig = AppConfigPreference.getInstance(this);
+
         initWidgets();
         InitUserFeatures();
         initReceiver();
+        initPostedDCP();
 
         mViewModel.getEmployeeInfo().observe(this, eEmployeeInfo -> {
             try{
@@ -99,8 +113,13 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 imgDept.setImageResource(AppDeptIcon.getIcon(eEmployeeInfo.getDeptIDxx()));
                 lblDept.setText(DeptCode.getDepartmentName(eEmployeeInfo.getDeptIDxx()));
                 cSlfiex = eEmployeeInfo.getSlfieLog().equalsIgnoreCase("1");
+
                 Fragment[] loFragment = new Fragment[]{mViewModel.GetUserFragments(eEmployeeInfo)};
-                viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), loFragment));
+
+                FragmentAdapter loAdapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
+                loAdapter.initFragments(loFragment);
+
+                viewPager.setAdapter(loAdapter);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -109,18 +128,25 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
 
     private void InitUserFeatures(){
         mViewModel.getEmployeeRole().observe(this, roles -> {
+
             try{
                 mViewModel.getChildRoles().observe(this, childMenus -> {
+
                     poParentLst.clear();
                     poChild.clear();
+
                     for(int x = 0; x < roles.size(); x++){
                         EEmployeeRole loRole = roles.get(x);
                         ParentObject loParent = new ParentObject(loRole.getObjectNm(), loRole.getHasChild());
+
                         poParentLst.add(loParent);
                         poChildLst = new ArrayList<>();
+
                         for (int i = 0; i < childMenus.size(); i++){
+
                             EEmployeeRole loChild = childMenus.get(i);
                             String lsParent = loRole.getObjectNm();
+
                             if(lsParent.equalsIgnoreCase(loChild.getParentxx())){
                                 if("selfie log".equalsIgnoreCase(loChild.getObjectNm().toLowerCase(Locale.ROOT))) {
                                     if(cSlfiex || loChild.getRecdStat().equalsIgnoreCase("1")) {
@@ -145,6 +171,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                             loIntent = poParentLst.get(groupPosition).getIntent(Activity_Main.this);
                             if(loIntent == null){
                                 loMessage.initDialog();
+                                loMessage.setIcon(R.drawable.baseline_error_24);
                                 loMessage.setTitle("Dashboard");
                                 loMessage.setMessage("Feature not available.");
                                 loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -161,6 +188,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                         loIntent = poChild.get(poParentLst.get(groupPosition)).get(childPosition).getIntent(Activity_Main.this);
                         if(loIntent == null){
                             loMessage.initDialog();
+                            loMessage.setIcon(R.drawable.baseline_error_24);
                             loMessage.setTitle("Dashboard");
                             loMessage.setMessage("Feature not available.");
                             loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -203,9 +231,12 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View view = navigationView.getHeaderView(0);
+
         viewPager = findViewById(R.id.viewpager);
+        img_banner = view.findViewById(R.id.img_banner);
         imgDept = view.findViewById(R.id.img_deptLogo);
         lblDept = view.findViewById(R.id.lbl_deptNme);
+
         lblDept.setOnClickListener(v -> {
             ImportEmployeeRole loImport = new ImportEmployeeRole(getApplication());
             loImport.RefreshEmployeeRole(new ImportEmployeeRole.OnImportEmployeeRoleCallback() {
@@ -224,12 +255,51 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 public void OnFailed(String message) {
                     poDialog.dismiss();
                     loMessage.initDialog();
+                    loMessage.setIcon(R.drawable.baseline_error_24);
                     loMessage.setTitle("Guanzon Circle");
                     loMessage.setMessage(message);
                     loMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
                     loMessage.show();
                 }
             });
+        });
+        img_banner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmployeeSession poSession = EmployeeSession.getInstance(Activity_Main.this);
+                String imgLink = "https://webfsgk.guanzongroup.com.ph/empid/" + poSession.getEmployeeID() + ".png";
+
+                Log.d(TAG, poSession.getEmployeeID());
+
+                mViewModel.DisplayURLImage(imgLink, new VMMainActivity.onDownload() {
+                    @Override
+                    public void onLoad(String title, String message) {
+                        poDialog.initDialog(title, message, true);
+                        poDialog.show();
+                    }
+                    @Override
+                    public void onDisplay(Bitmap loImg) {
+                        poDialog.dismiss();
+
+                        DialogQrCode qrDialog = new DialogQrCode(Activity_Main.this);
+                        qrDialog.setBitmap(loImg);
+
+                        qrDialog.show();
+                    }
+                    @Override
+                    public void onFailed(String message) {
+                        poDialog.dismiss();
+
+                        loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_error_24);
+                        loMessage.setTitle("Employee QR");
+                        loMessage.setMessage(message);
+                        loMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+
+                        loMessage.show();
+                    }
+                });
+            }
         });
     }
 
@@ -244,8 +314,50 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     private void initReceiver(){
         IntentFilter loFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(poNetRecvr, loFilter);
+        
         AppConfigPreference.getInstance(Activity_Main.this).setIsMainActive(true);
         Log.e(TAG, "Internet status receiver has been registered.");
+    }
+
+    private void initPostedDCP(){
+        mViewModel.getLatestPostedDCP().observe(this, new Observer<EDCPCollectionMaster>() {
+            @Override
+            public void onChanged(EDCPCollectionMaster edcpCollectionMaster) {
+                if (edcpCollectionMaster != null){
+
+                    if (edcpCollectionMaster.getTranStat() != null){
+                        if (edcpCollectionMaster.getTranStat().equals("2")){
+
+                            if (edcpCollectionMaster.getSendStat() != null){
+
+                                if (edcpCollectionMaster.getSendStat().equals("1")){
+                                    //todo: set dcp status to posted
+                                    loConfig.setDCPStatus(true);
+                                }else {
+                                    //todo: set dcp status for posting
+                                    loConfig.setDCPStatus(false);
+                                }
+
+                            }else {
+                                //todo: set dcp status for posting
+                                loConfig.setDCPStatus(false);
+                            }
+
+                        }else {
+                            //todo: set dcp status for posting
+                            loConfig.setDCPStatus(false);
+                        }
+
+                    }else {
+                        //todo: set dcp status for posting
+                        loConfig.setDCPStatus(false);
+                    }
+                }else {
+                    //todo: set dcp status for posting
+                    loConfig.setDCPStatus(false);
+                }
+            }
+        });
     }
 
     @Override
@@ -266,6 +378,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }else{
@@ -275,6 +388,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 finish();
             });
             loMessage.setNegativeButton("No", (view, dialog) -> dialog.dismiss());
+            loMessage.setIcon(R.drawable.baseline_contact_support_24);
             loMessage.setTitle("Guanzon Circle");
             loMessage.setMessage("Exit Guanzon Circle app?");
             loMessage.show();
@@ -305,6 +419,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 AppConfigPreference.getInstance(Activity_Main.this).setIsAppFirstLaunch(false);
                 startActivity(new Intent(Activity_Main.this, Activity_SplashScreen.class));
             });
+            loMessage.setIcon(R.drawable.baseline_contact_support_24);
             loMessage.setTitle("Account Session");
             loMessage.setMessage("Are you sure you want to end session/logout?");
             loMessage.show();
@@ -315,8 +430,10 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         Log.e("request code:", String.valueOf(requestCode));
         Log.e("result code:", String.valueOf(resultCode));
+
         if(requestCode == AppConstants.INTENT_SELFIE_LOGIN && resultCode == RESULT_OK){
             Intent intent = new Intent(Activity_Main.this, Activity_Application.class);
             intent.putExtra("app", AppConstants.INTENT_SELFIE_LOGIN);

@@ -42,6 +42,7 @@
                 android:id="@+id/cl_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/gradient_header_background"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -50,7 +51,6 @@
                     android:id="@+id/img_bg_guanzon_orange"
                     android:layout_width="0dp"
                     android:layout_height="150dp"
-                    android:src="@drawable/bg_samsungknox"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

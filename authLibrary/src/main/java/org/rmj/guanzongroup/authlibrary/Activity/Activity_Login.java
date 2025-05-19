@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -111,6 +110,7 @@ public class Activity_Login extends AppCompatActivity implements LoginCallback {
         podialog.dismiss();
         MessageBox loMessage = new MessageBox(this);
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setTitle("Guanzon Circle");
         loMessage.setMessage(message);
         loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());

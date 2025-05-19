@@ -26,6 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.apprdiver.util.MiscUtil;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECodeApproval;
@@ -33,7 +35,6 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
-import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.Obj.LoanApproval;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.Obj.ManualLog;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.Obj.SystemCode;
@@ -47,11 +48,12 @@ public class ApprovalCode {
 
     private final DApprovalCode poDao;
 
-    private final EmployeeMaster poUser;
+    private final DSCARqstEmp poDaoRstEmp;
 
     public final Application instance;
 
     private final GCircleApi poApi;
+
     private final HttpHeaders poHeaders;
 
     private String message;
@@ -59,7 +61,7 @@ public class ApprovalCode {
     public ApprovalCode(Application instance) {
         this.instance = instance;
         this.poDao = GGC_GCircleDB.getInstance(instance).ApprovalDao();
-        this.poUser = new EmployeeMaster(instance);
+        this.poDaoRstEmp = GGC_GCircleDB.getInstance(instance).scaRqstEmpDao();
         this.poApi = new GCircleApi(instance);
         this.poHeaders = HttpHeaders.getInstance(instance);
     }
@@ -78,6 +80,116 @@ public class ApprovalCode {
                 return new LoanApproval(instance);
         }
         return null;
+    }
+
+    public boolean ImportSCARequest(){
+        try{
+            JSONObject params = new JSONObject();
+            params.put("descript", "all");
+            params.put("timestamp", "");
+            //params.put("bsearch", true);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlScaRequest(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+
+            JSONArray laJson = loResponse.getJSONArray("detail");
+
+            poDao.clear();
+            for (int x = 0; x < laJson.length(); x++) {
+
+                JSONObject loJson = laJson.getJSONObject(x);
+                ESCA_Request loDetail = poDao.GetApprovalCode(loJson.getString("sSCACodex"));
+
+                if(loDetail == null){
+                    if(loJson.getString("cRecdStat").equalsIgnoreCase("1")) {
+
+                        ESCA_Request info = new ESCA_Request();
+
+                        info.setSCACodex(loJson.getString("sSCACodex"));
+                        info.setSCATitle(loJson.getString("sSCATitle"));
+                        info.setSCADescx(loJson.getString("sSCADescx"));
+                        info.setSCATypex(loJson.getString("cSCATypex"));
+                        info.setAreaHead(loJson.getString("cAreaHead"));
+                        info.setHCMDeptx(loJson.getString("cHCMDeptx"));
+                        info.setCSSDeptx(loJson.getString("cCSSDeptx"));
+                        info.setComplnce(loJson.getString("cComplnce"));
+                        info.setMktgDept(loJson.getString("cMktgDept"));
+                        info.setASMDeptx(loJson.getString("cASMDeptx"));
+                        info.setTLMDeptx(loJson.getString("cTLMDeptx"));
+                        info.setSCMDeptx(loJson.getString("cSCMDeptx"));
+                        info.setRecdStat(loJson.getString("cRecdStat"));
+                        info.setTimeStmp(loJson.getString("dTimeStmp"));
+
+                        poDao.SaveSCARequest(info);
+                        Log.d(TAG, "SCA Request has been saved.");
+                    }
+                }
+            }
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
+    public boolean ImportSCARequestEmp(String timestamp){
+        try {
+            JSONObject params = new JSONObject();
+            params.put("timestamp", timestamp);
+
+            String lsResponse = WebClient.sendRequest(poApi.getDownloadSCARqstEmp(), params.toString(), poHeaders.getHeaders());
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }else {
+
+                JSONArray laJson = loResponse.getJSONArray("detail");
+
+                poDaoRstEmp.clear();
+                for (int x = 0; x < laJson.length(); x++) {
+                    JSONObject loObject = laJson.getJSONObject(x);
+                    ESCARqstEmp loVal = new ESCARqstEmp();
+
+                    loVal.setsSCACodex(loObject.get("sSCACodex").toString());
+                    loVal.setsEmployIDx(loObject.get("sEmployID").toString());
+                    loVal.setsRecdStat(loObject.get("cRecdStat").toString());
+                    loVal.setdTimeStmpx(loObject.get("dTimeStmp").toString());
+
+                    poDaoRstEmp.SaveRqstEmp(loVal);
+                }
+            }
+
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 
     public boolean UploadApprovalCode(){
@@ -149,89 +261,6 @@ public class ApprovalCode {
         }
     }
 
-    public boolean ImportSCARequest(){
-        try{
-            JSONObject params = new JSONObject();
-            params.put("bsearch", true);
-            params.put("id", "All");
-
-            String lsResponse = WebClient.sendRequest(
-                    poApi.getUrlScaRequest(),
-                    params.toString(),
-                    poHeaders.getHeaders());
-
-            if(lsResponse == null){
-                message = SERVER_NO_RESPONSE;
-                return false;
-            }
-
-            JSONObject loResponse = new JSONObject(lsResponse);
-            String lsResult = loResponse.getString("result");
-
-            if(lsResult.equalsIgnoreCase("error")){
-                JSONObject loError = loResponse.getJSONObject("error");
-                message = getErrorMessage(loError);;
-                return false;
-            }
-
-            JSONArray laJson = loResponse.getJSONArray("detail");
-            for (int x = 0; x < laJson.length(); x++) {
-                JSONObject loJson = laJson.getJSONObject(x);
-                ESCA_Request loDetail = poDao.GetApprovalCode(loJson.getString("sSCACodex"));
-
-                if(loDetail == null){
-                    if(loJson.getString("cRecdStat").equalsIgnoreCase("1")) {
-                        ESCA_Request info = new ESCA_Request();
-                        info.setSCACodex(loJson.getString("sSCACodex"));
-                        info.setSCATitle(loJson.getString("sSCATitle"));
-                        info.setSCADescx(loJson.getString("sSCADescx"));
-                        info.setSCATypex(loJson.getString("cSCATypex"));
-                        info.setAreaHead(loJson.getString("cAreaHead"));
-                        info.setHCMDeptx(loJson.getString("cHCMDeptx"));
-                        info.setCSSDeptx(loJson.getString("cCSSDeptx"));
-                        info.setComplnce(loJson.getString("cComplnce"));
-                        info.setMktgDept(loJson.getString("cMktgDept"));
-                        info.setASMDeptx(loJson.getString("cASMDeptx"));
-                        info.setTLMDeptx(loJson.getString("cTLMDeptx"));
-                        info.setSCMDeptx(loJson.getString("cSCMDeptx"));
-                        info.setRecdStat(loJson.getString("cRecdStat"));
-                        info.setTimeStmp(loJson.getString("dTimeStmp"));
-                        poDao.SaveSCARequest(info);
-                        Log.d(TAG, "SCA Request has been saved.");
-                    }
-                }
-//                else {
-//                    Date ldDate1 = SQLUtil.toDate(loDetail.getTimeStmp(), SQLUtil.FORMAT_TIMESTAMP);
-//                    Date ldDate2 = SQLUtil.toDate((String) loJson.get("dTimeStmp"), SQLUtil.FORMAT_TIMESTAMP);
-//                    if (!ldDate1.equals(ldDate2)) {
-//                        loDetail.setSCACodex(loJson.getString("sSCACodex"));
-//                        loDetail.setSCATitle(loJson.getString("sSCATitle"));
-//                        loDetail.setSCADescx(loJson.getString("sSCADescx"));
-//                        loDetail.setSCATypex(loJson.getString("cSCATypex"));
-//                        loDetail.setAreaHead(loJson.getString("cAreaHead"));
-//                        loDetail.setHCMDeptx(loJson.getString("cHCMDeptx"));
-//                        loDetail.setCSSDeptx(loJson.getString("cCSSDeptx"));
-//                        loDetail.setComplnce(loJson.getString("cComplnce"));
-//                        loDetail.setMktgDept(loJson.getString("cMktgDept"));
-//                        loDetail.setASMDeptx(loJson.getString("cASMDeptx"));
-//                        loDetail.setTLMDeptx(loJson.getString("cTLMDeptx"));
-//                        loDetail.setSCMDeptx(loJson.getString("cSCMDeptx"));
-//                        loDetail.setRecdStat(loJson.getString("cRecdStat"));
-//                        loDetail.setTimeStmp(loJson.getString("dTimeStmp"));
-//                        poDao.SaveSCARequest(loDetail);
-//                        Log.d(TAG, "SCA Request has been updated.");
-//                    }
-//                }
-            }
-
-            return true;
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return false;
-        }
-    }
-
     public LiveData<List<ESCA_Request>> getAuthorizedFeatures(String fsVal){
 
         EEmployeeInfo loUser = poDao.GetUserInfo();
@@ -247,10 +276,17 @@ public class ApprovalCode {
         String lsDeptIDx = loUser.getDeptIDxx();
         String lsPostion = loUser.getPositnID();
 
-        if (lsEmpLvID == 4 ||
+        /*if (lsEmpLvID == 4 ||
                 lsEmpLvID == 5 ||
                 loUser.getEmployID().equalsIgnoreCase("M00112000440")){
-            lsCondition  = "cAreaHead = '1'";
+            lsCondition  = "cAreaHead = '1'";*/
+
+        //todo: replaced the old validation above as requested
+        if (lsEmpLvID == 4 || loUser.getEmployID().equalsIgnoreCase("M00105000084")) {
+            lsCondition  = "cAreaHead = '1'"; //AREA HEAD, LEXTER OCAMPO
+        } else if (lsEmpLvID == 5 || loUser.getEmployID().equalsIgnoreCase("H00220000001")
+                || loUser.getEmployID().equalsIgnoreCase("M00111005387")) {
+            lsCondition  = "cAreaHead = '1'"; //GENERAL MANAGER, Tania Vanessa Cañete, MICHAEL CUISON
         } else{
             switch (lsDeptIDx){
                 case "021": //hcm
@@ -285,8 +321,17 @@ public class ApprovalCode {
             }
         }
 
-        if (!lsCondition.isEmpty()) lsSqlQryxx = MiscUtil.addCondition(lsSqlQryxx, lsCondition);
+        if (!lsCondition.isEmpty()){
+            lsSqlQryxx = MiscUtil.addCondition(lsSqlQryxx, lsCondition);
+        }
+
+        Log.d(TAG, lsSqlQryxx);
+
         return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
+    }
+
+    public String getLatestStamp(){
+        return poDaoRstEmp.GetLatestStamp();
     }
 
     public enum eSCA{

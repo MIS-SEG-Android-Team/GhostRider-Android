@@ -48,7 +48,7 @@ public class TestProductInquiry {
         AppConfigPreference.getInstance(instance).setProductID("gRider");
         this.poSys = new ProductInquiry(instance);
         poAuth = new AccountMaster(instance).initGuanzonApp().getInstance(Auth.AUTHENTICATE);
-        poAuth.DoAction(new UserAuthInfo("mikegarcia8748@gmail.com", "123456", "09171870011"));
+        poAuth.DoAction(new UserAuthInfo("mikegarcia8748@gmail.com", "123456"));
     }
 
     @Test

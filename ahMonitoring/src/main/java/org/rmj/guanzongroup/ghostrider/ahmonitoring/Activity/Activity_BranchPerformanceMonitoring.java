@@ -62,8 +62,11 @@ public class Activity_BranchPerformanceMonitoring extends AppCompatActivity {
         this.BranchCD = getIntent().getStringExtra("brnCD");
         this.BranchNM = getIntent().getStringExtra("brnNM");
         this.mViewModel = new ViewModelProvider(Activity_BranchPerformanceMonitoring.this).get(VMBranchPerformanceMonitor.class);
+
         setContentView(R.layout.activity_branch_performance_monitoring);
+
         Log.e("pinasa ko galing area", String.valueOf(getIntent().getStringExtra("brnCD")));
+
         Toolbar toolbar = findViewById(R.id.toolbar_monitoring);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -85,8 +88,8 @@ public class Activity_BranchPerformanceMonitoring extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("SP Sales"));
         tabLayout.addTab(tabLayout.newTab().setText("Job Order"));
 
-//        BranchCD = getIntent().getStringExtra("brnCD");
         lblBranch.setText(BranchNM);
+
         initMCSales();
         initTablayout();
     }

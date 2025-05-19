@@ -209,7 +209,7 @@ public class Activity_SpouseEmploymentInfo extends AppCompatActivity {
 
                     txtJobNme.setOnItemClickListener((parent, view, position, id) -> {
                         for (int x = 0; x < loList.size(); x++) {
-                            String lsLabel = loList.get(x).getOccptnNm();
+                            String lsLabel = loList.get(x).getOccptnNm().trim();
                             String lsSlctd = txtJobNme.getText().toString().trim();
                             if (lsSlctd.equalsIgnoreCase(lsLabel)) {
                                 mViewModel.getModel().setJobTitle(loList.get(x).getOccptnID());
@@ -236,8 +236,8 @@ public class Activity_SpouseEmploymentInfo extends AppCompatActivity {
         mViewModel.getModel().setCompanyName(Objects.requireNonNull(txtCompNm.getText()).toString());
         mViewModel.getModel().setsCountryN(Objects.requireNonNull(txtCntryx.getText()).toString());
         mViewModel.getModel().setCompanyAddress(Objects.requireNonNull(txtCompAd.getText()).toString());
-        mViewModel.getModel().setJobTitle(Objects.requireNonNull(txtJobNme.getText()).toString());
-        mViewModel.getModel().setSpecificJob(Objects.requireNonNull(txtSpcfJb.getText()).toString());
+        //mViewModel.getModel().setJobTitle(Objects.requireNonNull(mViewModel.getModel().getJobTitle()));
+        //mViewModel.getModel().setSpecificJob(Objects.requireNonNull(txtSpcfJb.getText()).toString());
 
         if (txtLngthS.getText().toString().isEmpty()) {
             mViewModel.getModel().setLengthOfService(0);
@@ -266,6 +266,7 @@ public class Activity_SpouseEmploymentInfo extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
                 poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
@@ -280,7 +281,7 @@ public class Activity_SpouseEmploymentInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpouseEmploymentInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Employment Info");
+        getSupportActionBar().setTitle("");
 
 
         rgSectorx = findViewById(R.id.rg_sector);

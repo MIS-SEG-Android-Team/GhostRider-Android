@@ -18,7 +18,6 @@ import com.google.android.material.textview.MaterialTextView;
 import org.guanzongroup.com.itinerary.Adapter.AdapterItineraries;
 import org.rmj.g3appdriver.GCircle.room.Entities.EItinerary;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
-import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.lib.Notifications.data.SampleData;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
 import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMHomeEngineering;
@@ -39,7 +38,6 @@ public class Fragment_Home_Engineering extends Fragment {
             lblSyncStat;
 
     private RecyclerView rvAnnouncement, rvItinerary, rvLeaveApp, rvBusTripApp;
-    private MessageBox loMessage;
 
     public static Fragment_Home_Engineering newInstance() {
         return new Fragment_Home_Engineering();
@@ -51,7 +49,7 @@ public class Fragment_Home_Engineering extends Fragment {
                              ViewGroup container, Bundle savedInstanceState){
         mViewModel = new ViewModelProvider(this).get(VMHomeEngineering.class);
         view = inflater.inflate(R.layout.fragment_home_engineering, container, false);
-        loMessage = new MessageBox(getActivity());
+
         initWidgets();
         initUserInfo();
         iniItineraries();

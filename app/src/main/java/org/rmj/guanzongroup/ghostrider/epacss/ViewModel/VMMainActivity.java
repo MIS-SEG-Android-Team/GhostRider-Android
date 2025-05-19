@@ -12,6 +12,8 @@
 package org.rmj.guanzongroup.ghostrider.epacss.ViewModel;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -19,8 +21,12 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
+import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
+import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeRole;
+import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.lib.Panalo.Obj.ILOVEMYJOB;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -31,6 +37,7 @@ import org.rmj.guanzongroup.ghostrider.epacss.ui.Dashboard.Fragment_BHDashboard;
 import org.rmj.guanzongroup.ghostrider.epacss.ui.Dashboard.Fragment_Dashboard;
 import org.rmj.guanzongroup.ghostrider.epacss.ui.Dashboard.Fragment_Eng_Dashboard;
 
+import java.net.URL;
 import java.util.List;
 
 public class VMMainActivity extends AndroidViewModel {
@@ -39,7 +46,9 @@ public class VMMainActivity extends AndroidViewModel {
     private final DataSyncService poNetRecvr;
     private final EmployeeMaster poUser;
     private final ILOVEMYJOB poPanalo;
+    private Bitmap bmp;
     private String message;
+    private LRDcp poDCP;
 
     public VMMainActivity(@NonNull Application application) {
         super(application);
@@ -47,6 +56,7 @@ public class VMMainActivity extends AndroidViewModel {
         this.poNetRecvr = new DataSyncService(app);
         this.poUser = new EmployeeMaster(app);
         this.poPanalo = new ILOVEMYJOB(app);
+        this.poDCP = new LRDcp(application);
     }
 
     public DataSyncService getInternetReceiver() {
@@ -63,6 +73,10 @@ public class VMMainActivity extends AndroidViewModel {
 
     public LiveData<EEmployeeInfo> getEmployeeInfo() {
         return poUser.GetEmployeeInfo();
+    }
+
+    public LiveData<EDCPCollectionMaster> getLatestPostedDCP(){
+        return poDCP.GetPostedDCP();
     }
 
     public Fragment GetUserFragments(EEmployeeInfo args) {
@@ -88,7 +102,6 @@ public class VMMainActivity extends AndroidViewModel {
     }
 
     public void ResetRaffleStatus() {
-//        new ResetPanaloStatusTask().execute();
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
@@ -105,18 +118,46 @@ public class VMMainActivity extends AndroidViewModel {
             }
         });
     }
+
+    public void DisplayURLImage(String urlink, onDownload callback){
+        TaskExecutor.Execute(urlink, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.onLoad("Employee QR", "Downloading QR");
+            }
+            @Override
+            public Object DoInBackground(Object args) {
+                try {
+                    URL url = new URL(args.toString());
+                    bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+
+                    if (bmp != null){
+                        return true;
+                    }else {
+                        message = "No generated QR for employee";
+                        return false;
+                    }
+
+                }catch (Exception e){
+                    message = "No generated QR for employee";
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+            @Override
+            public void OnPostExecute(Object object) {
+                Boolean aBoolean = (Boolean) object;
+                if(aBoolean){
+                    callback.onDisplay(bmp);
+                }else {
+                    callback.onFailed(message);
+                }
+            }
+        });
+    }
+    public interface onDownload{
+        void onLoad(String title, String message);
+        void onDisplay(Bitmap loImg);
+        void onFailed(String message);
+    }
 }
-//    private class ResetPanaloStatusTask extends AsyncTask<Void, Void, Boolean>{
-//
-//        private String message;
-//
-//        @Override
-//        protected Boolean doInBackground(Void... voids) {
-//            if(!poPanalo.ResetRaffleStatus()){
-//                message = poPanalo.getMessage();
-//                return false;
-//            }
-//            return true;
-//        }
-//    }
-//}
