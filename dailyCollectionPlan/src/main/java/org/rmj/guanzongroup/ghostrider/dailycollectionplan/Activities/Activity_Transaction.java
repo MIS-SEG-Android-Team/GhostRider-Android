@@ -126,6 +126,7 @@ public class Activity_Transaction extends AppCompatActivity {
             return 1;
         }
     }
+
     private Fragment getTransactionFragment(String transaction){
         if(transaction.equalsIgnoreCase("Paid")){
             return new Fragment_PaidTransaction();
@@ -133,7 +134,6 @@ public class Activity_Transaction extends AppCompatActivity {
             return new Fragment_PromiseToPay();
         } else if(transaction.equalsIgnoreCase("Customer Not Around")){
             return new Fragment_CustomerNotAround();
-//            return new Fragment_CustomerNotAround();
         } else if(transaction.equalsIgnoreCase("Loan Unit") ||
                 transaction.equalsIgnoreCase("False Ownership") ||
                 transaction.equalsIgnoreCase("Transferred/Assumed")){
@@ -145,9 +145,15 @@ public class Activity_Transaction extends AppCompatActivity {
                 transaction.equalsIgnoreCase("Missing Unit") ||
                 transaction.equalsIgnoreCase("Missing Client and Unit") ||
                 transaction.equalsIgnoreCase("Did Not Pay") ||
-                transaction.equalsIgnoreCase("Not Visited") ||
-                transaction.equalsIgnoreCase("Others")){
-            return new Fragment_IncTransaction();
+                transaction.equalsIgnoreCase("Not Visited")){
+
+            Fragment_IncTransaction fragmentTrans = new Fragment_IncTransaction();
+
+            Bundle params = new Bundle();
+            params.putString("transaction", transaction);
+
+            fragmentTrans.setArguments(params);
+            return fragmentTrans;
         }
         return null;
     }

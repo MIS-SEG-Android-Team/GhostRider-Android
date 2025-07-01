@@ -191,6 +191,7 @@ public class VMCustomerNotAround extends AndroidViewModel {
     }
 
     public void SaveTransaction(CustomerNotAround foVal, ViewModelCallback callback){
+
         TaskExecutor.Execute(foVal, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {

@@ -70,7 +70,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/lbl_totalCollected"
@@ -139,12 +140,12 @@
                 android:orientation="vertical">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_collectionDate"
                     style="@style/TextInputStyleHeaders"
+                    android:id="@+id/til_collectionDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Date"
-                    android:textColorHint="@color/guanzon_text_grey">
+                    android:textColorHint="?attr/colorPrimary">
 
                     <com.google.android.material.textfield.TextInputEditText
                         style="@style/TextInputStyle.Edittext"
@@ -154,7 +155,6 @@
                         android:focusable="false"
                         android:focusableInTouchMode="false"
                         android:focusedByDefault="false"
-                        tools:targetApi="o"
                         android:textColor="@color/guanzon_text_grey"
                         android:background="@color/white"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -166,7 +166,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:hint="Search Customer's name"
-                    android:textColorHint="@color/guanzon_text_grey">
+                    android:textColorHint="?attr/colorPrimary">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txt_collectionSearch"
@@ -176,6 +176,7 @@
                         android:inputType="textCapWords|textPersonName"
                         android:maxLines="1"
                         android:background="@color/white"
+                        android:text=""
                         android:textColor="@color/guanzon_text_grey"
                         android:textCursorDrawable="@drawable/white_cursor" />
                 </com.google.android.material.textfield.TextInputLayout>

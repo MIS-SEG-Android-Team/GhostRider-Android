@@ -25,6 +25,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,10 +38,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,7 +54,6 @@ import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
-import org.rmj.g3appdriver.lib.Account.pojo.AccountInfo;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCounter;
 import org.rmj.guanzongroup.petmanager.Adapter.TimeLogAdapter;
 import org.rmj.guanzongroup.petmanager.Dialog.DialogBranchSelection;
@@ -66,11 +64,9 @@ import org.rmj.guanzongroup.petmanager.ViewModel.VMSelfieLog;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class Fragment_SelfieLog extends Fragment {
@@ -92,8 +88,10 @@ public class Fragment_SelfieLog extends Fragment {
 
     private ActivityResultLauncher<Intent> poCamera;
 
-    private ActivityResultLauncher<String[]> poRequest;
-
+    private interface OnDialogButtonCallback{
+        void OnPositive();
+        void OnNegative();
+    }
 
     public static Fragment_SelfieLog newInstance() {
         return new Fragment_SelfieLog();
@@ -152,57 +150,6 @@ public class Fragment_SelfieLog extends Fragment {
             StartTime.show();
         });
 
-        mViewModel.GetSelectedDate().observe(getViewLifecycleOwner(), date -> {
-            try{
-                mViewModel.GetTimeLogForTheDay(date).observe(getViewLifecycleOwner(), eLog_selfies -> {
-                    TimeLogAdapter logAdapter = new TimeLogAdapter(eLog_selfies, new TimeLogAdapter.OnTimeLogActionListener() {
-                        @Override
-                        public void OnImagePreview(String sTransNox) {
-
-                        }
-
-                        @Override
-                        public void OnClickResend(String TransNox) {
-                            mViewModel.ResendTimeIn(TransNox, new VMSelfieLog.OnLoginTimekeeperListener() {
-                                @Override
-                                public void OnLogin() {
-                                    poLoad.initDialog("Selfie Log", "Sending your selfie log. Please wait...", false);
-                                    poLoad.show();
-                                }
-
-                                @Override
-                                public void OnSuccess(String args) {
-                                    poLoad.dismiss();
-                                }
-
-                                @Override
-                                public void SaveOffline(String args) {
-
-                                }
-
-                                @Override
-                                public void OnFailed(String message) {
-                                    poLoad.dismiss();
-                                    poMessage.setIcon(R.drawable.baseline_error_24);
-                                    poMessage.initDialog();
-                                    poMessage.setTitle("Selfie Login");
-                                    poMessage.setMessage(message);
-                                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                                    poMessage.show();
-                                }
-                            });
-                        }
-                    });
-                    LinearLayoutManager loManager = new LinearLayoutManager(requireActivity());
-                    loManager.setOrientation(RecyclerView.VERTICAL);
-                    recyclerView.setLayoutManager(loManager);
-                    recyclerView.setAdapter(logAdapter);
-                });
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        });
-
         btnBranch.setOnClickListener(v -> mViewModel.CheckBranchList(new VMSelfieLog.OnBranchCheckListener() {
             @Override
             public void OnCheck() {
@@ -246,21 +193,19 @@ public class Fragment_SelfieLog extends Fragment {
                             public void OnFailed(String message) {
                                 poLoad.dismiss();
 
-                                poMessage.initDialog();
-                                poMessage.setIcon(R.drawable.baseline_error_24);
-                                poMessage.setTitle("Selfie Login");
-                                poMessage.setMessage(message);
-                                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                                poMessage.show();
+                                InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+                                    @Override
+                                    public void OnPositive() {}
+                                    @Override
+                                    public void OnNegative() {}
+                                });
                             }
                         });
                         dialog.dismiss();
                     }
 
                     @Override
-                    public void OnCancel() {
-
-                    }
+                    public void OnCancel() {}
                 });
             }
 
@@ -271,6 +216,7 @@ public class Fragment_SelfieLog extends Fragment {
         }));
 
         btnCamera.setOnClickListener(v -> {
+
             if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -282,7 +228,124 @@ public class Fragment_SelfieLog extends Fragment {
             }
         });
 
+        mViewModel.GetSelectedDate().observe(getViewLifecycleOwner(), date -> {
+            try{
+                mViewModel.GetTimeLogForTheDay(date).observe(getViewLifecycleOwner(), eLog_selfies -> {
+                    TimeLogAdapter logAdapter = new TimeLogAdapter(eLog_selfies, new TimeLogAdapter.OnTimeLogActionListener() {
+                        @Override
+                        public void OnImagePreview(String sTransNox) {
+
+                        }
+
+                        @Override
+                        public void OnClickResend(String TransNox) {
+                            mViewModel.ResendTimeIn(TransNox, new VMSelfieLog.OnLoginTimekeeperListener() {
+                                @Override
+                                public void OnLogin() {
+                                    poLoad.initDialog("Selfie Log", "Sending your selfie log. Please wait...", false);
+                                    poLoad.show();
+                                }
+
+                                @Override
+                                public void OnSuccess(String args) {
+                                    poLoad.dismiss();
+                                }
+
+                                @Override
+                                public void SaveOffline(String args) {}
+
+                                @Override
+                                public void OnFailed(String message) {
+                                    poLoad.dismiss();
+
+                                    InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+                                        @Override
+                                        public void OnPositive() {}
+                                        @Override
+                                        public void OnNegative() {}
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    LinearLayoutManager loManager = new LinearLayoutManager(requireActivity());
+                    loManager.setOrientation(RecyclerView.VERTICAL);
+
+                    recyclerView.setLayoutManager(loManager);
+                    recyclerView.setAdapter(logAdapter);
+                });
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
         return view;
+    }
+
+    private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnDialogButtonCallback callback){
+
+        poMessage.initDialog();
+        poMessage.setTitle("Selfie Login");
+        poMessage.setIcon(statusIcon);
+        poMessage.setMessage(message);
+
+        poMessage.setPositiveButton(posText, (view, dialog) -> {
+            dialog.dismiss();
+            callback.OnPositive();
+        });
+
+        if (messageType == 1){
+            poMessage.setNegativeButton(negText, (view, dialog) -> {
+                dialog.dismiss();
+                callback.OnNegative();
+
+            });
+        }
+
+        poMessage.show();
+    }
+
+    private void showDCPDisclosure(){
+
+        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
+            @Override
+            public void onAccept() {
+                dialogDisclosure.dismiss();
+
+                if (checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                        checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                        checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+
+                    Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    appSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    appSettings.setData(Uri.parse("package:" + requireActivity().getPackageName()));
+                    startActivity(appSettings);
+
+                }
+            }
+
+            @Override
+            public void onDecline() {
+                dialogDisclosure.dismiss();
+
+                MessageBox loMessage = new MessageBox(requireActivity());
+                loMessage.setIcon(R.drawable.baseline_error_24);
+                loMessage.initDialog();
+                loMessage.setTitle("Disclosure");
+                loMessage.setMessage("Disclosure denied. Selfie log cancelled.");
+                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                    }
+                });
+
+                loMessage.show();
+            }
+        });
+
+        dialogDisclosure.setMessage("Guanzon Circle requires location and camera permission to take selfie log when the app is in use.");
+        dialogDisclosure.show();
     }
 
     private void initWidgets(View view){
@@ -299,59 +362,46 @@ public class Fragment_SelfieLog extends Fragment {
     @SuppressLint("MissingPermission")
     private void validateSelfieLog(){
         try {
-            if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                poRequest.launch(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION});
-            } else {
+            mViewModel.ValidateSelfieBranch(poSelfie.getBranchCode(), new VMSelfieLog.OnValidateSelfieBranch() {
+                @Override
+                public void OnValidate() {
+                    poLoad.initDialog("Selfie Log", "Validating entry. Please wait...", false);
+                    poLoad.show();
+                }
 
-                mViewModel.ValidateSelfieBranch(poSelfie.getBranchCode(), new VMSelfieLog.OnValidateSelfieBranch() {
-                    @Override
-                    public void OnValidate() {
-                        poLoad.initDialog("Selfie Log", "Validating entry. Please wait...", false);
-                        poLoad.show();
-                    }
+                @Override
+                public void OnSuccess() {
+                    poLoad.dismiss();
+                    InitCamera("");
+                }
 
-                    @Override
-                    public void OnSuccess() {
-                        poLoad.dismiss();
-                        InitCamera("");
-                    }
+                @Override
+                public void OnRequireRemarks() {
+                    poLoad.dismiss();
 
-                    @Override
-                    public void OnRequireRemarks() {
-                        poLoad.dismiss();
+                    new DialogSelfieLogRemarks(requireActivity()).initDialog(new DialogSelfieLogRemarks.OnDialogRemarksEntry() {
+                        @Override
+                        public void OnConfirm(String args) {
+                            InitCamera(args);
+                        }
 
-                        new DialogSelfieLogRemarks(requireActivity()).initDialog(new DialogSelfieLogRemarks.OnDialogRemarksEntry() {
-                            @Override
-                            public void OnConfirm(String args) {
-                                InitCamera(args);
-                            }
+                        @Override
+                        public void OnCancel() {}
+                    });
+                }
 
-                            @Override
-                            public void OnCancel() {
+                @Override
+                public void OnFailed(String message) {
+                    poLoad.dismiss();
 
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void OnFailed(String message) {
-                        poLoad.dismiss();
-                        poMessage.initDialog();
-                        poMessage.setIcon(R.drawable.baseline_error_24);
-                        poMessage.setTitle("Selfie Login");
-                        poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                            dialog.dismiss();
-                            if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
-                                requireActivity().finish();
-                            }
-                        });
-                        poMessage.show();
-                    }
-                });
-            }
+                    InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+                        @Override
+                        public void OnPositive() {}
+                        @Override
+                        public void OnNegative() {}
+                    });
+                }
+            });
         } catch(RuntimeException e) {
             e.printStackTrace();
         }
@@ -393,23 +443,21 @@ public class Fragment_SelfieLog extends Fragment {
             @Override
             public void OnFailed(String message, Intent intent, String[] args) {
                 poLoad.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_contact_support_24);
-                poMessage.setTitle("Selfie Login");
-                poMessage.setMessage(message + "\n Proceed taking selfie log?");
-                poMessage.setPositiveButton("Continue", (view, dialog) -> {
-                    dialog.dismiss();
 
-                    poSelfie.setLocation(args[0]);
-                    poSelfie.setFileName(args[1]);
-                    poSelfie.setLongitude(args[2]);
-                    poSelfie.setLatitude(args[3]);
+                InitMessage(1, R.drawable.baseline_error_24, message + "\n Proceed taking selfie log?", "Continue", "Cancel", new OnDialogButtonCallback() {
+                    @Override
+                    public void OnPositive() {
+                        poSelfie.setLocation(args[0]);
+                        poSelfie.setFileName(args[1]);
+                        poSelfie.setLongitude(args[2]);
+                        poSelfie.setLatitude(args[3]);
 
-                    poCamera.launch(intent);
+                        poCamera.launch(intent);
+                    }
+
+                    @Override
+                    public void OnNegative() {}
                 });
-
-                poMessage.setNegativeButton("Cancel", (view1, dialog) -> dialog.dismiss());
-                poMessage.show();
             }
         });
     }
@@ -440,101 +488,59 @@ public class Fragment_SelfieLog extends Fragment {
             @Override
             public void OnWarning(String message) {
                 poLoad.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_contact_support_24);
-                poMessage.setTitle("Selfie Login");
 
-                poMessage.setMessage("A Cash count entry for current branch already exist on local device. Create another entry?");
-                poMessage.setPositiveButton("Create", (view, dialog) -> {
-                    Intent loIntent = new Intent(requireActivity(), Activity_CashCounter.class);
-                    loIntent.putExtra("BranchCd", poSelfie.getBranchCode());
-                    requireActivity().startActivity(loIntent);
-                    if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
-                        requireActivity().finish();
-                    }
-                });
+                InitMessage(1, R.drawable.baseline_contact_support_24, "A Cash count entry for current branch already exist on local device. Create another entry?",
+                        "Create", "Exit", new OnDialogButtonCallback() {
+                            @Override
+                            public void OnPositive() {
+                                Intent loIntent = new Intent(requireActivity(), Activity_CashCounter.class);
 
-                poMessage.setNegativeButton("Exit", (view, dialog) -> {
-                    if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
-                        requireActivity().finish();
-                    }
-                });
+                                loIntent.putExtra("BranchCd", poSelfie.getBranchCode());
+                                requireActivity().startActivity(loIntent);
 
-                poMessage.show();
+                                if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
+                                    requireActivity().finish();
+                                }
+                            }
+
+                            @Override
+                            public void OnNegative() {
+                                if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
+                                    requireActivity().finish();
+                                }
+                            }
+                        });
             }
 
             @Override
             public void OnFailed(String message) {
                 poLoad.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_error_24);
-                poMessage.setTitle("Selfie Login");
-                poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                    dialog.dismiss();
-                    if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
-                        requireActivity().finish();
+
+                InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+                    @Override
+                    public void OnPositive() {
+                        if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
+                            requireActivity().finish();
+                        }
                     }
+
+                    @Override
+                    public void OnNegative() {}
                 });
-                poMessage.show();
             }
 
             @Override
             public void OnUnauthorize(String message) {
                 poLoad.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_message_24);
-                poMessage.setTitle("Selfie Log");
-                poMessage.setMessage("Selfie log save.");
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                poMessage.show();
-            }
-        });
-    }
 
-    private void showDCPDisclosure(){
-        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
-            @Override
-            public void onAccept() {
-                dialogDisclosure.dismiss();
-
-                List<String> lsPermissions = new ArrayList<>();
-
-                if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                    lsPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-                }
-                if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                    lsPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-                }
-                if(ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                    lsPermissions.add(Manifest.permission.CAMERA);
-                }
-
-                poRequest.launch(lsPermissions.toArray(new String[0]));
-            }
-
-            @Override
-            public void onDecline() {
-                dialogDisclosure.dismiss();
-
-                MessageBox loMessage = new MessageBox(requireActivity());
-                loMessage.setIcon(R.drawable.baseline_error_24);
-                loMessage.initDialog();
-                loMessage.setTitle("Disclosure");
-                loMessage.setMessage("Disclosure denied. Selfie log cancelled.");
-                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                InitMessage(0, R.drawable.baseline_message_24, "Selfie log save.", "Okay", "", new OnDialogButtonCallback() {
                     @Override
-                    public void OnButtonClick(View view, AlertDialog dialog) {
-                        dialog.dismiss();
-                    }
+                    public void OnPositive() {}
+                    @Override
+                    public void OnNegative() {}
                 });
-
-                loMessage.show();
             }
         });
-
-        dialogDisclosure.setMessage("Guanzon Circle requires location and camera permission to take selfie log when the app is in use.");
-        dialogDisclosure.show();
     }
 
     private void InitActivityResultLaunchers(){
@@ -567,60 +573,36 @@ public class Fragment_SelfieLog extends Fragment {
                         }
 
                         //TODO: 3. VALIDATE SAVED COORDINATES
-
                         if (poSelfie.getLongitude() == null || poSelfie.getLatitude() == null){
-
-                            poMessage.initDialog();
-                            poMessage.setTitle("Selfie Log");
-                            poMessage.setIcon(R.drawable.baseline_error_24);
-                            poMessage.setMessage("Unable to get location coordinates. Please inform your superior for this matter.");
-                            poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                            InitMessage(0, R.drawable.baseline_error_24, "Unable to get location coordinates. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
                                 @Override
-                                public void OnButtonClick(View view, AlertDialog dialog) {
-                                    dialog.dismiss();
-                                }
+                                public void OnPositive() {}
+
+                                @Override
+                                public void OnNegative() {}
                             });
-
-                            poMessage.show();
-
                             return;
-
                         }
 
                         if (poSelfie.getLongitude().isEmpty() || poSelfie.getLatitude().isEmpty()){
-
-                            poMessage.initDialog();
-                            poMessage.setTitle("Selfie Log");
-                            poMessage.setIcon(R.drawable.baseline_error_24);
-                            poMessage.setMessage("Unable to get location coordinates. Please inform your superior for this matter.");
-                            poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                            InitMessage(0, R.drawable.baseline_error_24, "Location coordinates is empty. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
                                 @Override
-                                public void OnButtonClick(View view, AlertDialog dialog) {
-                                    dialog.dismiss();
-                                }
+                                public void OnPositive() {}
+
+                                @Override
+                                public void OnNegative() {}
                             });
-
-                            poMessage.show();
-
                             return;
                         }
 
-                        if (poSelfie.getLongitude().equalsIgnoreCase("0.00000000000") ||
-                                poSelfie.getLatitude().equalsIgnoreCase("0.00000000000")) {
-
-                            poMessage.initDialog();
-                            poMessage.setTitle("Selfie Log");
-                            poMessage.setIcon(R.drawable.baseline_error_24);
-                            poMessage.setMessage("Unable to get location coordinates. Please inform your superior for this matter.");
-                            poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                        if (poSelfie.getLongitude().equalsIgnoreCase("0.00000000000") || poSelfie.getLatitude().equalsIgnoreCase("0.00000000000")) {
+                            InitMessage(0, R.drawable.baseline_error_24, "Location coordinates is invalid. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
                                 @Override
-                                public void OnButtonClick(View view, AlertDialog dialog) {
-                                    dialog.dismiss();
-                                }
+                                public void OnPositive() {}
+
+                                @Override
+                                public void OnNegative() {}
                             });
-
-                            poMessage.show();
-
                             return;
                         }
 
@@ -649,32 +631,26 @@ public class Fragment_SelfieLog extends Fragment {
                             @Override
                             public void OnFailed(String message) {
                                 poLoad.dismiss();
-                                poMessage.initDialog();
-                                poMessage.setIcon(R.drawable.baseline_error_24);
-                                poMessage.setTitle("Selfie Log");
-                                poMessage.setMessage(message);
-                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                                poMessage.show();
+
+                                InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+                                    @Override
+                                    public void OnPositive() {}
+
+                                    @Override
+                                    public void OnNegative() {}
+                                });
                             }
+                        });
+                    }else {
+                        InitMessage(0, R.drawable.baseline_error_24, "Error capturing image", "Okay", "", new OnDialogButtonCallback() {
+                            @Override
+                            public void OnPositive() {}
+                            @Override
+                            public void OnNegative() {}
                         });
                     }
                 } catch (Exception e){
                     e.printStackTrace();
-                }
-            }
-        });
-
-        poRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
-            @Override
-            public void onActivityResult(Map<String, Boolean> result) {
-                if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-
-                    showDCPDisclosure();
-
-                } else {
-                    validateSelfieLog();
                 }
             }
         });

@@ -66,4 +66,14 @@ public class OTH extends LRDcp {
             return false;
         }
     }
+
+    @Override
+    public void UpdateCollection(EDCPCollectionDetail foVal) {
+        super.UpdateCollection(foVal);
+    }
+
+    @Override
+    public EDCPCollectionDetail GetCollectionForTransaction(String TransNox, String AccountNo, String EntryNox) {
+        return super.GetCollectionForTransaction(TransNox, AccountNo, EntryNox);
+    }
 }

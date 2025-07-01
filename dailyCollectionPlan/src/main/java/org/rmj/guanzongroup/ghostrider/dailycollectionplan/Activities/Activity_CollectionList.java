@@ -99,18 +99,11 @@ public class Activity_CollectionList extends AppCompatActivity {
 
     private String FILENAME;
 
-    private static final int MOBILE_DIALER = 104;
-    private static final int PICK_TEXT_FILE = 105;
-    private static final int EXPORT_TEXT_FILE = 106;
-
-    private final String FILE_TYPE = "-mob.txt";
-    private String fileContent= "";
-
     private ActivityResultLauncher<String[]> poRequest;
 
     private final ActivityResultLauncher<Intent> poImport = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if(result.getResultCode() == RESULT_OK){
-            Intent loIntent = result.getData();
+//            Intent loIntent = result.getData();
 //            Uri uri = loIntent.getData();
 //            importDataFromFile(uri);
         }
@@ -121,7 +114,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         public void onActivityResult(ActivityResult result) {
             if(result.getResultCode() == RESULT_OK){
                 Intent loIntent = result.getData();
-                Uri uri = loIntent.getData();
+//                Uri uri = loIntent.getData();
 //                exportCollectionList(uri, poDcpData);
 //                mViewModel.setExportedDCP(false);
             }

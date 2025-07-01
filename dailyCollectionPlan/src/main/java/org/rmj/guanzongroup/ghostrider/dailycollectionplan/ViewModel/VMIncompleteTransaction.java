@@ -25,7 +25,6 @@ import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
 import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
 import org.rmj.g3appdriver.lib.Location.LocationRetriever;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.OtherRemCode;
 import org.rmj.g3appdriver.etc.ImageFileCreator;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
@@ -51,7 +50,16 @@ public class VMIncompleteTransaction extends AndroidViewModel {
         return poSys.GetAccountDetailForTransaction(TransNox, AccountNo, EntryNox);
     }
 
+    public void UpdateCollection(EDCPCollectionDetail foVal) {
+        poSys.UpdateCollection(foVal);
+    }
+
+    public EDCPCollectionDetail GetCollectionForTransaction(String TransNox, String AccountNo, String EntryNox) {
+        return poSys.GetCollectionForTransaction(TransNox, AccountNo, EntryNox);
+    }
+
     public void InitCameraLaunch(Activity activity, String TransNox, OnInitializeCameraCallback callback){
+
         ImageFileCreator loImage = new ImageFileCreator(instance, AppConstants.SUB_FOLDER_SELFIE_LOG, TransNox);
         String[] lsResult = new String[4];
 
@@ -116,6 +124,7 @@ public class VMIncompleteTransaction extends AndroidViewModel {
     }
 
     public void SaveTransaction(OtherRemCode foVal, ViewModelCallback callback){
+
         TaskExecutor.Execute(foVal, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
