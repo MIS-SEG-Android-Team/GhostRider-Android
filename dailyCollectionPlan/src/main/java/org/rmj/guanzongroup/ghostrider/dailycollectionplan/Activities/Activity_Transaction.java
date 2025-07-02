@@ -11,8 +11,11 @@
 
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
@@ -22,6 +25,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
+
+import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_CustomerNotAround;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_IncTransaction;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_LoanUnit;
@@ -91,6 +96,20 @@ public class Activity_Transaction extends AppCompatActivity {
         FragmentAdapter loAdapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
         loAdapter.initFragment(getTransactionFragment(Remarksx));
         viewPager.setAdapter(loAdapter);
+
+        helpbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent loIntent = new Intent(Intent.ACTION_VIEW);
+                loIntent.setDataAndTypeAndNormalize(
+                        Uri.parse(AppConfigPreference.getInstance(Activity_Transaction.this).getAppServer() +
+                                "usermanuals/DCP%20Camera%20and%20Location.pdf"),
+                        "application/pdf");
+                loIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(loIntent);
+            }
+        });
     }
 
     @Override

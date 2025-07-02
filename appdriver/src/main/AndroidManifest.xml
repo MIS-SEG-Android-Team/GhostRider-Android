@@ -18,7 +18,7 @@
 
     <application android:usesCleartextTraffic="true">
         <activity
-            android:name=".etc.ProgressBar.Dialog_Toolkit"
+            android:name="org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_Manual"
             android:exported="false" />
     </application>
 

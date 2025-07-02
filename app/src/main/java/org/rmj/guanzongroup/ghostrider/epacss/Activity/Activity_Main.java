@@ -409,6 +409,8 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
         if(item.getItemId() == R.id.action_settings){
             startActivity(new Intent(Activity_Main.this, Activity_Settings.class));
             overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+        } else if (item.getItemId() == R.id.action_manual) {
+
         } else if(item.getItemId() == R.id.action_logout){
             loMessage.initDialog();
             loMessage.setNegativeButton("No", (view, dialog) -> dialog.dismiss());
