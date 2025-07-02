@@ -463,16 +463,10 @@ public class Fragment_CustomerNotAround extends Fragment {
             public void onAccept() {
                 dialogDisclosure.dismiss();
 
-                if (checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-
-                    Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                    appSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    appSettings.setData(Uri.parse("package:" + requireActivity().getPackageName()));
-                    startActivity(appSettings);
-
-                }
+                Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                appSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                appSettings.setData(Uri.parse("package:" + requireActivity().getPackageName()));
+                startActivity(appSettings);
             }
 
             @Override

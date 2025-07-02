@@ -588,10 +588,6 @@ public class LRDcp {
         poDao.UpdateCollectionDetail(foVal);
     }
 
-    public EDCPCollectionDetail GetCollectionForTransaction(String TransNox, String AccountNo, String EntryNox){
-        return poDao.GetCollectionDetail(TransNox, AccountNo, EntryNox);
-    }
-
     /**
      * this method is use by splashscreen to start location tracking service
      * @return

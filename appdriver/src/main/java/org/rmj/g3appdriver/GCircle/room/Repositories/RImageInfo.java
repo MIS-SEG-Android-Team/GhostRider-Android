@@ -194,6 +194,7 @@ public class RImageInfo {
             loImage.setLongitud(args5);
             loImage.setMD5Hashx(WebFileServer.createMD5Hash(args3));
             loImage.setCaptured(AppConstants.DATE_MODIFIED());
+
             poDao.SaveImageInfo(loImage);
             Log.d(TAG, "DCP Selfie has been saved.");
             return lsTransNo;

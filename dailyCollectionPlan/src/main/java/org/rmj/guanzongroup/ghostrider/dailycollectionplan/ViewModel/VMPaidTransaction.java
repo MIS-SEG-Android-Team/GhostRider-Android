@@ -11,7 +11,10 @@
 
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -28,6 +31,10 @@ import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.PaidDCP;
+import org.rmj.g3appdriver.etc.ImageFileCreator;
+import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
@@ -44,6 +51,8 @@ import java.util.Locale;
 
 public class VMPaidTransaction extends AndroidViewModel {
     private static final String TAG = VMPaidTransaction.class.getSimpleName();
+
+    private Context instance;
 
     private final EmployeeMaster poUser;
     private final RBankInfo poBank;
@@ -67,6 +76,8 @@ public class VMPaidTransaction extends AndroidViewModel {
 
     public VMPaidTransaction(@NonNull Application application) {
         super(application);
+
+        this.instance = application;
         this.poUser = new EmployeeMaster(application);
         this.poSys = new PAY(application);
         this.poBank = new RBankInfo(application);
@@ -227,6 +238,7 @@ public class VMPaidTransaction extends AndroidViewModel {
     }
 
     public void SavePaymentInfo(PaidDCP foVal, ViewModelCallback callback){
+
         TaskExecutor.Execute(foVal, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -261,6 +273,72 @@ public class VMPaidTransaction extends AndroidViewModel {
                 } else {
                     callback.OnSuccessResult();
                 }
+            }
+        });
+    }
+
+    public void InitCameraLaunch(Activity activity, String TransNox, OnInitializeCameraCallback callback){
+
+        ImageFileCreator loImage = new ImageFileCreator(instance, AppConstants.SUB_FOLDER_SELFIE_LOG, TransNox);
+        String[] lsResult = new String[4];
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnInit();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if(!loImage.IsFileCreated(true)){
+                    message = loImage.getMessage();
+                    return null;
+                }
+
+                lsResult[0] = loImage.getFilePath();
+                lsResult[1] = loImage.getFileName();
+
+                String lsCompx = android.os.Build.MANUFACTURER.toLowerCase();
+                LocationRetriever.iLocationRetriever location;
+
+                if (!lsCompx.equalsIgnoreCase("huawei")) {
+                    location = new GmsLocationRetriever();
+                } else {
+                    location = new HmsLocationRetriever();
+                }
+
+                location.GetLocation(instance, new LocationRetriever.OnRetrieveLocationListener() {
+                    @Override
+                    public void OnRetrieve(String latitude, String longitude) {
+
+                        lsResult[2] = latitude;
+                        lsResult[3] = longitude;
+
+                        Intent loIntent = loImage.getCameraIntent();
+                        loIntent.putExtra("result", true);
+
+                        callback.OnSuccess(loIntent, lsResult);
+                    }
+
+                    @Override
+                    public void OnFailed(String message, String latitude, String longitude) {
+
+                        lsResult[2] = latitude;
+                        lsResult[3] = longitude;
+
+                        Intent loIntent = loImage.getCameraIntent();
+                        loIntent.putExtra("result", false);
+
+                        callback.OnFailed(message, loIntent, lsResult);
+                    }
+                });
+
+                return null;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
             }
         });
     }

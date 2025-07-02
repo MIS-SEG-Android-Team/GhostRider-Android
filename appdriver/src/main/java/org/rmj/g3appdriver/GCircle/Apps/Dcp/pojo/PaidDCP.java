@@ -17,6 +17,8 @@ public class PaidDCP {
     private String CheckNo;
     private String AccntNo;
 
+    private String TransNox, EntryNox, FileName, FilePath, latitude, longtude;
+
     private String message;
 
     public PaidDCP() {
@@ -128,6 +130,54 @@ public class PaidDCP {
 
     public void setTotAmnt(double totAmnt) {
         TotAmnt = totAmnt;
+    }
+
+    public String getTransNox() {
+        return TransNox;
+    }
+
+    public void setTransNox(String transNox) {
+        TransNox = transNox;
+    }
+
+    public String getEntryNox() {
+        return EntryNox;
+    }
+
+    public void setEntryNox(String entryNox) {
+        EntryNox = entryNox;
+    }
+
+    public String getFileName() {
+        return FileName;
+    }
+
+    public void setFileName(String fileName) {
+        FileName = fileName;
+    }
+
+    public String getFilePath() {
+        return FilePath;
+    }
+
+    public void setFilePath(String filePath) {
+        FilePath = filePath;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongtude() {
+        return longtude;
+    }
+
+    public void setLongtude(String longtude) {
+        this.longtude = longtude;
     }
 
     public boolean isDataValid(){

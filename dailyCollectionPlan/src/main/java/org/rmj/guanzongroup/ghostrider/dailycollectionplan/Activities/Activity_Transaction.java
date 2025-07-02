@@ -13,6 +13,8 @@ package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ImageButton;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -66,11 +68,13 @@ public class Activity_Transaction extends AppCompatActivity {
         setContentView(R.layout.activity_transaction);
 
         instance = this;
+
         try {
             Remarksx = getIntent().getStringExtra("remarksx");
             TransNox = getIntent().getStringExtra("transnox");
             EntryNox = getIntent().getIntExtra("entrynox", 0);
             AccntNox = getIntent().getStringExtra("accntnox");
+
         } catch (NullPointerException e) {
             e.printStackTrace();
         } catch (RuntimeException r) {
@@ -79,6 +83,7 @@ public class Activity_Transaction extends AppCompatActivity {
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar_transaction);
         ViewPager2 viewPager = findViewById(R.id.viewpager_transaction);
+        ImageButton helpbtn = findViewById(R.id.helpbtn);
 
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);

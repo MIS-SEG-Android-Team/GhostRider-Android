@@ -54,10 +54,6 @@ public class VMIncompleteTransaction extends AndroidViewModel {
         poSys.UpdateCollection(foVal);
     }
 
-    public EDCPCollectionDetail GetCollectionForTransaction(String TransNox, String AccountNo, String EntryNox) {
-        return poSys.GetCollectionForTransaction(TransNox, AccountNo, EntryNox);
-    }
-
     public void InitCameraLaunch(Activity activity, String TransNox, OnInitializeCameraCallback callback){
 
         ImageFileCreator loImage = new ImageFileCreator(instance, AppConstants.SUB_FOLDER_SELFIE_LOG, TransNox);
@@ -128,6 +124,7 @@ public class VMIncompleteTransaction extends AndroidViewModel {
         TaskExecutor.Execute(foVal, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
+
                 if(!poSys.SaveTransaction(args)){
                     message = poSys.getMessage();
                     return false;

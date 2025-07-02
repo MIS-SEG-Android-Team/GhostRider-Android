@@ -79,10 +79,9 @@ public class Fragment_IncTransaction extends Fragment {
     private TextInputEditText txtRemarks;
     private MaterialButton btnPost;
 
-    private String TransNox;
+    private EDCPCollectionDetail poCollectDetail;
+    private String TransNox, AccntNox, Remarksx;
     private int EntryNox;
-    private String AccntNox;
-    private String Remarksx;
 
     private final ActivityResultLauncher<Intent> poCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
 
@@ -221,6 +220,8 @@ public class Fragment_IncTransaction extends Fragment {
         mViewModel.GetCollectionDetail(TransNox, AccntNox, String.valueOf(EntryNox)).observe(getViewLifecycleOwner(), detail -> {
             try{
 
+                poCollectDetail = detail;
+
                 poRem.setTransNox(TransNox);
                 poRem.setAccountNo(AccntNox);
                 poRem.setEntryNox(String.valueOf(EntryNox));
@@ -273,13 +274,34 @@ public class Fragment_IncTransaction extends Fragment {
                 }else {
 
                     //todo update collection detail only, no selfie log required
-                    EDCPCollectionDetail loDetail = mViewModel.GetCollectionForTransaction(TransNox, AccntNox, String.valueOf(EntryNox));
-                    loDetail.setTranStat("1");
-                    loDetail.setRemCodex(poRem.getRemCodex());
-                    loDetail.setRemarksx(poRem.getRemarksx());
-                    loDetail.setModified(AppConstants.DATE_MODIFIED());
 
-                    mViewModel.UpdateCollection(loDetail);
+                    if(poCollectDetail == null){
+                       InitMessage(0, R.drawable.baseline_error_24, "Unable to find account detail for transaction. Try to select transaction again.", "Okay", "", new OnDialogButtonCallback() {
+                           @Override
+                           public void OnPositive() {}
+
+                           @Override
+                           public void OnNegative() {}
+                       });
+                        return;
+                    }
+
+                    poCollectDetail.setTranStat("1");
+                    poCollectDetail.setRemCodex(poRem.getRemCodex());
+                    poCollectDetail.setRemarksx(poRem.getRemarksx());
+                    poCollectDetail.setModified(AppConstants.DATE_MODIFIED());
+
+                    mViewModel.UpdateCollection(poCollectDetail);
+
+                    InitMessage(0, R.drawable.baseline_message_24, "Collection detail has been updated", "Okay", "", new OnDialogButtonCallback() {
+                        @Override
+                        public void OnPositive() {
+                            requireActivity().finish();
+                        }
+
+                        @Override
+                        public void OnNegative() {}
+                    });
 
                 }
 
@@ -326,16 +348,10 @@ public class Fragment_IncTransaction extends Fragment {
             public void onAccept() {
                 dialogDisclosure.dismiss();
 
-                if (checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-
-                    Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                    appSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    appSettings.setData(Uri.parse("package:" + requireActivity().getPackageName()));
-                    startActivity(appSettings);
-
-                }
+                Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                appSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                appSettings.setData(Uri.parse("package:" + requireActivity().getPackageName()));
+                startActivity(appSettings);
             }
 
             @Override
