@@ -12,13 +12,8 @@
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
 import androidx.room.Dao;
-import androidx.room.Insert;
-
-import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
 
 @Dao
 public interface DUncapturedClient {
 
-    @Insert
-    void insert(EUncapturedClient uncapturedClient);
 }

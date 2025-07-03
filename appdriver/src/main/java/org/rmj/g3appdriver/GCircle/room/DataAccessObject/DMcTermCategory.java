@@ -11,7 +11,6 @@
 
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -39,9 +38,6 @@ public interface DMcTermCategory {
 
     @Query("SELECT * FROM MC_Term_Category ORDER BY dTimeStmp DESC LIMIT 1")
     EMcTermCategory GetLatestMcTermCategory();
-
-    @Query("SELECT * FROM MC_Term_Category")
-    LiveData<List<EMcTermCategory>> getAllMcTermCategory();
 
     @Query("SELECT MAX(dTimeStmp) FROM MC_Term_Category")
     String getLatestDataTime();

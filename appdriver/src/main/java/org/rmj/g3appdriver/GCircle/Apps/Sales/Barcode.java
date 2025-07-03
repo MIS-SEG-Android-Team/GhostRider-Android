@@ -3,7 +3,6 @@ package org.rmj.g3appdriver.GCircle.Apps.Sales;
 import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 
 import android.app.Application;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 

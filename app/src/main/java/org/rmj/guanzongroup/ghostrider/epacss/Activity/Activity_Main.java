@@ -60,6 +60,7 @@ import org.rmj.guanzongroup.ghostrider.epacss.Service.DataSyncService;
 import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMMainActivity;
 import org.rmj.guanzongroup.ghostrider.epacss.adapter.ExpandableListDrawerAdapter;
 import org.rmj.g3appdriver.etc.AppDeptIcon;
+import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_Manual;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_Settings;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Application;
 
@@ -410,7 +411,8 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
             startActivity(new Intent(Activity_Main.this, Activity_Settings.class));
             overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
         } else if (item.getItemId() == R.id.action_manual) {
-
+            startActivity(new Intent(Activity_Main.this, Activity_Manual.class));
+            overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
         } else if(item.getItemId() == R.id.action_logout){
             loMessage.initDialog();
             loMessage.setNegativeButton("No", (view, dialog) -> dialog.dismiss());

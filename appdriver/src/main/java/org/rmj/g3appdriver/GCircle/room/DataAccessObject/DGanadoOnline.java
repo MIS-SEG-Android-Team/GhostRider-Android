@@ -51,10 +51,7 @@ public interface DGanadoOnline {
 
 
     @Query("SELECT " +
-            "a.sModelIDx AS ModelIDx " +
-            ",a.sModelNme AS ModelNme " +
-            ",a.sBrandIDx AS BrandIDx" +
-            ",c.sColorIDx AS ColorIDx" +
+            "a.sModelNme AS ModelNme " +
             ",c.sColorNme AS ColorNme " +
             "FROM MC_MODEL a " +
             ", MC_Model_Color c " +
@@ -123,10 +120,7 @@ public interface DGanadoOnline {
         public String nFactorRt;
     }
     class McInfo{
-        public String ModelIDx;
         public String ModelNme;
-        public String BrandIDx;
-        public String ColorIDx;
         public String ColorNme;
     }
 

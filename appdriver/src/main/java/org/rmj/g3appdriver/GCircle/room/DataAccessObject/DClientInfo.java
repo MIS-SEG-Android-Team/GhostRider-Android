@@ -13,20 +13,11 @@ package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
-
 import org.rmj.g3appdriver.GCircle.room.Entities.EClientInfo;
 
 @Dao
 public interface DClientInfo {
-
-    @Insert
-    void insert(EClientInfo clientInfo);
-
-    @Update
-    void update(EClientInfo clientInfo);
 
     @Query("SELECT * FROM Client_Info_Master")
     LiveData<EClientInfo> getClientInfo();

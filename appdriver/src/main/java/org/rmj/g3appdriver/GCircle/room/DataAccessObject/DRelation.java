@@ -26,14 +26,8 @@ public interface DRelation {
     @Insert
     void insert(ERelation eRelation);
 
-    @Insert
-    void insertBulkData(List<ERelation> eRelation);
-
     @Update
     void update(ERelation foVal);
-
-    @Query("SELECT COUNT(*) FROM RELATION")
-    Integer GetRelationRecordsCount();
 
     @Query("SELECT * FROM RELATION WHERE sRelatnID=:fsVal")
     ERelation GetRelationInfo(String fsVal);
@@ -43,12 +37,6 @@ public interface DRelation {
 
     @Query("SELECT * FROM Relation ")
     LiveData<List<ERelation>> getRelation();
-
-    @Query("SELECT sRelatnDs FROM Relation")
-    LiveData<String[]> getRelatnDs();
-
-    @Query("SELECT sRelatnDs FROM Relation WHERE sRelatnID = :fsRelatId")
-    String getRelationFromId(String fsRelatId);
 
 }
 

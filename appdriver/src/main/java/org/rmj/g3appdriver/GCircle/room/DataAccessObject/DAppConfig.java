@@ -12,19 +12,8 @@
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
 import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-
-import org.rmj.g3appdriver.GCircle.room.Entities.EAppConfig;
-
-import java.util.List;
 
 @Dao
 public interface DAppConfig {
 
-    @Insert
-    void insert(EAppConfig sysConfig);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertSysConfig(List<EAppConfig> sysConfigs);
 }

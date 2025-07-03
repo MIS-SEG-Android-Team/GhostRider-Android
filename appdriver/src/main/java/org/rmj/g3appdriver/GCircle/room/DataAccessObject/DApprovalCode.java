@@ -14,15 +14,12 @@ package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.RawQuery;
-import androidx.room.Update;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ECodeApproval;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 
 import java.util.List;
@@ -33,17 +30,8 @@ public interface DApprovalCode {
     @Insert
     void SaveSCARequest(ESCA_Request foVal);
 
-    @Insert
-    void insert(ECodeApproval codeApproval);
-
     @Query("DELETE FROM xxxSCA_Request")
     void clear();
-
-    @Update
-    void update(ECodeApproval codeApproval);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertBulkData(List<ESCA_Request> requestList);
 
     @Query("SELECT * FROM XXXSCA_REQUEST WHERE sSCACodex =:TransNox")
     ESCA_Request GetApprovalCode(String TransNox);

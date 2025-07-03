@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_menu_add_collection"
+        android:orderInCategory="100"
+        android:title="New Guideline"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_menu_post_collection"
+        android:orderInCategory="100"
+        android:title="Download Guidelines"
+        app:showAsAction="never" />
+
+</menu>

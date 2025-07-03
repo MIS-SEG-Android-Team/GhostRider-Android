@@ -13,13 +13,10 @@ package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ESysConfig;
-
-import java.util.List;
 
 @Dao
 public interface DSysConfig {
@@ -35,10 +32,4 @@ public interface DSysConfig {
 
     @Query("SELECT * FROM xxxSysConfig WHERE sConfigCd =:fsVal")
     ESysConfig GetSysConfig(String fsVal);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertSysConfig(List<ESysConfig> sysConfigs);
-
-    @Query("SELECT sConfigVl FROM xxxSysConfig WHERE sConfigCd = 'dcp.coordinates.capturing.interval'")
-    String getLocationInterval();
 }

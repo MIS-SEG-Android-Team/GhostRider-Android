@@ -14,9 +14,7 @@ package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
 
-import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGLocatorSysLog;
 
 import java.util.List;
@@ -27,17 +25,11 @@ public interface DLocatorSysLog {
     @Insert()
     void insertLocation(EGLocatorSysLog locatorSysLog);
 
-    @Update
-    void Update(EGLocatorSysLog foVal);
-
     @Query("UPDATE GLocator_Sys_log SET cSendStat = '1', dTimeStmp =:dTimeStmp WHERE sLoctnIDx =:LoctID")
     void updateSysLogStatus(String dTimeStmp, String LoctID);
 
     @Query("SELECT * FROM GLocator_Sys_log WHERE cSendStat == '0' ORDER BY dTransact DESC")
     List<EGLocatorSysLog> GetTrackingLocations();
-
-    @Query("SELECT * FROM User_Info_Master")
-    EEmployeeInfo GetUserInfo();
 
     @Query("SELECT sUserIDxx FROM User_Info_Master")
     String getUserID();

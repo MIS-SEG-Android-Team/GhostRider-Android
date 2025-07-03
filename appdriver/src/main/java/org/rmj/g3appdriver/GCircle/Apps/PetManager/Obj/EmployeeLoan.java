@@ -1,19 +1,14 @@
 package org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
-
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmpLoan;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLoanTypes;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmpLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTypes;

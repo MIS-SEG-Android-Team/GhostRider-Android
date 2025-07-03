@@ -43,22 +43,9 @@ public interface DCountryInfo {
     @Query("SELECT * FROM Country_Info")
     LiveData<List<ECountryInfo>> getAllCountryInfo();
 
-    @Query("SELECT sCntryNme FROM Country_Info")
-    LiveData<String[]> getAllCountryNames();
-
-    @Query("SELECT sNational FROM Country_Info")
-    LiveData<String[]> getAllCountryCitizenNames();
-
     @Query("SELECT MAX(dTimeStmp) FROM Country_Info")
     String getLatestDataTime();
 
     @Query("SELECT * FROM Country_Info WHERE sCntryCde=:ID")
     ECountryInfo getCountryInfo(String ID);
-
-
-    @Query("SELECT sNational FROM Country_Info WHERE sCntryCde =:CntryCde")
-    LiveData<String> getClientCitizenship(String CntryCde);
-
-    @Query("SELECT sCntryNme FROM Country_Info WHERE sCntryCde =:fsCntryCd")
-    LiveData<String> getCountryNameFromId(String fsCntryCd);
 }

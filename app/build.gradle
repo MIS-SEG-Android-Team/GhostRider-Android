@@ -49,6 +49,9 @@ android {
     packagingOptions {
         resources.merges.add("core.properties")
     }
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 /*configurations.implementation {

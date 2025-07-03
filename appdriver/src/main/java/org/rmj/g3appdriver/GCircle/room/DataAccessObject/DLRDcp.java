@@ -92,9 +92,6 @@ public interface DLRDcp {
     @Query("SELECT * FROM LR_DCP_Collection_Detail WHERE sTransNox =:fsVal AND sRemCodex = 'PAY'")
     List<EDCPCollectionDetail> GetPaidCollections(String fsVal);
 
-    @Query("SELECT SUM(nAmountxx) FROM LR_DCP_Remittance WHERE sTransNox=:fsVal")
-    double GetRemittedCollection(String fsVal);
-
     @Query("SELECT SUM(nAmountxx) FROM LR_DCP_Remittance " +
             "WHERE sTransNox =:fsVal " +
             "AND cPaymForm ='0'")

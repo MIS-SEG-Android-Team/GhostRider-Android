@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ENotificationMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ENotificationRecipient;
@@ -20,12 +19,8 @@ public interface DPayslip {
     @Insert
     void insert(ENotificationRecipient notificationRecipient);
 
-    @Update
-    void Update(ENotificationRecipient foVal);
-
-    @Query("SELECT b.sTransNox, " +
+    @Query("SELECT " +
             "a.sMesgIDxx, " +
-            "a.sMsgTitle, " +
             "a.sMessagex, " +
             "b.cMesgStat, " +
             "b.dReceived " +
@@ -52,9 +47,7 @@ public interface DPayslip {
     ENotificationMaster CheckIfExist(String MesgID);
 
     class Payslip{
-        public String sTransNox;
         public String sMesgIDxx;
-        public String sMsgTitle;
         public String sMessagex;
         public String cMesgStat;
         public String dReceived;
