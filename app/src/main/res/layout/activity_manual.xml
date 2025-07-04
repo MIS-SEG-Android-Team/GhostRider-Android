@@ -62,6 +62,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
+        android:id="@+id/layout_nodisp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -84,6 +85,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_guides"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"/>

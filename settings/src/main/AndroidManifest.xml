@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -11,15 +11,18 @@
 
     <application>
         <activity
+            android:name=".Activity.PDFViewer"
+            android:exported="false" />
+        <activity
             android:name=".Activity.Activity_AppVersion"
-            android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/GhostRiderMaterialTheme.NoActionBar" >
         </activity>
         <activity
             android:name=".Activity.Activity_Developer"
             android:label="Developer Test"
             android:screenOrientation="portrait"
-            android:theme="@style/GhostRiderMaterialTheme.NoActionBar"/>
+            android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
         <activity
             android:name=".Activity.Activity_QrCodeScanner"
             android:label="Qr Code"
@@ -47,8 +50,8 @@
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
         <activity
             android:name=".Activity.Activity_LocalData"
-            android:screenOrientation="portrait"
             android:label="Manage Space"
+            android:screenOrientation="portrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
         <activity
             android:name=".Activity.Activity_Settings"

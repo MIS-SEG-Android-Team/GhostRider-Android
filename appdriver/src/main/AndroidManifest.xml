@@ -18,7 +18,10 @@
 
     <application android:usesCleartextTraffic="true">
         <activity
-            android:name="org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_Manual"
+            android:name="org.rmj.guanzongroup.ghostrider.epacss.Activity.Activity_PDFViewer"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.guanzongroup.ghostrider.epacss.Activity.Activity_Manual"
             android:exported="false" />
     </application>
 

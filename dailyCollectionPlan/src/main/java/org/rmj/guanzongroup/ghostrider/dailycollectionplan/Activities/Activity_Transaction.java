@@ -14,6 +14,7 @@ package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -104,7 +105,7 @@ public class Activity_Transaction extends AppCompatActivity {
                 Intent loIntent = new Intent(Intent.ACTION_VIEW);
                 loIntent.setDataAndTypeAndNormalize(
                         Uri.parse(AppConfigPreference.getInstance(Activity_Transaction.this).getAppServer() +
-                                "usermanuals/DCP%20Camera%20and%20Location.pdf"),
+                                "usermanuals/files/DCP%20Camera%20and%20Location.pdf"),
                         "application/pdf");
                 loIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(loIntent);

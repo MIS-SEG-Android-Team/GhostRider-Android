@@ -91,12 +91,10 @@ dependencies {
     implementation 'com.huawei.hms:location:6.4.0.300'
     implementation 'com.huawei.hms:site:4.0.3.300'
 
-
     //Image loader
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     // Image Slider Dependencies
-//    implementation 'com.github.smarteist:autoimageslider:1.4.0'
     implementation 'com.github.smarteist:Android-Image-Slider:1.4.0'
     implementation 'com.github.bumptech.glide:glide:4.13.2'
 

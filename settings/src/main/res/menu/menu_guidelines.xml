@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_menu_add_collection"
+        android:id="@+id/action_add_guideline"
         android:orderInCategory="100"
         android:title="New Guideline"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_menu_post_collection"
+        android:id="@+id/action_download_guideline"
         android:orderInCategory="100"
         android:title="Download Guidelines"
         app:showAsAction="never" />

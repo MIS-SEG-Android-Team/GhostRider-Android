@@ -1,13 +1,23 @@
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Query;
+import androidx.room.Upsert;
+
+import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
+
+import java.util.List;
 
 @Dao
 public interface DGuides {
 
-//    @Insert
-//    void InsertGuides(EGuides eGuides);
-//
-//    @Query("SELECT * FROM User_Guides")
-//    LiveData<EGuides> GetGuides();
+    @Upsert
+    void InsertGuides(EGuides eGuides);
+
+    @Query("DELETE FROM User_Guides")
+    void DeleteGuides();
+
+    @Query("SELECT * FROM User_Guides")
+    LiveData<List<EGuides>> GetGuides();
 }
