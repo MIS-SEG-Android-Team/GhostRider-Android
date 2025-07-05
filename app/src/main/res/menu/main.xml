@@ -23,7 +23,7 @@
         android:id="@+id/action_manual"
         android:orderInCategory="100"
         android:icon="@drawable/baseline_menu_book_24"
-        android:title="User Guide"
+        android:title="User Handbook"
         app:showAsAction="never"/>
 
     <item

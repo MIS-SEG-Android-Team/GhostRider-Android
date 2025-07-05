@@ -83,6 +83,12 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rcv_barcodes"
                         android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"/>
+
+                    <ExpandableListView
+                        android:id="@+id/exp_barcodes"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton

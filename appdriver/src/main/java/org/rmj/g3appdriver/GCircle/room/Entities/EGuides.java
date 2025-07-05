@@ -4,12 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
-@Entity(tableName = "User_Guides", primaryKeys = {"sTransNox"})
+@Entity(tableName = "User_Guides", primaryKeys = {"sTransNox", "type"})
 public class EGuides {
 
     @ColumnInfo
     @NonNull
     public String sTransNox;
+
+    @ColumnInfo
+    @NonNull
+    public String type;
 
     @ColumnInfo
     public String sTitlexx;
@@ -24,6 +28,15 @@ public class EGuides {
 
     public void setsTransNox(@NonNull String sTransNox) {
         this.sTransNox = sTransNox;
+    }
+
+    @NonNull
+    public String getType() {
+        return type;
+    }
+
+    public void setType(@NonNull String type) {
+        this.type = type;
     }
 
     public String getsTitlexx() {

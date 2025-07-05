@@ -37,6 +37,7 @@ import org.rmj.guanzongroup.ghostrider.settings.ViewModel.VMSettings;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Objects;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -71,7 +72,7 @@ public class Activity_Settings extends AppCompatActivity {
         mViewModel = new ViewModelProvider(this).get(VMSettings.class);
         loMessage = new MessageBox(Activity_Settings.this);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         Log.e("instancestate", String.valueOf(savedInstanceState));
 
 

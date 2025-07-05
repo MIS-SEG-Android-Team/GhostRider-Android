@@ -5,6 +5,7 @@ import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 import android.app.Application;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -13,10 +14,13 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcode;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcodeDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBarcodeDetail;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
@@ -33,6 +37,7 @@ import java.util.Locale;
 public class Barcode {
 
     private DBarcode barcodeDao;
+    private DBarcodeDetail barcodeDetailDao;
     private GCircleApi poApi;
     private HttpHeaders poHeaders;
 
@@ -40,8 +45,25 @@ public class Barcode {
 
     public Barcode(Application context){
         this.barcodeDao = GGC_GCircleDB.getInstance(context).barcodeDao();
+        this.barcodeDetailDao = GGC_GCircleDB.getInstance(context).barcodeDetailDao();
         this.poApi = new GCircleApi(context);
         this.poHeaders = HttpHeaders.getInstance(context);
+    }
+
+    public void saveBarcode(String barcode){
+
+        EBarcode foVal = new EBarcode();
+        foVal.setBarcodeIdxx(generateTransNox());
+        foVal.setBarcode(barcode);
+        foVal.setChecked(0);
+    }
+
+    public void selectBarcode(String bcodeIDxx, Integer status){
+        barcodeDao.index(bcodeIDxx, status);
+    }
+
+    public void deleteBarcode(String bcodeID){
+        barcodeDao.deleteBarcode(bcodeID);
     }
 
     private String getCurrentDate(){
@@ -53,20 +75,20 @@ public class Barcode {
         }
     }
 
-    public void saveBarcode(EBarcode barcode){
-        barcodeDao.save(barcode);
-    }
+    private String generateTransNox(){
 
-    public void selectBarcode(String bcodeIDxx, Integer status){
-        barcodeDao.index(bcodeIDxx, status);
-    }
+        String barcodeid = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            barcodeid = "MX01" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
+                    barcodeDao.getBarcodeCount() + 1;
+        }else {
+            barcodeid = "MX01" +
+                    new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
+                    barcodeDao.getBarcodeCount() + 1;
+        }
 
-    public int countBarcode(){
-        return barcodeDao.getBarcodeCount();
-    }
-
-    public void deleteBarcode(String bcodeID){
-        barcodeDao.deleteBarcode(bcodeID);
+        return barcodeid;
     }
 
     public LiveData<List<EBarcode>> getBarcodeList(){
@@ -79,6 +101,64 @@ public class Barcode {
 
     public String getMessage(){
         return message;
+    }
+
+    public Boolean downloadBundles(String sBundleIdxx){
+
+        try {
+
+            JSONObject loParams = new JSONObject();
+            loParams.put("sBundleIdxx", sBundleIdxx);
+
+            String lsResponse = WebClient.sendRequest(poApi.getUrlDownloadBundles(), loParams.toString(), poHeaders.getHeaders());
+
+           if (lsResponse == null || lsResponse.isEmpty()){
+                message = "No response from server";
+                return false;
+            }
+
+            Log.d("Barcode", lsResponse);
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if (lsResult.equalsIgnoreCase("error")) {
+
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return false;
+            }
+
+            JSONObject loData = loResponse.getJSONObject("detail");
+            JSONArray loArray = loData.getJSONArray("payload");
+
+            final String lsTransNox = generateTransNox();
+
+            for (int i = 0; i < loArray.length(); i++){
+
+                JSONObject loItem = loArray.getJSONObject(i);
+
+                EBarcodeDetail barcodeDetail = new EBarcodeDetail();
+                barcodeDetail.setBarcode_id(lsTransNox);
+                barcodeDetail.setnEntryNox(loItem.getInt("nEntryNox"));
+                barcodeDetail.setsDescript(loItem.getString("sSerialID"));
+
+                barcodeDetailDao.insert(barcodeDetail);
+            }
+
+            EBarcode barcode = new EBarcode();
+            barcode.setBarcodeIdxx(lsTransNox);
+            barcode.setBarcode(loData.getString("bundleIDxx"));
+            barcode.setsDescriptxx(loData.getString("sDescriptxx"));
+            barcode.setChecked(0);
+
+            barcodeDao.save(barcode);
+
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public Boolean submitBarcodes(JSONObject loData, String productType){

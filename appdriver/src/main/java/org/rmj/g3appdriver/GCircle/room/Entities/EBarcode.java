@@ -11,13 +11,16 @@ public class EBarcode {
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "barcode_id")
-    private String barcodeIdxx;
+    public String barcodeIdxx;
 
     @ColumnInfo(name = "barcode")
-    private String barcode;
+    public String barcode;
+
+    @ColumnInfo(name = "description")
+    public String sDescriptxx;
 
     @ColumnInfo(name = "checked")
-    private Integer checked = 0;
+    public Integer checked = 0;
 
     @NonNull
     public String getBarcodeIdxx() {
@@ -34,6 +37,14 @@ public class EBarcode {
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
+    }
+
+    public String getsDescriptxx() {
+        return sDescriptxx;
+    }
+
+    public void setsDescriptxx(String sDescriptxx) {
+        this.sDescriptxx = sDescriptxx;
     }
 
     public Integer getChecked() {

@@ -6,6 +6,8 @@ import static android.view.View.VISIBLE;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -15,8 +17,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputEditText;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
 import org.rmj.g3appdriver.etc.LoadDialog;
@@ -34,10 +39,12 @@ public class Activity_Manual extends AppCompatActivity {
     private VMGuide mViewmodel;
     private LoadDialog poDialog;
     private MessageBox poMessage;
+    private RecyclerviewUserGuideAdapter loAdapter;
 
     private LinearLayout layout_nodisp;
     private RecyclerView rcv_guides;
     private Toolbar toolbar;
+    private TextInputEditText txt_fileSearch;
 
     private interface OnDialogButtonCallback{
         void OnPositive();
@@ -55,7 +62,8 @@ public class Activity_Manual extends AppCompatActivity {
         poMessage = new MessageBox(this);
 
         InitViews();
-        InitObservers();
+        InitObserver();
+        InitListener();
 
     }
     @Override
@@ -63,10 +71,13 @@ public class Activity_Manual extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_guidelines, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        
-        if (item.getItemId() == R.id.action_add_guideline){
+
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }else if (item.getItemId() == R.id.action_add_guideline){
             
         } else if (item.getItemId() == R.id.action_download_guideline) {
 
@@ -128,13 +139,15 @@ public class Activity_Manual extends AppCompatActivity {
         layout_nodisp = findViewById(R.id.layout_nodisp);
         rcv_guides = findViewById(R.id.rcv_guides);
         toolbar = findViewById(R.id.toolbar_collectionList);
+        txt_fileSearch = findViewById(R.id.txt_fileSearch);
 
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
+
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
     }
-    private void InitObservers(){
+    private void InitObserver(){
 
         mViewmodel.GetGuides().observe(Activity_Manual.this, new Observer<List<EGuides>>() {
             @Override
@@ -154,10 +167,33 @@ public class Activity_Manual extends AppCompatActivity {
         });
     }
 
+    private void InitListener(){
+
+        txt_fileSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                try{
+                    String query = s.toString();
+                    loAdapter.GetFilter().filter(query);
+                    loAdapter.notifyDataSetChanged();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     private void InitAdapter(List<EGuides> loGuides){
 
-        RecyclerviewUserGuideAdapter loAdapter = new RecyclerviewUserGuideAdapter(loGuides, new RecyclerviewUserGuideAdapter.OnViewGuide() {
+        loAdapter = new RecyclerviewUserGuideAdapter(loGuides, new RecyclerviewUserGuideAdapter.OnViewGuide() {
             @Override
             public void OnView(EGuides loGuide) {
 
@@ -170,6 +206,6 @@ public class Activity_Manual extends AppCompatActivity {
 
         loAdapter.notifyDataSetChanged();
         rcv_guides.setAdapter(loAdapter);
-        rcv_guides.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        rcv_guides.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false));
     }
 }

@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -70,6 +71,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     private ConstraintLayout layout_barcodelist;
     private RecyclerView rcv_barcodes;
+    private ExpandableListView exp_barcodes;
     private FloatingActionButton fbtn_manual;
     private FloatingActionButton fbtn_scan;
 
@@ -106,8 +108,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
 
-                Log.d("PhoneBarcode", String.valueOf(result.getResultCode()));
-
                 //todo: check intent action
                 if (result.getResultCode() == Activity.RESULT_OK){
 
@@ -118,14 +118,9 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         initMessage("Failed to read barcode", "Okay", "",
                                 2, false, new onMessage() {
                                     @Override
-                                    public void onPosBtnListener() {
-
-                                    }
-
+                                    public void onPosBtnListener() {}
                                     @Override
-                                    public void onNegBtnListener() {
-
-                                    }
+                                    public void onNegBtnListener() {}
                                 });
 
                     }else {
@@ -133,21 +128,17 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         //todo: double check result data
                         if (!result.getData().getStringExtra("qrdata").isEmpty()){
 
-                            //todo: show confirmation, save barcode
-                            initMessage("Save barcode number "+ result.getData().getStringExtra("qrdata") + "?", "Yes", "No",
-                                    3, true, new onMessage() {
-                                        @Override
-                                        public void onPosBtnListener() {
-                                            SaveBarcodes(result.getData().getStringExtra("qrdata"));
-                                            Toast.makeText(Activity_MPBarcode_Scanner.this, "Barcode saved successfully", Toast.LENGTH_LONG).show();
+                            initMessage("Select type of item for barcode " + result.getData().getStringExtra("qrdata"), "Single Item", "Bundle", 3, true, new onMessage() {
+                                @Override
+                                public void onPosBtnListener() {
+                                    SaveBarcodes(result.getData().getStringExtra("qrdata"));
+                                }
 
-                                        }
-
-                                        @Override
-                                        public void onNegBtnListener() {
-                                            Toast.makeText(Activity_MPBarcode_Scanner.this, "Barcode saving cancelled", Toast.LENGTH_LONG).show();
-                                        }
-                                    });
+                                @Override
+                                public void onNegBtnListener() {
+                                    SaveBundles(result.getData().getStringExtra("qrdata"));
+                                }
+                            });
                         }else {
 
                             //todo: show message, failed to read empty barcode
@@ -228,6 +219,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         //todo barcode scan list objects
         layout_barcodelist = findViewById(R.id.layout_barcodelist);
         rcv_barcodes = findViewById(R.id.rcv_barcodes);
+        exp_barcodes = findViewById(R.id.exp_barcodes);
         fbtn_scan = findViewById(R.id.fbtn_scan);
         fbtn_manual = findViewById(R.id.fbtn_manual);
 
@@ -311,7 +303,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     public void onConfirm(String serial) {
 
                         //todo: show confirmation, save barcode
-                        initMessage("Save barcode number "+ serial + "?", "Yes", "No",
+                        initMessage("Select type of item for barcode "+ serial, "Single Item", "Bundle",
                                 3, true, new onMessage() {
                                     @Override
                                     public void onPosBtnListener() {
@@ -320,9 +312,9 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
                                     @Override
                                     public void onNegBtnListener() {
+                                        SaveBundles(serial);
                                     }
                                 });
-
                     }
                 });
             }
@@ -715,23 +707,38 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
     }
 
     private void SaveBarcodes(String serial){
+        mViewModel.saveBarcode(serial);
+        Toast.makeText(Activity_MPBarcode_Scanner.this, "Barcode saved successfully", Toast.LENGTH_LONG).show();
+    }
 
-        String barcodeid = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            barcodeid = "MX01" +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
-                    mViewModel.countBarcode() + 1;
-        }else {
-            barcodeid = "MX01" +
-                    new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
-                    mViewModel.countBarcode() + 1;
-        }
+    private void SaveBundles(String bundleIDxx){
 
-        EBarcode barcode = new EBarcode();
-        barcode.setBarcodeIdxx(barcodeid);
-        barcode.setBarcode(serial);
+        mViewModel.downloadBundles(bundleIDxx, new VMBarcode.OnDownloadBundles() {
+            @Override
+            public void OnLoad(String title, String message) {
+                poLoad.initDialog(title, message, false);
+                poLoad.show();
+            }
 
-        mViewModel.saveBarcode(barcode);
+            @Override
+            public void OnSuccess() {
+                poLoad.dismiss();
+                Toast.makeText(Activity_MPBarcode_Scanner.this, "Barcode saved successfully", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void OnFailed(String message) {
+                poLoad.dismiss();
+
+                initMessage(message, "Okay", "", 2, false, new onMessage() {
+                    @Override
+                    public void onPosBtnListener() {}
+
+                    @Override
+                    public void onNegBtnListener() {}
+                });
+            }
+        });
 
     }
 

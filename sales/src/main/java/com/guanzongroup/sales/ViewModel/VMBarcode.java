@@ -19,6 +19,7 @@ import org.rmj.g3appdriver.GCircle.Apps.Sales.Barcode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DTownInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
 import org.rmj.g3appdriver.lib.Etc.Town;
+import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
@@ -30,6 +31,7 @@ public class VMBarcode extends AndroidViewModel {
     private final Context context;
     private final Barcode poBarcode;
     private final Town poTown;
+    private final ConnectionUtil poConn;
 
     private String message;
 
@@ -39,6 +41,15 @@ public class VMBarcode extends AndroidViewModel {
         this.context = application;
         this.poTown = new Town(application);
         this.poBarcode = new Barcode(application);
+        this.poConn = new ConnectionUtil(application);
+    }
+
+    public LiveData<List<EBarcode>> observeBarcodeList(){
+        return poBarcode.getBarcodeList();
+    }
+
+    public LiveData<List<EBarcode>> observeCheckedBarcodeList(){
+        return poBarcode.getCheckedBarcodeList();
     }
 
     public void CheckPermission(onCheckPermission callback){
@@ -82,7 +93,7 @@ public class VMBarcode extends AndroidViewModel {
         });
     }
 
-    public void saveBarcode(EBarcode barcode){
+    public void saveBarcode(String barcode){
         poBarcode.saveBarcode(barcode);
     }
 
@@ -90,24 +101,44 @@ public class VMBarcode extends AndroidViewModel {
         poBarcode.selectBarcode(bcodeIDxx, status);
     }
 
-    public int countBarcode(){
-        return poBarcode.countBarcode();
-    }
-
     public void deleteBarcode(String barCodeID){
         poBarcode.deleteBarcode(barCodeID);
     }
 
-    public LiveData<List<EBarcode>> observeBarcodeList(){
-        return poBarcode.getBarcodeList();
-    }
+    public void downloadBundles(String sBundleIdxx, OnDownloadBundles callback){
 
-    public LiveData<List<EBarcode>> observeCheckedBarcodeList(){
-        return poBarcode.getCheckedBarcodeList();
-    }
+        TaskExecutor.Execute(sBundleIdxx, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnLoad("Guanzon Circle", "Downloading bundles . .");
+            }
 
-    public LiveData<List<DTownInfo.TownProvinceInfo>> observeTownProvinceInfo(){
-        return poTown.getTownProvinceInfo();
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConn.isDeviceConnected()){
+                    message = poConn.getMessage();
+                    return false;
+                }
+
+                if (!poBarcode.downloadBundles((String) args)){
+                    message = poBarcode.getMessage();
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if (!(Boolean) object){
+                    callback.OnFailed(message);
+                }else {
+                    callback.OnSuccess();
+                }
+            }
+        });
     }
 
     public void submitBarcodes(JSONObject loData, onSubmitBarcodes callback){
@@ -186,6 +217,12 @@ public class VMBarcode extends AndroidViewModel {
             }
         });
 
+    }
+
+    public interface OnDownloadBundles{
+        void OnLoad(String title, String message);
+        void OnSuccess();
+        void OnFailed(String message);
     }
 
     public interface onSubmitBarcodes{

@@ -44,8 +44,6 @@ public class UserGuides {
                 return false;
             }
 
-            Log.d("GuideManual", lsResponse);
-
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
 
@@ -58,16 +56,18 @@ public class UserGuides {
             JSONArray laGuides = new JSONArray(loResponse.getString("detail"));
             if (laGuides.length() > 0){
 
+                poDao.DeleteGuides();
+
                 for(int i = 0; i < laGuides.length(); i++){
 
                     JSONObject loObj = laGuides.getJSONObject(i);
                     EGuides loGuide = new EGuides();
 
                     loGuide.setsTransNox(loObj.getString("transNox"));
+                    loGuide.setType(loObj.getString("type"));
                     loGuide.setsTitlexx(loObj.getString("title"));
                     loGuide.setsURlxx(loObj.getString("link"));
 
-                    poDao.DeleteGuides();
                     poDao.InsertGuides(loGuide);
                 }
             }

@@ -30,6 +30,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DAreaPerformance;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBankInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarangayInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcode;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcodeDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchOpeningMonitor;
@@ -99,6 +100,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EAreaPerformance;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBankInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarangayInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBarcodeDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchOpenMonitor;
@@ -228,6 +230,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         ELoanTypes.class,
         ESCARqstEmp.class,
         EBarcode.class,
+        EBarcodeDetail.class,
         EGuides.class}, version = 45, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
@@ -303,6 +306,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DLoanTypes loanTypesDao();
     public abstract DSCARqstEmp scaRqstEmpDao();
     public abstract DBarcode barcodeDao();
+    public abstract DBarcodeDetail barcodeDetailDao();
     public abstract DGuides userguideDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
@@ -370,6 +374,12 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                     "PRIMARY KEY(barcode_id))");
 
             //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Barcode_Detail " +
+                    "(barcode_id TEXT NOT NULL, nEntryNox INTEGER NOT NULL, " +
+                    "sDescript TEXT, " +
+                    "PRIMARY KEY(barcode_id, nEntryNox))");
+
+            //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS User_Guides " +
                     "(sTransNox TEXT NOT NULL, sTitlexx TEXT, sURlxx TEXT, " +
                     "PRIMARY KEY(sTransNox))");
@@ -385,6 +395,9 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             }
             if (!CheckColumnExists(database, "Barcode", "checked")){
                 database.execSQL("ALTER TABLE Barcode ADD COLUMN checked INTEGER DEFAULT 0");
+            }
+            if (!CheckColumnExists(database, "Barcode", "description")){
+                database.execSQL("ALTER TABLE Barcode ADD COLUMN description TEXT");
             }
         }
     };
