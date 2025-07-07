@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Apps.Sales.Barcode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DTownInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBarcodeDetail;
 import org.rmj.g3appdriver.lib.Etc.Town;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -30,7 +31,6 @@ public class VMBarcode extends AndroidViewModel {
     @SuppressLint("StaticFieldLeak")
     private final Context context;
     private final Barcode poBarcode;
-    private final Town poTown;
     private final ConnectionUtil poConn;
 
     private String message;
@@ -39,7 +39,6 @@ public class VMBarcode extends AndroidViewModel {
         super(application);
 
         this.context = application;
-        this.poTown = new Town(application);
         this.poBarcode = new Barcode(application);
         this.poConn = new ConnectionUtil(application);
     }
@@ -48,7 +47,15 @@ public class VMBarcode extends AndroidViewModel {
         return poBarcode.getBarcodeList();
     }
 
+    public LiveData<List<EBarcodeDetail>> getBarcodeItems(String id){
+        return poBarcode.getBarcodeITems(id);
+    }
+
     public LiveData<List<EBarcode>> observeCheckedBarcodeList(){
+        return poBarcode.observeCheckedBarcodeList();
+    }
+
+    public List<EBarcode> getCheckedBarcodeList(){
         return poBarcode.getCheckedBarcodeList();
     }
 

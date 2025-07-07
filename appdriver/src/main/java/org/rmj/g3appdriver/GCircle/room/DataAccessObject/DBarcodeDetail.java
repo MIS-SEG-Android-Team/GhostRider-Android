@@ -15,6 +15,6 @@ public interface DBarcodeDetail {
     @Upsert
     void insert(EBarcodeDetail poBarcodeDetail);
 
-    @Query("SELECT * FROM Barcode_Detail WHERE barcode_id = :barcode_id")
+    @Query("SELECT * FROM Barcode_Detail WHERE barcode_id = :barcode_id ORDER BY nEntryNox ASC")
     LiveData<List<EBarcodeDetail>> GetBarcodeItems(String barcode_id);
 }

@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -32,8 +33,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -41,39 +40,34 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.guanzongroup.sales.Adapter.RecyclerView_Barcodes;
+import com.guanzongroup.sales.Adapter.ExpandableBarcodeAdapter;
 import com.guanzongroup.sales.Dialogs.Dialog_TransactionPIN;
 import com.guanzongroup.sales.R;
 import com.guanzongroup.sales.ViewModel.VMBarcode;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DTownInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBarcodeDetail;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_QrCodeScanner;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     private MaterialToolbar toolbar;
 
     private ConstraintLayout layout_barcodelist;
-    private RecyclerView rcv_barcodes;
     private ExpandableListView exp_barcodes;
     private FloatingActionButton fbtn_manual;
     private FloatingActionButton fbtn_scan;
+    private FloatingActionButton fbtn_delete;
 
     private ScrollView scv_details;
 
@@ -90,7 +84,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
     private TextInputEditText tie_suffix;
     private TextInputEditText tie_mobile;
 
-    private ConstraintLayout layout_buttons;
     private MaterialButton btn_previous;
     private MaterialButton btn_next;
 
@@ -218,10 +211,10 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
         //todo barcode scan list objects
         layout_barcodelist = findViewById(R.id.layout_barcodelist);
-        rcv_barcodes = findViewById(R.id.rcv_barcodes);
         exp_barcodes = findViewById(R.id.exp_barcodes);
         fbtn_scan = findViewById(R.id.fbtn_scan);
         fbtn_manual = findViewById(R.id.fbtn_manual);
+        fbtn_delete = findViewById(R.id.fbtn_delete);
 
         //todo details objects
         scv_details = findViewById(R.id.scv_details);
@@ -242,9 +235,53 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         tie_mobile = findViewById(R.id.tie_mobile);
 
         //todo buttons objects
-        layout_buttons = findViewById(R.id.layout_buttons);
         btn_previous = findViewById(R.id.btn_previous);
         btn_next = findViewById(R.id.btn_next);
+
+    }
+
+    private void initMessage(String message, String btnPos, String btnNeg,
+                             int type, Boolean forConfirm, onMessage callback){
+
+        poMessage.initDialog();
+        poMessage.setTitle("Guanzon Connect");
+        poMessage.setMessage(message);
+
+        switch (type){
+
+            case 1: //todo: success message
+                poMessage.setIcon(R.drawable.baseline_message_24);
+                break;
+            case 2: //todo: error message
+                poMessage.setIcon(R.drawable.baseline_error_24);
+                break;
+            case 3: //todo: confirm message
+                poMessage.setIcon(R.drawable.baseline_contact_support_24);
+                break;
+            default:
+                poMessage.setIcon(R.drawable.baseline_message_24);
+                break;
+        }
+
+        poMessage.setPositiveButton(btnPos, new MessageBox.DialogButton() {
+            @Override
+            public void OnButtonClick(View view, AlertDialog dialog) {
+                dialog.dismiss();
+                callback.onPosBtnListener();
+            }
+        });
+
+        if (forConfirm){
+            poMessage.setNegativeButton(btnNeg, new MessageBox.DialogButton() {
+                @Override
+                public void OnButtonClick(View view, AlertDialog dialog) {
+                    dialog.dismiss();
+                    callback.onNegBtnListener();
+                }
+            });
+        }
+
+        poMessage.show();
 
     }
 
@@ -316,6 +353,26 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                                     }
                                 });
                     }
+                });
+            }
+        });
+
+        fbtn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                initMessage("Are you sure you want to delete all selected barcodes?", "Yes", "No", 2, true, new onMessage() {
+                    @Override
+                    public void onPosBtnListener() {
+
+                        List<EBarcode> loVal = mViewModel.getCheckedBarcodeList();
+                        for (EBarcode barcode: loVal){
+                            mViewModel.deleteBarcode(barcode.getBarcodeIdxx());
+                        }
+                    }
+
+                    @Override
+                    public void onNegBtnListener() {}
                 });
             }
         });
@@ -457,40 +514,30 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     return;
                 }
 
-                RecyclerView_Barcodes adapterBcode =
-                        new RecyclerView_Barcodes(Activity_MPBarcode_Scanner.this, eBarcodes, new RecyclerView_Barcodes.onAction() {
-                            @Override
-                            public void onCheckAction(String lastIDChecked, Integer state) {
-                                mViewModel.selectBarcode(lastIDChecked, state);
+                HashMap<String, List<EBarcodeDetail>> barcodeITems = new HashMap<>();
+                for (EBarcode barcode: eBarcodes){
+
+                    mViewModel.getBarcodeItems(barcode.getBarcodeIdxx()).observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcodeDetail>>() {
+                        @Override
+                        public void onChanged(List<EBarcodeDetail> eBarcodeDetails) {
+                            if (eBarcodeDetails == null){
+                                return;
                             }
-
-                            @Override
-                            public void onDelete(String barcodeIDxx) {
-
-                                initMessage("Delete Barcode?", "Yes", "No", 3, true, new onMessage() {
-                                    @Override
-                                    public void onPosBtnListener() {
-                                        mViewModel.deleteBarcode(barcodeIDxx);
-                                    }
-
-                                    @Override
-                                    public void onNegBtnListener() {}
-                                });
-                            }
-                        });
-
-                adapterBcode.notifyDataSetChanged();
-
-                rcv_barcodes.setAdapter(adapterBcode);
-                rcv_barcodes.setLayoutManager(
-                        new LinearLayoutManager(Activity_MPBarcode_Scanner.this, LinearLayoutManager.VERTICAL, false));
-
-                if (eBarcodes.size() > 0){
-                    layout_buttons.setVisibility(View.VISIBLE);
-                    return;
+                            barcodeITems.put(barcode.getBarcodeIdxx(), eBarcodeDetails);
+                        }
+                    });
                 }
 
-                layout_buttons.setVisibility(View.GONE);
+                ExpandableBarcodeAdapter expAdapter = new ExpandableBarcodeAdapter(
+                        Activity_MPBarcode_Scanner.this, eBarcodes, barcodeITems, new ExpandableBarcodeAdapter.OnCheckedListener() {
+                    @Override
+                    public void OnChecked(Integer checkStatus, String barcode) {
+                        //mViewModel.selectBarcode(barcode, checkStatus);
+                    }
+                });
+
+                exp_barcodes.setAdapter(expAdapter);
+                expAdapter.notifyDataSetChanged();
             }
         });
 
@@ -499,8 +546,10 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             public void onChanged(List<EBarcode> eBarcodes) {
 
                 if (eBarcodes == null){
+                    fbtn_delete.setVisibility(View.GONE);
                     return;
                 }
+                fbtn_delete.setVisibility(View.VISIBLE);
 
                 List<String> barcodeEntries = new ArrayList<>();
                 for (EBarcode loVal: eBarcodes){
@@ -591,119 +640,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         List<String> financers = new ArrayList<>(laFinancer.values());
         tie_financer.setAdapter(new ArrayAdapter<String>(Activity_MPBarcode_Scanner.this, R.layout.support_simple_spinner_dropdown_item, financers));
 
-    }
-
-    private Boolean checkSelectedBarcodes(){
-
-        if (loIEMI == null || loIEMI.length() <= 0){
-
-            initMessage("Please select barcodes from list", "Okay", "", 2, false, new onMessage() {
-                @Override
-                public void onPosBtnListener() {}
-
-                @Override
-                public void onNegBtnListener() {}
-            });
-
-            return false;
-        }
-
-        return true;
-
-    }
-
-    private Boolean checkPaymentDetails(){
-
-        if (tie_paytype.getText() == null || tie_paytype.getText().toString().isEmpty()){
-
-            initMessage("Payment type is required", "Okay", "", 2, false, new onMessage() {
-                @Override
-                public void onPosBtnListener() {}
-                @Override
-                public void onNegBtnListener() {}
-            });
-
-            return false;
-        }
-
-        if (tie_paytype.getText().toString().equalsIgnoreCase("financing")){
-
-            if (tie_financer.getText() == null){
-
-                initMessage("Financer is required", "Okay", "", 2, false, new onMessage() {
-                    @Override
-                    public void onPosBtnListener() {}
-                    @Override
-                    public void onNegBtnListener() {}
-                });
-
-                return false;
-            }
-
-            if (getAdapterID(laFinancer, tie_financer.getText().toString()).isEmpty()){
-
-                initMessage("Financer is invalid", "Okay", "", 2, false, new onMessage() {
-                    @Override
-                    public void onPosBtnListener() {}
-                    @Override
-                    public void onNegBtnListener() {}
-                });
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private Boolean checkPersonalDetails(){
-
-        if (tie_lname.getText() == null || tie_lname.getText().toString().isEmpty()){
-
-            initMessage("Lastname is required", "Okay", "", 2, false, new onMessage() {
-                @Override
-                public void onPosBtnListener() {}
-
-                @Override
-                public void onNegBtnListener() {}
-            });
-
-            return false;
-        }
-
-        if (tie_fname.getText() == null || tie_fname.getText().toString().isEmpty()){
-
-            initMessage("Firstname is required", "Okay", "", 2, false, new onMessage() {
-                @Override
-                public void onPosBtnListener() {}
-
-                @Override
-                public void onNegBtnListener() {}
-            });
-
-            return false;
-        }
-
-        if (tie_mobile.getText() != null && !tie_mobile.getText().toString().isEmpty()){
-
-            String sMobile = tie_mobile.getText().toString();
-
-            if (!sMobile.matches("[0-9]{11}")){
-
-                initMessage("Mobile must be 11 digits and contain only numbers", "Okay", "", 2, false, new onMessage() {
-                    @Override
-                    public void onPosBtnListener() {}
-
-                    @Override
-                    public void onNegBtnListener() {}
-                });
-
-                return false;
-            }
-
-        }
-
-        return true;
     }
 
     private void SaveBarcodes(String serial){
@@ -849,6 +785,119 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     }
 
+    private Boolean checkSelectedBarcodes(){
+
+        if (loIEMI == null || loIEMI.length() <= 0){
+
+            initMessage("Please select barcodes from list", "Okay", "", 2, false, new onMessage() {
+                @Override
+                public void onPosBtnListener() {}
+
+                @Override
+                public void onNegBtnListener() {}
+            });
+
+            return false;
+        }
+
+        return true;
+
+    }
+
+    private Boolean checkPaymentDetails(){
+
+        if (tie_paytype.getText() == null || tie_paytype.getText().toString().isEmpty()){
+
+            initMessage("Payment type is required", "Okay", "", 2, false, new onMessage() {
+                @Override
+                public void onPosBtnListener() {}
+                @Override
+                public void onNegBtnListener() {}
+            });
+
+            return false;
+        }
+
+        if (tie_paytype.getText().toString().equalsIgnoreCase("financing")){
+
+            if (tie_financer.getText() == null){
+
+                initMessage("Financer is required", "Okay", "", 2, false, new onMessage() {
+                    @Override
+                    public void onPosBtnListener() {}
+                    @Override
+                    public void onNegBtnListener() {}
+                });
+
+                return false;
+            }
+
+            if (getAdapterID(laFinancer, tie_financer.getText().toString()).isEmpty()){
+
+                initMessage("Financer is invalid", "Okay", "", 2, false, new onMessage() {
+                    @Override
+                    public void onPosBtnListener() {}
+                    @Override
+                    public void onNegBtnListener() {}
+                });
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private Boolean checkPersonalDetails(){
+
+        if (tie_lname.getText() == null || tie_lname.getText().toString().isEmpty()){
+
+            initMessage("Lastname is required", "Okay", "", 2, false, new onMessage() {
+                @Override
+                public void onPosBtnListener() {}
+
+                @Override
+                public void onNegBtnListener() {}
+            });
+
+            return false;
+        }
+
+        if (tie_fname.getText() == null || tie_fname.getText().toString().isEmpty()){
+
+            initMessage("Firstname is required", "Okay", "", 2, false, new onMessage() {
+                @Override
+                public void onPosBtnListener() {}
+
+                @Override
+                public void onNegBtnListener() {}
+            });
+
+            return false;
+        }
+
+        if (tie_mobile.getText() != null && !tie_mobile.getText().toString().isEmpty()){
+
+            String sMobile = tie_mobile.getText().toString();
+
+            if (!sMobile.matches("[0-9]{11}")){
+
+                initMessage("Mobile must be 11 digits and contain only numbers", "Okay", "", 2, false, new onMessage() {
+                    @Override
+                    public void onPosBtnListener() {}
+
+                    @Override
+                    public void onNegBtnListener() {}
+                });
+
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
     private JSONObject ParsePaymentInfo() throws Exception{
 
         JSONObject loPaymentInfo = new JSONObject();
@@ -899,55 +948,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         }
 
         return returnID;
-    }
-
-    private void initMessage(String message, String btnPos, String btnNeg,
-                             int type, Boolean forConfirm, onMessage callback){
-
-        poMessage.initDialog();
-        poMessage.setTitle("Guanzon Connect");
-        poMessage.setMessage(message);
-
-        switch (type){
-
-            case 1: //todo: success message
-                poMessage.setIcon(R.drawable.baseline_message_24);
-                break;
-            case 2: //todo: error message
-                poMessage.setIcon(R.drawable.baseline_error_24);
-                break;
-            case 3: //todo: confirm message
-                poMessage.setIcon(R.drawable.baseline_contact_support_24);
-                break;
-            default:
-                poMessage.setIcon(R.drawable.baseline_message_24);
-                break;
-        }
-
-        poMessage.setPositiveButton(btnPos, new MessageBox.DialogButton() {
-            @Override
-            public void OnButtonClick(View view, AlertDialog dialog) {
-                dialog.dismiss();
-                callback.onPosBtnListener();
-            }
-        });
-
-        if (forConfirm){
-            poMessage.setNegativeButton(btnNeg, new MessageBox.DialogButton() {
-                @Override
-                public void OnButtonClick(View view, AlertDialog dialog) {
-                    dialog.dismiss();
-                    callback.onNegBtnListener();
-                }
-            });
-        }
-
-        poMessage.show();
-
-    }
-    private interface onMessage{
-        void onPosBtnListener();
-        void onNegBtnListener();
     }
 
     public class Dialog_QRImage{
@@ -1047,6 +1047,11 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             void onConfirm(String serial);
         }
 
+    }
+
+    private interface onMessage{
+        void onPosBtnListener();
+        void onNegBtnListener();
     }
 
 }

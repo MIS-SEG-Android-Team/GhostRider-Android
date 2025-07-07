@@ -95,8 +95,16 @@ public class Barcode {
         return barcodeDao.getBarcodes();
     }
 
-    public LiveData<List<EBarcode>> getCheckedBarcodeList(){
+    public LiveData<List<EBarcode>> observeCheckedBarcodeList(){
+        return barcodeDao.observeCheckedBarcodes();
+    }
+
+    public List<EBarcode> getCheckedBarcodeList(){
         return barcodeDao.getCheckedBarcodes();
+    }
+
+    public LiveData<List<EBarcodeDetail>> getBarcodeITems(String id){
+        return barcodeDetailDao.GetBarcodeItems(id);
     }
 
     public String getMessage(){

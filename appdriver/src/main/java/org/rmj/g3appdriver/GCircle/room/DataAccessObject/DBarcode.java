@@ -25,7 +25,10 @@ public interface DBarcode {
     LiveData<List<EBarcode>> getBarcodes();
 
     @Query("SELECT * FROM Barcode WHERE checked = 1")
-    LiveData<List<EBarcode>> getCheckedBarcodes();
+    LiveData<List<EBarcode>> observeCheckedBarcodes();
+
+    @Query("SELECT * FROM Barcode WHERE checked = 1")
+    List<EBarcode> getCheckedBarcodes();
 
     @Query("SELECT COUNT(*) FROM Barcode")
     int getBarcodeCount();

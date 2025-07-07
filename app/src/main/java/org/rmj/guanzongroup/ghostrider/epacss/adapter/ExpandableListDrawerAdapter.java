@@ -48,7 +48,7 @@ public class ExpandableListDrawerAdapter extends BaseExpandableListAdapter {
 
     @Override
     public ChildObject getChild(int groupPosition, int childPosititon) {
-        return Objects.requireNonNull(this.poChild.get(this.poParentLst.get(groupPosition))).get(childPosititon);
+        return Objects.requireNonNull(poChild.get(poParentLst.get(groupPosition))).get(childPosititon);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ExpandableListDrawerAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
         final String childText = getChild(groupPosition, childPosition).getChildMenuName();
-        LayoutInflater infalInflater = (LayoutInflater) this.context
+        LayoutInflater infalInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = infalInflater.inflate(R.layout.drawer_list_item, parent, false);
 
@@ -71,20 +71,20 @@ public class ExpandableListDrawerAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        if (this.poChild.get(this.poParentLst.get(groupPosition)) == null)
+        if (poChild.get(poParentLst.get(groupPosition)) == null)
             return 0;
         else
-            return Objects.requireNonNull(this.poChild.get(this.poParentLst.get(groupPosition))).size();
+            return Objects.requireNonNull(poChild.get(poParentLst.get(groupPosition))).size();
     }
 
     @Override
     public ParentObject getGroup(int groupPosition) {
-        return this.poParentLst.get(groupPosition);
+        return poParentLst.get(groupPosition);
     }
 
     @Override
     public int getGroupCount() {
-        return this.poParentLst.size();
+        return poParentLst.size();
 
     }
 
@@ -98,7 +98,7 @@ public class ExpandableListDrawerAdapter extends BaseExpandableListAdapter {
                              View convertView, ViewGroup parent) {
         String headerTitle = getGroup(groupPosition).getMenuName();
         int headerIcon = getGroup(groupPosition).getMenuIcon();
-        LayoutInflater infalInflater = (LayoutInflater) this.context
+        LayoutInflater infalInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = infalInflater.inflate(R.layout.drawer_list_header, parent, false);
 
