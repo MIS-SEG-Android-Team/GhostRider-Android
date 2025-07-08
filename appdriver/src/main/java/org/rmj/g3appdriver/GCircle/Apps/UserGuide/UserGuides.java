@@ -3,6 +3,7 @@ package org.rmj.g3appdriver.GCircle.Apps.UserGuide;
 import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 
 import android.app.Application;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -15,6 +16,7 @@ import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 
+import java.io.File;
 import java.util.List;
 
 public class UserGuides {
@@ -78,6 +80,45 @@ public class UserGuides {
             message = e.getMessage();
             return false;
         }
+    }
+
+    public Boolean UploadGuide(String filename, byte[] file){
+
+        try {
+
+            JSONObject params = new JSONObject();
+            params.put("filename", filename);
+            params.put("uploadedfile", Base64.encodeToString(file, Base64.DEFAULT));
+
+            String lsResponse = WebClient.sendRequest(poApi.getUrlUploadGuides(), params.toString(), poHeaders.getHeaders());
+            if (lsResponse == null || lsResponse.isEmpty()){
+                message = "No response from server";
+                return false;
+            }
+
+            Log.d("GuideResult", lsResponse);
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if (lsResult.equalsIgnoreCase("error")) {
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return false;
+            }
+
+            String sTransNox = loResponse.getString("transNox");
+            String sType = loResponse.getString("type");
+            String sTitle = loResponse.getString("title");
+            String sLink = loResponse.getString("link");
+
+            return true;
+
+        }catch (Exception e){
+            message = e.getMessage();
+            return false;
+        }
+
     }
 
     public LiveData<List<EGuides>> GetGuides(){

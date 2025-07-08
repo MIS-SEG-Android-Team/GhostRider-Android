@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -57,7 +56,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
@@ -108,8 +106,8 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     if (result.getData().getStringExtra("qrdata") == null){
 
                         //todo: show message, failed to read empty barcode
-                        initMessage("Failed to read barcode", "Okay", "",
-                                2, false, new onMessage() {
+                        InitMessage("Failed to read barcode", "Okay", "",
+                                2, false, new OnMessage() {
                                     @Override
                                     public void onPosBtnListener() {}
                                     @Override
@@ -121,7 +119,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         //todo: double check result data
                         if (!result.getData().getStringExtra("qrdata").isEmpty()){
 
-                            initMessage("Select type of item for barcode " + result.getData().getStringExtra("qrdata"), "Single Item", "Bundle", 3, true, new onMessage() {
+                            InitMessage("Select type of item for barcode " + result.getData().getStringExtra("qrdata"), "Single Item", "Bundle", 3, true, new OnMessage() {
                                 @Override
                                 public void onPosBtnListener() {
                                     SaveBarcodes(result.getData().getStringExtra("qrdata"));
@@ -135,8 +133,8 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         }else {
 
                             //todo: show message, failed to read empty barcode
-                            initMessage("Failed to read barcode", "Okay",
-                                    "", 2, false, new onMessage() {
+                            InitMessage("Failed to read barcode", "Okay",
+                                    "", 2, false, new OnMessage() {
                                         @Override
                                         public void onPosBtnListener() {
 
@@ -185,12 +183,12 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
         poMessage.initDialog();
 
-        initViews();
-        initListener();
-        initObserVables();
+        InitViews();
+        InitListener();
+        InitObserVables();
 
-        initPayType();
-        initFinancer();
+        InitPayType();
+        InitFinancer();
 
     }
 
@@ -204,7 +202,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void initViews() {
+    private void InitViews() {
 
         //todo toolbar object
         toolbar = findViewById(R.id.toolbar);
@@ -240,8 +238,8 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     }
 
-    private void initMessage(String message, String btnPos, String btnNeg,
-                             int type, Boolean forConfirm, onMessage callback){
+    private void InitMessage(String message, String btnPos, String btnNeg,
+                             int type, Boolean forConfirm, OnMessage callback){
 
         poMessage.initDialog();
         poMessage.setTitle("Guanzon Connect");
@@ -285,7 +283,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     }
 
-    private void initListener(){
+    private void InitListener(){
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -297,7 +295,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                mViewModel.CheckPermission(new VMBarcode.onCheckPermission() {
+                mViewModel.CheckPermission(new VMBarcode.OnCheckPermission() {
                     @Override
                     public void onChecking(String message) {
                         poLoad.initDialog("Guanzon Connect",message, false);
@@ -315,7 +313,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     public void onPermissionDenied(String message) {
                         poLoad.dismiss();
 
-                        initMessage(message, "Okay", "", 2, false, new onMessage() {
+                        InitMessage(message, "Okay", "", 2, false, new OnMessage() {
                             @Override
                             public void onPosBtnListener() {
                                 poArlPermission.launch(Manifest.permission.CAMERA);
@@ -340,8 +338,8 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     public void onConfirm(String serial) {
 
                         //todo: show confirmation, save barcode
-                        initMessage("Select type of item for barcode "+ serial, "Single Item", "Bundle",
-                                3, true, new onMessage() {
+                        InitMessage("Select type of item for barcode "+ serial, "Single Item", "Bundle",
+                                3, true, new OnMessage() {
                                     @Override
                                     public void onPosBtnListener() {
                                         SaveBarcodes(serial);
@@ -361,13 +359,13 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                initMessage("Are you sure you want to delete all selected barcodes?", "Yes", "No", 2, true, new onMessage() {
+                InitMessage("Are you sure you want to delete all selected barcodes?", "Yes", "No", 2, true, new OnMessage() {
                     @Override
                     public void onPosBtnListener() {
 
-                        List<EBarcode> loVal = mViewModel.getCheckedBarcodeList();
+                        List<EBarcode> loVal = mViewModel.GetCheckedBarcodeList();
                         for (EBarcode barcode: loVal){
-                            mViewModel.deleteBarcode(barcode.getBarcodeIdxx());
+                            mViewModel.DeleteBarcode(barcode.getBarcodeIdxx());
                         }
                     }
 
@@ -381,7 +379,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (!checkPersonalDetails()){
+                if (!CheckPersonalDetails()){
                     return;
                 }
 
@@ -390,11 +388,11 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     loSerials.append("• "+loIEMI.optString(i)).append("\n");
                 }
 
-                initMessage("Select action for your data", "SEND DETAILS", "GENERATE QR", 3, true, new onMessage() {
+                InitMessage("Select action for your data", "SEND DETAILS", "GENERATE QR", 3, true, new OnMessage() {
                     @Override
                     public void onPosBtnListener() {
 
-                        initMessage("Is your information correct?\n"+"Here is the summarry of your selected entries\n\n"+loSerials+"\n\nSave transaction now?", "Yes", "No", 3, true, new onMessage() {
+                        InitMessage("Is your information correct?\n"+"Here is the summarry of your selected entries\n\n"+loSerials+"\n\nSave transaction now?", "Yes", "No", 3, true, new OnMessage() {
                             @Override
                             public void onPosBtnListener() {
                                 SubmitBarcodes();
@@ -423,32 +421,26 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
                 Log.d("PhoneBarcode", String.valueOf(loIEMI));
 
-                Boolean allowNext = false;
+                boolean allowNext = false;
                 switch (btnState.getValue()){
 
                     case 1:
 
-                        if (!checkSelectedBarcodes()){
-
+                        if (!CheckSelectedBarcodes()){
                             allowNext = false;
                             btnState.setValue(1);
-
                             break;
                         }
-
                         allowNext = true;
                         break;
 
                     case 2:
 
-                        if (!checkPaymentDetails()){
-
+                        if (!CheckPaymentDetails()){
                             allowNext = false;
                             btnState.setValue(2);
-
                             break;
                         }
-
                         allowNext = true;
                         break;
 
@@ -459,7 +451,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                 }
 
                 int state = btnState.getValue() + 1;
-
                 if (state >= 3){
                     state = 3;
                 }
@@ -503,9 +494,9 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         });
     }
 
-    private void initObserVables(){
+    private void InitObserVables(){
 
-        mViewModel.observeBarcodeList().observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcode>>() {
+        mViewModel.ObserveBarcodeList().observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcode>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onChanged(List<EBarcode> eBarcodes) {
@@ -517,7 +508,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                 HashMap<String, List<EBarcodeDetail>> barcodeITems = new HashMap<>();
                 for (EBarcode barcode: eBarcodes){
 
-                    mViewModel.getBarcodeItems(barcode.getBarcodeIdxx()).observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcodeDetail>>() {
+                    mViewModel.GetBarcodeItems(barcode.getBarcodeIdxx()).observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcodeDetail>>() {
                         @Override
                         public void onChanged(List<EBarcodeDetail> eBarcodeDetails) {
                             if (eBarcodeDetails == null){
@@ -532,7 +523,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         Activity_MPBarcode_Scanner.this, eBarcodes, barcodeITems, new ExpandableBarcodeAdapter.OnCheckedListener() {
                     @Override
                     public void OnChecked(Integer checkStatus, String barcode) {
-                        //mViewModel.selectBarcode(barcode, checkStatus);
+                        mViewModel.SelectBarcode(barcode, checkStatus);
                     }
                 });
 
@@ -541,25 +532,40 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             }
         });
 
-        mViewModel.observeCheckedBarcodeList().observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcode>>() {
+        mViewModel.ObserveCheckedBarcodeList().observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcode>>() {
             @Override
             public void onChanged(List<EBarcode> eBarcodes) {
 
                 if (eBarcodes == null){
+                    btn_next.setEnabled(false);
+                    fbtn_delete.setVisibility(View.GONE);
+                    return;
+                } else if (eBarcodes.size() < 1) {
+                    btn_next.setEnabled(false);
                     fbtn_delete.setVisibility(View.GONE);
                     return;
                 }
+                btn_next.setEnabled(true);
                 fbtn_delete.setVisibility(View.VISIBLE);
 
-                List<String> barcodeEntries = new ArrayList<>();
                 for (EBarcode loVal: eBarcodes){
-                    barcodeEntries.add(loVal.getBarcode());
-                }
 
-                if (barcodeEntries.size() > 0){
-                    loIEMI = new JSONArray(barcodeEntries);
-                }else {
-                    loIEMI = new JSONArray();
+                    mViewModel.GetBarcodeItems(loVal.getBarcodeIdxx()).observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcodeDetail>>() {
+                        @Override
+                        public void onChanged(List<EBarcodeDetail> eBarcodeDetails) {
+
+                            List<String> barcodeEntries = new ArrayList<>();
+                            for (EBarcodeDetail items: eBarcodeDetails){
+                                barcodeEntries.add(items.getsDescript());
+                            }
+
+                            if (barcodeEntries.size() > 0){
+                                loIEMI = new JSONArray(barcodeEntries);
+                            }else {
+                                loIEMI = new JSONArray();
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -617,7 +623,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     }
 
-    private void initPayType(){
+    private void InitPayType(){
 
         List<String> loPayTypes = List.of(
                 "Cash",
@@ -629,7 +635,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         tie_paytype.setAdapter(adapter);
     }
 
-    private void initFinancer(){
+    private void InitFinancer(){
 
         laFinancer.put("C00118000296", "NorthPoint Excelsior Credit Corporation");
         laFinancer.put("C0W110000001", "Samsung Electronics Philippines Corporation");
@@ -643,13 +649,13 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
     }
 
     private void SaveBarcodes(String serial){
-        mViewModel.saveBarcode(serial);
+        mViewModel.SaveBarcode(serial);
         Toast.makeText(Activity_MPBarcode_Scanner.this, "Barcode saved successfully", Toast.LENGTH_LONG).show();
     }
 
     private void SaveBundles(String bundleIDxx){
 
-        mViewModel.downloadBundles(bundleIDxx, new VMBarcode.OnDownloadBundles() {
+        mViewModel.DownloadBundles(bundleIDxx, new VMBarcode.OnDownloadBundles() {
             @Override
             public void OnLoad(String title, String message) {
                 poLoad.initDialog(title, message, false);
@@ -666,7 +672,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             public void OnFailed(String message) {
                 poLoad.dismiss();
 
-                initMessage(message, "Okay", "", 2, false, new onMessage() {
+                InitMessage(message, "Okay", "", 2, false, new OnMessage() {
                     @Override
                     public void onPosBtnListener() {}
 
@@ -693,7 +699,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
                     loQRInfo.put("sSerialNo", loIEMI);
 
-                    mViewModel.submitBarcodes(loQRInfo, new VMBarcode.onSubmitBarcodes() {
+                    mViewModel.SubmitBarcodes(loQRInfo, new VMBarcode.OnSubmitBarcodes() {
                         @Override
                         public void onLoad(String title, String message) {
                             poLoad.initDialog(title, message, false);
@@ -714,7 +720,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         public void onFailed(String message) {
                             poLoad.dismiss();
 
-                            initMessage(message, "Okay", "", 2, false, new onMessage() {
+                            InitMessage(message, "Okay", "", 2, false, new OnMessage() {
                                 @Override
                                 public void onPosBtnListener() {}
 
@@ -746,7 +752,9 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
                     loQRInfo.put("sSerialNo", loIEMI);
 
-                    mViewModel.generateQR(loQRInfo, new VMBarcode.onGenerateQR() {
+                    Log.d("PhoneBarcode", loQRInfo.toString());
+
+                    mViewModel.GenerateQR(loQRInfo, new VMBarcode.OnGenerateQR() {
                         @Override
                         public void onGenerating() {
 
@@ -766,7 +774,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                         public void onQRGenerationFailed(String message) {
                             poLoad.dismiss();
 
-                            initMessage(message, "Okay", "", 2, false, new onMessage() {
+                            InitMessage(message, "Okay", "", 2, false, new OnMessage() {
                                 @Override
                                 public void onPosBtnListener() {}
 
@@ -785,11 +793,11 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     }
 
-    private Boolean checkSelectedBarcodes(){
+    private Boolean CheckSelectedBarcodes(){
 
         if (loIEMI == null || loIEMI.length() <= 0){
 
-            initMessage("Please select barcodes from list", "Okay", "", 2, false, new onMessage() {
+            InitMessage("Please select barcodes from list", "Okay", "", 2, false, new OnMessage() {
                 @Override
                 public void onPosBtnListener() {}
 
@@ -804,11 +812,11 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     }
 
-    private Boolean checkPaymentDetails(){
+    private Boolean CheckPaymentDetails(){
 
         if (tie_paytype.getText() == null || tie_paytype.getText().toString().isEmpty()){
 
-            initMessage("Payment type is required", "Okay", "", 2, false, new onMessage() {
+            InitMessage("Payment type is required", "Okay", "", 2, false, new OnMessage() {
                 @Override
                 public void onPosBtnListener() {}
                 @Override
@@ -822,7 +830,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
             if (tie_financer.getText() == null){
 
-                initMessage("Financer is required", "Okay", "", 2, false, new onMessage() {
+                InitMessage("Financer is required", "Okay", "", 2, false, new OnMessage() {
                     @Override
                     public void onPosBtnListener() {}
                     @Override
@@ -832,9 +840,9 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                 return false;
             }
 
-            if (getAdapterID(laFinancer, tie_financer.getText().toString()).isEmpty()){
+            if (GetAdapterID(laFinancer, tie_financer.getText().toString()).isEmpty()){
 
-                initMessage("Financer is invalid", "Okay", "", 2, false, new onMessage() {
+                InitMessage("Financer is invalid", "Okay", "", 2, false, new OnMessage() {
                     @Override
                     public void onPosBtnListener() {}
                     @Override
@@ -848,11 +856,11 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         return true;
     }
 
-    private Boolean checkPersonalDetails(){
+    private Boolean CheckPersonalDetails(){
 
         if (tie_lname.getText() == null || tie_lname.getText().toString().isEmpty()){
 
-            initMessage("Lastname is required", "Okay", "", 2, false, new onMessage() {
+            InitMessage("Lastname is required", "Okay", "", 2, false, new OnMessage() {
                 @Override
                 public void onPosBtnListener() {}
 
@@ -865,7 +873,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
         if (tie_fname.getText() == null || tie_fname.getText().toString().isEmpty()){
 
-            initMessage("Firstname is required", "Okay", "", 2, false, new onMessage() {
+            InitMessage("Firstname is required", "Okay", "", 2, false, new OnMessage() {
                 @Override
                 public void onPosBtnListener() {}
 
@@ -882,7 +890,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
             if (!sMobile.matches("[0-9]{11}")){
 
-                initMessage("Mobile must be 11 digits and contain only numbers", "Okay", "", 2, false, new onMessage() {
+                InitMessage("Mobile must be 11 digits and contain only numbers", "Okay", "", 2, false, new OnMessage() {
                     @Override
                     public void onPosBtnListener() {}
 
@@ -912,7 +920,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                 break;
             case "financing":
                 loPaymentInfo.put("paymentForm", "2");
-                loPaymentInfo.put("financer", getAdapterID(laFinancer, tie_financer.getText().toString()));
+                loPaymentInfo.put("financer", GetAdapterID(laFinancer, tie_financer.getText().toString()));
                 break;
             default:
                 loPaymentInfo.put("paymentForm", "0");
@@ -936,7 +944,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
         return loPersonalInfo;
     }
 
-    private String getAdapterID(HashMap<String, String> map, String value){
+    private String GetAdapterID(HashMap<String, String> map, String value){
 
         String returnID = "";
         for (Map.Entry<String, String> entry : map.entrySet()){
@@ -1049,7 +1057,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     }
 
-    private interface onMessage{
+    private interface OnMessage {
         void onPosBtnListener();
         void onNegBtnListener();
     }

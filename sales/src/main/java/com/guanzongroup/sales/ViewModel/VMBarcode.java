@@ -16,10 +16,8 @@ import androidx.lifecycle.LiveData;
 
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Apps.Sales.Barcode;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DTownInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcodeDetail;
-import org.rmj.g3appdriver.lib.Etc.Town;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
@@ -43,23 +41,23 @@ public class VMBarcode extends AndroidViewModel {
         this.poConn = new ConnectionUtil(application);
     }
 
-    public LiveData<List<EBarcode>> observeBarcodeList(){
+    public LiveData<List<EBarcode>> ObserveBarcodeList(){
         return poBarcode.getBarcodeList();
     }
 
-    public LiveData<List<EBarcodeDetail>> getBarcodeItems(String id){
+    public LiveData<List<EBarcodeDetail>> GetBarcodeItems(String id){
         return poBarcode.getBarcodeITems(id);
     }
 
-    public LiveData<List<EBarcode>> observeCheckedBarcodeList(){
+    public LiveData<List<EBarcode>> ObserveCheckedBarcodeList(){
         return poBarcode.observeCheckedBarcodeList();
     }
 
-    public List<EBarcode> getCheckedBarcodeList(){
+    public List<EBarcode> GetCheckedBarcodeList(){
         return poBarcode.getCheckedBarcodeList();
     }
 
-    public void CheckPermission(onCheckPermission callback){
+    public void CheckPermission(OnCheckPermission callback){
 
         TaskExecutor.Execute(context, new OnTaskExecuteListener() {
             @Override
@@ -100,19 +98,19 @@ public class VMBarcode extends AndroidViewModel {
         });
     }
 
-    public void saveBarcode(String barcode){
+    public void SaveBarcode(String barcode){
         poBarcode.saveBarcode(barcode);
     }
 
-    public void selectBarcode(String bcodeIDxx, Integer status){
+    public void SelectBarcode(String bcodeIDxx, Integer status){
         poBarcode.selectBarcode(bcodeIDxx, status);
     }
 
-    public void deleteBarcode(String barCodeID){
+    public void DeleteBarcode(String barCodeID){
         poBarcode.deleteBarcode(barCodeID);
     }
 
-    public void downloadBundles(String sBundleIdxx, OnDownloadBundles callback){
+    public void DownloadBundles(String sBundleIdxx, OnDownloadBundles callback){
 
         TaskExecutor.Execute(sBundleIdxx, new OnTaskExecuteListener() {
             @Override
@@ -148,7 +146,7 @@ public class VMBarcode extends AndroidViewModel {
         });
     }
 
-    public void submitBarcodes(JSONObject loData, onSubmitBarcodes callback){
+    public void SubmitBarcodes(JSONObject loData, OnSubmitBarcodes callback){
 
         TaskExecutor.Execute(loData, new OnTaskExecuteListener() {
             @Override
@@ -183,7 +181,7 @@ public class VMBarcode extends AndroidViewModel {
         });
     }
 
-    public void generateQR(JSONObject loData, onGenerateQR callback) throws Exception {
+    public void GenerateQR(JSONObject loData, OnGenerateQR callback) throws Exception {
 
         TaskExecutor.Execute(loData, new OnTaskExecuteListener() {
             @Override
@@ -232,19 +230,19 @@ public class VMBarcode extends AndroidViewModel {
         void OnFailed(String message);
     }
 
-    public interface onSubmitBarcodes{
+    public interface OnSubmitBarcodes {
         void onLoad(String title, String message);
         void onSuccess(String transNox);
         void onFailed(String message);
     }
 
-    public interface onGenerateQR{
+    public interface OnGenerateQR {
         void onGenerating();
         void onQRGenerated(Bitmap bitmap);
         void onQRGenerationFailed(String message);
     }
 
-    public interface onCheckPermission{
+    public interface OnCheckPermission {
         void onChecking(String message);
         void onPermissionGranted();
         void onPermissionDenied(String message);

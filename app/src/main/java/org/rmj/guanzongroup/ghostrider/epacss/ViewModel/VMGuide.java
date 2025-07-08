@@ -9,9 +9,11 @@ import androidx.lifecycle.LiveData;
 import org.rmj.g3appdriver.GCircle.Apps.UserGuide.UserGuides;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
+import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
+import java.io.File;
 import java.util.List;
 
 public class VMGuide extends AndroidViewModel {
@@ -22,6 +24,11 @@ public class VMGuide extends AndroidViewModel {
 
     public interface OnDownloadGuides{
         void OnDownloading();
+        void OnSuccess();
+        void OnFailed(String message);
+    }
+
+    public interface OnUploadGuide{
         void OnSuccess();
         void OnFailed(String message);
     }
@@ -63,6 +70,37 @@ public class VMGuide extends AndroidViewModel {
                 if (!(Boolean) object){
                     callback.OnFailed(message);
                 }else{
+                    callback.OnSuccess();
+                }
+            }
+        });
+    }
+
+    public void UploadGuide(String filename, byte[] file, OnUploadGuide callback){
+
+        TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isDeviceConnected()){
+                    message = poConnection.getMessage();
+                    return false;
+                }
+
+                if (!poGuides.UploadGuide(filename, file)){
+                    message = poGuides.getMessage();
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if(!(Boolean) object){
+                    callback.OnFailed(message);
+                }else {
                     callback.OnSuccess();
                 }
             }

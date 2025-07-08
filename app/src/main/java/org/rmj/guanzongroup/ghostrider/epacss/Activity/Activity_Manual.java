@@ -5,31 +5,44 @@ import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
+import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
+import org.rmj.guanzongroup.ghostrider.epacss.Dialog.Dialog_File_Upload;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
 import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMGuide;
 import org.rmj.guanzongroup.ghostrider.epacss.adapter.RecyclerviewUserGuideAdapter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,12 +52,45 @@ public class Activity_Manual extends AppCompatActivity {
     private VMGuide mViewmodel;
     private LoadDialog poDialog;
     private MessageBox poMessage;
+    private Dialog_File_Upload dialogFileUpload;
+    private FileUtility poFileUtil;
     private RecyclerviewUserGuideAdapter loAdapter;
 
     private LinearLayout layout_nodisp;
     private RecyclerView rcv_guides;
     private Toolbar toolbar;
     private TextInputEditText txt_fileSearch;
+
+    private File fileResult;
+
+    private final ActivityResultLauncher<Intent> poDocument = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+
+            try {
+
+                if (result.getResultCode() == RESULT_OK){
+
+                    if (result.getData() != null){
+                        Uri uri = Objects.requireNonNull(result.getData().getData());
+
+                        fileResult = poFileUtil.GetFileFromUri(uri);
+
+                        dialogFileUpload.load_prog.setVisibility(GONE);
+                        dialogFileUpload.btn_upload.setImageResource(R.drawable.baseline_cloud_upload_24);
+                        dialogFileUpload.btn_upload.setEnabled(true);
+
+                        dialogFileUpload.SetResult(true, poFileUtil.GetDisplayName(uri));
+                    }
+                }else {
+                    dialogFileUpload.SetResult(false,"Error attaching file");
+                }
+
+            }catch (Exception e){
+                dialogFileUpload.SetResult(false,e.getMessage());
+            }
+        }
+    });
 
     private interface OnDialogButtonCallback{
         void OnPositive();
@@ -60,6 +106,7 @@ public class Activity_Manual extends AppCompatActivity {
         mViewmodel = new ViewModelProvider(this).get(VMGuide.class);
         poDialog = new LoadDialog(this);
         poMessage = new MessageBox(this);
+        poFileUtil = new FileUtility(this);
 
         InitViews();
         InitObserver();
@@ -78,7 +125,65 @@ public class Activity_Manual extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             finish();
         }else if (item.getItemId() == R.id.action_add_guideline){
-            
+
+            dialogFileUpload = new Dialog_File_Upload(Activity_Manual.this, new Dialog_File_Upload.OnAction() {
+                @Override
+                public void OnSelectFile(Intent intent) {
+                    poDocument.launch(Intent.createChooser(intent, "Select a file"));
+                }
+
+                @Override
+                public void OnUpload(String filename) {
+                    try {
+
+                        if (poFileUtil.ReadFileToBytes(fileResult) == null){
+                            InitMessage(0, R.drawable.baseline_error_24, "Cannot read file properly", "Okay", "", new OnDialogButtonCallback() {
+                                @Override
+                                public void OnPositive() {}
+
+                                @Override
+                                public void OnNegative() {}
+                            });
+                            return;
+                        }
+
+                        mViewmodel.UploadGuide(filename, poFileUtil.ReadFileToBytes(fileResult), new VMGuide.OnUploadGuide() {
+                            @SuppressLint("ResourceAsColor")
+                            @Override
+                            public void OnSuccess() {
+                                dialogFileUpload.load_prog.setIndeterminate(false);
+                                dialogFileUpload.load_prog.setProgress(100);
+                                dialogFileUpload.load_prog.setIndicatorColor(ContextCompat.getColor(Activity_Manual.this, R.color.check_green));
+
+                                dialogFileUpload.btn_upload.setEnabled(false);
+                                dialogFileUpload.btn_select.setEnabled(true);
+                                dialogFileUpload.btn_cancel.setEnabled(true);
+                            }
+
+                            @SuppressLint("ResourceAsColor")
+                            @Override
+                            public void OnFailed(String message) {
+
+                                dialogFileUpload.mtv_file.setText(message);
+
+                                dialogFileUpload.load_prog.setIndeterminate(false);
+                                dialogFileUpload.load_prog.setProgress(100);
+                                dialogFileUpload.load_prog.setIndicatorColor(ContextCompat.getColor(Activity_Manual.this, R.color.cross_red));
+
+                                dialogFileUpload.btn_upload.setEnabled(false);
+                                dialogFileUpload.btn_select.setEnabled(true);
+                                dialogFileUpload.btn_cancel.setEnabled(true);
+                            }
+                        });
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            dialogFileUpload.Show();
+
         } else if (item.getItemId() == R.id.action_download_guideline) {
 
             poDialog.initDialog("User Guide", "Downloading Guides", false);
@@ -111,7 +216,24 @@ public class Activity_Manual extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    @SuppressLint("NotifyDataSetChanged")
+    private void InitAdapter(List<EGuides> loGuides){
 
+        loAdapter = new RecyclerviewUserGuideAdapter(loGuides, new RecyclerviewUserGuideAdapter.OnViewGuide() {
+            @Override
+            public void OnView(EGuides loGuide) {
+
+                Intent loIntent = new Intent(Activity_Manual.this, Activity_PDFViewer.class);
+                loIntent.putExtra("pdf_url", loGuide.getsURlxx());
+                startActivity(loIntent);
+                overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+            }
+        });
+
+        loAdapter.notifyDataSetChanged();
+        rcv_guides.setAdapter(loAdapter);
+        rcv_guides.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false));
+    }
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnDialogButtonCallback callback){
 
         poMessage.initDialog();
@@ -166,7 +288,6 @@ public class Activity_Manual extends AppCompatActivity {
             }
         });
     }
-
     private void InitListener(){
 
         txt_fileSearch.addTextChangedListener(new TextWatcher() {
@@ -190,22 +311,4 @@ public class Activity_Manual extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void InitAdapter(List<EGuides> loGuides){
-
-        loAdapter = new RecyclerviewUserGuideAdapter(loGuides, new RecyclerviewUserGuideAdapter.OnViewGuide() {
-            @Override
-            public void OnView(EGuides loGuide) {
-
-                Intent loIntent = new Intent(Activity_Manual.this, Activity_PDFViewer.class);
-                loIntent.putExtra("pdf_url", loGuide.getsURlxx());
-                startActivity(loIntent);
-                overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
-            }
-        });
-
-        loAdapter.notifyDataSetChanged();
-        rcv_guides.setAdapter(loAdapter);
-        rcv_guides.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false));
-    }
 }

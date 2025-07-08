@@ -92,10 +92,11 @@ public class ExpandableBarcodeAdapter extends BaseExpandableListAdapter {
             mtv_barcode.setText(master.getBarcode());
         }
 
+        mcb_barcodecb.setCheckedState(master.getChecked());
         mcb_barcodecb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (master.getChecked().equals(1)){
+                if (isChecked){
                     callback.OnChecked(1, master.getBarcodeIdxx());
                 }else {
                     callback.OnChecked(0, master.getBarcodeIdxx());
