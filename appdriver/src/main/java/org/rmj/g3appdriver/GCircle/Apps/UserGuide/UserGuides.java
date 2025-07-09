@@ -15,18 +15,21 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
+import org.rmj.g3appdriver.etc.AppConfigPreference;
 
 import java.io.File;
 import java.util.List;
 
 public class UserGuides {
 
+    private AppConfigPreference poConfig;
     private DGuides poDao;
     private GCircleApi poApi;
     private HttpHeaders poHeaders;
     private String message;
 
     public UserGuides(Application context){
+        this.poConfig = AppConfigPreference.getInstance(context);
         this.poDao = GGC_GCircleDB.getInstance(context).userguideDao();
         this.poApi = new GCircleApi(context);
         this.poHeaders = HttpHeaders.getInstance(context);
@@ -60,6 +63,8 @@ public class UserGuides {
 
                 poDao.DeleteGuides();
 
+                //todo link of device configured server
+                String lsFileDir = poConfig.getAppServer() + "usermanuals/";
                 for(int i = 0; i < laGuides.length(); i++){
 
                     JSONObject loObj = laGuides.getJSONObject(i);
@@ -68,7 +73,7 @@ public class UserGuides {
                     loGuide.setsTransNox(loObj.getString("transNox"));
                     loGuide.setType(loObj.getString("type"));
                     loGuide.setsTitlexx(loObj.getString("title"));
-                    loGuide.setsURlxx(loObj.getString("link"));
+                    loGuide.setsURlxx(lsFileDir + loObj.getString("link"));
 
                     poDao.InsertGuides(loGuide);
                 }
@@ -96,8 +101,6 @@ public class UserGuides {
                 return false;
             }
 
-            Log.d("GuideResult", lsResponse);
-
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
 
@@ -107,10 +110,17 @@ public class UserGuides {
                 return false;
             }
 
-            String sTransNox = loResponse.getString("transNox");
-            String sType = loResponse.getString("type");
-            String sTitle = loResponse.getString("title");
-            String sLink = loResponse.getString("link");
+            //todo link of device configured server
+            String lsFileDir = poConfig.getAppServer() + "usermanuals/";
+
+            EGuides loGuide = new EGuides();
+
+            loGuide.setsTransNox(loResponse.getString("transNox"));
+            loGuide.setType(loResponse.getString("type"));
+            loGuide.setsTitlexx(loResponse.getString("title"));
+            loGuide.setsURlxx(lsFileDir + loResponse.getString("link"));
+
+            poDao.InsertGuides(loGuide);
 
             return true;
 

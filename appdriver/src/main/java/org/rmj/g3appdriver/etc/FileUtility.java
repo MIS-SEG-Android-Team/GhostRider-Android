@@ -1,5 +1,6 @@
 package org.rmj.g3appdriver.etc;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -70,6 +71,12 @@ public class FileUtility {
         }
 
         return destinationFile;
+    }
+
+
+    public String GetMimeType(Uri uri) {
+        ContentResolver cr = context.getContentResolver();
+        return cr.getType(uri);
     }
 
     public byte[] ReadFileToBytes(File file) throws IOException {

@@ -82,12 +82,6 @@ public class Fragment_Associate_Dashboard extends Fragment {
                 lblFullNme.setText(eEmployeeInfo.getUserName());
                 lblUserLvl.setText(DeptCode.parseUserLevel(eEmployeeInfo.getEmpLevID()));
                 lblDept.setText(DeptCode.getDepartmentName(eEmployeeInfo.getDeptIDxx()));
-//                imgUser.setImageResource(AppConstants.getUserIcon(eEmployeeInfo.getUserLevl()));
-//                if(eEmployeeInfo.getDeptIDxx().equalsIgnoreCase(DeptCode.MANAGEMENT_INFORMATION_SYSTEM)){
-//                    lnDevMode.setVisibility(View.VISIBLE);
-//                } else {
-//                    lnDevMode.setVisibility(View.GONE);
-//                }
 
                 initEmployeeApp(eEmployeeInfo);
             } catch (Exception e){

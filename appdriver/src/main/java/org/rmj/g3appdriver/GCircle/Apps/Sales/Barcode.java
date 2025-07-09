@@ -56,6 +56,8 @@ public class Barcode {
         foVal.setBarcodeIdxx(generateTransNox());
         foVal.setBarcode(barcode);
         foVal.setChecked(0);
+
+        barcodeDao.save(foVal);
     }
 
     public void selectBarcode(String bcodeIDxx, Integer status){

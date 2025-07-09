@@ -5,16 +5,12 @@ import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.activity.result.ActivityResult;
@@ -32,6 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
+import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
+import org.rmj.g3appdriver.GCircle.Etc.PositionCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
 import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.LoadDialog;
@@ -42,13 +41,13 @@ import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMGuide;
 import org.rmj.guanzongroup.ghostrider.epacss.adapter.RecyclerviewUserGuideAdapter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Objects;
 
 
 public class Activity_Manual extends AppCompatActivity {
 
+    private EmployeeSession poSession;
     private VMGuide mViewmodel;
     private LoadDialog poDialog;
     private MessageBox poMessage;
@@ -74,16 +73,23 @@ public class Activity_Manual extends AppCompatActivity {
                     if (result.getData() != null){
                         Uri uri = Objects.requireNonNull(result.getData().getData());
 
+                        if (!poFileUtil.GetMimeType(uri).equals("application/pdf")){
+                            dialogFileUpload.SetResult(false, "File type is not pdf");
+                            dialogFileUpload.btn_upload.setEnabled(false);
+                            return;
+                        }
+
                         fileResult = poFileUtil.GetFileFromUri(uri);
 
                         dialogFileUpload.load_prog.setVisibility(GONE);
-                        dialogFileUpload.btn_upload.setImageResource(R.drawable.baseline_cloud_upload_24);
                         dialogFileUpload.btn_upload.setEnabled(true);
 
                         dialogFileUpload.SetResult(true, poFileUtil.GetDisplayName(uri));
                     }
                 }else {
-                    dialogFileUpload.SetResult(false,"Error attaching file");
+                    if (result.getResultCode() != RESULT_CANCELED){
+                        dialogFileUpload.SetResult(false,"Error attaching file");
+                    }
                 }
 
             }catch (Exception e){
@@ -103,6 +109,7 @@ public class Activity_Manual extends AppCompatActivity {
 
         setContentView(R.layout.activity_manual);
 
+        poSession = EmployeeSession.getInstance(this);
         mViewmodel = new ViewModelProvider(this).get(VMGuide.class);
         poDialog = new LoadDialog(this);
         poMessage = new MessageBox(this);
@@ -116,6 +123,26 @@ public class Activity_Manual extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_guidelines, menu);
+
+        //TODO ADD GUIDE, allow access to MIS Department only
+        if (Objects.equals(poSession.getDeptID(), DeptCode.MANAGEMENT_INFORMATION_SYSTEM)){
+
+            //TODO AREA HEAD / SUPERVISORS
+            if (Integer.parseInt(poSession.getEmployeeLevel()) > DeptCode.LEVEL_RANK_FILE){
+                menu.findItem(R.id.action_add_guideline).setEnabled(true);
+            }else {
+
+                //TODO RANKED LEVEL, DEVELOPERS ONLY
+                if (Objects.equals(poSession.getPositionID(), PositionCode.Code_Junior_Programmer) ||
+                        Objects.equals(poSession.getPositionID(), PositionCode.Code_Senior_Programmer)){
+
+                    menu.findItem(R.id.action_add_guideline).setEnabled(true);
+                }
+            }
+        }else {
+            menu.findItem(R.id.action_add_guideline).setEnabled(false);
+        }
+
         return true;
     }
 
@@ -237,7 +264,7 @@ public class Activity_Manual extends AppCompatActivity {
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnDialogButtonCallback callback){
 
         poMessage.initDialog();
-        poMessage.setTitle("Daily Collection Plan");
+        poMessage.setTitle("User Guide");
         poMessage.setIcon(statusIcon);
         poMessage.setMessage(message);
 

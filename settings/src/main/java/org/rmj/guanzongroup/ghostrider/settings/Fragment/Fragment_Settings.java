@@ -33,7 +33,6 @@ import androidx.preference.PreferenceFragmentCompat;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_AppVersion;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_Developer;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_HelpList;
@@ -218,14 +217,18 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
         }
 
         if(debugMode != null){
-            /*
-            TODO ALLOW TO ALL USERS TO CHANGE THEIR IP CONNECTION, INTENDED FOR MOBILE FIESTA SETUP AND APPLICATION TESTING
+            /**
+            TODO allow users to change IP CONNECTION,
+             intended for MOBILE FIESTA setup and APPLICATION TESTING.
+             But also back up, incase their is a change of the production server link.
+
             EmployeeSession poUser = EmployeeSession.getInstance(requireActivity());
             if (!poUser.getDeptID().equalsIgnoreCase(DeptCode.MANAGEMENT_INFORMATION_SYSTEM)){
                 debugMode.setVisible(false);
             } else {
                 debugMode.setVisible(true);
-            }*/
+            }
+             **/
             debugMode.setVisible(true);
             debugMode.setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireActivity(), Activity_Developer.class));

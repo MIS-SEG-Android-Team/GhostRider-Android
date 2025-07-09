@@ -74,12 +74,6 @@ public class EmployeeLoan {
     public String GetEmpLevel(){
         return poSession.getEmployeeLevel();
     }
-    public String GetEmpName(){
-        return poSession.getUserName();
-    }
-    public String GetEmpDepartment(){
-        return DeptCode.getDepartmentName(poSession.getDeptID());
-    }
     public String GetLoanName(String sIDxx){
         return poTypes.GetLoanNm(sIDxx);
     }
