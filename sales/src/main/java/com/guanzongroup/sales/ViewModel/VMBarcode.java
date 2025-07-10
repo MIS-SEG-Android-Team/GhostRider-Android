@@ -49,7 +49,7 @@ public class VMBarcode extends AndroidViewModel {
         return poBarcode.getBarcodeITems(id);
     }
 
-    public LiveData<List<EBarcode>> ObserveCheckedBarcodeList(){
+    public LiveData<List<EBarcodeDetail>> ObserveCheckedBarcodeList(){
         return poBarcode.observeCheckedBarcodeList();
     }
 
@@ -98,10 +98,6 @@ public class VMBarcode extends AndroidViewModel {
         });
     }
 
-    public void SaveBarcode(String barcode){
-        poBarcode.saveBarcode(barcode);
-    }
-
     public void SelectBarcode(String bcodeIDxx, Integer status){
         poBarcode.selectBarcode(bcodeIDxx, status);
     }
@@ -110,9 +106,13 @@ public class VMBarcode extends AndroidViewModel {
         poBarcode.deleteBarcode(barCodeID);
     }
 
-    public void DownloadBundles(String sBundleIdxx, OnDownloadBundles callback){
+    public void ClearBarcodes(){
+        poBarcode.clearBarcodes();
+    }
 
-        TaskExecutor.Execute(sBundleIdxx, new OnTaskExecuteListener() {
+    public void DownloadBarcode(String sBarcodeIdxx, OnDownloadBundles callback){
+
+        TaskExecutor.Execute(sBarcodeIdxx, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
                 callback.OnLoad("Guanzon Circle", "Downloading bundles . .");
@@ -126,7 +126,7 @@ public class VMBarcode extends AndroidViewModel {
                     return false;
                 }
 
-                if (!poBarcode.downloadBundles((String) args)){
+                if (!poBarcode.downloadBarcode((String) args)){
                     message = poBarcode.getMessage();
                     return false;
                 }

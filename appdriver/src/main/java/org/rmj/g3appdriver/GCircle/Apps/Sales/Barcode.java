@@ -50,22 +50,17 @@ public class Barcode {
         this.poHeaders = HttpHeaders.getInstance(context);
     }
 
-    public void saveBarcode(String barcode){
-
-        EBarcode foVal = new EBarcode();
-        foVal.setBarcodeIdxx(generateTransNox());
-        foVal.setBarcode(barcode);
-        foVal.setChecked(0);
-
-        barcodeDao.save(foVal);
-    }
-
     public void selectBarcode(String bcodeIDxx, Integer status){
         barcodeDao.index(bcodeIDxx, status);
     }
 
     public void deleteBarcode(String bcodeID){
         barcodeDao.deleteBarcode(bcodeID);
+    }
+
+    public void clearBarcodes(){
+        barcodeDao.clearBarcode();
+        barcodeDetailDao.clear();
     }
 
     private String getCurrentDate(){
@@ -97,7 +92,7 @@ public class Barcode {
         return barcodeDao.getBarcodes();
     }
 
-    public LiveData<List<EBarcode>> observeCheckedBarcodeList(){
+    public LiveData<List<EBarcodeDetail>> observeCheckedBarcodeList(){
         return barcodeDao.observeCheckedBarcodes();
     }
 
@@ -113,12 +108,12 @@ public class Barcode {
         return message;
     }
 
-    public Boolean downloadBundles(String sBundleIdxx){
+    public Boolean downloadBarcode(String sBarcodeIdxx){
 
         try {
 
             JSONObject loParams = new JSONObject();
-            loParams.put("sBundleIdxx", sBundleIdxx);
+            loParams.put("sBarcodexx", sBarcodeIdxx);
 
             String lsResponse = WebClient.sendRequest(poApi.getUrlDownloadBundles(), loParams.toString(), poHeaders.getHeaders());
 
@@ -151,14 +146,15 @@ public class Barcode {
                 EBarcodeDetail barcodeDetail = new EBarcodeDetail();
                 barcodeDetail.setBarcode_id(lsTransNox);
                 barcodeDetail.setnEntryNox(loItem.getInt("nEntryNox"));
-                barcodeDetail.setsDescript(loItem.getString("sSerialID"));
+                barcodeDetail.setsSerialID(loItem.getString("sSerialID"));
+                barcodeDetail.setsDescript(loItem.getString("sDescript"));
 
                 barcodeDetailDao.insert(barcodeDetail);
             }
 
             EBarcode barcode = new EBarcode();
             barcode.setBarcodeIdxx(lsTransNox);
-            barcode.setBarcode(loData.getString("bundleIDxx"));
+            barcode.setBarcode(loData.getString("barcodeIDxx"));
             barcode.setsDescriptxx(loData.getString("sDescriptxx"));
             barcode.setChecked(0);
 

@@ -16,6 +16,9 @@ public class EBarcodeDetail {
     public int nEntryNox;
 
     @ColumnInfo
+    public String sSerialID;
+
+    @ColumnInfo
     public String sDescript;
 
     @NonNull
@@ -34,6 +37,14 @@ public class EBarcodeDetail {
 
     public void setnEntryNox(@NonNull int nEntryNox) {
         this.nEntryNox = nEntryNox;
+    }
+
+    public String getsSerialID() {
+        return sSerialID;
+    }
+
+    public void setsSerialID(String sSerialID) {
+        this.sSerialID = sSerialID;
     }
 
     public String getsDescript() {

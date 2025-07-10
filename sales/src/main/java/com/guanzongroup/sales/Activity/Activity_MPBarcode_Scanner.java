@@ -90,7 +90,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
     private MessageBox poMessage;
 
     private final HashMap<String, String> laFinancer = new HashMap<>();
-
     private JSONArray loIEMI = new JSONArray();
 
     private final MutableLiveData<Integer> btnState = new MutableLiveData<>(1);
@@ -118,18 +117,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
                         //todo: double check result data
                         if (!result.getData().getStringExtra("qrdata").isEmpty()){
-
-                            InitMessage("Select type of item for barcode " + result.getData().getStringExtra("qrdata"), "Single Item", "Bundle", 3, true, new OnMessage() {
-                                @Override
-                                public void onPosBtnListener() {
-                                    SaveBarcodes(result.getData().getStringExtra("qrdata"));
-                                }
-
-                                @Override
-                                public void onNegBtnListener() {
-                                    SaveBundles(result.getData().getStringExtra("qrdata"));
-                                }
-                            });
+                            SaveBarcode(result.getData().getStringExtra("qrdata"));
                         }else {
 
                             //todo: show message, failed to read empty barcode
@@ -336,20 +324,7 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                 dialog_barcodeManual.initDialogBarcodeManual(new Dialog_BarcodeManual.onConfirm() {
                     @Override
                     public void onConfirm(String serial) {
-
-                        //todo: show confirmation, save barcode
-                        InitMessage("Select type of item for barcode "+ serial, "Single Item", "Bundle",
-                                3, true, new OnMessage() {
-                                    @Override
-                                    public void onPosBtnListener() {
-                                        SaveBarcodes(serial);
-                                    }
-
-                                    @Override
-                                    public void onNegBtnListener() {
-                                        SaveBundles(serial);
-                                    }
-                                });
+                        SaveBarcode(serial);
                     }
                 });
             }
@@ -418,8 +393,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                 if (!btnState.isInitialized()){
                     btnState.setValue(1);
                 }
-
-                Log.d("PhoneBarcode", String.valueOf(loIEMI));
 
                 boolean allowNext = false;
                 switch (btnState.getValue()){
@@ -532,40 +505,26 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
             }
         });
 
-        mViewModel.ObserveCheckedBarcodeList().observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcode>>() {
+        mViewModel.ObserveCheckedBarcodeList().observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcodeDetail>>() {
             @Override
-            public void onChanged(List<EBarcode> eBarcodes) {
+            public void onChanged(List<EBarcodeDetail> eBarcodes) {
 
-                if (eBarcodes == null){
-                    btn_next.setEnabled(false);
-                    fbtn_delete.setVisibility(View.GONE);
-                    return;
-                } else if (eBarcodes.size() < 1) {
-                    btn_next.setEnabled(false);
-                    fbtn_delete.setVisibility(View.GONE);
-                    return;
+                List<String> barcodeEntries = new ArrayList<>();
+                loIEMI = new JSONArray();
+
+                for (EBarcodeDetail loVal: eBarcodes){
+                    barcodeEntries.add(loVal.getsSerialID());
                 }
-                btn_next.setEnabled(true);
-                fbtn_delete.setVisibility(View.VISIBLE);
 
-                for (EBarcode loVal: eBarcodes){
+                loIEMI = new JSONArray(barcodeEntries);
 
-                    mViewModel.GetBarcodeItems(loVal.getBarcodeIdxx()).observe(Activity_MPBarcode_Scanner.this, new Observer<List<EBarcodeDetail>>() {
-                        @Override
-                        public void onChanged(List<EBarcodeDetail> eBarcodeDetails) {
-
-                            List<String> barcodeEntries = new ArrayList<>();
-                            for (EBarcodeDetail items: eBarcodeDetails){
-                                barcodeEntries.add(items.getsDescript());
-                            }
-
-                            if (barcodeEntries.size() > 0){
-                                loIEMI = new JSONArray(barcodeEntries);
-                            }else {
-                                loIEMI = new JSONArray();
-                            }
-                        }
-                    });
+                if (loIEMI.length() > 0){
+                    btn_next.setEnabled(true);
+                    fbtn_delete.setVisibility(View.VISIBLE);
+                }else {
+                    btn_next.setEnabled(false);
+                    fbtn_delete.setVisibility(View.GONE);
+                    return;
                 }
             }
         });
@@ -648,14 +607,9 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
 
     }
 
-    private void SaveBarcodes(String serial){
-        mViewModel.SaveBarcode(serial);
-        Toast.makeText(Activity_MPBarcode_Scanner.this, "Barcode saved successfully", Toast.LENGTH_LONG).show();
-    }
+    private void SaveBarcode(String sBarcodeIdxx){
 
-    private void SaveBundles(String bundleIDxx){
-
-        mViewModel.DownloadBundles(bundleIDxx, new VMBarcode.OnDownloadBundles() {
+        mViewModel.DownloadBarcode(sBarcodeIdxx, new VMBarcode.OnDownloadBundles() {
             @Override
             public void OnLoad(String title, String message) {
                 poLoad.initDialog(title, message, false);
@@ -751,8 +705,6 @@ public class Activity_MPBarcode_Scanner extends AppCompatActivity {
                     loQRInfo.put("sCustInfo", ParsePersonalInfo());
 
                     loQRInfo.put("sSerialNo", loIEMI);
-
-                    Log.d("PhoneBarcode", loQRInfo.toString());
 
                     mViewModel.GenerateQR(loQRInfo, new VMBarcode.OnGenerateQR() {
                         @Override

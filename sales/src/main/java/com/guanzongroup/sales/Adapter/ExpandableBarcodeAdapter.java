@@ -116,6 +116,11 @@ public class ExpandableBarcodeAdapter extends BaseExpandableListAdapter {
         MaterialTextView mtv_barcode = convertView.findViewById(R.id.mtv_barcode);
         EBarcodeDetail item = (EBarcodeDetail) getChild(groupPosition, childPosition);
 
+        if (item.getsDescript() != null && !item.getsDescript().isEmpty()){
+            mtv_barcode.setText(item.getsDescript());
+        }else {
+            mtv_barcode.setText(item.getsSerialID());
+        }
         mtv_barcode.setText(item.getsDescript());
 
         return convertView;

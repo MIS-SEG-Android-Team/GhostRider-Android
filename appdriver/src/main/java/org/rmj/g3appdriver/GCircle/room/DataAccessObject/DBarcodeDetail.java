@@ -15,6 +15,9 @@ public interface DBarcodeDetail {
     @Upsert
     void insert(EBarcodeDetail poBarcodeDetail);
 
+    @Query("DELETE FROM Barcode_Detail")
+    void clear();
+
     @Query("SELECT * FROM Barcode_Detail WHERE barcode_id = :barcode_id ORDER BY nEntryNox ASC")
     LiveData<List<EBarcodeDetail>> GetBarcodeItems(String barcode_id);
 }

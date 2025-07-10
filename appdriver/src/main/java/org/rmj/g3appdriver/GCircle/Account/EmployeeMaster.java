@@ -25,8 +25,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.apprdiver.util.SQLUtil;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcode;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcodeDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeLeave;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGuides;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeRole;
@@ -49,6 +52,9 @@ public class EmployeeMaster {
 
     private final DEmployeeInfo poDao;
     private final DEmployeeRole roleDao;
+    private final DGuides guidesDao;
+    private final DBarcode barcodeDao;
+    private final DBarcodeDetail barcodeDetailDao;
 
     private DEmployeeLeave leaveDao;
     private DEmployeeBusinessTrip btripDao;
@@ -68,6 +74,9 @@ public class EmployeeMaster {
         this.leaveDao = GGC_GCircleDB.getInstance(instance).employeeLeaveDao();
         this.btripDao = GGC_GCircleDB.getInstance(instance).employeeOBDao();
         this.roleDao = GGC_GCircleDB.getInstance(instance).employeeRoleDao();
+        this.guidesDao = GGC_GCircleDB.getInstance(instance).userguideDao();
+        this.barcodeDao = GGC_GCircleDB.getInstance(instance).barcodeDao();
+        this.barcodeDetailDao = GGC_GCircleDB.getInstance(instance).barcodeDetailDao();
         this.employeeInfo = poDao.getEmployeeInfo();
         this.poSession = EmployeeSession.getInstance(instance);
         this.poConfig = AppConfigPreference.getInstance(instance);
@@ -128,6 +137,10 @@ public class EmployeeMaster {
 
         leaveDao.deleteApplication();
         btripDao.delete();
+
+        guidesDao.clear();
+        barcodeDao.clearBarcode();
+        barcodeDetailDao.clear();
 
         poSession.initUserLogout();
     }

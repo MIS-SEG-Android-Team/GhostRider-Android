@@ -18,6 +18,9 @@ public interface DGuides {
     @Query("DELETE FROM User_Guides")
     void DeleteGuides();
 
+    @Query("DELETE FROM User_Guides")
+    void clear();
+
     @Query("SELECT * FROM User_Guides")
     LiveData<List<EGuides>> GetGuides();
 }
