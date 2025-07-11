@@ -1,20 +1,18 @@
-package org.rmj.guanzongroup.ghostrider.epacss.Activity;
+package org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy;
 
 import android.app.AlertDialog;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.github.barteksc.pdfviewer.PDFView;
 
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.ViewModel.VMLoadPDF;
+import org.rmj.g3appdriver.R;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.guanzongroup.ghostrider.epacss.R;
-import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMLoadPDF;
 
 import java.io.InputStream;
 

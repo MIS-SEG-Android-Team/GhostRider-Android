@@ -39,6 +39,7 @@ public class Activity_HelpList extends AppCompatActivity {
     public static  ExpandableListView expHelpView;
     private PopulateExpandableHelpList populateExpandableHelpList;
     public static ExpandableListHelpAdapter helpAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

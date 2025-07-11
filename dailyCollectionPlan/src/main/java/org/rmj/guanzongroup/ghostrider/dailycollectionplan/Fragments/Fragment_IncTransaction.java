@@ -45,11 +45,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.obj.OTH;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
-import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
@@ -210,7 +206,7 @@ public class Fragment_IncTransaction extends Fragment {
         poMessage = new MessageBox(requireActivity());
         poRem = new OtherRemCode();
 
-        initWidgets(view);
+        InitWidgets(view);
 
         TransNox = Activity_Transaction.getInstance().getTransNox();
         EntryNox = Activity_Transaction.getInstance().getEntryNox();
@@ -378,7 +374,7 @@ public class Fragment_IncTransaction extends Fragment {
         dialogDisclosure.show();
     }
 
-    private void initWidgets(View v){
+    private void InitWidgets(View v){
         lblFullNme = v.findViewById(R.id.lbl_customerName);
         lblAccount = v.findViewById(R.id.lbl_AccountNo);
         lblTransact = v.findViewById(R.id.lbl_transaction);

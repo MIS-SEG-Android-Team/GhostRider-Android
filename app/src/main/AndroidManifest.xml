@@ -57,7 +57,10 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:label">
         <activity
-            android:name=".Dialog.Dialog_File_Upload"
+            android:name="org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_PDFViewer"
             android:exported="false" />
         <activity
             android:name=".Activity.Activity_DataManager"
@@ -78,21 +81,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--
-        <activity
-            android:name="org.rmj.guanzongroup.petmanager.Activity.Activity_EmployeeApplicationSearch"
-            android:screenOrientation="userPortrait"
-            android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        -->
         <activity
             android:name=".Activity.Activity_Main"
             android:exported="true"

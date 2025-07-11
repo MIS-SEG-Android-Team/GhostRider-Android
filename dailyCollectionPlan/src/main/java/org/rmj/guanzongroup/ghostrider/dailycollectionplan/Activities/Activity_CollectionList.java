@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -94,36 +95,15 @@ public class Activity_CollectionList extends AppCompatActivity {
 
     private Intent loService;
     private String serviceName;
-    private AppConfigPreference poConfig;
     private DialogDisclosure dialogDisclosure;
 
     private String FILENAME;
 
     private ActivityResultLauncher<String[]> poRequest;
 
-    private final ActivityResultLauncher<Intent> poImport = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if(result.getResultCode() == RESULT_OK){
-//            Intent loIntent = result.getData();
-//            Uri uri = loIntent.getData();
-//            importDataFromFile(uri);
-        }
-    });
-
-    private final ActivityResultLauncher<Intent> poExport = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-        @Override
-        public void onActivityResult(ActivityResult result) {
-            if(result.getResultCode() == RESULT_OK){
-                Intent loIntent = result.getData();
-//                Uri uri = loIntent.getData();
-//                exportCollectionList(uri, poDcpData);
-//                mViewModel.setExportedDCP(false);
-            }
-        }
-    });
-
     private final ActivityResultLauncher<Intent> poDialer = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if(result.getResultCode() == RESULT_OK){
-
+        if(result.getResultCode() != RESULT_OK){
+            Toast.makeText(Activity_CollectionList.this, "Could not dial phone number", Toast.LENGTH_LONG);
         }
     });
 
@@ -136,11 +116,10 @@ public class Activity_CollectionList extends AppCompatActivity {
         mViewModel = new ViewModelProvider(this).get(VMCollectionList.class);
         loService = new Intent(Activity_CollectionList.this, GLocatorService.class);
         serviceName = Objects.requireNonNull(GLocatorService.class.getPackage()).getName() + "."+ GLocatorService.class.getSimpleName();
-        poConfig = AppConfigPreference.getInstance(this);
         dialogDisclosure = new DialogDisclosure(this);
 
-        initWidgets();
-        initPermission();
+        InitWidgets();
+        InitPermission();
 
         mViewModel.GetUserInfo().observe(Activity_CollectionList.this, user -> {
             try {
@@ -168,9 +147,9 @@ public class Activity_CollectionList extends AppCompatActivity {
                         if(ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                                 || ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
-                            showDCPDisclosure();
+                            ShowDCPDisclosure();
                         }else {
-                            showDownloadDcp();
+                            ShowDownloadDcp();
                         }
                     });
 
@@ -186,15 +165,13 @@ public class Activity_CollectionList extends AppCompatActivity {
                         } catch (URISyntaxException e) {
                             e.printStackTrace();
                         }
-
-                        poImport.launch(intent);
                     });
                 }
 
                 CollectionAdapter loAdapter = new CollectionAdapter(collectionDetails, new CollectionAdapter.OnItemClickListener() {
                     @Override
                     public void OnClick(int position) {
-                        showTransaction(position,collectionDetails);
+                        ShowTransaction(position,collectionDetails);
                     }
 
                     @Override
@@ -262,13 +239,11 @@ public class Activity_CollectionList extends AppCompatActivity {
         if(item.getItemId() == android.R.id.home){
             finish();
         } else if(item.getItemId() == R.id.action_menu_add_collection){
-            showAddDcpCollection();
+            ShowAddDcpCollection();
         } else if (item.getItemId() == R.id.action_menu_post_collection) {
-            showPostCollection();
+            ShowPostCollection();
         } else if (item.getItemId() == R.id.action_clear_dcp) {
             ClearDCPRecords();
-//            Intent loIntent = new Intent(Activity_CollectionList.this, Activity_ImageLog.class);
-//            startActivity(loIntent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -293,7 +268,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
 
-    private void initWidgets(){
+    private void InitWidgets(){
         Toolbar toolbar = findViewById(R.id.toolbar_collectionList);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -319,16 +294,16 @@ public class Activity_CollectionList extends AppCompatActivity {
         poMessage = new MessageBox(Activity_CollectionList.this);
     }
 
-    private void initPermission(){
+    private void InitPermission(){
         poRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
             Log.d("PERMISSION RESULT", result.toString());
 
             if(ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(Activity_CollectionList.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
 
-                showDownloadDcp();
+                ShowDownloadDcp();
             } else {
-                showDCPDisclosure();
+                ShowDCPDisclosure();
             }
         });
     }
@@ -446,7 +421,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         poMessage.show();
     }
 
-    public void showPostCollection(){
+    public void ShowPostCollection(){
         mViewModel.CheckDcpForPosting(new VMCollectionList.OnCheckDcpForPosting() {
             @Override
             public void OnLoad() {
@@ -492,7 +467,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         });
     }
 
-    public void showTransaction(int position, List<EDCPCollectionDetail> collectionDetails){
+    public void ShowTransaction(int position, List<EDCPCollectionDetail> collectionDetails){
         DialogAccountDetail loDialog = new DialogAccountDetail(Activity_CollectionList.this);
         loDialog.initAccountDetail(Activity_CollectionList.this ,collectionDetails.get(position), (dialog, remarksCode) -> {
             Intent loIntent = new Intent(Activity_CollectionList.this, Activity_Transaction.class);
@@ -506,7 +481,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         loDialog.show();
     }
 
-    public void showAddDcpCollection(){
+    public void ShowAddDcpCollection(){
         try {
             DialogAddCollection loDialog = new DialogAddCollection(Activity_CollectionList.this);
             loDialog.initDialog(new DialogAddCollection.OnDialogButtonClickListener() {
@@ -604,7 +579,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         }
     }
 
-    public void showDownloadDcp(){
+    public void ShowDownloadDcp(){
         boolean isTesting = mViewModel.IsTesting();
         if(isTesting){
             Dialog_DebugEntry loDebug = new Dialog_DebugEntry(Activity_CollectionList.this);
@@ -624,7 +599,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         }
     }
 
-    public void showDCPDisclosure(){
+    public void ShowDCPDisclosure(){
         dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
             @Override
             public void onAccept() {

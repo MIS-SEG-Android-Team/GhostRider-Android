@@ -27,6 +27,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_CustomerNotAround;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments.Fragment_IncTransaction;
@@ -102,12 +103,7 @@ public class Activity_Transaction extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent loIntent = new Intent(Intent.ACTION_VIEW);
-                loIntent.setDataAndTypeAndNormalize(
-                        Uri.parse(AppConfigPreference.getInstance(Activity_Transaction.this).getAppServer() +
-                                "usermanuals/files/DCP%20Camera%20and%20Location.pdf"),
-                        "application/pdf");
-                loIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Intent loIntent = new Intent(Activity_Transaction.this, Activity_Manual.class);
                 startActivity(loIntent);
             }
         });

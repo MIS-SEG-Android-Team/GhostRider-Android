@@ -1,4 +1,4 @@
-package org.rmj.guanzongroup.ghostrider.epacss.ViewModel;
+package org.rmj.g3appdriver.GCircle.Apps.User_Guide.ViewModel;
 
 import android.app.Application;
 
@@ -6,14 +6,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import org.rmj.g3appdriver.GCircle.Apps.UserGuide.UserGuides;
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Object.UserGuides;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
-import java.io.File;
 import java.util.List;
 
 public class VMGuide extends AndroidViewModel {

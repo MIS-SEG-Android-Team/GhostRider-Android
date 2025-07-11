@@ -42,13 +42,18 @@ public class Activity_Help extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_help);
+
         initWidgets();
         AppConfigPreference.getInstance(Activity_Help.this).setIsAppFirstLaunch(false);
+
         help = getIntent().getIntExtra("help", 0);
         img = SettingsConstants.getHelpImages(Activity_Help.this,getIntent().getIntExtra("help", 0));
-        addBottomDots(0);
         adapter = new ViewPagerAdapter(Activity_Help.this, img);
+
+        addBottomDots(0);
+
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -72,6 +77,7 @@ public class Activity_Help extends AppCompatActivity {
 
             }
         });
+
         btn_previous.setOnClickListener(v -> {
             int current = getItem(-1);
             if (current < img.length) {
@@ -91,9 +97,6 @@ public class Activity_Help extends AppCompatActivity {
         });
 
     }
-    private int getItem(int i) {
-        return viewPager.getCurrentItem() + i;
-    }
 
     public void initWidgets(){
         layout_dot = findViewById(R.id.layoutDots);
@@ -101,7 +104,9 @@ public class Activity_Help extends AppCompatActivity {
         btn_previous = findViewById(R.id.btn_previous);
         btnNext =  findViewById(R.id.btn_next);
     }
-
+    private int getItem(int i) {
+        return viewPager.getCurrentItem() + i;
+    }
     public void addBottomDots(int page_position) {
         dots = new TextView[img.length];
         layout_dot.removeAllViews();
@@ -123,7 +128,6 @@ public class Activity_Help extends AppCompatActivity {
         //set active dot color
         dots[page_position].setTextColor(getResources().getColor(R.color.guanzon_orange));
     }
-
     private void setTutorialFinish(){
         if (help == AppConstants.INTENT_SELFIE_LOGIN) {
             AppAssistantConfig.getInstance(Activity_Help.this).setHELP_SLOGIN_NOTICE(true);

@@ -15,6 +15,7 @@ import static org.rmj.g3appdriver.utils.ServiceScheduler.FIFTEEN_MINUTE_PERIODIC
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -35,6 +36,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
+import org.rmj.g3appdriver.etc.GMSUtility;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.TransparentToolbar;
 import org.rmj.g3appdriver.utils.AppDirectoryCreator;
@@ -54,6 +56,7 @@ public class Activity_SplashScreen extends AppCompatActivity {
     public static final String TAG = Activity_SplashScreen.class.getSimpleName();
 
     private VMSplashScreen mViewModel;
+    private GMSUtility poGMS;
 
     private ProgressBar prgrssBar;
     private MaterialTextView lblVrsion;
@@ -79,6 +82,25 @@ public class Activity_SplashScreen extends AppCompatActivity {
         lblVrsion = findViewById(R.id.lbl_versionInfo);
         lblVrsion.setText(BuildConfig.VERSION_NAME);
         loSched = new ServiceScheduler(this);
+        poGMS = new GMSUtility(this);
+
+        //TODO Check for new version
+        poGMS.GetAppStatus(new GMSUtility.OnGetUpdate() {
+            @Override
+            public void OnResult(int status) {
+                poDialog.initDialog();
+                poDialog.setTitle("Guanzon Circle");
+                poDialog.setIcon(R.drawable.baseline_error_24);
+                poDialog.setMessage("New version detected. Please update your application");
+                poDialog.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+            }
+        });
 
         InitActivityResultLaunchers();
 

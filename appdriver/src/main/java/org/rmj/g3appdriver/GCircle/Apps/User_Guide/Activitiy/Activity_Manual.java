@@ -1,4 +1,4 @@
-package org.rmj.guanzongroup.ghostrider.epacss.Activity;
+package org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -29,16 +29,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Adapter.RecyclerviewUserGuideAdapter;
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Dialog.Dialog_File_Upload;
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.ViewModel.VMGuide;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.GCircle.Etc.PositionCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
+import org.rmj.g3appdriver.R;
 import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.guanzongroup.ghostrider.epacss.Dialog.Dialog_File_Upload;
-import org.rmj.guanzongroup.ghostrider.epacss.R;
-import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMGuide;
-import org.rmj.guanzongroup.ghostrider.epacss.adapter.RecyclerviewUserGuideAdapter;
 
 import java.io.File;
 import java.util.List;

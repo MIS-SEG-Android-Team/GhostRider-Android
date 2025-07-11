@@ -49,7 +49,8 @@ public class VMSplashScreen extends AndroidViewModel {
     private String message;
 
     public VMSplashScreen(@NonNull Application application) {
-        super(application); 
+        super(application);
+
         this.instance = application;
         this.poConn = new ConnectionUtil(instance);
         this.poConfig = AppConfigPreference.getInstance(instance);
@@ -60,6 +61,7 @@ public class VMSplashScreen extends AndroidViewModel {
         this.poConfig.setUpdateLocally(false);
         this.poConfig.setTestCase(false);
         this.poConfig.setupAppVersionInfo(BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME, "");
+
         ETokenInfo loToken = new ETokenInfo();
         loToken.setTokenInf("temp_token");
         CheckConnection();

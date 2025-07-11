@@ -1,10 +1,9 @@
-package org.rmj.g3appdriver.GCircle.Apps.UserGuide;
+package org.rmj.g3appdriver.GCircle.Apps.User_Guide.Object;
 
 import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 
 import android.app.Application;
 import android.util.Base64;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import org.json.JSONArray;
@@ -17,7 +16,6 @@ import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 
-import java.io.File;
 import java.util.List;
 
 public class UserGuides {

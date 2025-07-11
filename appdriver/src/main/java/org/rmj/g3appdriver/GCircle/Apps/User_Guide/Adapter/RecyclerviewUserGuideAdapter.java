@@ -1,4 +1,4 @@
-package org.rmj.guanzongroup.ghostrider.epacss.adapter;
+package org.rmj.g3appdriver.GCircle.Apps.User_Guide.Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +12,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
-import org.rmj.guanzongroup.ghostrider.epacss.R;
+import org.rmj.g3appdriver.R;
 
 import java.util.ArrayList;
 import java.util.List;

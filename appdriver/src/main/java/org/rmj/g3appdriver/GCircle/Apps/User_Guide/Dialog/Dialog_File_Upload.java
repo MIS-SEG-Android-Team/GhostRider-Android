@@ -1,11 +1,9 @@
-package org.rmj.guanzongroup.ghostrider.epacss.Dialog;
+package org.rmj.g3appdriver.GCircle.Apps.User_Guide.Dialog;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -21,7 +19,8 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.rmj.guanzongroup.ghostrider.epacss.R;
+import org.rmj.g3appdriver.R;
+
 
 public class Dialog_File_Upload {
     private final AlertDialog poDialog;
