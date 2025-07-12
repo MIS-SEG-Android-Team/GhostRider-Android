@@ -136,11 +136,11 @@ public class Activity_Manual extends AppCompatActivity {
                 if (Objects.equals(poSession.getPositionID(), PositionCode.Code_Junior_Programmer) ||
                         Objects.equals(poSession.getPositionID(), PositionCode.Code_Senior_Programmer)){
 
-                    menu.findItem(R.id.action_add_guideline).setEnabled(true);
+                    menu.findItem(R.id.action_add_guideline).setVisible(true);
                 }
             }
         }else {
-            menu.findItem(R.id.action_add_guideline).setEnabled(false);
+            menu.findItem(R.id.action_add_guideline).setVisible(false);
         }
 
         return true;

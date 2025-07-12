@@ -14,14 +14,12 @@ package org.rmj.guanzongroup.ghostrider.settings.Activity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -29,8 +27,6 @@ import com.google.android.material.button.MaterialButton;
 
 import org.rmj.g3appdriver.dev.encryp.CodeGenerator;
 import org.rmj.guanzongroup.ghostrider.settings.R;
-
-import static org.rmj.guanzongroup.ghostrider.settings.etc.SettingsConstants.GCARD_SCAN;
 
 public class Activity_DigitalGcard extends AppCompatActivity {
     private CodeGenerator loGenerator;

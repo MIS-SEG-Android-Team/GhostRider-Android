@@ -1,84 +1,65 @@
 package org.rmj.guanzongroup.ghostrider.settings.ViewModel;
 
-import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
-
-import java.util.List;
-
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-
-import org.rmj.g3appdriver.lib.Version.AppVersion;
-import org.rmj.g3appdriver.lib.Version.VersionInfo;
-import org.rmj.g3appdriver.utils.ConnectionUtil;
-import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.etc.GMSUtility;
+import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 
 public class VMAppVersion extends AndroidViewModel {
 
-    private AppVersion poSys;
-    private ConnectionUtil poconn;
-    private String message;
-
-    public interface onDownloadVersionList{
-        void onDownload();
-        void onSuccess(List<VersionInfo> list);
+    public interface onDownload{
+        void onDownloading(int status);
+        void onSuccess();
         void onFailed(String message);
     }
 
     public VMAppVersion(@NonNull Application application) {
         super(application);
-        poSys = new AppVersion(application);
-        poconn = new ConnectionUtil(application);
     }
 
-    public void getVersionList(onDownloadVersionList listener){
+    public void GetUpdate(GMSUtility poGMS, onDownload callback){
 
-        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
-            @Override
-            public void OnPreExecute() {
-                listener.onDownload();
-            }
-
+        TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
 
-                try {
-                    if(!poconn.isDeviceConnected()){
-                        message = poconn.getMessage();
-                        return null;
+                poGMS.GetUpdate(new GMSUtility.OnGetUpdate() {
+                    @Override
+                    public void OnResult(int status) {
+
+                        if (status == 2){
+
+                            poGMS.StartUpdate(new GMSUtility.OnUpdateResult() {
+                                @Override
+                                public void OnDownloading(int status) {
+                                    callback.onDownloading(status);
+                                }
+
+                                @Override
+                                public void OnSuccess() {
+                                    callback.onSuccess();
+                                }
+
+                                @Override
+                                public void OnFailed(String message) {
+                                    callback.onFailed(message);
+                                }
+                            });
+
+                        }else {
+                            callback.onFailed("Update not available");
+                        }
                     }
-
-                    List<VersionInfo> list = poSys.GetVersionInfo();
-
-                    if(list == null){
-                        message = poSys.getMessage();
-                        return null;
-                    }
-
-                    return list;
-                }catch (Exception e){
-                    e.printStackTrace();
-                    message = getLocalMessage(e);
-                    return null;
-                }
-
+                });
+                return null;
             }
 
             @Override
-            public void OnPostExecute(Object object) {
-
-                List<VersionInfo> versionInfos = (List<VersionInfo>) object;
-
-                if(versionInfos == null){
-                    listener.onFailed(message);
-                }else {
-                    listener.onSuccess(versionInfos);
-                }
-
-            }
+            public void OnPostExecute(Object object) {}
         });
     }
 

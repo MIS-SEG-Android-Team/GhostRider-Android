@@ -34,18 +34,8 @@
             android:screenOrientation="portrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
         <activity
-            android:name=".Activity.Activity_Help"
-            android:label="GCard Info"
-            android:screenOrientation="portrait"
-            android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
-        <activity
             android:name=".Activity.Activity_DigitalGcard"
             android:label="GCard Info"
-            android:screenOrientation="portrait"
-            android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
-        <activity
-            android:name=".Activity.Activity_CheckUpdate"
-            android:label="System Update"
             android:screenOrientation="portrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
         <activity

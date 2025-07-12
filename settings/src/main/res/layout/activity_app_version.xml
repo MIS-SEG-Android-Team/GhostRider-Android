@@ -68,76 +68,12 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ScrollView
-        android:id="@+id/scv"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@+id/btn_checkupdate"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/constraintLayout2">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/scv_parent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/lbl_updatedLog"
-                style="@style/PrimaryHeaderStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rec_updatelogs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lbl_updatedLog" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/lbl_updatedFixedConcerns"
-                style="@style/PrimaryHeaderStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="25dp"
-                android:layout_marginRight="20dp"
-                android:text=""
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/rec_updatelogs" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rec_updatedFixedConcerns"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lbl_updatedFixedConcerns" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
-
     <com.google.android.material.button.MaterialButton
+        style="@style/MaterialButtonAccent"
         android:id="@+id/btn_checkupdate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Check for Updates"
-        style="@style/MaterialButtonAccent"
+        android:hint="Download Updates"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

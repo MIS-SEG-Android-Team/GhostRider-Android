@@ -37,6 +37,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.GMSUtility;
+import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.TransparentToolbar;
 import org.rmj.g3appdriver.utils.AppDirectoryCreator;
@@ -52,22 +53,19 @@ import org.rmj.guanzongroup.petmanager.Dialog.DialogDisclosure;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressLint("CustomSplashScreen")
 public class Activity_SplashScreen extends AppCompatActivity {
     public static final String TAG = Activity_SplashScreen.class.getSimpleName();
 
     private VMSplashScreen mViewModel;
-    private GMSUtility poGMS;
 
     private ProgressBar prgrssBar;
     private MaterialTextView lblVrsion;
 
-    private MessageBox poDialog;
+    private MessageBox poMessage;
 
     private ActivityResultLauncher<String[]> poRequest;
-
     private ActivityResultLauncher<Intent> poLogin;
-
-    private ServiceScheduler loSched;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -77,38 +75,16 @@ public class Activity_SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
 
         mViewModel = new ViewModelProvider(this).get(VMSplashScreen.class);
-        poDialog = new MessageBox(Activity_SplashScreen.this);
+        poMessage = new MessageBox(Activity_SplashScreen.this);
+
         prgrssBar = findViewById(R.id.progress_splashscreen);
         lblVrsion = findViewById(R.id.lbl_versionInfo);
         lblVrsion.setText(BuildConfig.VERSION_NAME);
-        loSched = new ServiceScheduler(this);
-        poGMS = new GMSUtility(this);
-
-        //TODO Check for new version
-        poGMS.GetAppStatus(new GMSUtility.OnGetUpdate() {
-            @Override
-            public void OnResult(int status) {
-                poDialog.initDialog();
-                poDialog.setTitle("Guanzon Circle");
-                poDialog.setIcon(R.drawable.baseline_error_24);
-                poDialog.setMessage("New version detected. Please update your application");
-                poDialog.setPositiveButton("Okay", new MessageBox.DialogButton() {
-                    @Override
-                    public void OnButtonClick(View view, AlertDialog dialog) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-            }
-        });
-
-        InitActivityResultLaunchers();
 
         new TransparentToolbar(Activity_SplashScreen.this).SetupActionbar();
-
         startService(new Intent(Activity_SplashScreen.this, GMessagingService.class));
-        Log.e(TAG, "Firebase messaging service started.");
 
+        InitActivityResultLaunchers();
         InitializeAppContentDisclosure();
 
         FirebaseMessaging.getInstance().getToken()
@@ -134,6 +110,7 @@ public class Activity_SplashScreen extends AppCompatActivity {
     }
 
     private void InitializeAppContentDisclosure(){
+
         boolean isFirstLaunch = AppConfigPreference.getInstance(Activity_SplashScreen.this).isAppFirstLaunch();
         if(isFirstLaunch) {
 
@@ -215,15 +192,15 @@ public class Activity_SplashScreen extends AppCompatActivity {
 
             @Override
             public void OnFailed(String message) {
-                poDialog.initDialog();
-                poDialog.setIcon(R.drawable.baseline_error_24);
-                poDialog.setTitle("Guanzon Circle");
-                poDialog.setMessage(message);
-                poDialog.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
+                poMessage.setTitle("Guanzon Circle");
+                poMessage.setMessage(message);
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
                     dialog.dismiss();
                     finish();
                 });
-                poDialog.show();
+                poMessage.show();
             }
         });
     }
@@ -238,7 +215,7 @@ public class Activity_SplashScreen extends AppCompatActivity {
             if (result.getResultCode() == RESULT_OK) {
                 startActivity(new Intent(Activity_SplashScreen.this, Activity_Main.class));
 
-                loSched.scheduleJob(Activity_SplashScreen.this, DataDownloadService.class, FIFTEEN_MINUTE_PERIODIC, AppConstants.DataServiceID);
+                ServiceScheduler.scheduleJob(Activity_SplashScreen.this, DataDownloadService.class, FIFTEEN_MINUTE_PERIODIC, AppConstants.DataServiceID);
                 finish();
             } else if (result.getResultCode() == RESULT_CANCELED) {
                 finish();

@@ -13,6 +13,7 @@ package org.rmj.guanzongroup.ghostrider.epacss.ViewModel;
 
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
+import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.ETokenInfo;
 import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
+import org.rmj.g3appdriver.etc.GMSUtility;
 import org.rmj.g3appdriver.lib.Etc.Barangay;
 import org.rmj.g3appdriver.lib.Etc.Branch;
 import org.rmj.g3appdriver.lib.Etc.Province;
@@ -33,6 +35,7 @@ import org.rmj.g3appdriver.lib.Etc.Town;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnLoadApplicationListener;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 import org.rmj.guanzongroup.ghostrider.epacss.BuildConfig;
 
@@ -79,7 +82,7 @@ public class VMSplashScreen extends AndroidViewModel {
         });
     }
 
-    private void CheckConnection(){
+    public void CheckConnection(){
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
@@ -104,12 +107,14 @@ public class VMSplashScreen extends AndroidViewModel {
     }
 
     public void InitializeData(OnInitializeCallback mListener){
+
         TaskExecutor loTask = new TaskExecutor();
         loTask.setOnLoadApplicationListener(new OnLoadApplicationListener() {
             @Override
             public Object DoInBackground() {
                 try{
                     if(poConn.isDeviceConnected()){
+
                         if(!new Branch(instance).ImportBranches()){
                             Log.e(TAG, "Unable to import branches");
                         }

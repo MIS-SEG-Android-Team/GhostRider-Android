@@ -30,12 +30,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_AppVersion;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_Developer;
-import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_HelpList;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_LocalData;
 import org.rmj.guanzongroup.ghostrider.settings.Dialog.Dialog_ChangePassword;
 import org.rmj.guanzongroup.ghostrider.settings.R;
@@ -236,13 +234,6 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                 return false;
             });
         }
-        if(helpPref != null){
-            helpPref.setOnPreferenceClickListener(preference -> {
-                startActivity(new Intent(requireActivity(), Activity_HelpList.class));
-                requireActivity().overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
-                return false;
-            });
-        }
     }
 
     @Override
@@ -256,7 +247,6 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
         super.onStart();
         checkPermissionCamera();
         checkPermissionPhoneState();
-//        Toast.makeText(getApplicationContext(),"Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart Called
     }
     @Override
     public void onResume()
@@ -264,7 +254,6 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
         super.onResume();
         checkPermissionCamera();
         checkPermissionPhoneState();
-//        Toast.makeText(getApplicationContext(),"Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart Called
     }
 
     boolean checkPermissionCamera() {
