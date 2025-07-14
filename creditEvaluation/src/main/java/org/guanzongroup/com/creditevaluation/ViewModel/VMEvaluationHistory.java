@@ -49,54 +49,6 @@ public class VMEvaluationHistory extends AndroidViewModel {
         new DownloadApplicationsForBHApproval(callback).execute();
     }
 
-    /*private class DownloadApplicationsForBHApproval extends AsyncTask<Void, Void, Boolean> {
-
-        private final OnTransactionCallback loCallBck;
-
-        private String message;
-
-        private DownloadApplicationsForBHApproval(OnTransactionCallback foCallBck) {
-            this.loCallBck = foCallBck;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            loCallBck.onLoad();
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                if(!poConn.isDeviceConnected()) {
-                    message = poConn.getMessage();
-                    return false;
-                }
-
-                if(!poSys.DownloadApplicationsForBHApproval()){
-                    message = poSys.getMessage();
-                    return false;
-                }
-
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess) {
-                loCallBck.onFailed(message);
-            } else {
-                loCallBck.onSuccess("");
-            }
-        }
-
-    }*/
     private class DownloadApplicationsForBHApproval{
         private final OnTransactionCallback loCallBck;
         private String message;

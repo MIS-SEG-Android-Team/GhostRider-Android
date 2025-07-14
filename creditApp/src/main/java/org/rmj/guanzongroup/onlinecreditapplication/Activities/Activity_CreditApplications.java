@@ -62,6 +62,7 @@ public class Activity_CreditApplications extends AppCompatActivity {
             public void OnFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
                 poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -144,6 +145,7 @@ public class Activity_CreditApplications extends AppCompatActivity {
             public void OnSuccess() {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage("Applicant sent!");
                 poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -154,6 +156,7 @@ public class Activity_CreditApplications extends AppCompatActivity {
             public void OnFailed(String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
                 poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());

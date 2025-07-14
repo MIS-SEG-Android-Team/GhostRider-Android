@@ -72,6 +72,7 @@ public class DialogAccountDetail {
 
         poTown = new Town(activity.getApplication());
         poDCPRepo = new RDailyCollectionPlan(activity.getApplication());
+
         MaterialTextView lblReferNo = view.findViewById(R.id.lbl_dcpReferNo);
         MaterialTextView lblTransNo = view.findViewById(R.id.lbl_dcpTransNo);
         MaterialTextView lblClientN = view.findViewById(R.id.lbl_dcpClientNm);
@@ -81,6 +82,7 @@ public class DialogAccountDetail {
         MaterialTextView lblDueDate = view.findViewById(R.id.lbl_dcpDueDate);
         MaterialTextView transType = view.findViewById(R.id.lbl_transaction_type);
         LinearLayout linearLayout = view.findViewById(R.id.linear_lunInfo);
+
         dFullName = view.findViewById(R.id.dialog_fullName);
         dAddress = view.findViewById(R.id.dialog_address);
         dGender = view.findViewById(R.id.dialog_gender);
@@ -123,7 +125,6 @@ public class DialogAccountDetail {
                 linearLayout.setVisibility(View.GONE);
             }
             transType.setText(DCP_Constants.getRemarksDescription(foDetail.getRemCodex()));
-//            lblRemarks.setText(DCP_Constants.getRemarksDescription(foDetail.getRemCodex()));
         }
         Log.e("Remarks code", foDetail.getRemCodex() + "");
         lblReferNo.setText(foDetail.getReferNox());
@@ -133,10 +134,12 @@ public class DialogAccountDetail {
         lblSerialx.setText(foDetail.getSerialNo());
         lblAmountx.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(foDetail.getAmtDuexx())));
         lblDueDate.setText(FormatUIText.formatGOCasBirthdate(foDetail.getDueDatex()));
+
         lblBalnce.setText(FormatUIText.getCurrencyUIFormat(foDetail.getABalance()));
         lblDelayx.setText(String.valueOf(foDetail.getDelayAvg()));
         lblLastPy.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(foDetail.getLastPaym())));
         lblLastPd.setText(FormatUIText.formatGOCasBirthdate(foDetail.getLastPaid()));
+
         btnConfirm.setOnClickListener(view1 -> {
             listener.OnClick(poDialogx, spnTransact.getText().toString());
         });
@@ -219,6 +222,7 @@ public class DialogAccountDetail {
         } catch (Exception e){
             e.printStackTrace();
             poMessage.initDialog();
+            poMessage.setIcon(R.drawable.baseline_error_24);
             poMessage.setTitle("Error Report");
             poMessage.setMessage(e.getMessage());
             poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());

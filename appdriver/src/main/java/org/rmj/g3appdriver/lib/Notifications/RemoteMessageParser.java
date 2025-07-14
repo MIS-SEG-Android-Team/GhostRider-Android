@@ -1,5 +1,7 @@
 package org.rmj.g3appdriver.lib.Notifications;
 
+import android.util.Log;
+
 import com.google.firebase.messaging.RemoteMessage;
 
 import org.json.JSONException;
@@ -19,6 +21,9 @@ public class RemoteMessageParser {
     public String getValueOf(String JSONDataKeyValue){
         String msg_data = dataMessage.getData().get("msg_data");
         String value = "";
+
+        Log.d("RemoteMessageParser", msg_data);
+
         try{
             JSONObject jsonData = new JSONObject(msg_data);
             value = jsonData.getString(JSONDataKeyValue);

@@ -67,19 +67,4 @@ public class DevTools {
         }
     }
 
-    public boolean GetTestStatus(){
-        return poConfig.getTestStatus();
-    }
-
-    public boolean SetTestStatus(boolean isTest){
-        try {
-            poConfig.setTestCase(isTest);
-            poUser.LogoutUserSession();
-            return true;
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return false;
-        }
-    }
 }

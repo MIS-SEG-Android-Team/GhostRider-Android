@@ -12,6 +12,7 @@
 package org.rmj.g3appdriver.GCircle.ImportData.Obj;
 
 import android.app.Application;
+import android.util.Log;
 
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.ApprovalCode;
 import org.rmj.g3appdriver.GCircle.ImportData.model.ImportDataCallback;
@@ -20,9 +21,14 @@ import org.rmj.g3appdriver.GCircle.ImportData.model.ImportInstance;
 public class Import_SCARequest implements ImportInstance {
     public static final String TAG = Import_SCARequest.class.getSimpleName();
     private final ApprovalCode poSys;
+    private String stamp = "";
 
     public Import_SCARequest(Application instance) {
         this.poSys = new ApprovalCode(instance);
+    }
+
+    public void setTimeStamp(String stamp){
+        this.stamp = stamp;
     }
 
     @Override
@@ -32,5 +38,12 @@ public class Import_SCARequest implements ImportInstance {
         } else {
             callback.OnSuccessImportData();
         }
+
+        if (!poSys.ImportSCARequestEmp(stamp)){
+            callback.OnFailedImportData(poSys.getMessage());
+        }else {
+            callback.OnSuccessImportData();
+        }
     }
+
 }

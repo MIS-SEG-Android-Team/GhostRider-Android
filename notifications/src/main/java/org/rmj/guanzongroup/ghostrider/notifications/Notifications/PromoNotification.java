@@ -1,10 +1,12 @@
 package org.rmj.guanzongroup.ghostrider.notifications.Notifications;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 
 import androidx.core.app.TaskStackBuilder;
@@ -12,6 +14,7 @@ import androidx.core.app.TaskStackBuilder;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.room.Entities.ENotificationMaster;
 import org.rmj.guanzongroup.ghostrider.notifications.Etc.iNotificationUI;
+import org.rmj.guanzongroup.ghostrider.notifications.R;
 
 import java.util.Date;
 
@@ -36,7 +39,6 @@ public class PromoNotification implements iNotificationUI {
     public void CreateNotification() {
         try{
             // this portion of code generates random channel id for notifications needed to show separately
-            int lnChannelID = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
 
             Intent loIntent = new Intent(mContext, Class.forName("org.rmj.guanzongroup.guanzonapp.Activity.Activity_SplashScreen"));
 
@@ -76,6 +78,18 @@ public class PromoNotification implements iNotificationUI {
 
             String lsTitlexx = poMessage.getMsgTitle();
             String lsMessage = poMessage.getMessagex();
+
+            Notification.Builder loBuilder = new Notification.Builder(mContext)
+                    .setContentIntent(notifyPendingIntent)
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setAutoCancel(true)
+                    .setSmallIcon(R.drawable.ic_guanzon_logo)
+                    .setContentTitle(lsTitlexx)
+                    .setContentText(lsMessage);
+
+            int lnChannelID = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+
+            loManager.notify(lnChannelID, loBuilder.build());
 
 //            Glide.with(mContext)
 //                    .asBitmap()

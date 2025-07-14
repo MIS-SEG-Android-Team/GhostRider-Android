@@ -15,6 +15,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.os.StrictMode;
+import android.util.Log;
 
 import org.rmj.g3appdriver.GConnect.Account.ClientSession;
 import org.rmj.g3appdriver.dev.Device.Telephony;
@@ -79,7 +80,9 @@ public class HttpHeaders {
         String lsDevcIDx = poTlphony.getDeviceID();
         String lsDateTme = SQLUtil.dateFormat(calendar.getTime(), "yyyyMMddHHmmss");
         String lsDevcMdl = Build.MODEL;
-        String lsMobileN = poConfigx.getMobileNo();
+
+        //api mobile requirement removed
+        String lsMobileN = "";
 
         if(lsTokenxx.isEmpty()){
             lsTokenxx = "f7qNSw8TRPWHSCga0g8YFF:APA91bG3i_lBPPWv9bbRasNzRH1XX1y0vzp6Ct8S_a-yMPDvSmud8FEVPMr26zZtBPHq2CmaIw9Rx0MZmf3sbuK44q3vQemUBoPPS4Meybw8pnTpcs3p0VbiTuoLHJtdncC6BgirJxt3";
@@ -100,6 +103,9 @@ public class HttpHeaders {
         hash_toLower = hash_toLower.toLowerCase();
         headers.put("g-api-hash", hash_toLower);
         headers.put("g-api-log", lsLogNoxx);
+
+        Log.d(TAG, headers.toString());
+
         return headers;
     }
 
@@ -119,7 +125,9 @@ public class HttpHeaders {
         String lsDevcIDx = poTlphony.getDeviceID();
         String lsDateTme = SQLUtil.dateFormat(calendar.getTime(), "yyyyMMddHHmmss");
         String lsDevcMdl = Build.MODEL;
-        String lsMobileN = poConfigx.getMobileNo();
+
+        //api mobile requirement removed
+        String lsMobileN = "";
 
         if(lsTokenxx.isEmpty()){
             lsTokenxx = "f7qNSw8TRPWHSCga0g8YFF:APA91bG3i_lBPPWv9bbRasNzRH1XX1y0vzp6Ct8S_a-yMPDvSmud8FEVPMr26zZtBPHq2CmaIw9Rx0MZmf3sbuK44q3vQemUBoPPS4Meybw8pnTpcs3p0VbiTuoLHJtdncC6BgirJxt3";

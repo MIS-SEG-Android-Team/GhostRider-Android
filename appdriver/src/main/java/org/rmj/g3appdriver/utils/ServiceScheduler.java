@@ -22,17 +22,18 @@ import static android.content.Context.JOB_SCHEDULER_SERVICE;
 
 public class ServiceScheduler {
     private static final String TAG = ServiceScheduler.class.getSimpleName();
+    private static JobScheduler loScheduler;
 
-    public static long EIGHT_HOUR_PERIODIC = 28800000;
     public static long FIFTEEN_MINUTE_PERIODIC = 900000;
 
+    public ServiceScheduler(Context context){
+        loScheduler = (JobScheduler)context.getSystemService(JOB_SCHEDULER_SERVICE);
+    }
+
     @SuppressLint({"MissingPermission", "NewApi"})
-    public static boolean isJobRunning(Context context, int JobID){
-        JobScheduler scheduler = (JobScheduler) context.getSystemService( JOB_SCHEDULER_SERVICE ) ;
-
+    public static boolean isJobRunning(int JobID){
         boolean hasBeenScheduled = false ;
-
-        for ( JobInfo jobInfo : scheduler.getAllPendingJobs() ) {
+        for ( JobInfo jobInfo : loScheduler.getAllPendingJobs() ) {
             if (jobInfo.getId() == JobID) {
                 hasBeenScheduled = true ;
                 break ;
@@ -50,12 +51,18 @@ public class ServiceScheduler {
                 .setPersisted(true)
                 .setPeriodic(periodic)
                 .build();
-        JobScheduler loScheduler = (JobScheduler)context.getSystemService(JOB_SCHEDULER_SERVICE);
+
+        loScheduler = (JobScheduler)context.getSystemService(JOB_SCHEDULER_SERVICE);
         int liResult = loScheduler.schedule(loJob);
+
         if(liResult == JobScheduler.RESULT_SUCCESS){
             Log.e(TAG, jobService.getSimpleName() + " Service Scheduled");
         } else {
             Log.e(TAG, jobService.getSimpleName() + " Service Scheduled Failed.");
         }
+    }
+
+    public static void stopSchedule(int JobID){
+        loScheduler.cancel(JobID);
     }
 }

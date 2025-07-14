@@ -3,24 +3,25 @@ package org.rmj.guanzongroup.pacitareward.Adapter;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-public class Fragment_BranchListAdapter extends FragmentStatePagerAdapter {
+public class Fragment_BranchListAdapter extends FragmentStateAdapter {
     public Fragment[] fragments;
-
-    public Fragment_BranchListAdapter(@NonNull FragmentManager fm, Fragment[] fragments) {
-        super(fm);
+    public Fragment_BranchListAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+        super(fragmentManager, lifecycle);
+    }
+    public void initFragments(Fragment[] fragments){
         this.fragments = fragments;
     }
 
     @NonNull
     @Override
-    public Fragment getItem(int position) {
+    public Fragment createFragment(int position) {
         return fragments[position];
     }
-
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return fragments.length;
     }
 }

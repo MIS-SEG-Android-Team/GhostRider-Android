@@ -10,6 +10,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -112,7 +113,8 @@ public class RaffleNotification implements PnlNotification{
 //                            .bigLargeIcon(null))
                             .setSmallIcon(R.drawable.ic_guanzon_circle)
                             .setContentTitle(lsTitlexx)
-                            .setContentText(lsMessage);
+                            .setContentText(lsMessage)
+                            .setColor(Color.rgb(255, 219, 77));
 
             loManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             loManager.notify(lnChannelID, notification.build());

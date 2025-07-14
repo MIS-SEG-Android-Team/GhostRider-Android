@@ -15,12 +15,17 @@ import static android.app.Activity.RESULT_OK;
 import static androidx.core.content.ContextCompat.checkSelfPermission;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,25 +35,21 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
-
-
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.AddressUpdate;
@@ -57,18 +58,22 @@ import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.MobileUpdate;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_Transaction;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Adapter.AddressInfoAdapter;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Adapter.MobileInfoAdapter;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogDisclosure;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.OnInitializeCameraCallback;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.VMCustomerNotAround;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.ViewModelCallback;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Fragment_CustomerNotAround extends Fragment {
 
     private VMCustomerNotAround mViewModel;
+    private DialogDisclosure dialogDisclosure;
     private LoadDialog poDialog;
     private MessageBox poMessage;
     private CustomerNotAround poCna;
@@ -92,58 +97,188 @@ public class Fragment_CustomerNotAround extends Fragment {
 
     private String transNo;
 
-    ActivityResultLauncher<String[]> poRequest = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> InitializeCamera());
-
     private final ActivityResultLauncher<Intent> poCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
-            if(result.getResultCode() == RESULT_OK) {
-                mViewModel.SaveTransaction(poCna, new ViewModelCallback() {
-                    @Override
-                    public void OnStartSaving() {
-                        poDialog.initDialog("Selfie Log", "Saving promise to pay. Please wait...", false);
-                        poDialog.show();
+
+            try {
+
+                if(result.getResultCode() == RESULT_OK) {
+
+                    //TODO: 1. GET COORDINATES OF CAPTURED IMAGE'S PROPERTIES,
+                    // NOTE: TO GET THIS PROPERLY. ENABLE MANUALLY THE TAG LOCATION SETTINGS ON CAMERA WITHIN THE APP
+                    @SuppressLint({"NewApi", "LocalSuppress"}) ExifInterface exifInterface =
+                            new ExifInterface(
+                                    Objects.requireNonNull(requireContext().getContentResolver().openInputStream(
+                                            MediaStore.setRequireOriginal(Uri.fromFile(new File(poCna.getFilePath())))
+                                    ))
+                            );
+
+                    //TODO: 2. SET IMAGE COORDINATES, IF NOT EMPTY
+                    if (exifInterface.getLatLong() != null){
+
+                        Log.d("DCP Fragment", "Image Longitude is " + String.valueOf(Objects.requireNonNull(exifInterface.getLatLong())[1])
+                                + " and Image Latitude is " + String.valueOf(exifInterface.getLatLong()[0]));
+
+                        poCna.setLatitude(String.valueOf(exifInterface.getLatLong()[0]));
+                        poCna.setLongtude(String.valueOf(exifInterface.getLatLong()[1]));
                     }
 
-                    @Override
-                    public void OnSuccessResult() {
-                        poDialog.dismiss();
-                        poMessage.initDialog();
-                        poMessage.setTitle("Daily Collection Plan");
-                        poMessage.setMessage("Customer not around has been save.");
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                            dialog.dismiss();
-                            requireActivity().finish();
+                    //TODO: 3. VALIDATE SAVED COORDINATES
+                    if (poCna.getLongtude() == null || poCna.getLatitude() == null){
+                        InitMessage(0, R.drawable.baseline_error_24, "Unable to get location coordinates. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
                         });
-                        poMessage.show();
+                        return;
                     }
 
-                    @Override
-                    public void OnFailedResult(String message) {
-                        poDialog.dismiss();
-                        poMessage.initDialog();
-                        poMessage.setTitle("Daily Collection Plan");
-                        poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                        poMessage.show();
+                    if (poCna.getLongtude().isEmpty() || poCna.getLatitude().isEmpty()){
+                        InitMessage(0, R.drawable.baseline_error_24, "Location coordinates is empty. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
+                        });
+                        return;
                     }
-                });
+
+                    if (poCna.getLongtude().equalsIgnoreCase("0.00000000000") || poCna.getLatitude().equalsIgnoreCase("0.00000000000")) {
+                        InitMessage(0, R.drawable.baseline_error_24, "Location coordinates is invalid. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
+                        });
+                        return;
+                    }
+
+                    mViewModel.SaveTransaction(poCna, new ViewModelCallback() {
+                        @Override
+                        public void OnStartSaving() {
+                            poDialog.initDialog("Selfie Log", "Saving selfie log. Please wait...", false);
+                            poDialog.show();
+                        }
+
+                        @Override
+                        public void OnSuccessResult() {
+                            poDialog.dismiss();
+
+                            poMessage.initDialog();
+                            poMessage.setIcon(R.drawable.baseline_message_24);
+                            poMessage.setTitle("Daily Collection Plan");
+                            poMessage.setMessage("Customer not around has been save.");
+                            poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                                dialog.dismiss();
+                                requireActivity().finish();
+                            });
+                            poMessage.show();
+                        }
+
+                        @Override
+                        public void OnFailedResult(String message) {
+                            poDialog.dismiss();
+                            poMessage.initDialog();
+                            poMessage.setIcon(R.drawable.baseline_error_24);
+                            poMessage.setTitle("Daily Collection Plan");
+                            poMessage.setMessage(message);
+                            poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                            poMessage.show();
+                        }
+                    });
+                }else {
+                    InitMessage(0, R.drawable.baseline_error_24, "Error capturing image", "Okay", "", new OnDialogButtonCallback() {
+                        @Override
+                        public void OnPositive() {}
+                        @Override
+                        public void OnNegative() {}
+                    });
+                }
+
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
     });
 
     private final ActivityResultLauncher<Intent> poDialer = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if(result.getResultCode() == RESULT_OK){
 
-        } else {
-
-        }
     });
+
+    private class OnRadioButtonSelectListener implements RadioGroup.OnCheckedChangeListener {
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            if(group.getId() == R.id.rg_CnaInput) {
+                if(checkedId == R.id.rb_contactNox) {
+                    isMobileToggled = true;
+                    lnContactNox.setVisibility(View.VISIBLE);
+                    lnAddress.setVisibility(View.GONE);
+                    spnRequestCode.setSelection(0);
+                    rb_permanent.setChecked(false);
+                    rb_present.setChecked(false);
+                    txtHouseNox.setText("");
+                    txtAddress.setText("");
+                    txtTown.setText("");
+                    txtBrgy.setText("");
+                    cbPrimary.setChecked(false);
+                    txtRemarks.setText("");
+                    InitMobileList();
+                } else if(checkedId == R.id.rb_address){
+                    isMobileToggled = false;
+                    lnContactNox.setVisibility(View.GONE);
+                    lnAddress.setVisibility(View.VISIBLE);
+                    spnRequestCode.setSelection(0);
+                    cbPrimeContact.setChecked(false);
+                    txtContact.setText("");
+                    txtRemarks.setText("");
+                    InitAddressList();
+                }
+            }
+            else if(group.getId() == R.id.rg_address_type) {
+                if(checkedId == R.id.rb_permanent) {
+                    poAddress.setcAddrssTp("0");
+                }
+                else if(checkedId == R.id.rb_present) {
+                    poAddress.setcAddrssTp("1");
+                }
+            }
+        }
+    }
+
+    private class OnCheckboxSetListener implements CheckBox.OnCheckedChangeListener{
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if(buttonView.isChecked()){
+                poMobile.setPrimaryx("1");
+                poAddress.setPrimaryStatus("1");
+            } else{
+                poMobile.setPrimaryx("0");
+                poAddress.setPrimaryStatus("0");
+            }
+        }
+    }
+
+    private interface OnDialogButtonCallback{
+        void OnPositive();
+        void OnNegative();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(requireActivity()).get(VMCustomerNotAround.class);
+
         View view = inflater.inflate(R.layout.fragment_customer_not_around_fragment, container, false);
+        String AccountN = Activity_Transaction.getInstance().getAccntNox();
+        int EntryNox = Activity_Transaction.getInstance().getEntryNox();
+
+        initWidgets(view);
+
+        mViewModel = new ViewModelProvider(requireActivity()).get(VMCustomerNotAround.class);
+        dialogDisclosure = new DialogDisclosure(requireActivity());
         poCna = new CustomerNotAround();
         poAddress = new AddressUpdate();
         poMobile = new MobileUpdate();
@@ -151,9 +286,6 @@ public class Fragment_CustomerNotAround extends Fragment {
         poMessage = new MessageBox(requireActivity());
 
         transNo = Activity_Transaction.getInstance().getTransNox();
-        String AccountN = Activity_Transaction.getInstance().getAccntNox();
-        int EntryNox = Activity_Transaction.getInstance().getEntryNox();
-        initWidgets(view);
 
         mViewModel.GetUserInfo().observe(getViewLifecycleOwner(), user -> {
             try{
@@ -176,7 +308,9 @@ public class Fragment_CustomerNotAround extends Fragment {
                 lblAccNo.setText(detail.getAcctNmbr());
                 lblClientNm.setText(detail.getFullName());
                 lblClientAddress.setText(detail.getAddressx());
+
                 InitMobileList();
+
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -277,23 +411,86 @@ public class Fragment_CustomerNotAround extends Fragment {
         });
 
         btnSubmit.setOnClickListener(v -> {
+
             if(txtRemarks.getText().toString().trim().isEmpty()){
                 Toast.makeText(requireActivity(), "Please enter remarks", Toast.LENGTH_SHORT).show();
                 return;
             }
+
             poCna.setRemarksx(txtRemarks.getText().toString());
-            if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+
+            if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                poRequest.launch(new String[]{
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.CAMERA});
+
+                ShowDCPDisclosure();
+
             } else {
                 InitializeCamera();
             }
         });
+
         return view;
+    }
+
+    private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnDialogButtonCallback callback){
+
+        poMessage.initDialog();
+        poMessage.setTitle("Daily Collection Plan");
+        poMessage.setIcon(statusIcon);
+        poMessage.setMessage(message);
+
+        poMessage.setPositiveButton(posText, (view, dialog) -> {
+            dialog.dismiss();
+            callback.OnPositive();
+        });
+
+        if (messageType == 1){
+            poMessage.setNegativeButton(negText, (view, dialog) -> {
+                dialog.dismiss();
+                callback.OnNegative();
+
+            });
+        }
+
+        poMessage.show();
+    }
+
+    private void ShowDCPDisclosure(){
+
+        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
+            @Override
+            public void onAccept() {
+                dialogDisclosure.dismiss();
+
+                Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                appSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                appSettings.setData(Uri.parse("package:" + requireActivity().getPackageName()));
+                startActivity(appSettings);
+            }
+
+            @Override
+            public void onDecline() {
+                dialogDisclosure.dismiss();
+
+                MessageBox loMessage = new MessageBox(requireActivity());
+                loMessage.setIcon(R.drawable.baseline_error_24);
+                loMessage.initDialog();
+                loMessage.setTitle("Disclosure");
+                loMessage.setMessage("Disclosure denied. Selfie log cancelled.");
+                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                    }
+                });
+
+                loMessage.show();
+            }
+        });
+
+        dialogDisclosure.setMessage("Guanzon Circle requires location and camera permission to take selfie log when the app is in use.");
+        dialogDisclosure.show();
     }
 
     private void initWidgets(View v){
@@ -336,116 +533,74 @@ public class Fragment_CustomerNotAround extends Fragment {
         cbPrimeContact.setOnCheckedChangeListener(new OnCheckboxSetListener());
     }
 
-    private class OnRadioButtonSelectListener implements RadioGroup.OnCheckedChangeListener {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            if(group.getId() == R.id.rg_CnaInput) {
-                if(checkedId == R.id.rb_contactNox) {
-                    isMobileToggled = true;
-                    lnContactNox.setVisibility(View.VISIBLE);
-                    lnAddress.setVisibility(View.GONE);
-                    spnRequestCode.setSelection(0);
-                    rb_permanent.setChecked(false);
-                    rb_present.setChecked(false);
-                    txtHouseNox.setText("");
-                    txtAddress.setText("");
-                    txtTown.setText("");
-                    txtBrgy.setText("");
-                    cbPrimary.setChecked(false);
-                    txtRemarks.setText("");
-                    InitMobileList();
-                } else if(checkedId == R.id.rb_address){
-                    isMobileToggled = false;
-                    lnContactNox.setVisibility(View.GONE);
-                    lnAddress.setVisibility(View.VISIBLE);
-                    spnRequestCode.setSelection(0);
-                    cbPrimeContact.setChecked(false);
-                    txtContact.setText("");
-                    txtRemarks.setText("");
-                    InitAddressList();
-                }
-            }
-            else if(group.getId() == R.id.rg_address_type) {
-                if(checkedId == R.id.rb_permanent) {
-                    poAddress.setcAddrssTp("0");
-                }
-                else if(checkedId == R.id.rb_present) {
-                    poAddress.setcAddrssTp("1");
-                }
-            }
-        }
-    }
-
-    private class OnCheckboxSetListener implements CheckBox.OnCheckedChangeListener{
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if(buttonView.isChecked()){
-                poMobile.setPrimaryx("1");
-                poAddress.setPrimaryStatus("1");
-            } else{
-                poMobile.setPrimaryx("0");
-                poAddress.setPrimaryStatus("0");
-            }
-        }
-    }
-
     private void InitializeCamera(){
+
         LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
+
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             Toast.makeText(requireActivity(), "Please enable your location service.", Toast.LENGTH_SHORT).show();
             return;
         }
-        poMessage.initDialog();
-        poMessage.setTitle("Daily Collection Plan");
-        poMessage.setMessage("Please take a selfie with the customer or within the area of the customer.");
-        poMessage.setPositiveButton("Okay", (view, dialog) -> {
-            dialog.dismiss();
-            mViewModel.InitCameraLaunch(requireActivity(), transNo, new OnInitializeCameraCallback() {
-                @Override
-                public void OnInit() {
-                    poDialog.initDialog("Daily Collection Plan", "Initializing camera. Please wait...", false);
-                    poDialog.show();
-                }
 
-                @Override
-                public void OnSuccess(Intent intent, String[] args) {
-                    poDialog.dismiss();
-                    poCna.setFilePath(args[0]);
-                    poCna.setFileName(args[1]);
-                    poCna.setLatitude(args[2]);
-                    poCna.setLongtude(args[3]);
-                    poCamera.launch(intent);
-                }
+        InitMessage(0, R.drawable.baseline_message_24, "Please take a selfie within the area", "Okay", "", new OnDialogButtonCallback() {
+            @Override
+            public void OnPositive() {
 
-                @Override
-                public void OnFailed(String message, Intent intent, String[] args) {
-                    poDialog.dismiss();
-                    poMessage.initDialog();
-                    poMessage.setTitle("Daily Collection Plan");
-                    poMessage.setMessage(message + "\n Proceed taking selfie?");
-                    poMessage.setPositiveButton("Continue", (view, dialog) -> {
-                        dialog.dismiss();
+                mViewModel.InitCameraLaunch(requireActivity(), transNo, new OnInitializeCameraCallback() {
+                    @Override
+                    public void OnInit() {
+                        poDialog.initDialog("Daily Collection Plan", "Initializing camera. Please wait...", false);
+                        poDialog.show();
+                    }
+
+                    @Override
+                    public void OnSuccess(Intent intent, String[] args) {
+                        poDialog.dismiss();
+
                         poCna.setFilePath(args[0]);
                         poCna.setFileName(args[1]);
                         poCna.setLatitude(args[2]);
                         poCna.setLongtude(args[3]);
+
                         poCamera.launch(intent);
-                    });
-                    poMessage.setNegativeButton("Cancel", (view1, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                }
-            });
+                    }
+
+                    @Override
+                    public void OnFailed(String message, Intent intent, String[] args) {
+                        poDialog.dismiss();
+                        poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_contact_support_24);
+                        poMessage.setTitle("Daily Collection Plan");
+                        poMessage.setMessage(message + "\n Proceed taking selfie?");
+                        poMessage.setPositiveButton("Continue", (view, dialog) -> {
+                            dialog.dismiss();
+
+                            poCna.setFilePath(args[0]);
+                            poCna.setFileName(args[1]);
+                            poCna.setLatitude(args[2]);
+                            poCna.setLongtude(args[3]);
+
+                            poCamera.launch(intent);
+                        });
+                        poMessage.setNegativeButton("Cancel", (view1, dialog) -> dialog.dismiss());
+                        poMessage.show();
+                    }
+                });
+            }
+
+            @Override
+            public void OnNegative() {}
         });
-        poMessage.setNegativeButton("Cancel", (view, dialog) -> dialog.dismiss());
-        poMessage.show();
     }
 
     private void InitMobileList(){
+
         mViewModel.GetMobileUpdates(poMobile.getClientID()).observe(getViewLifecycleOwner(), mobileNox -> {
             try {
                 mobileAdapter = new MobileInfoAdapter(new MobileInfoAdapter.OnItemInfoClickListener() {
                     @Override
                     public void OnDelete(int position) {
+
                         mViewModel.RemoveMobile(mobileNox.get(position).sTransNox, new VMCustomerNotAround.OnRemoveDetailCallback() {
                             @Override
                             public void OnSuccess() {

@@ -34,32 +34,13 @@ import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 public class VMLogin extends AndroidViewModel {
     public static final String TAG =  VMLogin.class.getSimpleName();
     private final AppConfigPreference poConfig;
-    private final Telephony poTlphony;
     private final iAuth poSys;
-
     private String message;
 
     public VMLogin(@NonNull Application application) {
         super(application);
         this.poSys = new AccountMaster(application).initGuanzonApp().getInstance(Auth.AUTHENTICATE);
-        poConfig = AppConfigPreference.getInstance(application);
-        poTlphony = new Telephony(application);
-    }
-
-    @SuppressLint("NewApi")
-    public String getMobileNo(){
-        if(poConfig.getMobileNo().isEmpty()) {
-            return poTlphony.getMobilNumbers();
-        } else {
-            return poConfig.getMobileNo();
-        }
-    }
-
-    public int hasMobileNo(){
-        if(poConfig.getMobileNo().equalsIgnoreCase("")) {
-            return View.VISIBLE;
-        }
-        return View.GONE;
+        this.poConfig = AppConfigPreference.getInstance(application);
     }
 
     public boolean isAgreed(){

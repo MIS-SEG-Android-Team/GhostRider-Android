@@ -43,6 +43,7 @@ public class Register implements iAuth {
             params.put("pswd", loInfo.getPassword());
             params.put("mobile", loInfo.getMobileNo());
 
+            Log.d(TAG, params.toString());
             String lsResponse = WebClient.sendRequest(
                     poApi.getUrlCreateAccount(),
                     params.toString(),

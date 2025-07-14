@@ -99,7 +99,7 @@ public class CollectionLogAdapter extends RecyclerView.Adapter<CollectionLogAdap
             lblRemarks = itemView.findViewById(R.id.lbl_dcpRemarks);
 
             itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
+                int position = getBindingAdapterPosition();
                 if(position != RecyclerView.NO_POSITION){
                     listener.OnClick(position);
                 }

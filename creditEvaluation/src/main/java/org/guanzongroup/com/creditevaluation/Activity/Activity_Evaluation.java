@@ -135,10 +135,14 @@ public class Activity_Evaluation extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(VMEvaluation.class);
+
         setContentView(R.layout.activity_evaluation);
+
+        mViewModel = new ViewModelProvider(this).get(VMEvaluation.class);
+
         initWidgets();
         initIntentData();
+
         psTransNo = getIntent().getStringExtra("transno");
         mViewModel.GetApplicationDetail(psTransNo).observe(Activity_Evaluation.this, ci -> {
             try{
@@ -308,6 +312,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                     public void OnSuccess() {
                         poDialogx.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("CI Evaluation");
                         poMessage.setMessage("CI Result uploaded successfully.");
                         poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -318,6 +323,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                     public void OnFailed(String message) {
                         poDialogx.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("CI Evaluation List");
                         poMessage.setMessage(message);
                         poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -354,6 +360,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                     public void OnSuccess() {
                         poDialogx.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("CI Evaluation");
                         poMessage.setMessage("Your recommendation has been saved to server.");
                         poMessage.setPositiveButton("Okay", (view, dialog) -> {
@@ -367,6 +374,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                     public void OnFailed(String message) {
                         poDialogx.dismiss();
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("CI Evaluation List");
                         poMessage.setMessage(message);
                         poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -489,6 +497,7 @@ public class Activity_Evaluation extends AppCompatActivity {
 
     public void showDialogImg(){
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("Residence Info");
         poMessage.setMessage("Please take a picture of the applicant residence area. \n");
         poMessage.setPositiveButton("Okay", (view, dialog) -> {
@@ -514,6 +523,7 @@ public class Activity_Evaluation extends AppCompatActivity {
                 public void OnFailed(String message, Intent intent, String[] args) {
                     poDialogx.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_contact_support_24);
                     poMessage.setTitle("CI Evaluation");
                     poMessage.setMessage(message + "\n Proceed taking picture?");
                     poMessage.setPositiveButton("Continue", (view, dialog) -> {

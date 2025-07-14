@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,22 +23,15 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeLeave;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
-import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.lib.Notifications.data.SampleData;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.OnCheckEmployeeApplicationListener;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_BranchPerformanceMonitoring;
-import org.rmj.guanzongroup.ghostrider.epacss.Activity.Activity_SplashScreen;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
 import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMHomeBH;
-import org.rmj.guanzongroup.ghostrider.epacss.adapter.NewsEventsModel;
 import org.rmj.guanzongroup.ghostrider.notifications.Adapter.AdapterAnnouncements;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Application;
 import org.rmj.guanzongroup.petmanager.Adapter.EmployeeApplicationAdapter;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class Fragment_Home_BH extends Fragment {
@@ -47,15 +39,11 @@ public class Fragment_Home_BH extends Fragment {
     private MaterialTextView lblFullNme;
     private MaterialTextView lblDept;
     private String lblBranchCD,lblBranchNM;
-    private double latitude, longitude;
-    private List<NewsEventsModel> newsList;
     private RecyclerView rvCompnyAnouncemnt, rvLeaveApp, rvBusTripApp;
-    private MessageBox loMessage;
     private CircularProgressIndicator mcIndicator,spIndicator,joIndicator;
     private MaterialTextView mcGoalPerc,mcGoalFraction,spGoalPerc,spGoalFraction,joGoalPerc,joGoalFraction;
     private VMHomeBH mViewModel;
     private MaterialCardView btnPerformance;
-//    private RecyclerView rvCompnyAnouncemnt;
 
     public static Fragment_Home_BH newInstance() {
         return new Fragment_Home_BH();
@@ -66,8 +54,7 @@ public class Fragment_Home_BH extends Fragment {
                              ViewGroup container, Bundle savedInstanceState){
         mViewModel = new ViewModelProvider(this).get(VMHomeBH.class);
         View view = inflater.inflate(R.layout.fragment_home_bh, container, false);
-        newsList = new ArrayList<>();
-        loMessage = new MessageBox(getActivity());
+
         lblFullNme = view.findViewById(R.id.bhName);
         lblDept = view.findViewById(R.id.bhPosition);
 

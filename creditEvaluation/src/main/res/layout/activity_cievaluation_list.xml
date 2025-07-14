@@ -22,13 +22,14 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header_background"
         android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay">
 
         <com.google.android.material.appbar.MaterialToolbar
+            app:popupTheme="@style/GhostRiderMaterialTheme.PopupOverlay"
             android:id="@+id/toolbar_creditEvalutionList"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/GhostRiderMaterialTheme.PopupOverlay" />
+            android:layout_height="?attr/actionBarSize" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -83,7 +84,8 @@
                     style="@style/TextInputStyleHeaders"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Search Loan Applicant">
+                    android:hint="Search Loan Applicant"
+                    android:textColorHint="@color/guanzon_text_grey">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txt_ci_search"
@@ -93,7 +95,9 @@
                         android:fontFamily="@font/roboto"
                         android:imeOptions="actionDone"
                         android:inputType="textCapWords"
-                        android:maxLines="1"/>
+                        android:maxLines="1"
+                        android:textColor="@color/guanzon_text_grey"
+                        android:background="@color/white"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>

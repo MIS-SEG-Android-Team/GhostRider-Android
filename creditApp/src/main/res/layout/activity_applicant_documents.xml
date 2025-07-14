@@ -12,6 +12,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header_background"
         android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -43,11 +44,8 @@
                     android:text="GoCas No. : 437Z19000052"
                     android:textSize="16sp"
                     android:gravity="start"
-                    tools:ignore="HardcodedText"
                     android:fontFamily="@font/roboto_medium"
-                    tools:targetApi="jelly_bean"/>
-
-
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -62,9 +60,8 @@
                 android:layout_height="wrap_content"
                 android:text="Garcia, Michael Permison"
                 android:textSize="16sp"
-                tools:ignore="HardcodedText"
                 android:fontFamily="@font/roboto_medium"
-                tools:targetApi="jelly_bean"/>
+                android:textStyle="bold"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -90,9 +87,8 @@
                     android:layout_weight="1"
                     android:text="December 12, 2019"
                     android:gravity="end"
-                    tools:ignore="HardcodedText"
                     android:fontFamily="@font/roboto_regular"
-                    tools:targetApi="jelly_bean"/>
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -120,9 +116,8 @@
                     android:layout_weight="1"
                     android:text="December 12, 2019"
                     android:gravity="end"
-                    tools:ignore="HardcodedText"
                     android:fontFamily="@font/roboto_regular"
-                    tools:targetApi="jelly_bean"/>
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -150,9 +145,8 @@
                     android:layout_weight="1"
                     android:text="December 12, 2019"
                     android:gravity="end"
-                    tools:ignore="HardcodedText"
                     android:fontFamily="@font/roboto_regular"
-                    tools:targetApi="jelly_bean"/>
+                    android:textStyle="bold"/>
 
             </LinearLayout>
             <LinearLayout
@@ -179,9 +173,8 @@
                     android:layout_weight="1"
                     android:text="December 12, 2019"
                     android:gravity="end"
-                    tools:ignore="HardcodedText"
                     android:fontFamily="@font/roboto_regular"
-                    tools:targetApi="jelly_bean"/>
+                    android:textStyle="bold"/>
 
             </LinearLayout>
 
@@ -210,17 +203,9 @@
                     android:layout_weight="1"
                     android:text="Approve with CI"
                     android:gravity="end"
-                    tools:ignore="HardcodedText"
                     android:fontFamily="@font/roboto_regular"
-                    tools:targetApi="jelly_bean"/>
+                    android:textStyle="bold"/>
             </LinearLayout>
-
-            <com.google.android.material.divider.MaterialDivider
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:padding="3dp"
-                android:background="@color/guanzon_orange"/>
-
 
         </LinearLayout>
 

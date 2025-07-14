@@ -70,7 +70,6 @@ public class GCircleApi extends WebApi {
     private static final String URL_SEND_REQUEST = "nmm/send_request.php";
     private static final String URL_SEND_REQUEST_SYSTEM = "nmm/send_request_system.php";
 
-    private static final String URL_KWIKSEARCH = "integsys/paramqry/cash_count_rqst_officer.php";
     private static final String URL_IMPORT_PAYSLIP = "petmgr/import_payslips.php";
     private static final String URL_SEND_LEAVE_APPLICATION = "petmgr/send_leave_application.php";
     private static final String URL_GET_LEAVE_APPLICATION = "petmgr/get_leave_application.php";
@@ -78,9 +77,11 @@ public class GCircleApi extends WebApi {
     private static final String URL_SEND_OB_APPLICATION = "petmgr/send_ob_application.php";
     private static final String URL_GET_OB_APPLICATION = "petmgr/get_ob_application.php";
     private static final String URL_CONFIRM_OB_APPLICATION = "petmgr/confirm_ob_application.php";
+    private static final String URL_SUBMIT_EMPLOAN_ENTRY = "petmgr/send_loan_application.php";
+
     private static final String URL_REQUEST_RANDOM_STOCK_INVENTORY = "integsys/bullseye/random_stock_inventory_request.php";
     private static final String URL_SUBMIT_RANDOM_STOCK_INVENTORY = "integsys/bullseye/random_stock_inventory_submit.php";
-
+    private static final String URL_KWIKSEARCH = "integsys/paramqry/cash_count_rqst_officer.php";
     private static final String URL_REQUEST_FOR_EVALUATIONS = "integsys/gocas/ci_request_for_evaluations.php";
     private static final String URL_ADD_FOR_EVALUATION = "integsys/gocas/ci_add_for_evaluation.php";
     private static final String URL_DOWNLOAD_CREDIT_APP = "integsys/gocas/download_credit_app.php";
@@ -88,6 +89,8 @@ public class GCircleApi extends WebApi {
     private static final String URL_POST_CI_APPROVAL = "integsys/gocas/ci_submit_approval.php";
     private static final String URL_DOWNLOAD_BH_PREVIEW = "integsys/gocas/bh_request_evaluation_preview.php";
     private static final String URL_POST_BH_APPROVAL = "integsys/gocas/bh_submit_approval.php";
+    private static final String URL_IMPORT_LOAN_TYPES = "integsys/param/download_loan_type.php";
+    private static final String URL_DOWNLOAD_SCARQST_EMP = "integsys/param/download_sca_request_emp.php";
 
     private static final String REQUEST_USER_ACCESS = "security/request_android_object.php";
 
@@ -102,9 +105,12 @@ public class GCircleApi extends WebApi {
     private static final String GET_PACITA_RULES = "gcircle/pacita/import_pacita_rules.php";
     private static final String GET_PACITA_EVALUATIONS = "gcircle/pacita/import_pacita_evaluations.php";
     private static final String SUBMIT_PACITA_RESULT = "gcircle/pacita/submit_pacita_result.php";
-
     private static final String URL_SUBMIT_INQUIRY = "gcircle/ganado/submit_inquiry.php";
     private static final String URL_DOWNLOAD_INQUIRIES = "gcircle/ganado/import_inquiries.php";
+    private static final String URL_SUBMIT_BARCODE = "gcircle/general/submit_order.php";
+    private static final String URL_DOWNLOAD_GUIDES = "usermanuals/download_manuals.php";
+    private static final String URL_UPLOAD_GUIDES = "usermanuals/upload_manual.php";
+    private static final String URL_DOWNLOAD_BUNDLES = "gcircle/general/download_items.php";
 
     public GCircleApi(Application instance) {
         super(instance);
@@ -872,6 +878,69 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_INQUIRIES);
         return LIVE + URL_DOWNLOAD_INQUIRIES;
+    }
+
+    public String getDownloadLoanTypes() {
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_IMPORT_LOAN_TYPES);
+            return LOCAL + URL_IMPORT_LOAN_TYPES;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_IMPORT_LOAN_TYPES);
+        return LIVE + URL_IMPORT_LOAN_TYPES;
+    }
+
+    public String getSubmitLoanEntry(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_SUBMIT_EMPLOAN_ENTRY);
+            return LOCAL + URL_SUBMIT_EMPLOAN_ENTRY;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_SUBMIT_EMPLOAN_ENTRY);
+        return LIVE + URL_SUBMIT_EMPLOAN_ENTRY;
+    }
+
+    public String getDownloadSCARqstEmp(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_DOWNLOAD_SCARQST_EMP);
+            return LOCAL + URL_DOWNLOAD_SCARQST_EMP;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_SCARQST_EMP);
+        return LIVE + URL_DOWNLOAD_SCARQST_EMP;
+    }
+
+    public String getUrlSubmitBarcode(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_SUBMIT_BARCODE);
+            return LOCAL + URL_SUBMIT_BARCODE;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_SUBMIT_BARCODE);
+        return LIVE + URL_SUBMIT_BARCODE;
+    }
+
+    public String getUrlDownloadGuides(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_DOWNLOAD_GUIDES);
+            return LOCAL + URL_DOWNLOAD_GUIDES;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_GUIDES);
+        return LIVE + URL_DOWNLOAD_GUIDES;
+    }
+
+    public String getUrlUploadGuides(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_UPLOAD_GUIDES);
+            return LOCAL + URL_UPLOAD_GUIDES;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_UPLOAD_GUIDES);
+        return LIVE + URL_UPLOAD_GUIDES;
+    }
+
+    public String getUrlDownloadBundles(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_DOWNLOAD_BUNDLES);
+            return LOCAL + URL_DOWNLOAD_BUNDLES;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_BUNDLES);
+        return LIVE + URL_DOWNLOAD_BUNDLES;
     }
 
 }

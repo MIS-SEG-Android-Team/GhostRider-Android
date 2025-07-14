@@ -13,22 +13,11 @@ import androidx.lifecycle.LiveData;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.rmj.apprdiver.util.LRUtil;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.obj.RClientUpdate;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.AddressUpdate;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.CustomerNotAround;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.ImportParams;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.LoanUnit;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.MobileUpdate;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.OtherRemCode;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.PaidDCP;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.PromiseToPay;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.Remittance;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DAddressUpdate;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMobileUpdate;
 import org.rmj.g3appdriver.GCircle.room.Entities.EClientUpdate;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
@@ -78,6 +67,7 @@ public class LRDcp {
     protected final RClientUpdate poClient;
     protected final DCPFileManager poReader;
     protected final RCollectionRemittance poRemit;
+    protected final DLRDcp poDCP;
 
     protected String message;
 
@@ -98,6 +88,7 @@ public class LRDcp {
         this.poClient = new RClientUpdate(instance);
         this.poReader = new DCPFileManager(instance);
         this.poRemit = new RCollectionRemittance(instance);
+        this.poDCP = GGC_GCircleDB.getInstance(instance).DcpDao();
         this.CURRENT_DATE = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
     }
 
@@ -107,6 +98,10 @@ public class LRDcp {
 
     public LiveData<DEmployeeInfo.EmployeeBranch> GetUserInfo(){
         return poUser.GetEmployeeBranch();
+    }
+
+    public LiveData<EDCPCollectionMaster> GetPostedDCP(){
+        return poDCP.GetLatestPostedDcp();
     }
 
     public boolean SaveTransaction(Object args){
@@ -365,16 +360,6 @@ public class LRDcp {
                 return false;
             }
 
-//
-//            ParcelFileDescriptor pfd = instance.getContentResolver().
-//                    openFileDescriptor(uri, "w");
-//            FileOutputStream fileOutputStream =
-//                    new FileOutputStream(pfd.getFileDescriptor());
-//            fileOutputStream.write(loArray.toString().getBytes());
-//            // Let the document provider know you're done by closing the stream.
-//            fileOutputStream.close();
-//            pfd.close();
-
             return true;
         } catch (Exception e){
             e.printStackTrace();
@@ -412,6 +397,8 @@ public class LRDcp {
                 message = SERVER_NO_RESPONSE;
                 return false;
             }
+
+            Log.d(TAG, lsResponse);
 
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
@@ -597,12 +584,17 @@ public class LRDcp {
         }
     }
 
+    public void UpdateCollection(EDCPCollectionDetail foVal){
+        poDao.UpdateCollectionDetail(foVal);
+    }
+
     /**
      * this method is use by splashscreen to start location tracking service
      * @return
      */
     public boolean HasCollection(){
         EDCPCollectionMaster loMaster = poDao.GetColletionMasterForPosting();
+        Log.d(TAG + "has collection", String.valueOf(loMaster != null));
         return loMaster != null;
     }
 

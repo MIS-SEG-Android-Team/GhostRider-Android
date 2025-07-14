@@ -18,12 +18,7 @@ import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-//import org.junit.runner.RunWith;
-//import org.robolectric.RobolectricTestRunner;
-//import org.robolectric.annotation.Config;
-
-//@RunWith(RobolectricTestRunner.class)
-//@Config(sdk = {Build.VERSION_CODES.O_MR1}, manifest= Config.NONE)
+import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMSplashScreen;
 public class VMSplashScreenTest extends TestCase {
     private VMSplashScreen mViewModel;
 

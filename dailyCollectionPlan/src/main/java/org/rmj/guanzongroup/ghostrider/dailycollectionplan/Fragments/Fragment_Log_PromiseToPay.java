@@ -16,8 +16,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.view.LayoutInflater;
@@ -63,13 +65,14 @@ public class Fragment_Log_PromiseToPay extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_promise_to_pay_log, container, false);
         initWidgets(v);
-        mViewModel = ViewModelProviders.of(this).get(VMLogPromiseToPay.class);
+        mViewModel = new ViewModelProvider(this).get(VMLogPromiseToPay.class);
         return v;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         // TODO: Do the coding here
         txtAcctNo.setText(Activity_TransactionDetail.acctNox);
         txtClientName.setText(Activity_TransactionDetail.fullNme);
@@ -84,7 +87,7 @@ public class Fragment_Log_PromiseToPay extends Fragment {
                 .observe(getViewLifecycleOwner(), eImageInfo -> {
                     try {
                         setPic(eImageInfo.getFileLoct());
-                        ivTransImage.setOnClickListener(view -> {
+                        ivTransImage.setOnClickListener(v -> {
                             poDialogx = new DialogDisplayImage(getActivity(),
                                     Activity_TransactionDetail.acctNox, eImageInfo.getFileLoct());
                             poDialogx.initDialog(dialog -> {

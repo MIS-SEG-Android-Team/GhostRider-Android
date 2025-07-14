@@ -46,6 +46,4 @@
             android:layout_marginTop="@dimen/nav_header_height"/>
 
     </com.google.android.material.navigation.NavigationView>
-
-
 </androidx.drawerlayout.widget.DrawerLayout>

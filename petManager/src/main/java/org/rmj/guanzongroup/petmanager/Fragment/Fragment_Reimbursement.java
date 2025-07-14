@@ -68,8 +68,9 @@ public class Fragment_Reimbursement extends Fragment implements VMReimbursement.
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         mViewModel = new ViewModelProvider(this).get(VMReimbursement.class);
 
         mViewModel.getExpensesList().observe(getViewLifecycleOwner(), reimburseInfos -> {
@@ -96,7 +97,7 @@ public class Fragment_Reimbursement extends Fragment implements VMReimbursement.
         });
         mViewModel.getTotalAmount().observe(getViewLifecycleOwner(), integer -> txtTotAmnt.setText(String.valueOf(integer)));
 
-        btnAdd.setOnClickListener(view -> {
+        btnAdd.setOnClickListener(v -> {
             if(btnAdd.getText().toString().toLowerCase().equalsIgnoreCase("add")) {
                 String lsDetail = Objects.requireNonNull(txtDetail.getText()).toString();
                 String lsAmount = Objects.requireNonNull(txtAmount.getText()).toString();

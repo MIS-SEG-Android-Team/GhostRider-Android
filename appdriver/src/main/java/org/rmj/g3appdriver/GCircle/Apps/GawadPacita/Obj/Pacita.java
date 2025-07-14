@@ -218,7 +218,7 @@ public class Pacita {
         }
     }
 
-    public boolean UpdateBranchRate(String TransNox, int EntryNox, String Result){
+    public boolean UpdateBranchRate(String TransNox, String loPayloadx){
         try{
             EPacitaEvaluation loDetail = poDao.CheckEvaulationRecord(TransNox);
 
@@ -227,19 +227,23 @@ public class Pacita {
                 return false;
             }
 
-            String lsPayload = loDetail.getPayloadx();
+            /*String lsPayload = loDetail.getPayloadx();
 
             JSONArray laJson = new JSONArray(lsPayload);
+
             for(int x = 0; x < laJson.length(); x++){
+
                 int lnEntryNo = laJson.getJSONObject(x).getInt("nEntryNox");
+
                 if(EntryNox == lnEntryNo){
+
                     laJson.getJSONObject(x).put("xRatingxx", Result);
                     Log.d(TAG, "Entry No. " + EntryNox + ", has been updated!");
                     break;
                 }
-            }
+            }*/
 
-            loDetail.setPayloadx(laJson.toString());
+            loDetail.setPayloadx(loPayloadx);
             poDao.Update(loDetail);
 
             return true;

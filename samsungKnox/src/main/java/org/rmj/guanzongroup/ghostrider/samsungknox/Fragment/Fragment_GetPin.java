@@ -100,6 +100,7 @@ public class Fragment_GetPin extends Fragment implements ViewModelCallBack {
     public void OnRequestFailed(String message) {
         dialog.dismiss();
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setMessage(message);
         loMessage.setTitle("Knox Get PIN");
         loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());

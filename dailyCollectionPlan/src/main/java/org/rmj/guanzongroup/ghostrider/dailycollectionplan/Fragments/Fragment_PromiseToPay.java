@@ -95,6 +95,7 @@ public class Fragment_PromiseToPay extends Fragment {
                     @Override
                     public void OnSuccessResult() {
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
                         poMessage.setTitle("Promise To Pay");
                         poMessage.setMessage("Promise to pay has been save.");
                         poMessage.setPositiveButton("Okay", (view, dialog) -> {
@@ -107,6 +108,7 @@ public class Fragment_PromiseToPay extends Fragment {
                     @Override
                     public void OnFailedResult(String message) {
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
                         poMessage.setTitle("Promise To Pay");
                         poMessage.setMessage(message);
                         poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -262,6 +264,7 @@ public class Fragment_PromiseToPay extends Fragment {
             return;
         }
         poMessage.initDialog();
+        poMessage.setIcon(R.drawable.baseline_message_24);
         poMessage.setTitle("Promise To Pay");
         poMessage.setMessage("Please take a selfie with the customer or within the area of the customer.");
         poMessage.setPositiveButton("Okay", (view, dialog) -> {
@@ -287,6 +290,7 @@ public class Fragment_PromiseToPay extends Fragment {
                 public void OnFailed(String message, Intent intent, String[] args) {
                     poDialog.dismiss();
                     poMessage.initDialog();
+                    poMessage.setIcon(R.drawable.baseline_contact_support_24);
                     poMessage.setTitle("Promise To Pay");
                     poMessage.setMessage(message + "\n Proceed taking selfie?");
                     poMessage.setPositiveButton("Continue", (view, dialog) -> {

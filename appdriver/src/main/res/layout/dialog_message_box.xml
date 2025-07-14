@@ -17,51 +17,69 @@
     android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="25dp"
-    app:cardUseCompatPadding="true"
-    app:cardPreventCornerOverlap="true"
+    app:cardCornerRadius="15dp"
     android:theme="@style/GhostRiderMaterialTheme"
-    android:layout_marginHorizontal="20dp">
+    android:layout_marginHorizontal="25dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingHorizontal="5dp"
+        android:paddingTop="5dp">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/lbl_dialogTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Title"
-            android:textSize="21sp"
-            android:gravity="center"
-            android:textAlignment="center"
-            android:paddingTop="20dp"
-            android:fontFamily="@font/roboto_bold"/>
-
-        <ScrollView
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/data_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/lbl_dialogMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Message"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:gravity="center"
-                android:textAlignment="center"
-                android:fontFamily="@font/roboto"
-                android:paddingTop="25dp"
-                android:paddingBottom="30dp"/>
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/msg_icon"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/baseline_message_24"
+                android:paddingHorizontal="3dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lbl_dialogTitle"
+                app:layout_constraintBottom_toBottomOf="@+id/lbl_dialogTitle"
+                app:layout_constraintWidth_percent="0.09"/>
 
-        </ScrollView>
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/lbl_dialogTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Title"
+                android:textSize="18sp"
+                android:fontFamily="@font/roboto_bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/msg_icon"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <ScrollView
+                android:id="@+id/message_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@+id/msg_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lbl_dialogTitle">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/lbl_dialogMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Message"
+                    android:paddingVertical="5dp"
+                    android:fontFamily="@font/roboto"
+                    android:textSize="15sp"/>
+            </ScrollView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
             android:layout_height="0.7dp"
-            android:background="@color/guanzon_orange"/>
+            android:background="@color/guanzon_orange"
+            android:layout_marginVertical="5dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -75,15 +93,8 @@
                 android:layout_weight="1"
                 android:text="YES"
                 android:fontFamily="@font/roboto_medium"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:visibility="visible"/>
-
-            <com.google.android.material.divider.MaterialDivider
-                android:id="@+id/view_midBorder"
-                android:layout_width="0.7dp"
-                android:layout_height="match_parent"
-                android:background="@color/guanzon_orange"
-                android:visibility="visible"/>
+                android:visibility="visible"
+                android:layout_marginEnd="2dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_dialogNegative"
@@ -92,8 +103,8 @@
                 android:layout_weight="1"
                 android:text="NO"
                 android:fontFamily="@font/roboto_medium"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:visibility="visible"/>
+                android:visibility="visible"
+                android:layout_marginStart="2dp"/>
 
         </LinearLayout>
 

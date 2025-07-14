@@ -46,18 +46,10 @@ public class BranchPerformance extends ABPM {
             int lsUserLvl = 4;
             String lsDeptIDx = poDao.GetUserDepartment();
 
-//            if(!lsDeptIDx.equalsIgnoreCase(DeptCode.SALES) ||
-//                    !lsDeptIDx.equalsIgnoreCase(DeptCode.CREDIT_SUPPORT_SERVICES)){
-//                message = "Your department code is not authorize to download branch performance info";
-//                return false;
-//            }
-
             if(!lsDeptIDx.equalsIgnoreCase(DeptCode.MANAGEMENT_INFORMATION_SYSTEM)) {
-                if(!lsDeptIDx.equalsIgnoreCase(DeptCode.MANAGEMENT_INFORMATION_SYSTEM)) {
-                    if(lsUserLvl < DeptCode.LEVEL_BRANCH_HEAD) {
-                        message = "User is not authorize to download area/branch performance";
-                        return false;
-                    }
+                if(lsUserLvl < DeptCode.LEVEL_BRANCH_HEAD) {
+                    message = "User is not authorize to download area/branch performance";
+                    return false;
                 }
             }
 

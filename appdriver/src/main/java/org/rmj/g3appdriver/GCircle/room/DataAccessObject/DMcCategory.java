@@ -11,12 +11,10 @@
 
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Update;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EMcCategory;
 
@@ -31,17 +29,11 @@ public interface DMcCategory {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insetBulkData(List<EMcCategory> categories);
 
-    @Update
-    void update(EMcCategory mcCategory);
-
     @Query("SELECT * FROM MC_Category WHERE sMcCatIDx =:fsVal")
     EMcCategory GetMcCategory(String fsVal);
 
     @Query("SELECT * FROM MC_Category ORDER BY dTimeStmp DESC LIMIT 1")
     EMcCategory GetLatestMcCategory();
-
-    @Query("SELECT * FROM MC_Category")
-    LiveData<List<EMcCategory>> getAllMcCategory();
 
     @Query("SELECT MAX(dTimeStmp) FROM MC_Category")
     String getLatestDataTime();

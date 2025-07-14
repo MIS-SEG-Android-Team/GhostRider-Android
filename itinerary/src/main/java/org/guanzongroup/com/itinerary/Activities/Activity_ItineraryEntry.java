@@ -52,7 +52,7 @@ public class Activity_ItineraryEntry extends AppCompatActivity {
         setContentView(R.layout.activity_itinerary_entry);
 
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Employee Itinerary");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         txtDate = findViewById(R.id.txt_schedDate);
@@ -206,6 +206,7 @@ public class Activity_ItineraryEntry extends AppCompatActivity {
                     public void OnSuccess(String args) {
                         poLoad.dismiss();
                         poDialog.initDialog();
+                        poDialog.setIcon(R.drawable.baseline_message_24);
                         poDialog.setTitle("Employee Itinerary");
                         poDialog.setMessage(args);
                         poDialog.setPositiveButton("Okay", (view, dialog) -> {
@@ -224,6 +225,7 @@ public class Activity_ItineraryEntry extends AppCompatActivity {
                     public void OnFailed(String message) {
                         poLoad.dismiss();
                         poDialog.initDialog();
+                        poDialog.setIcon(R.drawable.baseline_error_24);
                         poDialog.setTitle("Employee Itinerary");
                         poDialog.setMessage(message);
                         poDialog.setPositiveButton("Okay", (view, dialog) -> {

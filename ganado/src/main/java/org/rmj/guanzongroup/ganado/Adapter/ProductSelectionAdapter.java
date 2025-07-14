@@ -90,18 +90,18 @@ public class ProductSelectionAdapter extends RecyclerView.Adapter<ProductSelecti
             e.printStackTrace();
         }
 
+        String finalLsImgUrl = lsImgUrl;
         if (lsImgUrl != "") {
             ImageFileManager.LoadImageToView(lsImgUrl, holder.itemImg);
-            String finalLsImgUrl = lsImgUrl;
-            holder.itemView.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.OnClick(
-                            loModel.getModelIDx(),
-                            loModel.getBrandIDx(),
-                            finalLsImgUrl);
-                }
-            });
         }
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.OnClick(
+                        loModel.getModelIDx(),
+                        loModel.getBrandIDx(),
+                        finalLsImgUrl);
+            }
+        });
     }
 
     @Override

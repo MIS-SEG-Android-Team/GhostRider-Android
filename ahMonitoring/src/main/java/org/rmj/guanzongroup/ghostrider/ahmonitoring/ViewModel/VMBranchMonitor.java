@@ -62,9 +62,6 @@ public class VMBranchMonitor extends AndroidViewModel {
     public LiveData<List<DBranchPerformance.PeriodicalPerformance>> GetJobOrderPeriodicPerformance(String BranchCd){
         return poSys.GetJobOrderPeriodicPerformance(BranchCd);
     }
-    public LiveData<DBranchPerformance.MonthlyPieChart> get12MonthBranchPieChartData(String sBranchCd, String fsValue1, String fsValue2) {
-        return poDatabse.get12MonthBranchPieChartData(sBranchCd, fsValue1, fsValue2);
-    }
 
     public LiveData<String> getBranchName(String brnCD){
         return poBranch.getBranchName(brnCD);

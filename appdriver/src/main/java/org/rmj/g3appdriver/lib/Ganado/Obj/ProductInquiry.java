@@ -190,6 +190,7 @@ public class ProductInquiry {
             joAmort.put("nEndMrtgg", loAmort.nEndMrtgg);
             joAmort.put("nAcctThru", loAmort.nAcctThru);
             joAmort.put("nFactorRt", loAmort.nFactorRt);
+
             poPrice.setDownPayment(args1);
             return poPrice.getMonthlyAmort(joAmort);
         } catch (Exception e){

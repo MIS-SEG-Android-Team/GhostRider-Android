@@ -11,7 +11,6 @@
 
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -19,19 +18,11 @@ import androidx.room.Update;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EProvinceInfo;
 
-import java.util.List;
-
 @Dao
 public interface DProvinceInfo {
 
     @Insert
     void insert(EProvinceInfo provinceInfo);
-
-    @Insert
-    void insertBulkData(List<EProvinceInfo> provinceInfoList);
-
-    @Query("SELECT COUNT(*) FROM Province_Info")
-    Integer GetProvinceRecordsCount();
 
     @Query("SELECT * FROM Province_Info ORDER BY dTimeStmp DESC LIMIT 1")
     EProvinceInfo GetLatestProvince();
@@ -41,21 +32,6 @@ public interface DProvinceInfo {
 
     @Update
     void update(EProvinceInfo provinceInfo);
-
-    @Query("SELECT * FROM Province_Info")
-    LiveData<List<EProvinceInfo>> getAllProvinceInfo();
-
-    @Query("SELECT * FROM Province_Info")
-    LiveData<List<EProvinceInfo>> getAllProvinceName();
-
-    @Query("SELECT sProvName FROM Province_Info")
-    LiveData<String[]> getAllProvinceNames();
-
-    @Query("SELECT * FROM Province_Info WHERE sProvName LIKE:ProvinceName")
-    LiveData<List<EProvinceInfo>> searchProvinceName(String ProvinceName);
-
-    @Query("SELECT sProvName FROM Province_Info WHERE sProvIDxx = :provID")
-    LiveData<String> getProvinceNameFromProvID(String provID);
 
     @Query("SELECT MAX(dTimeStmp) FROM Province_Info")
     String getLatestDataTime();

@@ -14,6 +14,7 @@ import org.rmj.g3appdriver.GConnect.room.Entities.EClientInfo;
 import org.rmj.g3appdriver.GConnect.room.GGC_GConnectDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
+import org.rmj.g3appdriver.dev.Device.Telephony;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.lib.Account.Model.iAuth;
 import org.rmj.g3appdriver.lib.Account.pojo.UserAuthInfo;
@@ -26,7 +27,7 @@ public class SignIn implements iAuth {
     private final GConnectApi poApi;
     private final HttpHeaders poHeaders;
     private final AppConfigPreference poConfig;
-
+    private final Telephony poDevID;
     private String message;
 
     public SignIn(Application instance) {
@@ -35,6 +36,7 @@ public class SignIn implements iAuth {
         this.poApi = new GConnectApi(instance);
         this.poHeaders = HttpHeaders.getInstance(instance);
         this.poConfig = AppConfigPreference.getInstance(instance);
+        this.poDevID = new Telephony(instance);
     }
 
     @Override
@@ -44,11 +46,6 @@ public class SignIn implements iAuth {
             if(!loInfo.isAuthInfoValid()){
                 message = loInfo.getMessage();
                 return 0;
-            }
-
-            if(poConfig.getMobileNo().isEmpty()){
-                poConfig.setMobileNo(loInfo.getMobileNo());
-                Log.d(TAG, "Mobile number has been initialized.");
             }
 
             JSONObject params = new JSONObject();
@@ -80,8 +77,6 @@ public class SignIn implements iAuth {
             ClientSession loAccount = ClientSession.getInstance(instance);
             loAccount.setUserID(loResponse.getString("sUserIDxx"));
             loAccount.setFullName(loResponse.getString("sUserName"));
-//                    loInfo.setEmailAdd(loResponse.getString("sEmailAdd"));
-            loAccount.setMobileNo(loInfo.getMobileNo());
             loAccount.setLoginStatus(true);
 
             EClientInfo loClient = new EClientInfo();

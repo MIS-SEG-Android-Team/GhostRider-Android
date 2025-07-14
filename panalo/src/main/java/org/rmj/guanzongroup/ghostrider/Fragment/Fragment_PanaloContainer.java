@@ -11,7 +11,7 @@ import androidx.annotation.experimental.UseExperimental;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
@@ -22,10 +22,9 @@ import com.google.android.material.tabs.TabLayout;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERaffleStatus;
 import org.rmj.guanzongroup.ghostrider.Adapter.FragmentAdapter;
 import org.rmj.guanzongroup.ghostrider.Dialog.DialogMechanics;
+import org.rmj.guanzongroup.ghostrider.Dialog.DialogRaffle;
 import org.rmj.guanzongroup.ghostrider.R;
 import org.rmj.guanzongroup.ghostrider.ViewModel.VMPanaloContainer;
-
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,13 +32,11 @@ import java.util.Objects;
  * create an instance of this fragment.
  */
 public class Fragment_PanaloContainer extends Fragment {
-
     private VMPanaloContainer mViewModel;
     private View view;
     private TabLayout tabLayout;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
     private MaterialCardView btnMechanics;
-
     private Fragment[] fragment;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -87,23 +84,36 @@ public class Fragment_PanaloContainer extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mViewModel = new ViewModelProvider(requireActivity()).get(VMPanaloContainer.class);
         view= inflater.inflate(R.layout.fragment_panalo_container, container, false);
-        fragment = new Fragment[]{new Fragment_Raffle(), new Fragment_Rewards()};
+
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.ViewPager);
         btnMechanics = view.findViewById(R.id.btnMechanics);
 
+        mViewModel = new ViewModelProvider(requireActivity()).get(VMPanaloContainer.class);
+        fragment = new Fragment[]{new Fragment_Raffle(), new Fragment_Rewards()};
+
         tabLayout.addTab(tabLayout.newTab().setText("Raffle Draw"));
         tabLayout.addTab(tabLayout.newTab().setText("Redemption"));
 
-        viewPager.setAdapter(new FragmentAdapter(getChildFragmentManager(), fragment));
+        FragmentAdapter loAdapter = new FragmentAdapter(getChildFragmentManager(), getLifecycle());
+        loAdapter.initFragments(fragment);
 
-        if(fragment.length > 1){
-            tabLayout.setupWithViewPager(viewPager);
-            Objects.requireNonNull(tabLayout.getTabAt(0)).setText("Raffle Draw");
-            Objects.requireNonNull(tabLayout.getTabAt(1)).setText("Redemption");
-        }
+        viewPager.setAdapter(loAdapter);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         mViewModel.GetRaffleStatus().observe(requireActivity(), new Observer<ERaffleStatus>() {
             @Override
@@ -137,7 +147,12 @@ public class Fragment_PanaloContainer extends Fragment {
 
             }
         });
+
         initBtnMechanics();
+
+        /*DialogRaffle diagRaffle = new DialogRaffle(requireActivity());
+        diagRaffle.show();*/
+
         return view;
     }
 

@@ -36,22 +36,24 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
+import org.rmj.g3appdriver.etc.GMSUtility;
+import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.TransparentToolbar;
 import org.rmj.g3appdriver.utils.AppDirectoryCreator;
 import org.rmj.g3appdriver.utils.ServiceScheduler;
-import org.rmj.guanzongroup.authlibrary.Activity.Activity_Authenticate;
 import org.rmj.guanzongroup.authlibrary.Activity.Activity_Login;
-import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Service.GLocatorService;
 import org.rmj.guanzongroup.ghostrider.epacss.BuildConfig;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
 import org.rmj.guanzongroup.ghostrider.epacss.Service.DataDownloadService;
 import org.rmj.guanzongroup.ghostrider.epacss.Service.GMessagingService;
 import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMSplashScreen;
+import org.rmj.guanzongroup.petmanager.Dialog.DialogDisclosure;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressLint("CustomSplashScreen")
 public class Activity_SplashScreen extends AppCompatActivity {
     public static final String TAG = Activity_SplashScreen.class.getSimpleName();
 
@@ -60,29 +62,31 @@ public class Activity_SplashScreen extends AppCompatActivity {
     private ProgressBar prgrssBar;
     private MaterialTextView lblVrsion;
 
-    private MessageBox poDialog;
+    private MessageBox poMessage;
 
     private ActivityResultLauncher<String[]> poRequest;
-
     private ActivityResultLauncher<Intent> poLogin;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(VMSplashScreen.class);
+
         setContentView(R.layout.activity_splash_screen);
-        InitActivityResultLaunchers();
-        poDialog = new MessageBox(Activity_SplashScreen.this);
-        new TransparentToolbar(Activity_SplashScreen.this).SetupActionbar();
+
+        mViewModel = new ViewModelProvider(this).get(VMSplashScreen.class);
+        poMessage = new MessageBox(Activity_SplashScreen.this);
+
         prgrssBar = findViewById(R.id.progress_splashscreen);
         lblVrsion = findViewById(R.id.lbl_versionInfo);
         lblVrsion.setText(BuildConfig.VERSION_NAME);
 
+        new TransparentToolbar(Activity_SplashScreen.this).SetupActionbar();
         startService(new Intent(Activity_SplashScreen.this, GMessagingService.class));
-        Log.e(TAG, "Firebase messaging service started.");
 
+        InitActivityResultLaunchers();
         InitializeAppContentDisclosure();
+
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
@@ -106,23 +110,32 @@ public class Activity_SplashScreen extends AppCompatActivity {
     }
 
     private void InitializeAppContentDisclosure(){
+
         boolean isFirstLaunch = AppConfigPreference.getInstance(Activity_SplashScreen.this).isAppFirstLaunch();
         if(isFirstLaunch) {
-            MessageBox loMessage = new MessageBox(Activity_SplashScreen.this);
-            loMessage.initDialog();
-            loMessage.setTitle("Guanzon Circle");
-            loMessage.setMessage("Guanzon Circle collects location data for Selfie Log, DCP and other major features of the app" +
+
+            DialogDisclosure dialogDisclosure = new DialogDisclosure(this);
+            dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
+                @Override
+                public void onAccept() {
+                    dialogDisclosure.dismiss();
+                    CheckPermissions();
+                }
+
+                @Override
+                public void onDecline() {
+                    dialogDisclosure.dismiss();
+                    finish();
+                }
+            });
+
+            dialogDisclosure.setMessage("Guanzon Circle collects location data for Selfie Log, DCP and other major features of the app" +
                     " even when the app is closed or not in use.");
-            loMessage.setPositiveButton("Agree", (view, dialog) -> {
-                dialog.dismiss();
-                CheckPermissions();
-            });
-            loMessage.setNegativeButton("Disagree", (view, dialog) -> {
-                dialog.dismiss();
-                finish();
-            });
-            loMessage.show();
+
+            dialogDisclosure.show();
+
             findViewById(R.id.lblFirstLaunchNotice).setVisibility(View.VISIBLE);
+
         } else {
             CheckPermissions();
         }
@@ -151,12 +164,6 @@ public class Activity_SplashScreen extends AppCompatActivity {
         if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             lsPermissions.add(Manifest.permission.CAMERA);
         }
-        if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            lsPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        }
-        if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            lsPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if(ActivityCompat.checkSelfPermission(Activity_SplashScreen.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
                 lsPermissions.add(Manifest.permission.POST_NOTIFICATIONS);
@@ -173,12 +180,6 @@ public class Activity_SplashScreen extends AppCompatActivity {
             }
 
             @Override
-            public void OnHasDCP() {
-                startService(new Intent(Activity_SplashScreen.this, GLocatorService.class));
-                Log.d(TAG, "Location tracking service started.");
-            }
-
-            @Override
             public void OnSuccess() {
                 startActivity(new Intent(Activity_SplashScreen.this, Activity_Main.class));
                 finish();
@@ -191,14 +192,15 @@ public class Activity_SplashScreen extends AppCompatActivity {
 
             @Override
             public void OnFailed(String message) {
-                poDialog.initDialog();
-                poDialog.setTitle("Guanzon Circle");
-                poDialog.setMessage(message);
-                poDialog.setPositiveButton("Okay", (view, dialog) -> {
+                poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
+                poMessage.setTitle("Guanzon Circle");
+                poMessage.setMessage(message);
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
                     dialog.dismiss();
                     finish();
                 });
-                poDialog.show();
+                poMessage.show();
             }
         });
     }
@@ -209,8 +211,10 @@ public class Activity_SplashScreen extends AppCompatActivity {
         });
 
         poLogin = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            Log.d(TAG, String.valueOf(result.getResultCode()));
             if (result.getResultCode() == RESULT_OK) {
                 startActivity(new Intent(Activity_SplashScreen.this, Activity_Main.class));
+
                 ServiceScheduler.scheduleJob(Activity_SplashScreen.this, DataDownloadService.class, FIFTEEN_MINUTE_PERIODIC, AppConstants.DataServiceID);
                 finish();
             } else if (result.getResultCode() == RESULT_CANCELED) {

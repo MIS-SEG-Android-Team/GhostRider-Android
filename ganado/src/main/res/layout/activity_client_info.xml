@@ -30,20 +30,19 @@
         android:layout_height="0dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
+        android:src="@drawable/gradient_header_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent=".3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/lbl_CustomerInfo"
-        style="@style/PrimaryHeaderStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto"
+        android:fontFamily="@font/roboto_bold"
         android:text="CUSTOMER INFO"
-        android:textSize="24sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/shapeableImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -180,7 +179,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto"
-                            android:text="Gender" />
+                            android:text="Gender"/>
                         <RadioGroup
                             android:id="@+id/rg_gender"
                             android:layout_width="match_parent"
@@ -192,14 +191,16 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Male" />
+                                android:text="Male"
+                                android:textSize="11sp"/>
 
                             <com.google.android.material.radiobutton.MaterialRadioButton
                                 android:id="@+id/rb_female"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Female" />
+                                android:text="Female"
+                                android:textSize="11sp"/>
                         </RadioGroup>
                     </LinearLayout>
                 </LinearLayout>

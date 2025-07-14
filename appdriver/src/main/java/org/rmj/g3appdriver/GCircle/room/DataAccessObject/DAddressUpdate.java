@@ -26,15 +26,14 @@ public interface DAddressUpdate {
 
     @Query("SELECT " +
             "a.sTransNox, " +
-            "a.cReqstCDe, " +
             "a.cAddrssTp, " +
             "IFNULL(a.sHouseNox, '') AS sHouseNox, " +
             "IFNULL(a.sAddressx, '') AS sAddressx," +
             "b.sBrgyName, " +
             "c.sTownName, " +
             "d.sProvName, " +
-            "a.cPrimaryx, " +
-            "a.sRemarksx FROM Address_Update_Request a " +
+            "a.cPrimaryx " +
+            "FROM Address_Update_Request a " +
             "LEFT JOIN Barangay_Info b ON a.sBrgyIDxx = b.sBrgyIDxx " +
             "LEFT JOIN Town_Info c ON b.sTownIDxx = c.sTownIDxx " +
             "LEFT JOIN Province_Info d ON c.sProvIDxx = d.sProvIDxx " +
@@ -43,7 +42,6 @@ public interface DAddressUpdate {
 
     class AddressUpdateInfo{
         public String sTransNox;
-        public String cReqstCDe;
         public String cAddrssTp;
         public String sHouseNox;
         public String sAddressx;
@@ -51,6 +49,5 @@ public interface DAddressUpdate {
         public String sTownName;
         public String sProvName;
         public String cPrimaryx;
-        public String sRemarksx;
     }
 }

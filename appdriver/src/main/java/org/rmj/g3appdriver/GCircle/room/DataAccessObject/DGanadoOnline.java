@@ -37,7 +37,7 @@ public interface DGanadoOnline {
     @Query("SELECT * FROM MC_Brand WHERE sBrandNme IN ('HONDA', 'SUZUKI', 'KAWASAKI', 'YAMAHA')")
     LiveData<List<EMcBrand>> getAllMcBrand();
 
-    @Query("SELECT * FROM Mc_Model WHERE cRecdStat = '1' AND sBrandIDx = :BrandID")
+    @Query("SELECT * FROM Mc_Model WHERE cRecdStat = '1' AND cEndOfLfe = '0' AND sBrandIDx = :BrandID")
     LiveData<List<EMcModel>> getAllModeFromBrand(String BrandID);
     @Query("SELECT * FROM Mc_Model WHERE cRecdStat = '1' AND sBrandIDx = :BrandID AND sModelIDx = :ModelID")
     LiveData<EMcModel> getModeFromBrand(String BrandID, String ModelID);
@@ -51,10 +51,7 @@ public interface DGanadoOnline {
 
 
     @Query("SELECT " +
-            "a.sModelIDx AS ModelIDx " +
-            ",a.sModelNme AS ModelNme " +
-            ",a.sBrandIDx AS BrandIDx" +
-            ",c.sColorIDx AS ColorIDx" +
+            "a.sModelNme AS ModelNme " +
             ",c.sColorNme AS ColorNme " +
             "FROM MC_MODEL a " +
             ", MC_Model_Color c " +
@@ -123,11 +120,7 @@ public interface DGanadoOnline {
         public String nFactorRt;
     }
     class McInfo{
-        public String ModelIDx;
         public String ModelNme;
-        public String BrandIDx;
-        public String sBrandNme;
-        public String ColorIDx;
         public String ColorNme;
     }
 

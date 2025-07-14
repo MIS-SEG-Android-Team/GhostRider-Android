@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.model.BranchApplicationModel;
 import org.rmj.guanzongroup.onlinecreditapplication.R;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.ArrayList;
@@ -33,25 +32,15 @@ public class BranchApplicationsAdapter extends RecyclerView.Adapter<BranchApplic
 
     private List<BranchApplicationModel> plLoanApp;
     private List<BranchApplicationModel> plLoanApp1;
-    private List<BranchApplicationModel> plSchList;
     private List<BranchApplicationModel> filteredList;
-    private OnVoidApplicationListener onVoidApplicationListener;
-    private OnExportGOCASListener onExportGOCASListener;
     private OnApplicationClickListener onApplicationClickListener;
-
-//    private final SearchFilter poSearch;
 
     public BranchApplicationsAdapter(List<BranchApplicationModel> plLoanApp, OnApplicationClickListener onApplicationClickListener) {
         this.plLoanApp = plLoanApp;
         this.plLoanApp1 = plLoanApp;
         this.onApplicationClickListener = onApplicationClickListener;
-//        this.poSearch = new SearchFilter();
     }
-    public interface OnItemClickListener {
-        void OnClick(int position);
 
-        void OnActionButtonClick();
-    }
     @NonNull
     @Override
     public ClientInfoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -67,9 +56,6 @@ public class BranchApplicationsAdapter extends RecyclerView.Adapter<BranchApplic
         holder.lblClientName.setText(poLoan.getsCompnyNm());
         holder.lblAppltnDate.setText(poLoan.getdTransact());
         holder.lblStatus.setText(poLoan.getTransactionStatus());
-//        holder.lblAccntTern.setText(poLoan.getnAcctTerm());
-//        holder.lblModelName.setText(poLoan.getsModelNme());
-//        holder.lblMobileNo.setText(poLoan.getsMobileNo());
     }
 
     @Override
@@ -77,17 +63,10 @@ public class BranchApplicationsAdapter extends RecyclerView.Adapter<BranchApplic
         return plLoanApp.size();
     }
 
-//    public SearchFilter getSearchFilter(){
-//        return poSearch;
-//    }
     public class ClientInfoViewHolder extends RecyclerView.ViewHolder{
 
         MaterialTextView lblTransNoxxx, lblClientName, lblAppltnDate;
-//        TextView lblModelName;
-//        TextView lblAccntTern;
-//        TextView lblMobileNo;
         MaterialTextView lblStatus;
-        MaterialButton btnVoid;
 
         public ClientInfoViewHolder(@NonNull View itemView, OnApplicationClickListener onApplicationClickListener) {
             super(itemView);
@@ -96,10 +75,6 @@ public class BranchApplicationsAdapter extends RecyclerView.Adapter<BranchApplic
             lblClientName = itemView.findViewById(R.id.lbl_listLog_applicantName);
             lblAppltnDate = itemView.findViewById(R.id.lbl_listLog_applicationDate);
             lblStatus = itemView.findViewById(R.id.lbl_listLog_applicationWithCI);
-//            lblModelName = itemView.findViewById(R.id.lbl_modelName);
-//            lblAccntTern = itemView.findViewById(R.id.lbl_accntTerm);
-//            lblMobileNo = itemView.findViewById(R.id.lbl_mobileNo);
-
 
             itemView.setOnClickListener(v12 -> {
                 if(BranchApplicationsAdapter.this.onApplicationClickListener !=null){
@@ -112,17 +87,8 @@ public class BranchApplicationsAdapter extends RecyclerView.Adapter<BranchApplic
         }
     }
 
-
-    public interface OnVoidApplicationListener{
-        void OnVoid(int position, String TransNox);
-    }
-
     public interface OnApplicationClickListener{
         void OnClick(int position, List<BranchApplicationModel> loanList);
-    }
-
-    public interface OnExportGOCASListener{
-        void onExport(String GOCAS, String ClientName,String DateApplied);
     }
 
     @Override

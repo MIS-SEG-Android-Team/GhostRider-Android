@@ -59,14 +59,30 @@ public class PAY extends LRDcp {
             loDetail.setRemarksx(foVal.getRemarks());
             loDetail.setTranStat("2");
             loDetail.setModified(AppConstants.DATE_MODIFIED());
+
+            String lsImageID = poImage.SaveDcpImage(
+                    foVal.getAccntNo(),
+                    foVal.getTransNox(),
+                    foVal.getFileName(),
+                    foVal.getFilePath(),
+                    foVal.getLatitude(),
+                    foVal.getLongtude());
+
+            if(lsImageID == null){
+                message = poImage.getMessage();
+                return null;
+            }
+
             poDao.UpdateCollectionDetail(loDetail);
             poConfig.setDCP_PRNox(loDetail.getPRNoxxxx());
 
             Log.d(TAG, "Client payment has been save.");
+
             JSONObject loJson = new JSONObject();
             loJson.put("sTransNox", foVal.getTransNo());
             loJson.put("nEntryNox", foVal.getEntryNo());
             loJson.put("sAcctNmbr", foVal.getAccntNo());
+
             return loJson.toString();
         } catch (Exception e){
             e.printStackTrace();

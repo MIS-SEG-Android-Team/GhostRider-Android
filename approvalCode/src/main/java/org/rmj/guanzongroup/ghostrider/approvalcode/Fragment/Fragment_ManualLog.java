@@ -171,6 +171,7 @@ public class Fragment_ManualLog extends Fragment {
                 public void OnFailed(String message) {
                     poDialog.dismiss();
                     poMsgBox.initDialog();
+                    poMsgBox.setIcon(R.drawable.baseline_error_24);
                     poMsgBox.setTitle("Approval Code");
                     poMsgBox.setMessage(message);
                     poMsgBox.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());

@@ -8,20 +8,38 @@
  * project file created : 4/24/21 3:19 PM
  * project file last modified : 4/24/21 3:18 PM
  */
-//include ':imageMap'
-//include ':map'
+
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+//this code fix repositroy issues
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+
+        google()
+        mavenCentral()
+
+        maven { url = uri("https://maven.scijava.org/content/repositories/public/") }
+        maven { url = uri("https://maven.localazy.com/repository/release/") }
+        maven {url = uri("https://mvnrepository.com/artifact/")}
+        maven { url = uri("https://jitpack.io") }
+        maven {url 'https://developer.huawei.com/repo/'}
+    }
+}
 
 include ':settings'
 include ':dailyCollectionPlan'
-//include ':openCvLibrary_341'
-//include ':imgCapture'
-//include ':CreditEvaluator'
 include ':approvalCode'
 include ':samsungKnox'
 include ':notifications'
 include ':ahMonitoring'
 include ':promotions'
-//include ':creditApp'
 include ':authLibrary'
 include ':app'
 rootProject.name = "GhostRider_Android"
@@ -35,3 +53,4 @@ include ':panalo'
 include ':petManager'
 include ':pacitaReward'
 include ':ganado'
+include ':sales'

@@ -23,9 +23,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-//import org.json.simple.JSONObject;
-//import org.json.simple.parser.JSONParser;
-//import org.rmj.apprdiver.util.WebFile;
 import org.rmj.g3appdriver.dev.Database.GCircle.DataAccessObject.DCreditApplicationDocuments;
 import org.rmj.g3appdriver.dev.Database.GCircle.Entities.ECreditApplicationDocuments;
 import org.rmj.g3appdriver.dev.Database.GCircle.Entities.EFileCode;

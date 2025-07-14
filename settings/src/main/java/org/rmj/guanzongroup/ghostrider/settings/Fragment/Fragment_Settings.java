@@ -11,6 +11,7 @@
 
 package org.rmj.guanzongroup.ghostrider.settings.Fragment;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -22,19 +23,17 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_AppVersion;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_Developer;
-import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_HelpList;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_LocalData;
 import org.rmj.guanzongroup.ghostrider.settings.Dialog.Dialog_ChangePassword;
 import org.rmj.guanzongroup.ghostrider.settings.R;
@@ -50,7 +49,6 @@ import static org.rmj.g3appdriver.etc.AppConstants.STORAGE_REQUEST;
 
 public class Fragment_Settings  extends PreferenceFragmentCompat {
 
-//    private SwitchPreferenceCompat themePreference;
     private Preference locationPref,
             cameraPref,
             phonePref,
@@ -66,9 +64,9 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
     private LoadDialog poDialog;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-//        themePreference = getPreferenceManager().findPreference("themePrefs");
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         cameraPref = getPreferenceManager().findPreference("cameraPrefs");
         locationPref = getPreferenceManager().findPreference("locationPrefs");
         phonePref = getPreferenceManager().findPreference("phonePrefs");
@@ -95,18 +93,6 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
 
         mViewModel.getCameraSummary().observe(getViewLifecycleOwner(),s -> cameraPref.setSummary(s));
 
-//        if (themePreference != null) {
-//            themePreference.setOnPreferenceChangeListener((preference, newValue) -> {
-//                Boolean themeOption = (Boolean) newValue;
-//                if (themeOption) {
-//                    themePreference.getSummaryOn();
-//                } else {
-//                    themePreference.getSummaryOff();
-//                }
-////                ThemeHelper.applyTheme(themeOption);
-//                return true;
-//            });
-//        }
         if (cameraPref != null) {
             cameraPref.setOnPreferenceClickListener(preference -> {
                 if ((ActivityCompat.checkSelfPermission(requireActivity(), CAMERA) != PackageManager.PERMISSION_GRANTED)) {
@@ -115,7 +101,8 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                     });
                 }else {
                     loMessage.initDialog();
-                    loMessage.setNegativeButton("Okay", (view, dialog) -> dialog.dismiss());
+                    loMessage.setIcon(R.drawable.baseline_message_24);
+                    loMessage.setNegativeButton("Okay", (v, dialog) -> dialog.dismiss());
                     loMessage.setTitle("GhostRider Permissions");
                     loMessage.setMessage("You have already granted this permission.");
                     loMessage.show();
@@ -141,7 +128,8 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                 }else {
 
                     loMessage.initDialog();
-                    loMessage.setNegativeButton("Okay", (view, dialog) -> dialog.dismiss());
+                    loMessage.setNegativeButton("Okay", (v, dialog) -> dialog.dismiss());
+                    loMessage.setIcon(R.drawable.baseline_message_24);
                     loMessage.setTitle("GhostRider Permissions");
                     loMessage.setMessage("You have already granted this permission.");
                     loMessage.show();
@@ -150,9 +138,9 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
             });
         }
         if (exportPref != null) {
-           exportPref.setOnPreferenceClickListener(preference -> {
-               try {
-                   dbExport.export();
+            exportPref.setOnPreferenceClickListener(preference -> {
+                try {
+                    dbExport.export();
 //                   mViewModel.isStoragePermissionGranted().observe(getViewLifecycleOwner(), isGranted -> {
 //                      if (!isGranted){
 //                          mViewModel.getStoragePermission().observe(getViewLifecycleOwner(), strings -> {
@@ -162,15 +150,15 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
 //                      }
 //                   });
 
-               }catch (SecurityException e){
-                   Log.e("Security Exception " , e.getMessage());
-               }
-               catch (Exception e){
-                   Log.e("Exception " , e.getMessage());
-               }
+                }catch (SecurityException e){
+                    Log.e("Security Exception " , e.getMessage());
+                }
+                catch (Exception e){
+                    Log.e("Exception " , e.getMessage());
+                }
 
-               return false;
-           });
+                return false;
+            });
         }
 
         if(localData != null){
@@ -195,6 +183,7 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                     public void OnSuccess() {
                         poDialog.dismiss();
                         loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_message_24);
                         loMessage.setTitle("Change Password");
                         loMessage.setMessage("Account updated successfully");
                         loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -206,6 +195,7 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
                     public void OnFailed(String message) {
                         poDialog.dismiss();
                         loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_error_24);
                         loMessage.setTitle("Change Password");
                         loMessage.setMessage(message);
                         loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -225,27 +215,27 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
         }
 
         if(debugMode != null){
+            /**
+            TODO allow users to change IP CONNECTION,
+             intended for MOBILE FIESTA setup and APPLICATION TESTING.
+             But also back up, incase their is a change of the production server link.
+
             EmployeeSession poUser = EmployeeSession.getInstance(requireActivity());
             if (!poUser.getDeptID().equalsIgnoreCase(DeptCode.MANAGEMENT_INFORMATION_SYSTEM)){
                 debugMode.setVisible(false);
             } else {
                 debugMode.setVisible(true);
             }
+             **/
+            debugMode.setVisible(true);
             debugMode.setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireActivity(), Activity_Developer.class));
                 requireActivity().overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
                 return false;
             });
         }
-        if(helpPref != null){
-            helpPref.setOnPreferenceClickListener(preference -> {
-                startActivity(new Intent(requireActivity(), Activity_HelpList.class));
-                requireActivity().overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
-                return false;
-            });
-        }
-
     }
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
@@ -257,7 +247,6 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
         super.onStart();
         checkPermissionCamera();
         checkPermissionPhoneState();
-//        Toast.makeText(getApplicationContext(),"Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart Called
     }
     @Override
     public void onResume()
@@ -265,7 +254,6 @@ public class Fragment_Settings  extends PreferenceFragmentCompat {
         super.onResume();
         checkPermissionCamera();
         checkPermissionPhoneState();
-//        Toast.makeText(getApplicationContext(),"Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart Called
     }
 
     boolean checkPermissionCamera() {

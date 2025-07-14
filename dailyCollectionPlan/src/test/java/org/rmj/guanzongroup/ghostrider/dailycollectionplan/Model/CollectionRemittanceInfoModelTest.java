@@ -15,15 +15,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.rmj.g3appdriver.GRider.Constants.AppConstants;
-
-import static org.junit.Assert.*;
+import org.rmj.g3appdriver.etc.AppConstants;
 
 public class CollectionRemittanceInfoModelTest {
     private String TransNox;
 
     private String EntryNox;
-    private String Transact = new AppConstants().CURRENT_DATE;
+    private String Transact = new AppConstants().CURRENT_DATE();
     private String PaymForm;
     private String RemitTyp;
     private String CompnyNm;

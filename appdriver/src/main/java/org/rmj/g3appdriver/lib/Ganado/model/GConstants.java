@@ -49,11 +49,13 @@ public class GConstants {
     public static String[] PAYMENT_FORM = {"Cash", "Installment"};
 
     public static String[] INQUIRY_STATUS = {
-            "Open",
-            "Extracted",
-            "Engaged",
-            "Lost Sales",
-            "Bought"};
+            "Pending",
+            "Verified",
+            "Unable to Verify",
+            "Expired",
+            "Bought",
+            "Pending Inc. Release",
+            "Incentive Released"};
 
     public static ArrayAdapter<String> getAdapter(Context mContext, String[] data) {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_dropdown_item, data){

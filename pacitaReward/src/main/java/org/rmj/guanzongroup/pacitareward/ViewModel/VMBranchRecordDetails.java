@@ -41,36 +41,6 @@ public class VMBranchRecordDetails extends AndroidViewModel {
         new EvaluationRecordDetails(mListener).execute(sBranchcd);
     }
 
-    /*public class EvaluationRecordDetails extends AsyncTask<String, Void, Boolean>{
-        private BranchRecordDetailsCallBack mListener;
-        private EvaluationRecordDetails(BranchRecordDetailsCallBack mListener){
-            this.mListener = mListener;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mListener.onInitialize("Loading Branch Record Details. Please wait . . .");
-        }
-        @Override
-        protected Boolean doInBackground(String... branchCD) {
-            if(!poConn.isDeviceConnected()){
-                message = poConn.getMessage();
-                return false;
-            }
-            return true;
-        }
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-
-            if (result == false){
-                mListener.onError(message);
-            }else {
-                mListener.onSuccess(message);
-            }
-        }
-    }*/
     public class EvaluationRecordDetails{
         private BranchRecordDetailsCallBack mListener;
         private EvaluationRecordDetails(BranchRecordDetailsCallBack mListener){

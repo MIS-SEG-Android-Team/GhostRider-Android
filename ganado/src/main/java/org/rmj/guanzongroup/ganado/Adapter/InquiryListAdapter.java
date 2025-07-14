@@ -12,6 +12,7 @@
 package org.rmj.guanzongroup.ganado.Adapter;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,17 +30,16 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGanadoOnline;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGanadoOnline;
 import org.rmj.g3appdriver.lib.Ganado.Obj.ProductInquiry;
 import org.rmj.g3appdriver.lib.Ganado.model.GConstants;
+import org.rmj.guanzongroup.ganado.Dialog.DialogInquiryHistory;
 import org.rmj.guanzongroup.ganado.R;
 
 import java.util.List;
 
 public class InquiryListAdapter extends RecyclerView.Adapter<InquiryListAdapter.ApplicationViewHolder> {
-
     private List<EGanadoOnline> poModel;
     private ProductInquiry poApp;
     private OnModelClickListener listener;
     private boolean forViewing = false;
-
     private Application mContex;
     public interface OnModelClickListener{
         void OnClick(String TransNox);
@@ -75,17 +75,20 @@ public class InquiryListAdapter extends RecyclerView.Adapter<InquiryListAdapter.
                 lsSendStat = "Pending";
             }
 
-            holder.lblSendStat.setText(lsSendStat);
             JSONObject object = new JSONObject(loModel.getClntInfo());
-            holder.lblMobileNo.setText(object.getString("sMobileNo"));
             JSONObject object1 = new JSONObject(loModel.getProdInfo());
             DGanadoOnline.McInfo eganado = poApp.GetMCInfo(object1.getString("sModelIDx"),object1.getString("sBrandIDx"),object1.getString("sColorIDx"));
+
+            holder.lblSendStat.setText(lsSendStat);
+            holder.lblMobileNo.setText(object.getString("sMobileNo"));
+
             holder.lblUnitDesc.setText(eganado.ModelNme + " (" + eganado.ColorNme + ")");
             holder.lblInqTypex.setText(GConstants.PAYMENT_FORM[Integer.parseInt(loModel.getPaymForm())]);
             String lsTranStat = loModel.getTranStat();
             if (lsTranStat == null || lsTranStat.isEmpty()){
                 lsTranStat = "0";
             }
+
             holder.lblInqStats.setText(GConstants.INQUIRY_STATUS[Integer.parseInt(lsTranStat)]);
             holder.itemView.setOnClickListener(v -> {
                 if(listener != null){
@@ -104,15 +107,14 @@ public class InquiryListAdapter extends RecyclerView.Adapter<InquiryListAdapter.
     }
 
     public static class ApplicationViewHolder extends RecyclerView.ViewHolder{
-
+        View view;
         MaterialTextView lblClientNm, lblSendStat, lblMobileNo, lblUnitDesc, lblInqTypex, lblInqStats;
-
         LinearLayout lnStatus;
-
         ShapeableImageView imgType;
-
         public ApplicationViewHolder(@NonNull View view) {
             super(view);
+
+            this.view = view;
             lblClientNm = view.findViewById(R.id.lbl_clientName);
             lblSendStat = view.findViewById(R.id.lbl_status);
             lblMobileNo = view.findViewById(R.id.lbl_mobileNo);

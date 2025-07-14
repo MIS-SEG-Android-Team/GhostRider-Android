@@ -18,8 +18,16 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.StrictMode;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.huawei.wisesecurity.ucs.credential.outer.NetworkCapability;
 
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 
@@ -41,9 +49,8 @@ public class ConnectionUtil {
     private final Context context;
     private String message;
 
-    private static final String LOCAL = "http://192.168.10.64";
+    private static final String LOCAL = "http://192.165.10.65/";
     private static final String PRIMARY_LIVE = "https://restgk.guanzongroup.com.ph";
-//    private static final String SECONDARY_LIVE = "restgk1.guanzongroup.com.ph";
 
     public ConnectionUtil(Context context){
         this.context = context;
@@ -55,13 +62,26 @@ public class ConnectionUtil {
 
     public boolean isDeviceConnected(){
         try {
+
             if (!deviceConnected()) {
                 message = NOT_CONNECTED;
                 return false;
             }
 
             String lsAddress;
+
             AppConfigPreference loConfig = AppConfigPreference.getInstance(context);
+
+            Log.d("App IP", loConfig.getAppServer());
+            if (!isReachable(loConfig.getAppServer())){
+                message = UNABLE_TO_REACH_SERVER;
+                return false;
+            }
+
+            return true;
+
+            /* TODO THIS IS REPLACED WITH CONFIGURED IP, FROM DEVELOPER SETTINGS -guillier 05/08/2024
+
             boolean isTestCase = loConfig.getTestStatus();
             if (isTestCase) {
                 lsAddress = LOCAL;
@@ -79,42 +99,8 @@ public class ConnectionUtil {
                 return false;
             }
 
-            return true;
+            return true;*/
 
-//                    boolean isBackUp = loConfig.isBackUpServer();
-//                    if (isBackUp) {
-//                        lsAddress = SECONDARY_LIVE;
-//                        if (!isReachable(lsAddress)) {
-//                            Log.e(TAG, "Unable to connect to secondary server.");
-//                            lsAddress = PRIMARY_LIVE;
-//                            if (isReachable(lsAddress)) {
-//                                Log.d(TAG, "Primary server is reachable.");
-//                                loConfig.setIfBackUpServer(false);
-//                                return true;
-//                            } else {
-//                                message = "Unable to connect to our servers.";
-//                                return false;
-//                            }
-//                        } else {
-//                            return true;
-//                        }
-//                    } else {
-//                        lsAddress = PRIMARY_LIVE;
-//                        if (!isReachable(lsAddress)) {
-//                            Log.e(TAG, "Unable to connect to primary server.");
-//                            lsAddress = SECONDARY_LIVE;
-//                            if (isReachable(lsAddress)) {
-//                                Log.d(TAG, "Secondary server is reachable.");
-//                                loConfig.setIfBackUpServer(true);
-//                                return true;
-//                            } else {
-//                                message = "Unable to connect to our servers.";
-//                                return false;
-//                            }
-//                        } else {
-//                            return true;
-//                        }
-//                    }
         } catch (Exception e){
             e.printStackTrace();
             message = e.getMessage();
@@ -129,7 +115,7 @@ public class ConnectionUtil {
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    private boolean isReachable(String lsAddress)
+    public boolean isReachable(String lsAddress)
     {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -147,8 +133,6 @@ public class ConnectionUtil {
             int responseCode = httpUrlConnection.getResponseCode();
 
             return responseCode == HttpURLConnection.HTTP_OK;
-//            InetAddress ipAddress = InetAddress.getByName(lsAddress);
-//            return ipAddress.isReachable(5000); // Adjust the timeout value as needed
         } catch (Exception e){
             e.printStackTrace();
             message = getLocalMessage(e);
@@ -192,7 +176,7 @@ public class ConnectionUtil {
     public boolean isWifiConnected(){
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return mWifi.isConnected();
 
+        return mWifi.isConnected();
     }
 }

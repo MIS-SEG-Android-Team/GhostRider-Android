@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission
         android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
@@ -16,7 +17,12 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application android:usesCleartextTraffic="true">
-
+        <activity
+            android:name="org.rmj.guanzongroup.ghostrider.epacss.Activity.Activity_PDFViewer"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.guanzongroup.ghostrider.epacss.Activity.Activity_Manual"
+            android:exported="false" />
     </application>
 
 </manifest>

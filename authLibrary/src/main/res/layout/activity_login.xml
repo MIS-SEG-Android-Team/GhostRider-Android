@@ -79,6 +79,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passw_layout"
+        android:visibility="gone"
         app:layout_constraintWidth_percent="0.85">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -98,7 +99,7 @@
         android:layout_marginTop="6dp"
         android:text="Create Account"
         app:layout_constraintTop_toBottomOf="@+id/mobno_layout"
-        app:layout_constraintStart_toStartOf="@+id/mobno_layout"/>
+        app:layout_constraintStart_toStartOf="@+id/passw_layout"/>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtv_forgotpassw"
@@ -107,7 +108,7 @@
         android:layout_marginTop="6dp"
         android:text="Forgot Password?"
         app:layout_constraintTop_toBottomOf="@+id/mobno_layout"
-        app:layout_constraintEnd_toEndOf="@+id/mobno_layout"/>
+        app:layout_constraintEnd_toEndOf="@+id/passw_layout"/>
 
     <LinearLayout
         android:id="@+id/ln_Terms"

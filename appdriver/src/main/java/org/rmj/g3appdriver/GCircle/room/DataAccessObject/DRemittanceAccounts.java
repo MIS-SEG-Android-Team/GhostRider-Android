@@ -26,21 +26,11 @@ public interface DRemittanceAccounts {
     @Insert
     void SaveAccountRemittance(ERemittanceAccounts foVal);
 
-    @Insert
-    void insertBulkData(List<ERemittanceAccounts> remittanceAccounts);
-
     @Query("SELECT * FROM Collection_Account_Remittance WHERE sBranchCd =:args AND sBnkActID =:args1 AND sActNamex =:args2")
     ERemittanceAccounts GetAccount(String args, String args1, String args2);
 
     @Query("DELETE FROM Collection_Account_Remittance")
     void ClearRecords();
-
-    @Query("SELECT * FROM Collection_Account_Remittance")
-    List<ERemittanceAccounts> getRemittanceAccountsIfExist();
-
-    @Query("SELECT * FROM Collection_Account_Remittance " +
-            "WHERE sBranchCd = (SELECT sBranchCd FROM User_Info_Master)")
-    LiveData<ERemittanceAccounts> getDefaultRemittanceAccount();
 
     @Query("SELECT * FROM Collection_Account_Remittance " +
             "WHERE sBranchCd = (SELECT sBranchCd FROM USER_INFO_MASTER) " +

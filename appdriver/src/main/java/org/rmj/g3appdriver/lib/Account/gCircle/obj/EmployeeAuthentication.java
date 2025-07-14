@@ -40,7 +40,6 @@ public class EmployeeAuthentication implements iAuth {
     private final AppConfigPreference poConfig;
     private final Telephony poDevID;
     private final AppVersion poVersion;
-
     private String message;
 
     public EmployeeAuthentication(Application instance) {
@@ -63,19 +62,15 @@ public class EmployeeAuthentication implements iAuth {
                 return 0;
             }
 
-            if(poConfig.getMobileNo().isEmpty()){
-                poConfig.setMobileNo(loInfo.getMobileNo());
-                Log.d(TAG, "Mobile number has been initialized.");
-            }
-
             JSONObject params = new JSONObject();
-            params.put("user", loInfo.getEmail());
+            params.put("user",  loInfo.getEmail().trim());
             params.put("pswd", loInfo.getPassword());
 
             String lsResponse = WebClient.sendRequest(
                     poApi.getUrlAuthEmployee(),
                     params.toString(),
                     poHeaders.getHeaders());
+
             if(lsResponse == null){
                 message = SERVER_NO_RESPONSE;
                 return 0;
@@ -106,7 +101,7 @@ public class EmployeeAuthentication implements iAuth {
             employeeInfo.setEmployID(loResponse.getString("sEmployID"));
             employeeInfo.setDeviceID(poDevID.getDeviceID());
             employeeInfo.setModelIDx(Build.MODEL);
-            employeeInfo.setMobileNo(poConfig.getMobileNo());
+            employeeInfo.setMobileNo(loResponse.getString("sMobileNo"));
             employeeInfo.setLoginxxx(AppConstants.DATE_MODIFIED());
             employeeInfo.setSessionx(AppConstants.CURRENT_DATE());
             poDao.RemoveSessions();

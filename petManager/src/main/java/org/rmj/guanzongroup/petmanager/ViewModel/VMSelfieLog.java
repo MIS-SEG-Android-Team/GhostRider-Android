@@ -16,8 +16,11 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -32,13 +35,14 @@ import org.rmj.g3appdriver.etc.ImageFileCreator;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
-import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
 import org.rmj.g3appdriver.GCircle.Apps.CashCount.CashCount;
+import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
-
 import java.util.List;
 
 public class VMSelfieLog extends AndroidViewModel {
@@ -117,10 +121,6 @@ public class VMSelfieLog extends AndroidViewModel {
         this.pdTransact.setValue(fsVal);
     }
 
-    public LiveData<List<ESelfieLog>> getAllEmployeeTimeLog(String fsVal){
-        return poSys.GetAllEmployeeTimeLog(fsVal);
-    }
-
     public LiveData<List<DSelfieLog.LogTime>> GetTimeLogForTheDay(String date){
         return poSys.GetAllTimeLog(date);
     }
@@ -132,6 +132,7 @@ public class VMSelfieLog extends AndroidViewModel {
     }
 
     public void CheckBranchList(OnBranchCheckListener listener){
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -169,8 +170,10 @@ public class VMSelfieLog extends AndroidViewModel {
     }
 
     public void InitCameraLaunch(Activity activity, OnInitializeCameraCallback callback){
+
         ImageFileCreator loImage = new ImageFileCreator(instance, AppConstants.SUB_FOLDER_SELFIE_LOG, poSession.getUserID());
         String[] lsResult = new String[4];
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -179,40 +182,57 @@ public class VMSelfieLog extends AndroidViewModel {
 
             @Override
             public Object DoInBackground(Object args) {
+
                 if(!loImage.IsFileCreated(true)){
                     message = loImage.getMessage();
                     return null;
+                }else {
+
+                    lsResult[0] = loImage.getFilePath();
+                    lsResult[1] = loImage.getFileName();
+
+                    String lsCompx = android.os.Build.MANUFACTURER.toLowerCase();
+                    LocationRetriever.iLocationRetriever location;
+
+                    if (!lsCompx.equalsIgnoreCase("huawei")) {
+                        location = new GmsLocationRetriever();
+                    } else {
+                        location = new HmsLocationRetriever();
+                    }
+
+                    location.GetLocation(instance, new LocationRetriever.OnRetrieveLocationListener() {
+                        @Override
+                        public void OnRetrieve(String latitude, String longitude) {
+                            lsResult[2] = latitude;
+                            lsResult[3] = longitude;
+
+                            Intent loIntent = loImage.getCameraIntent();
+                            loIntent.putExtra("result", true);
+
+                            callback.OnSuccess(loIntent, lsResult);
+                        }
+
+                        @Override
+                        public void OnFailed(String message, String latitude, String longitude) {
+                            lsResult[2] = latitude;
+                            lsResult[3] = longitude;
+
+                            Intent loIntent = loImage.getCameraIntent();
+                            loIntent.putExtra("result", false);
+
+                            callback.OnFailed(message, loIntent, lsResult);
+                        }
+                    });
+
+                    return false;
+
                 }
 
-                LocationRetriever loLrt = new LocationRetriever(instance, activity);
-                if(loLrt.HasLocation()){
-                    lsResult[0] = loImage.getFilePath();
-                    lsResult[1] = loImage.getFileName();
-                    lsResult[2] = loLrt.getLatitude();
-                    lsResult[3] = loLrt.getLongitude();
-                    Intent loIntent = loImage.getCameraIntent();
-                    loIntent.putExtra("result", true);
-                    return loIntent;
-                } else {
-                    lsResult[0] = loImage.getFilePath();
-                    lsResult[1] = loImage.getFileName();
-                    lsResult[2] = loLrt.getLatitude();
-                    lsResult[3] = loLrt.getLongitude();
-                    Intent loIntent = loImage.getCameraIntent();
-                    loIntent.putExtra("result", false);
-                    message = loLrt.getMessage();
-                    return loIntent;
-                }
             }
 
             @Override
             public void OnPostExecute(Object object) {
-                Intent loResult = (Intent) object;
-                if(loResult.getBooleanExtra("result", false)){
-                    callback.OnSuccess(loResult, lsResult);
-                } else {
-                    callback.OnFailed(message, loResult, lsResult);
-                }
+
             }
         });
     }
@@ -221,6 +241,7 @@ public class VMSelfieLog extends AndroidViewModel {
      *
      */
     public void ValidateSelfieBranch(String args, OnValidateSelfieBranch listener){
+
         TaskExecutor.Execute(args, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -243,14 +264,12 @@ public class VMSelfieLog extends AndroidViewModel {
                     case 0:
                         listener.OnFailed(message);
                         break;
-                    case 2:
-                    case 5:
+                    case 2, 5:
                         listener.OnRequireRemarks();
                         break;
-                    case 3:
-                    case 4:
-                    case 1:
+                    default:
                         listener.OnSuccess();
+                        break;
                 }
             }
         });
@@ -293,11 +312,11 @@ public class VMSelfieLog extends AndroidViewModel {
                 callback.OnLogin();
 
             }
-
             @Override
             public Object DoInBackground(Object args) {
                 try{
                     SelfieLog.SelfieLogDetail logDetail = (SelfieLog.SelfieLogDetail) args;
+
                     String lsTransNo = poSys.SaveSelfieLog(logDetail);
                     if(lsTransNo == null){
                         message = poSys.getMessage();
@@ -324,7 +343,6 @@ public class VMSelfieLog extends AndroidViewModel {
                     return 0;
                 }
             }
-
             @Override
             public void OnPostExecute(Object object) {
                 int lnResult = (int) object;
@@ -387,6 +405,7 @@ public class VMSelfieLog extends AndroidViewModel {
     }
 
     public void ValidateCashCount(String fsVal, OnValidateCashCount callback){
+
         TaskExecutor.Execute(fsVal, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -397,6 +416,7 @@ public class VMSelfieLog extends AndroidViewModel {
             public Object DoInBackground(Object args) {
                 String branchCd = (String) args;
                 int lnResult = poCash.ValidateCashCount(branchCd);
+
                 if(lnResult == 1){
                     message = branchCd;
                     return lnResult;

@@ -49,10 +49,14 @@ public class Activity_SpouseSelfEmploymentInfo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_spouse_self_employment_info);
+
         mViewModel = new ViewModelProvider(Activity_SpouseSelfEmploymentInfo.this).get(VMSpouseBusiness.class);
         poMessage = new MessageBox(Activity_SpouseSelfEmploymentInfo.this);
-        setContentView(R.layout.activity_spouse_self_employment_info);
+
         initWidgets();
+
         mViewModel.InitializeApplication(getIntent());
         mViewModel.GetApplication().observe(Activity_SpouseSelfEmploymentInfo.this, app -> {
             try {
@@ -189,6 +193,7 @@ public class Activity_SpouseSelfEmploymentInfo extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
                 poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
@@ -201,7 +206,7 @@ public class Activity_SpouseSelfEmploymentInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SpouseSelfEmploymentInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Spouse Self Employment Info");
+        getSupportActionBar().setTitle("");
 
         spnBizIndustry = findViewById(R.id.spn_bizIndustry);
         spnMonthOrYr = findViewById(R.id.spn_monthOrYr);

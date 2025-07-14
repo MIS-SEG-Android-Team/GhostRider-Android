@@ -14,7 +14,6 @@ package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -35,9 +34,6 @@ public interface DMcModel {
 
     @Insert
     void insert(EMCModelCashPrice mcPrice);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertBulkData(List<EMcModel> models);
 
     @Update
     void update(EMcModel mcModel);
@@ -69,12 +65,6 @@ public interface DMcModel {
     @Query("SELECT * FROM Mc_Model WHERE sBrandIDx = :BrandID")
     LiveData<List<EMcModel>> getAllModeFromBrand(String BrandID);
 
-    @Query("SELECT (sModelNme || \" \" || sModelCde) AS ModelInfo FROM Mc_Model WHERE sBrandIDx = :BrandID")
-    LiveData<String[]> getAllModelName(String BrandID);
-
-    @Query("SELECT sModelNme FROM Mc_Model WHERE sModelIDx = :ModelIDx")
-    String getModelName(String ModelIDx);
-
     @Query("SELECT MAX(dTimeStmp) FROM Mc_Model")
     String getLatestDataTime();
 
@@ -84,8 +74,6 @@ public interface DMcModel {
 
 
     @Query("SELECT  " +
-            "a.sModelIDx, " +
-            "d.sModelNme, " +
             "a.nSelPrice, " +
             "a.nMinDownx, " +
             "b.nMiscChrg, " +
@@ -129,8 +117,6 @@ public interface DMcModel {
     }
 
     class McAmortInfo{
-        public String sModelIDx;
-        public String sModelNme;
         public String nSelPrice;
         public String nMinDownx;
         public String nMiscChrg;

@@ -15,38 +15,28 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
-
+import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
-
 import org.rmj.g3appdriver.etc.ActivityFragmentAdapter;
 import org.rmj.guanzongroup.petmanager.R;
-import org.rmj.guanzongroup.petmanager.ViewModel.VMFragmentApproval;
-
-import java.util.Objects;
 
 public class Fragment_Approval extends Fragment {
-
-    private VMFragmentApproval mViewModel;
     private View view;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
     private TabLayout tabLayout;
-
     public static Fragment_Approval newInstance() {
         return new Fragment_Approval();
     }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(this).get(VMFragmentApproval.class);
+
         view = inflater.inflate(R.layout.fragment_approval, container, false);
         setupWidgets();
+
         return view;
     }
 
@@ -54,12 +44,30 @@ public class Fragment_Approval extends Fragment {
         viewPager = view.findViewById(R.id.viewpager_leave_ob_fragment_view);
         tabLayout = view.findViewById(R.id.tabLayout_leave_ob_fragment_indicator);
 
-        ActivityFragmentAdapter adapter = new ActivityFragmentAdapter(getChildFragmentManager());
+        ActivityFragmentAdapter adapter = new ActivityFragmentAdapter(getChildFragmentManager(), getLifecycle());
         adapter.addFragment(new Fragment_LeaveApproval(), "Leave");
         adapter.addFragment(new Fragment_BusinessTripApproval(), "Business Trip");
         adapter.addFragment(new Fragment_Employee_Applications(), "Your Applications");
+
         viewPager.setAdapter(adapter);
 
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addTab(tabLayout.newTab().setText("Leave"));
+        tabLayout.addTab(tabLayout.newTab().setText("Business Trip"));
+        tabLayout.addTab(tabLayout.newTab().setText("Your Applications"));
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 }

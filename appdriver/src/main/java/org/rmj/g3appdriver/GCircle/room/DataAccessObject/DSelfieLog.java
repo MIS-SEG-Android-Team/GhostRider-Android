@@ -17,8 +17,6 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESelfieLog;
-import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESelfieLog;
 
@@ -69,21 +67,16 @@ public interface DSelfieLog {
     ESelfieLog CheckSelfieLogIfExist(String BranchCd, String Transact);
 
     @Query("SELECT * FROM Branch_Info WHERE sBranchCd =:args")
-
     EBranchInfo GetSelfieLogBranch(String args);
 
     @Query("SELECT " +
             "a.sTransNox, " +
             "a.sBranchCd, " +
             "(SELECT sBranchNm FROM Branch_Info WHERE sBranchCd = a.sBranchCd) AS sBranchNm, " +
-            "a.dTransact, " +
             "a.dLogTimex, " +
             "a.cSendStat AS cSlfSentx," +
-            "b.sTransNox AS sImageIDx, " +
-            "b.sImageNme, " +
             "b.cSendStat AS cImgSentx, " +
-            "b.sFileLoct," +
-            "b.dSendDate " +
+            "b.sFileLoct " +
             "FROM Employee_Log_Selfie a " +
             "LEFT JOIN Image_Information b " +
             "ON a.sImageIDx = b.sTransNox " +
@@ -100,13 +93,9 @@ public interface DSelfieLog {
         public String sTransNox;
         public String sBranchCd;
         public String sBranchNm;
-        public String dTransact;
         public String dLogTimex;
         public String cSlfSentx;
-        public String sImageIDx;
-        public String sImageNme;
         public String cImgSentx;
         public String sFileLoct;
-        public String dSendDate;
     }
 }

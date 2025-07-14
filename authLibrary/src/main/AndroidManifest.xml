@@ -5,26 +5,26 @@
 
     <application>
         <activity
+            android:name=".Activity.Activity_TermsAndConditions"
+            android:exported="false" />
+        <activity
             android:name=".Activity.Activity_ForgotPassword"
             android:exported="true"
             android:screenOrientation="userPortrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".Activity.Activity_CreateAccount"
             android:exported="true"
             android:screenOrientation="userPortrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".Activity.Activity_Login"
             android:exported="true"
             android:screenOrientation="userPortrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".Activity.Activity_Authenticate"
             android:exported="true"

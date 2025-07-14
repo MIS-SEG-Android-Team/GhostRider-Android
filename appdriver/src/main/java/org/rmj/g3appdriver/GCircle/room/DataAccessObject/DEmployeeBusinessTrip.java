@@ -30,6 +30,8 @@ public interface DEmployeeBusinessTrip {
 
     @Update()
     void update(EEmployeeBusinessTrip obLeave);
+    @Query("DELETE FROM Employee_Business_Trip")
+    void delete();
 
     @Query("SELECT * FROM User_Info_Master")
     EEmployeeInfo GetEmployeeInfo();
@@ -65,7 +67,10 @@ public interface DEmployeeBusinessTrip {
     @Query("UPDATE Employee_Business_Trip SET cSendStat = '1' WHERE sTransNox=:TransNox")
     void updateObApprovalPostedStatus(String TransNox);
 
-    @Query("SELECT * FROM Employee_Business_Trip WHERE sApproved IS NULL AND dApproved IS NULL ORDER BY dTransact DESC")
+    @Query("SELECT * FROM Employee_Business_Trip " +
+            "WHERE cTranStat = '0' " +
+            "AND (dDateFrom >= DATE('now', '-30 day') AND dDateThru >= DATE('now', '-30 day')) " +
+            "ORDER BY dTransact DESC")
     LiveData<List<EEmployeeBusinessTrip>> getOBListForApproval();
 
     @Query("SELECT * FROM Employee_Business_Trip " +

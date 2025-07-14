@@ -42,6 +42,9 @@ public class VMInquiry extends AndroidViewModel {
     public LiveData<List<EGanadoOnline>> GetInquiries(){
         return poSys.GetInquiries();
     }
+    public EGanadoOnline GetInquiry(String TransNox){
+        return poSys.GetInquiry(TransNox);
+    }
 
     public void ImportCriteria(OnTaskExecute listener){
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {

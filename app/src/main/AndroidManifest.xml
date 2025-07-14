@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Created by Android Team MIS-SEG Year 2021
-  ~ Copyright (c) 2021. Guanzon Central Office
-  ~ Guanzon Bldg., Perez Blvd., Dagupan City, Pangasinan 2400
-  ~ Project name : GhostRider_Android
-  ~ Module : GhostRider_Android.app
-  ~ Electronic Personnel Access Control Security System
-  ~ project file created : 4/24/21 3:19 PM
-  ~ project file last modified : 4/24/21 3:17 PM
-  -->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -27,31 +15,21 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
-
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
 
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
     <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
-
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
-
     <uses-permission
         android:name="android.permission.WRITE_SYNC_SETTINGS"
         tools:ignore="ProtectedPermissions" />
@@ -68,68 +46,52 @@
 
     <application
         android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/menu_home"
-        android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="true"
         android:manageSpaceActivity="org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_LocalData"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
-        tools:replace="android:allowBackup,android:label"
-        android:enableOnBackInvokedCallback="true">
-
-        <activity android:name=".Activity.Activity_DataManager"
+        android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup,android:label">
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_PDFViewer"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.Activity_DataManager"
+            android:exported="true"
             android:screenOrientation="userPortrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="true"/>
-
-       <activity
+            android:windowSoftInputMode="adjustPan" />
+        <activity
             android:name=".Activity.Activity_SplashScreen"
+            android:exported="true"
+            android:launchMode="singleTask"
             android:screenOrientation="userPortrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-            android:launchMode="singleTask"
-            android:exported="true">
-
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-<!--        <activity
-            android:name="org.rmj.guanzongroup.petmanager.Activity.Activity_EmployeeApplicationSearch"
-            android:screenOrientation="userPortrait"
-            android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> -->
-
         <activity
             android:name=".Activity.Activity_Main"
+            android:exported="true"
             android:label="@string/menu_home"
-            android:screenOrientation="userPortrait"
-            android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
             android:launchMode="singleTop"
-            android:exported="true"/>
+            android:screenOrientation="userPortrait"
+            android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
 
         <service
             android:name=".Service.DataDownloadService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <service android:name="org.rmj.guanzongroup.ghostrider.dailycollectionplan.Service.GLocatorService"
-            android:foregroundServiceType="location"
-            tools:ignore="Instantiatable" />
-
         <service
             android:name=".Service.GMessagingService"
             android:exported="true">
@@ -137,22 +99,26 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
-            See README(https://goo.gl/l4GJaQ) for more. -->
+        <service
+            android:name="org.rmj.guanzongroup.ghostrider.dailycollectionplan.Service.GLocatorService"
+            android:foregroundServiceType="location" />
+        <!--
+ Set custom default icon. This is used when no icon is set for incoming notification messages.
+            See README(https://goo.gl/l4GJaQ) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_guanzon_logo" />
-        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <!--
+ Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/guanzon_digital_orange" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
-
         <meta-data
             android:name="firebase_messaging_auto_init_enabled"
             android:value="false" />
@@ -164,14 +130,12 @@
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
-            tools:replace="android:authorities"
-            android:grantUriPermissions="true">
-
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>

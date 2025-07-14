@@ -163,78 +163,102 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/TextInputStyle"
+                        android:id="@+id/til_cashPrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         android:hint="Cash Price">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/txt_cashPrice"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/footer_dark_grey"
                             android:enabled="false"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/CustomDropDownTilStyle"
+                    <LinearLayout
+                        android:id="@+id/linearInstallment"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Installment Term">
+                        android:visibility="gone"
+                        android:orientation="vertical">
 
-                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                            android:id="@+id/spn_installmentTerm"
-                            style="@style/DropdownStyleTheme"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/CustomDropDownTilStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:padding="16dp" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:hint="Installment Term">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                                android:id="@+id/spn_installmentTerm"
+                                style="@style/DropdownStyleTheme"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="16dp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/TextInputStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight=".8"
+                                android:hint="Downpayment">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/txt_downpayment"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:imeOptions="actionDone"
+                                    android:inputType="number|none"
+                                    android:maxLength="50" />
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnCalculate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="10dp"
+                                android:layout_weight="1.2"
+                                android:text="Calculate"
+                                android:textSize="11sp"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/txtyourmnmdp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="The required Minimum Down Payment is at least"
+                            android:textStyle="italic"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/roboto_light_italic"
+                            android:textColor="@color/cross_red"
+                            android:layout_marginVertical="5dp"/>
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/TextInputStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight=".8"
-                            android:hint="Downpayment">
+                            android:hint="Monthly Payment">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/txt_downpayment"
+                                android:id="@+id/txt_monthlyAmort"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:imeOptions="actionDone"
+                                android:layout_marginBottom="10dp"
+                                android:focusable="false"
+                                android:focusableInTouchMode="false"
+                                android:focusedByDefault="false"
                                 android:inputType="number|none"
                                 android:maxLength="50" />
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnCalculate"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="10dp"
-                            android:layout_weight="1.2"
-                            android:text="Calculate" />
                     </LinearLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/TextInputStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Monthly Payment">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/txt_monthlyAmort"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:focusable="false"
-                            android:focusableInTouchMode="false"
-                            android:focusedByDefault="false"
-                            android:inputType="number|none"
-                            android:maxLength="50" />
-                    </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/TextInputStyle"

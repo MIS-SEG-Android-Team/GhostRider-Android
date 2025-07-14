@@ -15,8 +15,6 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
-
 import org.rmj.g3appdriver.GCircle.room.Entities.EBankInfo;
 
 import java.util.List;
@@ -26,9 +24,6 @@ public interface DBankInfo {
 
     @Insert
     void SaveBankInfo(EBankInfo foVal);
-
-    @Update
-    void UpdateBankInfo(EBankInfo foVal);
 
     @Query("SELECT * FROM Bank_Info WHERE cRecdStat = 1")
     LiveData<List<EBankInfo>> getBankInfoList();

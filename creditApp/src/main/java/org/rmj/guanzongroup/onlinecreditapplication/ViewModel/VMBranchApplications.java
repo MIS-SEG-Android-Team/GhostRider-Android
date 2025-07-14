@@ -1,7 +1,6 @@
 package org.rmj.guanzongroup.onlinecreditapplication.ViewModel;
 
 import android.app.Application;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -9,6 +8,8 @@ import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditOnlineApplication;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 import java.util.List;
 
@@ -24,52 +25,50 @@ public class VMBranchApplications extends AndroidViewModel {
         this.poApp = new CreditOnlineApplication(application);
     }
 
-    public void ImportBranchApplications(OnDownloadApplicationsListener listener){
-        new ImportApplicationsTask(listener).execute();
-    }
-
     public LiveData<List<EBranchLoanApplication>> GetBranchApplications(){
         return poApp.GetBranchApplications();
     }
 
-    private class ImportApplicationsTask extends AsyncTask<Void, Void, Boolean>{
+    public void ImportBranchApplications(OnDownloadApplicationsListener listener){
+        //new ImportApplicationsTask(listener).execute();
 
-        private final OnDownloadApplicationsListener listener;
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                listener.OnDownload("Credit Online Application", "Downloading entries from your current branch. Please wait...");
+            }
 
-        public ImportApplicationsTask(OnDownloadApplicationsListener listener) {
-            this.listener = listener;
-        }
+            @Override
+            public Object DoInBackground(Object args) {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            listener.OnDownload("Credit Online Application", "Downloading entries from your current branch. Please wait...");
-        }
+                try{
+                    if(!poApp.DownloadBranchApplications()){
+                        message = poApp.getMessage();
+                        return false;
+                    }
 
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try{
-                if(!poApp.DownloadBranchApplications()){
-                    message = poApp.getMessage();
+                    return true;
+                } catch (Exception e){
+                    e.printStackTrace();
+                    message =e.getMessage();
                     return false;
                 }
 
-                return true;
-            } catch (Exception e){
-                e.printStackTrace();
-                message =e.getMessage();
-                return false;
             }
-        }
 
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess){
-                listener.OnFailed(message);
-            } else {
-                listener.OnSuccess("");
+            @Override
+            public void OnPostExecute(Object object) {
+
+                Boolean isSuccess = (Boolean) object;
+
+                if(!isSuccess){
+                    listener.OnFailed(message);
+                } else {
+                    listener.OnSuccess("");
+                }
+
             }
-        }
+        });
     }
+
 }

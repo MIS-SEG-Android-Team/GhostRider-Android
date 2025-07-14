@@ -26,16 +26,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:paddingHorizontal="15dp">
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            >
+            android:scrollbars="vertical">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -607,6 +609,7 @@
             android:fontFamily="@font/roboto_medium"
             android:text="Please select transaction type."
             android:textSize="16sp" />
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/CustomDropDownTilStyle"
             android:layout_width="match_parent"
