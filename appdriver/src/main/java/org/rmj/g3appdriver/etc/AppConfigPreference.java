@@ -100,11 +100,11 @@ public class AppConfigPreference {
 
     /**
      *
-     * @return Default return value https://restgk.guanzongroup.com.ph/
+     * @return Default return value https://apps.guanzongroup.com.ph/
      * live data address
      */
     public String getAppServer(){
-        return pref.getString(APP_SERVER, "https://restgk.guanzongroup.com.ph/");
+        return pref.getString(APP_SERVER, "https://apps.guanzongroup.com.ph/");
     }
 
     public void setProductID(String ProductID){

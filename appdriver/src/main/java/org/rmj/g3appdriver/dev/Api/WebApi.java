@@ -21,10 +21,8 @@ public abstract class WebApi {
 
     private final AppConfigPreference poConfig;
 
-    //protected static final String LOCAL = "http://192.165.10.65/";
-
-    private static final String PRIMARY_LIVE = "https://restgk.guanzongroup.com.ph/";
-    private static final String SECONDARY_LIVE = "https://restgk1.guanzongroup.com.ph/";
+    private static final String PRIMARY_LIVE = "https://apps.guanzongroup.com.ph/";
+    private static final String SECONDARY_LIVE = "https://restgk.guanzongroup.com.ph/";
 
     protected static final String GCARD = "gcard/ms/";
     protected static final String GCARDs = "gcard/mx/";
@@ -59,16 +57,5 @@ public abstract class WebApi {
 
     protected boolean isUnitTest(){
         return isUnitTest;
-    }
-
-    private static final String URL_DOWNLOAD_UPDATE = "https://restgk.guanzongroup.com.ph/apk/gCircle.apk";
-    private static final String URL_DOWNLOAD_TEST_UPDATE = "https://restgk.guanzongroup.com.ph/apk/test/gRider.apk";
-
-    public String getUrlDownloadUpdate() {
-        return URL_DOWNLOAD_UPDATE;
-    }
-
-    public String getUrlDownloadTestUpdate() {
-        return URL_DOWNLOAD_TEST_UPDATE;
     }
 }

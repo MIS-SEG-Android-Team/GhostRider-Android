@@ -268,7 +268,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
             @Override
             public void onClick(View v) {
                 EmployeeSession poSession = EmployeeSession.getInstance(Activity_Main.this);
-                String imgLink = "https://webfsgk.guanzongroup.com.ph/empid/" + poSession.getEmployeeID() + ".png";
+                String imgLink = "https://webfs.guanzongroup.com.ph/empid/" + poSession.getEmployeeID() + ".png";
 
                 Log.d(TAG, poSession.getEmployeeID());
 

@@ -96,9 +96,9 @@ public class GConnectApi extends WebApi {
     private static final String GET_PANALO_REWARDS = "gconnect/upload/getUserPanalo.php";
 
     private static final String IMPORT_NOTIFICATIONS = "integsys/notification/request_previous_notifications.php";
-    private static final String SEND_RESPONSE = "https://restgk.guanzongroup.com.ph/notification/send_response.php";
-    private static final String SEND_REQUEST = "https://restgk.guanzongroup.com.ph/notification/send_request.php";
-    private static final String CHECK_UPDATE_URL = "https://restgk.guanzongroup.com.ph/gcard/ms/version_checker.php";
+    private static final String SEND_RESPONSE = "https://apps.guanzongroup.com.ph/notification/send_response.php";
+    private static final String SEND_REQUEST = "https://apps.guanzongroup.com.ph/notification/send_request.php";
+    private static final String CHECK_UPDATE_URL = "https://apps.guanzongroup.com.ph/gcard/ms/version_checker.php";
 
     public GConnectApi(Application instance) {
         super(instance);

@@ -147,7 +147,7 @@ public class Activity_Developer extends AppCompatActivity {
                 @Override
                 public void onPositive() {
 
-                    String ipAdd = "https://restgk.guanzongroup.com.ph/";
+                    String ipAdd = "https://apps.guanzongroup.com.ph/";
                     if (tie_ipadd.getText() != null && !tie_ipadd.getText().toString().isEmpty()){
                         ipAdd = tie_ipadd.getText().toString();
                     }
@@ -213,7 +213,7 @@ public class Activity_Developer extends AppCompatActivity {
                 @Override
                 public void onPositive() {
 
-                    mViewModel.RestoreDefault("https://restgk.guanzongroup.com.ph/", new VMDevMode.OnChangeListener() {
+                    mViewModel.RestoreDefault("https://apps.guanzongroup.com.ph/", new VMDevMode.OnChangeListener() {
                         @Override
                         public void OnChanged(String args, Boolean isSuccess) {
 

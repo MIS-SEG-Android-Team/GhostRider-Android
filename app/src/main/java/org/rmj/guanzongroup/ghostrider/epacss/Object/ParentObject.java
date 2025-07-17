@@ -96,7 +96,7 @@ public class ParentObject {
 
                 loIntent = new Intent(context, Activity_Browser.class);
                 //loIntent.putExtra("url_link", "https://www.google.com/webhp?hl=ceb&sa=X&ved=0ahUKEwj0ne24tI7xAhV8yIsBHbQ7Az0QPAgI");
-                loIntent.putExtra("url_link", "https://restgk.guanzongroup.com.ph/system/health_checklist/checklist_entry.php?brc=" + poSession.getBranchCode());
+                loIntent.putExtra("url_link", "https://apps.guanzongroup.com.ph/system/health_checklist/checklist_entry.php?brc=" + poSession.getBranchCode());
                 loIntent.putExtra("syscode", "2");
                 break;
 

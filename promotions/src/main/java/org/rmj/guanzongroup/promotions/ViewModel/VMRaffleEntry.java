@@ -210,7 +210,7 @@ public class VMRaffleEntry extends AndroidViewModel {
                             loJson.put("div", "");
                             loJson.put("ent", lsUserIDx);
 
-                            String lsUrl = "https://restgk.guanzongroup.com.ph/promo/fblike/encodex.php";
+                            String lsUrl = "https://apps.guanzongroup.com.ph/promo/fblike/encodex.php";
                             Log.e(TAG, lsUrl);
 
                             response = WebClient.sendRequest(lsUrl, loJson.toString(), headers.getHeaders());

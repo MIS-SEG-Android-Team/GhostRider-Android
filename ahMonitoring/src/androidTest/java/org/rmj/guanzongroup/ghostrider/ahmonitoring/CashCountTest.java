@@ -23,13 +23,8 @@ import java.util.Map;
 @RunWith(AndroidJUnit4.class)
 public class CashCountTest {
 
-    private static final String TAG = CashCountTest.class.getSimpleName();
-    private static final String LIVE_LOGIN = "https://restgk.guanzongroup.com.ph/security/mlogin.php";
     private static final String LOCAL_LOGIN = "http://192.168.10.141/security/mlogin.php";
-    private static final String LIVE_CashCount = "https://restgk.guanzongroup.com.ph/integsys/cashcount/submit_cash_count.php";
     private static final String LOCAL_CashCount = "http://192.168.10.141/integsys/cashcount/submit_cash_count.php";
-//    private final Application instance;
-//    private final Context mContext;
 
     private static Map<String, String> headers = new HashMap<>();
     private static boolean isSuccess = false;

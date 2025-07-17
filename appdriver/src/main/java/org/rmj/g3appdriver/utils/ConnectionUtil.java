@@ -50,7 +50,7 @@ public class ConnectionUtil {
     private String message;
 
     private static final String LOCAL = "http://192.165.10.65/";
-    private static final String PRIMARY_LIVE = "https://restgk.guanzongroup.com.ph";
+    private static final String PRIMARY_LIVE = "https://apps.guanzongroup.com.ph";
 
     public ConnectionUtil(Context context){
         this.context = context;

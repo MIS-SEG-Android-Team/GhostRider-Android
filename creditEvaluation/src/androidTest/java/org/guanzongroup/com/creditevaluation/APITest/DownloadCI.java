@@ -25,18 +25,8 @@ import java.util.Map;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4.class)
 public class DownloadCI {
-    private static final String TAG = DownloadCI.class.getSimpleName();
-    private static final String LIVE_LOGIN = "https://restgk.guanzongroup.com.ph/security/mlogin.php";
     private static final String LOCAL_LOGIN = "http://192.168.10.141/security/mlogin.php";
-    private static final String LIVE_CashCount = "https://restgk.guanzongroup.com.ph/integsys/cashcount/submit_cash_count.php";
-    private static final String LOCAL_CashCount = "http://192.168.10.141/integsys/cashcount/submit_cash_count.php";
-
-//    public static String IMPORT_FOR_EVALUATION = "https://restgk.guanzongroup.com.ph/integsys/gocas/ci_request_for_evaluations.php";
     public static String SUBMIT_EVALUATION_RESULT = "http://192.168.10.141/integsys/evaluator/submit_evaluation_result.php";
-    public static String IMPORT_FOR_EVALUATION = "http://192.168.10.141/integsys/gocas/ci_request_for_evaluations.php";
-
-//    private final Application instance;
-//    private final Context mContext;
 
     private static Map<String, String> headers = new HashMap<>();
     private static boolean isSuccess = false;
@@ -88,82 +78,7 @@ public class DownloadCI {
         }
         assertTrue(isSuccess);
     }
-//
-//    @Test
-//    public void test02CashCountNewFields() throws Exception{
-//        JSONObject params = new JSONObject();
-//        params.put("nCn0001cx", "10");
-//        params.put("nCn0005cx", "0");
-//        params.put("nCn0010cx", "0");
-//        params.put("nCn0025cx", "0");
-//        params.put("nCn0050cx", "0");
-//        params.put("nCn0001px", "0");
-//        params.put("nCn0005px", "0");
-//        params.put("nCn0010px", "10");
-//        params.put("nNte0020p", "0");
-//        params.put("nNte0050p", "0");
-//        params.put("nNte0100p", "33");
-//        params.put("nNte0200p", "34");
-//        params.put("nNte0500p", "16");
-//        params.put("nNte1000p", "4");
-//        params.put("sTransNox", "M09877123");
-//        params.put("sBranchCd", "M001");
-//        params.put("nPettyAmt", "12000.50");
-//        params.put("sORNoxxxx", "125334");
-//        params.put("sSINoxxxx", "256348");
-//        params.put("sPRNoxxxx", "256348");
-//        params.put("sCRNoxxxx", "256348");
-//        params.put("sORNoxNPt", "256348");
-//        params.put("sPRNoxNPt", "256348");
-//        params.put("sDRNoxxxx", "256348");
-//        params.put("dTransact", AppConstants.CURRENT_DATE);
-//        params.put("dEntryDte", new AppConstants().DATE_MODIFIED);
-//        params.put("sReqstdBy", "");
-//
-//        String lsResponse = WebClient.httpPostJSon(LOCAL_CashCount,
-//                params.toString(), (HashMap<String, String>) headers);
-//        if(lsResponse == null){
-//            isSuccess = false;
-//        } else {
-//            JSONObject loResponse = new JSONObject(lsResponse);
-//            String lsResult = loResponse.getString("result");
-//            if(lsResult.equalsIgnoreCase("success")){
-//                isSuccess = true;
-//            } else {
-//                JSONObject loError = loResponse.getJSONObject("error");
-//                String lsMessage = loError.getString("message");
-//                isSuccess = false;
-//            }
-//        }
-//        assertTrue(isSuccess);
-//    }
 
-    @Test
-    public void test03DownloadForEvaluator() throws Exception {
-//        GCircleApi loApi = new GCircleApi();
-//        JSONObject params = new JSONObject();
-//        params.put("sEmployID", "M00119001131");
-//        String lsApiAdd = loApi.getUrlAddForEvaluation(false);
-//        String lsResponse = WebClient.httpPostJSon(IMPORT_FOR_EVALUATION,
-//                params.toString(), (HashMap<String, String>) headers);
-//        if(lsResponse == null){
-//            isSuccess = false;
-//        } else {
-//            Log.d(TAG, lsResponse);
-//            JSONObject loResponse = new JSONObject(lsResponse);
-//            String lsResult = loResponse.getString("result");
-//            if(lsResult.equalsIgnoreCase("success")){
-//                isSuccess = true;
-//            } else {
-//                JSONObject loError = loResponse.getJSONObject("error");
-//                String lsMessage = loError.getString("message");
-//                isSuccess = false;
-//            }
-//        }
-//        assertTrue(isSuccess);
-    }
-
-//    @Test
     public void test04SubmitEvaluation() throws Exception {
         JSONObject params = new JSONObject();
         params.put("sTransNox", "CI4K52200069");
