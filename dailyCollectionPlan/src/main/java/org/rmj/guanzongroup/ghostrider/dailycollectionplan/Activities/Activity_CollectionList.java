@@ -341,6 +341,7 @@ public class Activity_CollectionList extends AppCompatActivity {
     }
 
     private void PostCollection(String fsVal){
+
         mViewModel.PostCollectionList(fsVal, new VMCollectionList.OnActionCallback() {
             @Override
             public void OnLoad() {

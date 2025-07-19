@@ -398,17 +398,6 @@ public class RImageInfo {
         }
     }
 
-    public String PreviewImage(String FileCode, String ImageName, String SourceCD, String SourceNo){
-        try{
-
-            return "";
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return null;
-        }
-    }
-
     private String CreateUniqueID(){
         String lsUniqIDx = "";
         try{

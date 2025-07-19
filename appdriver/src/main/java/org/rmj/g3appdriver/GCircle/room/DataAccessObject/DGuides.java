@@ -21,6 +21,10 @@ public interface DGuides {
     @Query("DELETE FROM User_Guides")
     void clear();
 
+    @Query("SELECT COUNT(*) FROM User_Guides")
+    int GetRowsCountForID();
+
     @Query("SELECT * FROM User_Guides")
     LiveData<List<EGuides>> GetGuides();
+
 }

@@ -56,7 +56,7 @@ public class VMGuide extends AndroidViewModel {
                 }
 
                 if (!poGuides.DownloadGuides()){
-                    message = poGuides.getMessage();
+                    message = poGuides.GetMessage();
                     return false;
                 }else{
                     return true;
@@ -75,7 +75,7 @@ public class VMGuide extends AndroidViewModel {
         });
     }
 
-    public void UploadGuide(String filename, byte[] file, OnUploadGuide callback){
+    public void UploadGuide(String fileloc, String filename, OnUploadGuide callback){
 
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
@@ -86,8 +86,8 @@ public class VMGuide extends AndroidViewModel {
                     return false;
                 }
 
-                if (!poGuides.UploadGuide(filename, file)){
-                    message = poGuides.getMessage();
+                if (!poGuides.UploadGuide(fileloc, filename)){
+                    message = poGuides.GetMessage();
                     return false;
                 }
 

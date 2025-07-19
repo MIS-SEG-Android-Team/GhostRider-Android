@@ -174,7 +174,7 @@ public class Activity_Manual extends AppCompatActivity {
                             return;
                         }
 
-                        mViewmodel.UploadGuide(filename, poFileUtil.ReadFileToBytes(fileResult), new VMGuide.OnUploadGuide() {
+                        mViewmodel.UploadGuide(fileResult.getAbsolutePath(), filename, new VMGuide.OnUploadGuide() {
                             @SuppressLint("ResourceAsColor")
                             @Override
                             public void OnSuccess() {

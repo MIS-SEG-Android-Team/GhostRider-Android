@@ -73,7 +73,6 @@ public class FileUtility {
         return destinationFile;
     }
 
-
     public String GetMimeType(Uri uri) {
         ContentResolver cr = context.getContentResolver();
         return cr.getType(uri);

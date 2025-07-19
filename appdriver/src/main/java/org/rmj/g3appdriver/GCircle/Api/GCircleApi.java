@@ -109,7 +109,6 @@ public class GCircleApi extends WebApi {
     private static final String URL_DOWNLOAD_INQUIRIES = "gcircle/ganado/import_inquiries.php";
     private static final String URL_SUBMIT_BARCODE = "gcircle/general/submit_order.php";
     private static final String URL_DOWNLOAD_GUIDES = "usermanuals/download_manuals.php";
-    private static final String URL_UPLOAD_GUIDES = "usermanuals/upload_manual.php";
     private static final String URL_DOWNLOAD_BUNDLES = "gcircle/general/download_items.php";
 
     public GCircleApi(Application instance) {
@@ -923,15 +922,6 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_GUIDES);
         return LIVE + URL_DOWNLOAD_GUIDES;
-    }
-
-    public String getUrlUploadGuides(){
-        if(isUnitTest()) {
-            Log.d(TAG, "Initialize api:" + LOCAL + URL_UPLOAD_GUIDES);
-            return LOCAL + URL_UPLOAD_GUIDES;
-        }
-        Log.d(TAG, "Initialize api:" + LIVE + URL_UPLOAD_GUIDES);
-        return LIVE + URL_UPLOAD_GUIDES;
     }
 
     public String getUrlDownloadBundles(){

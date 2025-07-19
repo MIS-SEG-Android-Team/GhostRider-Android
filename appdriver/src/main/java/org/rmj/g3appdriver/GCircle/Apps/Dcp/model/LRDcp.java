@@ -223,6 +223,26 @@ public class LRDcp {
                         loData.put("sRemarksx", detail.getRemarksx());
                         params.put("sRemCodex", detail.getRemCodex());
                         params.put("dModified", detail.getModified());
+
+                        //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
+                        loImage = poDao.GetDcpImageForPosting(
+                                detail.getTransNox(),
+                                detail.getAcctNmbr());
+
+                        if(loImage != null){
+
+                            if(!poConfig.getTestStatus()){
+                                loData.put("sImageNme", loImage.getImageNme());
+                                loData.put("sSourceCD", loImage.getSourceCD());
+                                loData.put("nLongitud", loImage.getLongitud());
+                                loData.put("nLatitude", loImage.getLatitude());
+
+                                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                                if(lsImageID == null){
+                                    Log.e(TAG, poImage.getMessage());
+                                }
+                            }
+                        }
                         break;
 
                     case "CNA":
@@ -242,6 +262,26 @@ public class LRDcp {
                             Log.e(TAG, message);
                         } else {
                             loData.put("Mobile", mobile);
+                        }
+
+                        //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
+                        loImage = poDao.GetDcpImageForPosting(
+                                detail.getTransNox(),
+                                detail.getAcctNmbr());
+
+                        if(loImage != null){
+
+                            if(!poConfig.getTestStatus()){
+                                loData.put("sImageNme", loImage.getImageNme());
+                                loData.put("sSourceCD", loImage.getSourceCD());
+                                loData.put("nLongitud", loImage.getLongitud());
+                                loData.put("nLatitude", loImage.getLatitude());
+
+                                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                                if(lsImageID == null){
+                                    Log.e(TAG, poImage.getMessage());
+                                }
+                            }
                         }
 
                         break;
@@ -305,12 +345,13 @@ public class LRDcp {
                         break;
 
                     default:
+
                         loImage = poDao.GetDcpImageForPosting(
                                 detail.getTransNox(),
                                 detail.getAcctNmbr());
 
                         if(loImage != null){
-                            Log.d(TAG, "Not visited image found.");
+
                             if(!poConfig.getTestStatus()){
                                 loData.put("sImageNme", loImage.getImageNme());
                                 loData.put("sSourceCD", loImage.getSourceCD());
@@ -322,8 +363,6 @@ public class LRDcp {
                                     Log.e(TAG, poImage.getMessage());
                                 }
                             }
-                        } else {
-                            Log.e(TAG, "Not visited image not found.");
                         }
                 }
                 loData.put("sRemarksx", detail.getRemarksx());
@@ -745,6 +784,26 @@ public class LRDcp {
                         loData.put("sRemarksx", detail.getRemarksx());
                         params.put("sRemCodex", detail.getRemCodex());
                         params.put("dModified", detail.getModified());
+
+                        //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
+                        loImage = poDao.GetDcpImageForPosting(
+                                detail.getTransNox(),
+                                detail.getAcctNmbr());
+
+                        if(loImage != null){
+
+                            if(!poConfig.getTestStatus()){
+                                loData.put("sImageNme", loImage.getImageNme());
+                                loData.put("sSourceCD", loImage.getSourceCD());
+                                loData.put("nLongitud", loImage.getLongitud());
+                                loData.put("nLatitude", loImage.getLatitude());
+
+                                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                                if(lsImageID == null){
+                                    Log.e(TAG, poImage.getMessage());
+                                }
+                            }
+                        }
                         break;
 
                     case "CNA":
@@ -764,6 +823,26 @@ public class LRDcp {
                             Log.e(TAG, message);
                         } else {
                             loData.put("Mobile", mobile);
+                        }
+
+                        //TODO ADD IMAGE POSTING FOR CUSTOMER NOT AROUND
+                        loImage = poDao.GetDcpImageForPosting(
+                                detail.getTransNox(),
+                                detail.getAcctNmbr());
+
+                        if(loImage != null){
+
+                            if(!poConfig.getTestStatus()){
+                                loData.put("sImageNme", loImage.getImageNme());
+                                loData.put("sSourceCD", loImage.getSourceCD());
+                                loData.put("nLongitud", loImage.getLongitud());
+                                loData.put("nLatitude", loImage.getLatitude());
+
+                                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                                if(lsImageID == null){
+                                    Log.e(TAG, poImage.getMessage());
+                                }
+                            }
                         }
 
                         break;
@@ -827,12 +906,13 @@ public class LRDcp {
                         break;
 
                     default:
+
                         loImage = poDao.GetDcpImageForPosting(
                                 detail.getTransNox(),
                                 detail.getAcctNmbr());
 
                         if(loImage != null){
-                            Log.d(TAG, "Not visited image found.");
+
                             if(!poConfig.getTestStatus()){
                                 loData.put("sImageNme", loImage.getImageNme());
                                 loData.put("sSourceCD", loImage.getSourceCD());
@@ -844,8 +924,6 @@ public class LRDcp {
                                     Log.e(TAG, poImage.getMessage());
                                 }
                             }
-                        } else {
-                            Log.e(TAG, "Not visited image not found.");
                         }
                 }
                 loData.put("sRemarksx", detail.getRemarksx());
