@@ -22,9 +22,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
-
 import com.google.android.material.button.MaterialButton;
-
 import org.rmj.g3appdriver.dev.encryp.CodeGenerator;
 import org.rmj.guanzongroup.ghostrider.settings.R;
 

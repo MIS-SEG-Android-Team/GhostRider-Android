@@ -627,16 +627,6 @@ public class LRDcp {
         poDao.UpdateCollectionDetail(foVal);
     }
 
-    /**
-     * this method is use by splashscreen to start location tracking service
-     * @return
-     */
-    public boolean HasCollection(){
-        EDCPCollectionMaster loMaster = poDao.GetColletionMasterForPosting();
-        Log.d(TAG + "has collection", String.valueOf(loMaster != null));
-        return loMaster != null;
-    }
-
     public boolean HasRemittedCollection(){
         try{
             EDCPCollectionMaster loMaster = poDao.GetColletionMasterForPosting();

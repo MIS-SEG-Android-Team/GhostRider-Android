@@ -23,21 +23,21 @@ import org.rmj.g3appdriver.R;
 
 
 public class Dialog_File_Upload {
+    private final Context instance;
     private final AlertDialog poDialog;
     private final ConstraintLayout layout_file;
     private final TextInputEditText tie_fileupload;
-    public final MaterialTextView mtv_file;
+    public final MaterialTextView mtv_file, mtv_title;
     public final ImageButton btn_upload;
     public final LinearProgressIndicator load_prog;
-    public final MaterialButton btn_select;
-    public final MaterialButton btn_cancel;
+    public final MaterialButton btn_select, btn_cancel;
 
     public interface OnAction{
         void OnSelectFile(Intent intent);
         void OnUpload(String filname);
     }
 
-    public Dialog_File_Upload(Context context, OnAction callback){
+    public Dialog_File_Upload(Context context, String title, OnAction callback){
 
         AlertDialog.Builder poBuilder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_file_upload, null);
@@ -46,13 +46,18 @@ public class Dialog_File_Upload {
         poDialog = poBuilder.create();
         poDialog.setCancelable(false);
 
+        instance = context;
+
         layout_file = view.findViewById(R.id.layout_file);
         tie_fileupload = view.findViewById(R.id.tie_fileupload);
         mtv_file = view.findViewById(R.id.mtv_file);
+        mtv_title = view.findViewById(R.id.mtv_title);
         btn_upload = view.findViewById(R.id.btn_upload);
         load_prog = view.findViewById(R.id.load_prog);
         btn_select = view.findViewById(R.id.btn_select);
         btn_cancel = view.findViewById(R.id.btn_cancel);
+
+        mtv_title.setText(title);
 
         btn_select.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +70,7 @@ public class Dialog_File_Upload {
 
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("application/pdf");
+                intent.setType("*/*");
 
                 callback.OnSelectFile(intent);
             }
@@ -99,7 +104,7 @@ public class Dialog_File_Upload {
     }
 
     @SuppressLint("ResourceAsColor")
-    public void SetResult(Boolean isSuccess, String result){
+    public void SetResult(Boolean isSuccess, String resultType, String result){
 
         layout_file.setVisibility(View.VISIBLE);
         mtv_file.setText(result);
@@ -108,6 +113,30 @@ public class Dialog_File_Upload {
             btn_upload.setEnabled(false);
         }else {
             btn_upload.setEnabled(true);
+        }
+
+        if (resultType == null){
+            mtv_file.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(instance, R.drawable.baseline_error_24), null, null, null);
+            return;
+        }
+
+        switch (resultType){
+
+            case "application/pdf":
+                mtv_file.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(instance, R.drawable.baseline_picture_as_pdf_24), null, null, null);
+                break;
+
+
+
+                
+            case "image/jpeg":
+                mtv_file.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(instance, R.drawable.baseline_image_24), null, null, null);
+                break;
+
+            default:
+                mtv_file.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(instance, R.drawable.baseline_insert_drive_file_24), null, null, null);
+                break;
+
         }
     }
 

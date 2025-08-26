@@ -174,6 +174,7 @@ public class VMCollectionList extends AndroidViewModel {
     }
 
     public void CheckDcpForPosting(OnCheckDcpForPosting callback){
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -74,7 +75,7 @@ public class Activity_Manual extends AppCompatActivity {
                         Uri uri = Objects.requireNonNull(result.getData().getData());
 
                         if (!poFileUtil.GetMimeType(uri).equals("application/pdf")){
-                            dialogFileUpload.SetResult(false, "File type is not pdf");
+                            dialogFileUpload.SetResult(false, null, "File type is not pdf");
                             dialogFileUpload.btn_upload.setEnabled(false);
                             return;
                         }
@@ -84,16 +85,16 @@ public class Activity_Manual extends AppCompatActivity {
                         dialogFileUpload.load_prog.setVisibility(GONE);
                         dialogFileUpload.btn_upload.setEnabled(true);
 
-                        dialogFileUpload.SetResult(true, poFileUtil.GetDisplayName(uri));
+                        dialogFileUpload.SetResult(true, poFileUtil.GetMimeType(uri), poFileUtil.GetDisplayName(uri));
                     }
                 }else {
                     if (result.getResultCode() != RESULT_CANCELED){
-                        dialogFileUpload.SetResult(false,"Error attaching file");
+                        dialogFileUpload.SetResult(false, null,"Error attaching file");
                     }
                 }
 
             }catch (Exception e){
-                dialogFileUpload.SetResult(false,e.getMessage());
+                dialogFileUpload.SetResult(false, null, e.getMessage());
             }
         }
     });
@@ -153,7 +154,7 @@ public class Activity_Manual extends AppCompatActivity {
             finish();
         }else if (item.getItemId() == R.id.action_add_guideline){
 
-            dialogFileUpload = new Dialog_File_Upload(Activity_Manual.this, new Dialog_File_Upload.OnAction() {
+            dialogFileUpload = new Dialog_File_Upload(Activity_Manual.this, "Choose PDF files only", new Dialog_File_Upload.OnAction() {
                 @Override
                 public void OnSelectFile(Intent intent) {
                     poDocument.launch(Intent.createChooser(intent, "Select a file"));
@@ -161,6 +162,7 @@ public class Activity_Manual extends AppCompatActivity {
 
                 @Override
                 public void OnUpload(String filename) {
+
                     try {
 
                         if (poFileUtil.ReadFileToBytes(fileResult) == null){

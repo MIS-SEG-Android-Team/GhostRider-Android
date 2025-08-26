@@ -14,9 +14,10 @@
         android:orientation="vertical">
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Choose PDF files only"
+            android:text="Select a file"
             android:textStyle="bold"
             android:padding="10dp"/>
 
@@ -45,7 +46,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="No attached file"
-                android:drawableStart="@drawable/baseline_picture_as_pdf_24"
+                android:drawableStart="@drawable/baseline_insert_drive_file_24"
                 android:drawablePadding="10dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

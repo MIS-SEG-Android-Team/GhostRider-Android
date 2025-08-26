@@ -149,8 +149,10 @@ public class UserGuides {
             if (loUpload == null) {
                 message = SERVER_NO_RESPONSE;
                 reportException(poSession.getUserID(), message);
-                return null;
+                return false;
             }
+
+            Log.d("FILE UPLOAD", loUpload.toString());
 
             JSONObject loResult = new JSONObject(loUpload.toJSONString());
             if(loResult.has("result")){
