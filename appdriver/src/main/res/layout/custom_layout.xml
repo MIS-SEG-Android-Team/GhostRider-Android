@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:orientation="vertical"
+    android:background="@drawable/radbackgroud"
+    android:padding="20dp"
+    >
+
+    <ImageView
+        android:id="@+id/dialog_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/kay"
+        android:layout_gravity="center"/>
+
+
+
+        <TextView
+            android:layout_marginTop="14dp"
+            android:justificationMode="inter_word"
+            android:id="@+id/dialog_text"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:text="This is asadadadasdasdaasdasdsdasdasdadasdsdasdasdasdsdasdsdadasdasdasdasdasdasdasdasd long message that needs scrolling. Add more text here to test the scroll functionality."
+            android:textSize="12sp"/>
+
+    <Button
+        android:id="@+id/dialog_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CLOSE"
+        android:backgroundTint="#f67321"/>
+</LinearLayout>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Article9">
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/TextInputStyle"
+        android:id="@+id/searchView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="Find"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.950">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchView"
+            android:maxLines="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="15sp"
+            android:imeOptions="actionNext"
+             android:drawablePadding="10dp"
+            android:drawableTint="@color/footer_dark_grey"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <androidx.cardview.widget.CardView
+        android:layout_below="@id/searchView1"
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <!-- Left side: Title + Info + Description -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:backgroundTint="#f67321"
+                        android:id="@+id/titles"
+                        android:gravity="start"
+                        android:textColor="@color/black"
+                        android:padding="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Article 9\nViolation of Fiduciary Duties"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="4dp"/>
+
+
+                </LinearLayout>
+
+                <TextView
+
+                    android:justificationMode="inter_word"
+                    android:id="@+id/description"
+                    android:maxLines="3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text= "Violation of Fiduciary Duties shall refer to any breach, neglect, or failure by an individual entrusted with fiduciary responsibilities to act with the utmost good faith, loyalty, and care towards the party to whom such duties are owed. This may include, but is not limited to, actions or omissions that result in conflicts of interest, misappropriation of assets, self-dealing, or any other conduct that undermines the trust and confidence placed in the fiduciary relationship."
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"/>
+                <TextView
+                    android:id="@+id/readMore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Read More"
+                    android:textSize="12dp"
+                    android:textColor="#f67321"
+                    android:textStyle="bold"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <!-- Right side: Image -->
+            <ImageView
+                android:id="@+id/cardImage"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/article9" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ExpandableListView
+
+        android:groupIndicator="@null"
+        android:layout_below="@id/banner"
+        android:id="@+id/expandableListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</RelativeLayout>

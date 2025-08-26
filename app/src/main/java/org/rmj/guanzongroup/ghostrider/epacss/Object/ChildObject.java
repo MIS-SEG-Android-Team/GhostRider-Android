@@ -20,6 +20,7 @@ import org.guanzongroup.com.creditevaluation.Activity.Activity_CIEvaluationList;
 import org.guanzongroup.com.creditevaluation.Activity.Activity_EvaluationCIHistory;
 import org.guanzongroup.com.itinerary.Activities.Activity_ItineraryEntry;
 import org.guanzongroup.com.itinerary.Activities.Activity_ItineraryLog;
+import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Menus;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.guanzongroup.documentscanner.Activity_DocumentScan;
 import org.rmj.guanzongroup.ganado.Activities.Activity_BrandSelection;
@@ -193,6 +194,9 @@ public class ChildObject {
                 break;
             case "mp scanner":
                 loIntent = new Intent(context, Activity_MPBarcode_Scanner.class);
+                break;
+            case "rules and policies":
+                loIntent = new Intent(context, Activity_Menus.class);
                 break;
             default:
                 loIntent = null;

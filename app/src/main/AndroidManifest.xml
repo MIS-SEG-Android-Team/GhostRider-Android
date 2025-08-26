@@ -63,6 +63,42 @@
             android:name="org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_PDFViewer"
             android:exported="false" />
         <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Menus"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_MainArticle"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Definition"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Summary"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article1"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article2"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article3"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article4"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article5"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article6"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article7"
+            android:exported="false" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article8"
+            android:exported="false" />
+        <activity
             android:name=".Activity.Activity_DataManager"
             android:exported="true"
             android:screenOrientation="userPortrait"
