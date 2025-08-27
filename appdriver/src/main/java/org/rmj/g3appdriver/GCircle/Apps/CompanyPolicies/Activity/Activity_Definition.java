@@ -30,12 +30,15 @@ public class Activity_Definition extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_definition);
         recyclerView = findViewById(R.id.recyclerView);
+
         TextInputEditText searchView = findViewById(R.id.searchView);
         searchView.setBackground(null);
+
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         itemList = loadJsonData();
         adapter = new DefinitionAdapter(this, itemList);
         recyclerView.setAdapter(adapter);
+
         searchView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

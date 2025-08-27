@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textview.MaterialTextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,11 +40,14 @@ public class Activity_Article5 extends AppCompatActivity {
 
         searchView = findViewById(R.id.searchView);
         expandableListView = findViewById(R.id.expandableListView);
-        TextView readMore = findViewById(R.id.readMore);
-        TextView description = findViewById(R.id.description);
+
+        MaterialTextView readMore = findViewById(R.id.readMore);
+        MaterialTextView description = findViewById(R.id.description);
+
         fullViolationList = loadViolations(this);
         adapter = new ViolationAdapter(this, fullViolationList);
         expandableListView.setAdapter(adapter);
+
         readMore.setOnClickListener(v -> {
             isExpanded = !isExpanded;
             if (isExpanded) {
@@ -54,6 +57,7 @@ public class Activity_Article5 extends AppCompatActivity {
                description.setMaxLines(3);
                 readMore.setText("Read More");
             }});
+
         searchView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

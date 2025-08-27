@@ -2,9 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Article4">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <com.google.android.material.textfield.TextInputLayout
         style="@style/TextInputStyle"
         android:id="@+id/searchView1"
@@ -28,7 +27,8 @@
             android:drawablePadding="10dp"
             android:drawableTint="@color/footer_dark_grey"/>
     </com.google.android.material.textfield.TextInputLayout>
-    <androidx.cardview.widget.CardView
+
+    <com.google.android.material.card.MaterialCardView
         android:layout_below="@id/searchView1"
         android:id="@+id/banner"
         android:layout_width="match_parent"
@@ -43,7 +43,6 @@
             android:orientation="horizontal"
             android:padding="8dp">
 
-            <!-- Left side: Title + Info + Description -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -56,7 +55,7 @@
                     android:orientation="vertical"
                     android:gravity="center_vertical">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:backgroundTint="#f67321"
                         android:id="@+id/titles"
                         android:gravity="start"
@@ -72,8 +71,7 @@
 
                 </LinearLayout>
 
-                <TextView
-
+                <com.google.android.material.textview.MaterialTextView
                     android:justificationMode="inter_word"
                     android:id="@+id/description"
                     android:layout_width="match_parent"
@@ -82,18 +80,18 @@
                     android:maxLines="3"
                     android:text="All employees are expected to arrive on time. Punctuality in all dealing is expected [Reckoning Period is one (1) calendar year]. Each employee is given a grace period of five (5) minutes per day with no sanctions. However, when an employee is late six (6) minutes, it shall be deductible and reflected on the payroll system as “late”. More than the said allotted time, HCM will serve the Notice to Explain with applicable sanctions.Excessive tardiness may also be a ground for termination (Serious Misconduct/Willful Disobedience/Habitual Neglect of Duties) subject to the findings of the HCM."
                     android:textSize="14sp" />
-                <TextView
+
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/readMore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Read More"
-                    android:textSize="12dp"
-                    android:textColor="#f67321"
-                    android:textStyle="bold"
-                    android:gravity="center" />
+                    android:textSize="12sp"
+                    android:textColor="@color/guanzon_orange"
+                    android:gravity="end"
+                    android:layout_marginTop="10dp"/>
             </LinearLayout>
 
-            <!-- Right side: Image -->
             <ImageView
                 android:id="@+id/cardImage"
                 android:layout_width="120dp"
@@ -102,7 +100,8 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/article5" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <ExpandableListView
 

@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Article5">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <com.google.android.material.textfield.TextInputLayout
         style="@style/TextInputStyle"
         android:id="@+id/searchView1"
@@ -28,7 +28,8 @@
             android:drawablePadding="10dp"
             android:drawableTint="@color/footer_dark_grey"/>
     </com.google.android.material.textfield.TextInputLayout>
-    <androidx.cardview.widget.CardView
+
+    <com.google.android.material.card.MaterialCardView
         android:layout_below="@id/searchView1"
         android:id="@+id/banner"
         android:layout_width="match_parent"
@@ -56,7 +57,7 @@
                     android:orientation="vertical"
                     android:gravity="center_vertical">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:backgroundTint="#f67321"
                         android:id="@+id/titles"
                         android:gravity="start"
@@ -72,8 +73,7 @@
 
                 </LinearLayout>
 
-                <TextView
-
+                <com.google.android.material.textview.MaterialTextView
                     android:justificationMode="inter_word"
                     android:id="@+id/description"
                     android:layout_width="match_parent"
@@ -82,15 +82,17 @@
                     android:maxLines="3"
                     android:text="All employees are expected to report for work at all times. In case of emergency, the employee should notify his immediate supervisor two (2) hours before the said absence. Only accidents, death of immediate family members, confinement due to sickness are considered excused absences. All employees who were absent two (2) days and above due to sickness must submit a medical certificate to HCM Department prior to return to work.\n\nDue Process in Abandonment:\n\n(a) First Notice to apprise the employee of the particular acts or omissions for which his dismissal is sought; and\n\n(b) Second Notice to inform him of the employer’s decision to dismiss him on the ground of abandonment.\n\nFor obvious reasons, procedural due process in abandonment cases does not involve the conduct of hearing."
                     android:textSize="14sp" />
-                <TextView
+
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/readMore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Read More"
-                    android:textSize="12dp"
-                    android:textColor="#f67321"
-                    android:textStyle="bold"
-                    android:gravity="center" />
+                    android:textSize="12sp"
+                    android:textColor="@color/guanzon_orange"
+                    android:gravity="end"
+                    android:layout_marginTop="10dp"/>
+
             </LinearLayout>
 
             <!-- Right side: Image -->
@@ -102,7 +104,7 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/article5" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <ExpandableListView
 

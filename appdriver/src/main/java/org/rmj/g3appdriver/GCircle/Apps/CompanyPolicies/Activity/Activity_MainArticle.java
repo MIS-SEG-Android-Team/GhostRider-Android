@@ -5,18 +5,13 @@ import android.content.res.AssetManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.JsonReader;
-import android.util.Log;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.textfield.TextInputEditText;
-
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Adapter.itemAdapter;
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Model.Item;
 import org.rmj.g3appdriver.R;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -30,12 +25,11 @@ public class Activity_MainArticle extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_mainarticle);
 
         recyclerView = findViewById(R.id.recyclerViewArticles);
         TextInputEditText searchView = findViewById(R.id.searchView);
 
-        Log.d("Article Size ", String.valueOf(loadJsonData().size()));
         itemList = loadJsonData();
         adapter = new itemAdapter(this, itemList);
         recyclerView.setAdapter(adapter);
@@ -54,6 +48,7 @@ public class Activity_MainArticle extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+
     }
     private void filter(String text) {
         List<Item> filteredList = new ArrayList<>();
@@ -64,7 +59,6 @@ public class Activity_MainArticle extends AppCompatActivity {
         }
         adapter.updateList(filteredList);
     }
-
     private List<Item> loadJsonData() {
         List<Item> items = new ArrayList<>();
         try {

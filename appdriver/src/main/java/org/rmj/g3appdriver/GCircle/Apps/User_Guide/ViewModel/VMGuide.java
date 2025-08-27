@@ -75,6 +75,42 @@ public class VMGuide extends AndroidViewModel {
         });
     }
 
+    public void DownloadPolicySummary(OnDownloadGuides callback){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnDownloading();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isDeviceConnected()){
+                    message = poConnection.getMessage();
+                    return false;
+                }
+
+                if (!poGuides.DownloadPolicySummary()){
+                    message = poGuides.GetMessage();
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if (!(Boolean) object){
+                    callback.OnFailed(message);
+                }else{
+                    callback.OnSuccess();
+                }
+            }
+        });
+    }
+
     public void UploadGuide(String fileloc, String filename, OnUploadGuide callback){
 
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {

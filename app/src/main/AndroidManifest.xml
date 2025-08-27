@@ -99,6 +99,9 @@
             android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article8"
             android:exported="false" />
         <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article9"
+            android:exported="false" />
+        <activity
             android:name=".Activity.Activity_DataManager"
             android:exported="true"
             android:screenOrientation="userPortrait"

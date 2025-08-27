@@ -39,6 +39,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCIEvaluation;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCashCount;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DClientInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DClientUpdate;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCompanyPolicy;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCountryInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCreditApplicantInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCreditApplication;
@@ -149,6 +150,9 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EOccupationInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPacitaEvaluation;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPacitaRule;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPanaloReward;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyContents;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyItems;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyMenus;
 import org.rmj.g3appdriver.GCircle.room.Entities.EProvinceInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERaffleBasis;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERaffleInfo;
@@ -231,7 +235,10 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         ESCARqstEmp.class,
         EBarcode.class,
         EBarcodeDetail.class,
-        EGuides.class}, version = 45, exportSchema = false)
+        EGuides.class,
+        EPolicyMenus.class,
+        EPolicyItems.class,
+        EPolicyContents.class}, version = 45, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -308,6 +315,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DBarcode barcodeDao();
     public abstract DBarcodeDetail barcodeDetailDao();
     public abstract DGuides userguideDao();
+    public abstract DCompanyPolicy policyDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
@@ -383,6 +391,21 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             database.execSQL("CREATE TABLE IF NOT EXISTS User_Guides " +
                     "(sTransNox TEXT NOT NULL, sTitlexx TEXT, sURlxx TEXT, " +
                     "PRIMARY KEY(sTransNox))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Policy_Menus " +
+                    "(sTransNoxx TEXT NOT NULL, sNamexx TEXT, " +
+                    "PRIMARY KEY(sTransNoxx))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Policy_Items " +
+                    "(sTransNoxx TEXT NOT NULL, sTitlexx TEXT, sDescriptionxx TEXT, sImagexx TEXT, sSubTitlexx TEXT, sParentIDxx TEXT, " +
+                    "PRIMARY KEY(sTransNoxx))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Policy_Items " +
+                    "(sTransNoxx TEXT NOT NULL, sParentIDxx TEXT, sNamexx TEXT, sOffenses TEXT, " +
+                    "PRIMARY KEY(sTransNoxx))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");

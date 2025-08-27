@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textview.MaterialTextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Adapter.ViolationAdapter;
@@ -41,8 +41,9 @@ public class Activity_Article1 extends AppCompatActivity {
         fullViolationList = loadViolations(this);
         adapter = new ViolationAdapter(this, fullViolationList);
         expandableListView.setAdapter(adapter);
-        TextView readMore = findViewById(R.id.readMore);
-        TextView description = findViewById(R.id.description);
+
+        MaterialTextView readMore = findViewById(R.id.readMore);
+        MaterialTextView description = findViewById(R.id.description);
         readMore.setOnClickListener(v -> {
             isExpanded = !isExpanded;
             if (isExpanded) {

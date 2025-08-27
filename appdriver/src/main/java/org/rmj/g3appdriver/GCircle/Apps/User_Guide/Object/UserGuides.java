@@ -5,7 +5,7 @@ import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 import static org.rmj.g3appdriver.lib.Firebase.CrashReportingUtil.reportException;
 
 import android.app.Application;
-import android.util.Base64;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -13,8 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCompanyPolicy;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGuides;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyMenus;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
@@ -24,22 +26,25 @@ import org.rmj.g3appdriver.etc.AppConfigPreference;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class UserGuides {
-
     private final AppConfigPreference poConfig;
     private final EmployeeSession poSession;
     private final AppTokenManager poToken;
-    private final DGuides poDao;
+    private final DGuides dGuides;
+    private DCompanyPolicy dCompanyPolicy;
     private final GCircleApi poApi;
     private final HttpHeaders poHeaders;
     private String message;
 
     public UserGuides(Application context){
         this.poConfig = AppConfigPreference.getInstance(context);
-        this.poDao = GGC_GCircleDB.getInstance(context).userguideDao();
+        this.dGuides = GGC_GCircleDB.getInstance(context).userguideDao();
+        this.dCompanyPolicy = GGC_GCircleDB.getInstance(context).policyDao();
         this.poApi = new GCircleApi(context);
         this.poHeaders = HttpHeaders.getInstance(context);
         this.poSession = EmployeeSession.getInstance(context);
@@ -54,7 +59,7 @@ public class UserGuides {
             StringBuilder loBuilder = new StringBuilder(lsBranchCd);
             loBuilder.append(lsCrrYear);
 
-            int lnLocalID = poDao.GetRowsCountForID() + 1;
+            int lnLocalID = dGuides.GetRowsCountForID() + 1;
             String lsPadNumx = String.format("%05d", lnLocalID);
             loBuilder.append(lsPadNumx);
             lsUniqIDx = loBuilder.toString();
@@ -91,7 +96,7 @@ public class UserGuides {
             JSONArray laGuides = new JSONArray(loResponse.getString("detail"));
             if (laGuides.length() > 0){
 
-                poDao.DeleteGuides();
+                dGuides.DeleteGuides();
 
                 //todo link of device configured server
                 String lsFileDir = poConfig.getAppServer() + "usermanuals/";
@@ -105,9 +110,45 @@ public class UserGuides {
                     loGuide.setsTitlexx(loObj.getString("title"));
                     loGuide.setsURlxx(lsFileDir + loObj.getString("link"));
 
-                    poDao.InsertGuides(loGuide);
+                    dGuides.InsertGuides(loGuide);
                 }
             }
+
+            return true;
+
+        }catch (Exception e){
+            message = e.getMessage();
+            return false;
+        }
+    }
+
+    public Boolean DownloadPolicyMenus(){
+        HashMap<String, String> loMenus = new HashMap<>();
+        loMenus.put("0001", "SUMMARY OF INFRACTIONS AND THEIR CORRESPONDING DISCIPLINARY ACTIONS");
+        loMenus.put("0002", "TABLE OF OFFENSES AND ACTIONS");
+        loMenus.put("0003", "DEFINITION OF DISCIPLINARY PROCEDURES");
+
+        for (Map.Entry<String, String> entry : loMenus.entrySet()){
+            EPolicyMenus loMenu = new EPolicyMenus();
+            loMenu.setsNamexx(entry.getValue());
+            loMenu.setsTransNoxx(entry.getKey());
+
+            dCompanyPolicy.savePolicyMenus(loMenu);
+        }
+        return true;
+    }
+
+    public Boolean DownloadPolicySummary(){
+
+        try {
+
+            String lsResponse = WebClient.sendRequest("https://apps.guanzongroup.com.ph/apk/json/offenses_and_actions.json", new JSONObject().toString(), poHeaders.getHeaders());
+            if (lsResponse == null || lsResponse.isEmpty()){
+                message = "No response from server";
+                return false;
+            }
+
+            Log.d("JSON POLICY", lsResponse);
 
             return true;
 
@@ -180,7 +221,7 @@ public class UserGuides {
             loGuide.setsTitlexx(filename);
             loGuide.setsURlxx(loUpload.get("url").toString());
 
-            poDao.InsertGuides(loGuide);
+            dGuides.InsertGuides(loGuide);
 
             return true;
 
@@ -192,6 +233,6 @@ public class UserGuides {
     }
 
     public LiveData<List<EGuides>> GetGuides(){
-        return poDao.GetGuides();
+        return dGuides.GetGuides();
     }
 }

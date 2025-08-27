@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Definition">
+    android:layout_height="match_parent">
+
     <com.google.android.material.textfield.TextInputLayout
         style="@style/TextInputStyle"
         android:id="@+id/searchView1"
@@ -30,7 +30,8 @@
             android:drawablePadding="10dp"
             android:drawableTint="@color/footer_dark_grey"/>
     </com.google.android.material.textfield.TextInputLayout>
-    <androidx.cardview.widget.CardView
+
+    <com.google.android.material.card.MaterialCardView
         android:layout_below="@id/searchView1"
         android:id="@+id/banner"
         android:layout_width="match_parent"
@@ -45,9 +46,7 @@
             android:orientation="horizontal"
             android:padding="8dp">
 
-            <!-- Left side: Title + Info + Description -->
             <LinearLayout
-
                 android:layout_gravity="center"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -60,14 +59,13 @@
                     android:orientation="vertical"
                     android:gravity="center_vertical">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:layout_gravity="center_vertical"
                         android:justificationMode="inter_word"
                         android:backgroundTint="#f67321"
                         android:id="@+id/titles"
                         android:gravity="end"
                         android:textColor="@color/black"
-
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="DEFINITION OF \n DISCIPLINARY PROCEDURES"
@@ -75,11 +73,8 @@
                         android:textStyle="bold"/>
 
                 </LinearLayout>
-
-
             </LinearLayout>
 
-            <!-- Right side: Image -->
             <ImageView
                 android:id="@+id/cardImage"
                 android:layout_width="120dp"
@@ -88,7 +83,8 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/kay" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_below="@id/banner"
         xmlns:android="http://schemas.android.com/apk/res/android"

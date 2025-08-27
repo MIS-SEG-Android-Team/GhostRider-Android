@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textview.MaterialTextView;
+
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article1;
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article2;
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article3;
@@ -73,7 +76,7 @@ public class itemAdapter extends RecyclerView.Adapter<itemAdapter.ViewHolder> {
         View dialogView = inflater.inflate(R.layout.custom_layout, null);
 
         builder.setView(dialogView);
-        TextView dialogText = dialogView.findViewById(R.id.dialog_text);
+        MaterialTextView dialogText = dialogView.findViewById(R.id.dialog_text);
         dialogText.setText(item.subtitle);
         AlertDialog alertDialog = builder.create();
 
@@ -81,7 +84,7 @@ public class itemAdapter extends RecyclerView.Adapter<itemAdapter.ViewHolder> {
         alertDialog.setCancelable(false);
 
         // Set button click listener
-        Button button = dialogView.findViewById(R.id.dialog_button);
+        MaterialButton button = dialogView.findViewById(R.id.dialog_button);
         button.setOnClickListener(view -> alertDialog.dismiss());
         alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent); // Remove default corners
         alertDialog.show();

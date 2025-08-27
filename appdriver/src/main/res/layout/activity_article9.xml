@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Article9">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <com.google.android.material.textfield.TextInputLayout
         style="@style/TextInputStyle"
         android:id="@+id/searchView1"
@@ -27,8 +27,10 @@
             android:imeOptions="actionNext"
              android:drawablePadding="10dp"
             android:drawableTint="@color/footer_dark_grey"/>
+
     </com.google.android.material.textfield.TextInputLayout>
-    <androidx.cardview.widget.CardView
+
+    <com.google.android.material.card.MaterialCardView
         android:layout_below="@id/searchView1"
         android:id="@+id/banner"
         android:layout_width="match_parent"
@@ -43,7 +45,6 @@
             android:orientation="horizontal"
             android:padding="8dp">
 
-            <!-- Left side: Title + Info + Description -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -56,7 +57,7 @@
                     android:orientation="vertical"
                     android:gravity="center_vertical">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:backgroundTint="#f67321"
                         android:id="@+id/titles"
                         android:gravity="start"
@@ -72,8 +73,7 @@
 
                 </LinearLayout>
 
-                <TextView
-
+                <com.google.android.material.textview.MaterialTextView
                     android:justificationMode="inter_word"
                     android:id="@+id/description"
                     android:maxLines="3"
@@ -82,18 +82,19 @@
                     android:text= "Violation of Fiduciary Duties shall refer to any breach, neglect, or failure by an individual entrusted with fiduciary responsibilities to act with the utmost good faith, loyalty, and care towards the party to whom such duties are owed. This may include, but is not limited to, actions or omissions that result in conflicts of interest, misappropriation of assets, self-dealing, or any other conduct that undermines the trust and confidence placed in the fiduciary relationship."
                     android:textSize="14sp"
                     android:layout_marginTop="4dp"/>
-                <TextView
+
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/readMore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Read More"
-                    android:textSize="12dp"
-                    android:textColor="#f67321"
-                    android:textStyle="bold"
-                    android:gravity="center" />
+                    android:textSize="12sp"
+                    android:textColor="@color/guanzon_orange"
+                    android:gravity="end"
+                    android:layout_marginTop="10dp"/>
+
             </LinearLayout>
 
-            <!-- Right side: Image -->
             <ImageView
                 android:id="@+id/cardImage"
                 android:layout_width="120dp"
@@ -102,10 +103,9 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/article9" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <ExpandableListView
-
         android:groupIndicator="@null"
         android:layout_below="@id/banner"
         android:id="@+id/expandableListView"

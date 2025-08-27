@@ -66,6 +66,6 @@
             android:id="@+id/cardImage"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
-            android:src="@drawable/sample" />
+            android:src="@drawable/kayscope" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
