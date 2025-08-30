@@ -12,10 +12,8 @@ public class EPolicyContents {
     public String sTransNoxx;
     @ColumnInfo(name = "sParentIDxx")
     public String sParentIDxx;
-    @ColumnInfo(name = "sNamexx")
-    public String sNamexx;
-    @ColumnInfo(name = "sOffenses")
-    public String sOffenses;
+    @ColumnInfo(name = "sContentxx")
+    public String sContentxx;
 
     @NonNull
     public String getsTransNoxx() {
@@ -34,19 +32,11 @@ public class EPolicyContents {
         this.sParentIDxx = sParentIDxx;
     }
 
-    public String getsNamexx() {
-        return sNamexx;
+    public String getsContentxx() {
+        return sContentxx;
     }
 
-    public void setsNamexx(String sNamexx) {
-        this.sNamexx = sNamexx;
-    }
-
-    public String getsOffenses() {
-        return sOffenses;
-    }
-
-    public void setsOffenses(String sOffenses) {
-        this.sOffenses = sOffenses;
+    public void setsContentxx(String sContentxx) {
+        this.sContentxx = sContentxx;
     }
 }

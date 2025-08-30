@@ -80,6 +80,9 @@ public class ParentObject {
             case "sales":
                 lnIcon = R.drawable.ic_baseline_performance_monitor;
                 break;
+            case "company rule book":
+                lnIcon = R.drawable.baseline_policy_24;
+                break;
         }
         return lnIcon;
     }

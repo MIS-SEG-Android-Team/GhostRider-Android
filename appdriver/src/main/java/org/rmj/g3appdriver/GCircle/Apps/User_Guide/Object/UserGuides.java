@@ -13,9 +13,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DArticle;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCompanyPolicy;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGuides;
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleDetails;
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleHead;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyContents;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyMenus;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
@@ -37,6 +41,7 @@ public class UserGuides {
     private final AppTokenManager poToken;
     private final DGuides dGuides;
     private DCompanyPolicy dCompanyPolicy;
+    private DArticle dArticle;
     private final GCircleApi poApi;
     private final HttpHeaders poHeaders;
     private String message;
@@ -45,6 +50,7 @@ public class UserGuides {
         this.poConfig = AppConfigPreference.getInstance(context);
         this.dGuides = GGC_GCircleDB.getInstance(context).userguideDao();
         this.dCompanyPolicy = GGC_GCircleDB.getInstance(context).policyDao();
+        this.dArticle = GGC_GCircleDB.getInstance(context).articleDao();
         this.poApi = new GCircleApi(context);
         this.poHeaders = HttpHeaders.getInstance(context);
         this.poSession = EmployeeSession.getInstance(context);
@@ -123,33 +129,138 @@ public class UserGuides {
     }
 
     public Boolean DownloadPolicyMenus(){
-        HashMap<String, String> loMenus = new HashMap<>();
-        loMenus.put("0001", "SUMMARY OF INFRACTIONS AND THEIR CORRESPONDING DISCIPLINARY ACTIONS");
-        loMenus.put("0002", "TABLE OF OFFENSES AND ACTIONS");
-        loMenus.put("0003", "DEFINITION OF DISCIPLINARY PROCEDURES");
-
-        for (Map.Entry<String, String> entry : loMenus.entrySet()){
-            EPolicyMenus loMenu = new EPolicyMenus();
-            loMenu.setsNamexx(entry.getValue());
-            loMenu.setsTransNoxx(entry.getKey());
-
-            dCompanyPolicy.savePolicyMenus(loMenu);
-        }
-        return true;
-    }
-
-    public Boolean DownloadPolicySummary(){
 
         try {
 
-            String lsResponse = WebClient.sendRequest("https://apps.guanzongroup.com.ph/apk/json/offenses_and_actions.json", new JSONObject().toString(), poHeaders.getHeaders());
+            String lsResponse = WebClient.sendRequest(poApi.getUrlDownloadPolicyMenus(), new JSONObject().toString(), poHeaders.getHeaders());
             if (lsResponse == null || lsResponse.isEmpty()){
                 message = "No response from server";
                 return false;
             }
 
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if (lsResult.equalsIgnoreCase("error")) {
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return false;
+            }
+
+            Log.d("JSON POLICY", lsResponse);
+            JSONArray laMenus = new JSONArray(loResponse.getString("detail"));
+            for (int ctr = 0; ctr < laMenus.length(); ctr++){
+
+                JSONObject loMenu = laMenus.getJSONObject(ctr);
+
+                EPolicyMenus loPolicyMenu = new EPolicyMenus();
+                loPolicyMenu.setsTransNoxx(loMenu.getString("sTransNoxx"));
+                loPolicyMenu.setsNamexx(loMenu.getString("sNamexx"));
+
+                dCompanyPolicy.savePolicyMenus(loPolicyMenu);
+
+            }
+            return true;
+
+        }catch (Exception e){
+            message = e.getMessage();
+            return false;
+        }
+    }
+
+    public Boolean DownloadPolicySummaryDisciplinary(){
+
+        try {
+
+            String lsResponse = WebClient.sendRequest(poApi.getUrlDownloadPolicySummaryDisciplinary(), new JSONObject().toString(), poHeaders.getHeaders());
+            if (lsResponse == null || lsResponse.isEmpty()){
+                message = "No response from server";
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
             Log.d("JSON POLICY", lsResponse);
 
+            if (lsResult.equalsIgnoreCase("error")) {
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return false;
+            }
+
+            JSONArray laPolicies = new JSONArray(loResponse.getString("detail"));
+            for (int ctr = 0; ctr < laPolicies.length(); ctr++){
+
+                JSONObject loObj = laPolicies.getJSONObject(ctr);
+
+                EPolicyContents loPolicyContents = new EPolicyContents();
+                loPolicyContents.setsTransNoxx(loObj.getString("sTransNoxx"));
+                loPolicyContents.setsParentIDxx(loObj.getString("parentIDxx"));
+                loPolicyContents.setsContentxx(loObj.getString("content"));
+
+                dCompanyPolicy.savePolicyContents(loPolicyContents);
+
+            }
+            return true;
+
+        }catch (Exception e){
+            message = e.getMessage();
+            return false;
+        }
+    }
+
+    public Boolean DownloadArticles(){
+
+        try {
+
+            String lsResponse = WebClient.sendRequest(poApi.getUrlDownloadArticle(), new JSONObject().toString(), poHeaders.getHeaders());
+            if (lsResponse == null || lsResponse.isEmpty()){
+                message = "No response from server";
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if (lsResult.equalsIgnoreCase("error")) {
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return false;
+            }
+
+            JSONArray laArticleHead = new JSONArray(loResponse.getString("head"));
+            Log.d("JSON POLICY HEAD", loResponse.getString("head"));
+            for (int ctr = 0; ctr < laArticleHead.length(); ctr++){
+
+                JSONObject loArticle = laArticleHead.getJSONObject(ctr);
+
+                String sCodexx = loArticle.getString("image");
+
+                EArticleHead loArticleHead = new EArticleHead();
+                loArticleHead.setsCodexx(sCodexx.substring(0, 2).toUpperCase() +"00"+ sCodexx.substring(sCodexx.length() - 1));
+                loArticleHead.setsTitle(loArticle.getString("title"));
+                loArticleHead.setsDescription(loArticle.getString("description"));
+                loArticleHead.setsImage(loArticle.getString("image"));
+                loArticleHead.setsSubtitle(loArticle.getString("subtitle"));
+
+                dArticle.saveArticleHead(loArticleHead);
+
+            }
+            Thread.sleep(1000);
+
+            JSONArray laArticleItems = new JSONArray(loResponse.getString("detail"));
+            Log.d("JSON POLICY DETAIL", lsResponse);
+            for (int ctr = 0; ctr < laArticleItems.length(); ctr++){
+
+                JSONObject loArticleDetail = laArticleItems.getJSONObject(ctr);
+
+                EArticleDetails loArticleDetails = new EArticleDetails();
+                loArticleDetails.setsCodexx(loArticleDetail.getString("sCodexx"));
+                loArticleDetails.setsContentxx(loArticleDetail.getString("sItemxx"));
+
+                dArticle.saveArticleDetails(loArticleDetails);
+            }
             return true;
 
         }catch (Exception e){

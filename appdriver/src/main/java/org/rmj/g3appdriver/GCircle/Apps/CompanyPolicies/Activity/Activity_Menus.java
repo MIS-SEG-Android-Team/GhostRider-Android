@@ -49,6 +49,7 @@ public class Activity_Menus extends AppCompatActivity {
         });
 
         fabDownload.setOnClickListener(v -> {
+
             mViewmodel.DownloadPolicySummary(new VMGuide.OnDownloadGuides() {
                 @Override
                 public void OnDownloading() {

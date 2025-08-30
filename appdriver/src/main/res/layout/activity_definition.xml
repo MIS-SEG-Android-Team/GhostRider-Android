@@ -81,7 +81,7 @@
                 android:layout_height="100dp"
                 android:layout_marginStart="8dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/kay" />
+                android:src="@drawable/kayscope" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

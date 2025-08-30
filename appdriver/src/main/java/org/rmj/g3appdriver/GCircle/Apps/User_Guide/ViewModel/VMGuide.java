@@ -86,16 +86,34 @@ public class VMGuide extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
-                if (!poConnection.isDeviceConnected()){
-                    message = poConnection.getMessage();
-                    return false;
-                }
+                try{
 
-                if (!poGuides.DownloadPolicySummary()){
-                    message = poGuides.GetMessage();
-                    return false;
-                }else{
+                    if (!poConnection.isDeviceConnected()){
+                        message = poConnection.getMessage();
+                        return false;
+                    }
+
+                    if (!poGuides.DownloadPolicyMenus()){
+                        message = poGuides.GetMessage();
+                        return false;
+                    }
+                    Thread.sleep(1000);
+
+                    if (!poGuides.DownloadPolicySummaryDisciplinary()){
+                        message = poGuides.GetMessage();
+                        return false;
+                    }
+                    Thread.sleep(1000);
+
+                    if (!poGuides.DownloadArticles()){
+                        message = poGuides.GetMessage();
+                        return false;
+                    }
+
                     return true;
+                }catch (Exception e){
+                    message = e.getMessage();
+                    return false;
                 }
             }
 

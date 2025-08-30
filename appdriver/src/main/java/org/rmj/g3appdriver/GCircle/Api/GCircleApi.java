@@ -110,6 +110,9 @@ public class GCircleApi extends WebApi {
     private static final String URL_SUBMIT_BARCODE = "gcircle/general/submit_order.php";
     private static final String URL_DOWNLOAD_GUIDES = "usermanuals/download_manuals.php";
     private static final String URL_DOWNLOAD_BUNDLES = "gcircle/general/download_items.php";
+    private static final String URL_DOWNLOAD_POLICY_MENUS = "usermanuals/download_policy_menus.php";
+    private static final String URL_DOWNLOAD_POLICY_SUMMARY_DISCIPLINARY = "usermanuals/download_policy_summary_disciplinary.php";
+    private static final String URL_DOWNLOAD_ARTICLE = "usermanuals/download_articles.php";
 
     public GCircleApi(Application instance) {
         super(instance);
@@ -931,6 +934,33 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_BUNDLES);
         return LIVE + URL_DOWNLOAD_BUNDLES;
+    }
+
+    public String getUrlDownloadPolicyMenus(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_DOWNLOAD_POLICY_MENUS);
+            return LOCAL + URL_DOWNLOAD_POLICY_MENUS;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_POLICY_MENUS);
+        return LIVE + URL_DOWNLOAD_POLICY_MENUS;
+    }
+
+    public String getUrlDownloadPolicySummaryDisciplinary(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_DOWNLOAD_POLICY_SUMMARY_DISCIPLINARY);
+            return LOCAL + URL_DOWNLOAD_POLICY_SUMMARY_DISCIPLINARY;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_POLICY_SUMMARY_DISCIPLINARY);
+        return LIVE + URL_DOWNLOAD_POLICY_SUMMARY_DISCIPLINARY;
+    }
+
+    public String getUrlDownloadArticle(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_DOWNLOAD_ARTICLE);
+            return LOCAL + URL_DOWNLOAD_ARTICLE;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_ARTICLE);
+        return LIVE + URL_DOWNLOAD_ARTICLE;
     }
 
 }

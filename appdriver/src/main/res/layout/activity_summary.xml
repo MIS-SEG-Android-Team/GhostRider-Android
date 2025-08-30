@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Summary">
+    android:layout_height="match_parent">
     <com.google.android.material.textfield.TextInputLayout
         style="@style/TextInputStyle"
         android:id="@+id/searchView1"
@@ -84,9 +83,10 @@
                 android:layout_height="100dp"
                 android:layout_marginStart="8dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/kay" />
+                android:src="@drawable/kayscope" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_below="@id/banner"
         xmlns:android="http://schemas.android.com/apk/res/android"
