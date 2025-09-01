@@ -1,11 +1,13 @@
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
 import androidx.room.Upsert;
 
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleDetails;
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleHead;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyContents;
-import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyItems;
 import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyMenus;
 
 import java.util.List;
@@ -20,8 +22,8 @@ public interface DCompanyPolicy {
     void savePolicyContents(EPolicyContents foVal);
 
     @Query("SELECT * FROM Policy_Menus")
-    List<EPolicyMenus> getPolicyMenus();
+    LiveData<List<EPolicyMenus>> getPolicyMenus();
 
     @Query("SELECT * FROM Policy_Contents WHERE sParentIDxx =:fsVal")
-    List<EPolicyContents> getPolicyContents(String fsVal);
+    LiveData<List<EPolicyContents>> getPolicyContents(String fsVal);
 }

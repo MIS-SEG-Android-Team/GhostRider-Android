@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -24,6 +25,7 @@
             android:layout_height="match_parent"
             android:textSize="15sp"
             android:imeOptions="actionNext"
+
             android:drawablePadding="10dp"
             android:drawableTint="@color/footer_dark_grey"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -63,23 +65,22 @@
                         android:padding="5dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Article 4\nTardiness"
+                        android:text="No Title"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:layout_marginEnd="4dp"/>
-
 
                 </LinearLayout>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:justificationMode="inter_word"
                     android:id="@+id/description"
+                    android:maxLines="3"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="4dp"
-                    android:maxLines="3"
-                    android:text="All employees are expected to arrive on time. Punctuality in all dealing is expected [Reckoning Period is one (1) calendar year]. Each employee is given a grace period of five (5) minutes per day with no sanctions. However, when an employee is late six (6) minutes, it shall be deductible and reflected on the payroll system as “late”. More than the said allotted time, HCM will serve the Notice to Explain with applicable sanctions.Excessive tardiness may also be a ground for termination (Serious Misconduct/Willful Disobedience/Habitual Neglect of Duties) subject to the findings of the HCM."
-                    android:textSize="14sp" />
+                    android:text="No subtitle found"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"/>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/readMore"
@@ -98,14 +99,14 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/article5" />
+                android:src="@drawable/kayscope" />
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
     <ExpandableListView
-
         android:groupIndicator="@null"
+
         android:layout_below="@id/banner"
         android:id="@+id/expandableListView"
         android:layout_width="match_parent"

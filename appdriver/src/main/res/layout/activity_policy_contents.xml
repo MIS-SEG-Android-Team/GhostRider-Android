@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/TextInputStyle"
@@ -21,13 +21,13 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/searchView"
             android:maxLines="1"
+
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="15sp"
             android:imeOptions="actionNext"
-             android:drawablePadding="10dp"
+            android:drawablePadding="10dp"
             android:drawableTint="@color/footer_dark_grey"/>
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.card.MaterialCardView
@@ -45,73 +45,53 @@
             android:orientation="horizontal"
             android:padding="8dp">
 
+            <!-- Left side: Title + Info + Description -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="100dp"
                     android:orientation="vertical"
                     android:gravity="center_vertical">
 
                     <com.google.android.material.textview.MaterialTextView
+                        android:justificationMode="inter_word"
                         android:backgroundTint="#f67321"
                         android:id="@+id/titles"
-                        android:gravity="start"
+                        android:gravity="end"
+                        android:layout_gravity="center"
                         android:textColor="@color/black"
-                        android:padding="5dp"
+
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Article 3\nMaintaining a Clean and Healthy Work Environment"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:layout_marginEnd="4dp"/>
-
+                        android:text="No Title"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
 
                 </LinearLayout>
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:justificationMode="inter_word"
-                    android:maxLines="3"
-                    android:id="@+id/description"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text= "A clean and safe work environment benefits all employees and the Company. Therefore, it is the responsibility of each employee to follow appropriate hygienic practices; undergo annual physical examination, wear identification cards, prescribed uniforms and safety equipment, contribute to good housekeeping and follow safety and security rules and regulations at the work place."
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp"/>
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/readMore"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Read More"
-                    android:textSize="12sp"
-                    android:textColor="@color/guanzon_orange"
-                    android:gravity="end"
-                    android:layout_marginTop="10dp"/>
 
             </LinearLayout>
 
             <ImageView
                 android:id="@+id/cardImage"
                 android:layout_width="120dp"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:layout_marginStart="8dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/article3" />
+                android:scaleType="centerInside"
+                android:src="@drawable/kayscope" />
         </LinearLayout>
-
     </com.google.android.material.card.MaterialCardView>
 
-    <ExpandableListView
-
-        android:groupIndicator="@null"
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_below="@id/banner"
-        android:id="@+id/expandableListView"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

@@ -346,4 +346,16 @@ public class UserGuides {
     public LiveData<List<EGuides>> GetGuides(){
         return dGuides.GetGuides();
     }
+    public LiveData<List<EPolicyContents>> getPolicyContents(String sParentIDxx){
+        return dCompanyPolicy.getPolicyContents(sParentIDxx);
+    }
+    public LiveData<List<EPolicyMenus>> getPolicyMenus(){
+        return dCompanyPolicy.getPolicyMenus();
+    }
+    public LiveData<List<EArticleHead>> getArticleMenu(){
+        return dArticle.getArticleMenus();
+    }
+    public LiveData<List<EArticleDetails>> getArticleDetails(String sCodexx){
+        return dArticle.getArticleDetails(sCodexx);
+    }
 }

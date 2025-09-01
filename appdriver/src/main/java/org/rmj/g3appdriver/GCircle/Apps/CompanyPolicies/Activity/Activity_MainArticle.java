@@ -1,40 +1,128 @@
 package org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
-import android.content.res.AssetManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.JsonReader;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textview.MaterialTextView;
+
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Adapter.itemAdapter;
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Model.Item;
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.ViewModel.VMGuide;
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleHead;
 import org.rmj.g3appdriver.R;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.rmj.g3appdriver.etc.LoadDialog;
+import org.rmj.g3appdriver.etc.MessageBox;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Activity_MainArticle extends AppCompatActivity {
-    RecyclerView recyclerView;
-    itemAdapter adapter;
-    List<Item> itemList;
+    private TextInputEditText searchView;
+    private RecyclerView recyclerView;
+    private itemAdapter adapter;
+    private List<Item> itemList;
+    private VMGuide mViewModel;
+    private LoadDialog poDialog;
+    private MessageBox poMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_mainarticle);
 
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE
+        );
+
+        mViewModel = new ViewModelProvider(this).get(VMGuide.class);
+        poDialog = new LoadDialog(this);
+        poMessage = new MessageBox(this);
+
         recyclerView = findViewById(R.id.recyclerViewArticles);
-        TextInputEditText searchView = findViewById(R.id.searchView);
+        searchView = findViewById(R.id.searchView);
+        itemList = new ArrayList<>();
 
-        itemList = loadJsonData();
-        adapter = new itemAdapter(this, itemList);
-        recyclerView.setAdapter(adapter);
+        poDialog.initDialog("Guanzon Circle", "Loading Articles...", false);
+        poDialog.show();
 
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        poMessage.initDialog();
+        poMessage.setTitle("Guanzon Circle");
+        poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+            @Override
+            public void OnButtonClick(View view, AlertDialog dialog) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+
+        mViewModel.GetArticles().observe(Activity_MainArticle.this, new Observer<List<EArticleHead>>() {
+            @Override
+            public void onChanged(List<EArticleHead> eArticleHeads) {
+                if (eArticleHeads != null){
+
+                    if (eArticleHeads.size() < 1){
+                        poMessage.setIcon(R.drawable.baseline_message_24);
+                        poMessage.setMessage("No Articles Found");
+                        poMessage.show();
+                    }
+
+                    for (EArticleHead eArticleHead : eArticleHeads) {
+
+                        Item item = new Item();
+                        item.sCodexx = eArticleHead.getsCodexx();
+                        item.image = eArticleHead.getsImage();
+                        item.title = eArticleHead.getsTitle();
+                        item.description = eArticleHead.getsDescription();
+                        item.subtitle = eArticleHead.getsSubtitle();
+
+                        itemList.add(item);
+                    }
+
+                    adapter = new itemAdapter(Activity_MainArticle.this, itemList, new itemAdapter.OnViewArticle() {
+                        @Override
+                        public void OnViewSubtitle(String subTitlexx) {
+                            promptSubtitle(subTitlexx);
+                        }
+
+                        @Override
+                        public void OmViewArticle(String sCodexx, String sTitlexx, int sImagexx, String sSubTitlexx) {
+                            Intent loIntent = new Intent(Activity_MainArticle.this, Activity_Article_Details.class);
+                            loIntent.putExtra("sCodexx", sCodexx);
+                            loIntent.putExtra("sTitlexx", sTitlexx);
+                            loIntent.putExtra("sSubTitlexx", sSubTitlexx);
+                            loIntent.putExtra("sImage", sImagexx);
+                            startActivity(loIntent);
+                        }
+                    });
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.setLayoutManager(new GridLayoutManager(Activity_MainArticle.this, 2));
+
+                    poDialog.dismiss();
+                }else {
+                    poDialog.dismiss();
+
+                    poMessage.setIcon(R.drawable.baseline_message_24);
+                    poMessage.setMessage("No Articles Found");
+                    poMessage.show();
+                }
+            }
+        });
 
         searchView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -59,32 +147,25 @@ public class Activity_MainArticle extends AppCompatActivity {
         }
         adapter.updateList(filteredList);
     }
-    private List<Item> loadJsonData() {
-        List<Item> items = new ArrayList<>();
-        try {
-            AssetManager assetManager = getAssets();
-            InputStream inputStream = assetManager.open("menu.json");
-            JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
-            reader.beginArray();
-            while (reader.hasNext()) {
-                Item item = new Item();
-                reader.beginObject();
-                while (reader.hasNext()) {
-                    String name = reader.nextName();
-                    if (name.equals("image")) item.image = reader.nextString();
-                    else if (name.equals("title")) item.title = reader.nextString();
-                    else if (name.equals("subtitle")) item.subtitle = reader.nextString();
-                    else if (name.equals("description")) item.description = reader.nextString();
-                    else reader.skipValue();
-                }
-                reader.endObject();
-                items.add(item);
-            }
-            reader.endArray();
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return items;
+
+    private void promptSubtitle(String subtitle){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = LayoutInflater.from(this);
+
+        View dialogView = inflater.inflate(R.layout.custom_layout, null);
+
+        builder.setView(dialogView);
+        MaterialTextView dialogText = dialogView.findViewById(R.id.dialog_text);
+        dialogText.setText(subtitle);
+        AlertDialog alertDialog = builder.create();
+
+        // Optional: Make it non-cancelable
+        alertDialog.setCancelable(false);
+
+        // Set button click listener
+        MaterialButton button = dialogView.findViewById(R.id.dialog_button);
+        button.setOnClickListener(view -> alertDialog.dismiss());
+        alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent); // Remove default corners
+        alertDialog.show();
     }
 }

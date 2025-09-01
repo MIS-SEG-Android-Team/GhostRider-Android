@@ -7,7 +7,11 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Object.UserGuides;
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleDetails;
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleHead;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyContents;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyMenus;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -74,7 +78,6 @@ public class VMGuide extends AndroidViewModel {
             }
         });
     }
-
     public void DownloadPolicySummary(OnDownloadGuides callback){
 
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
@@ -128,7 +131,6 @@ public class VMGuide extends AndroidViewModel {
             }
         });
     }
-
     public void UploadGuide(String fileloc, String filename, OnUploadGuide callback){
 
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
@@ -162,5 +164,17 @@ public class VMGuide extends AndroidViewModel {
 
     public LiveData<List<EGuides>> GetGuides(){
         return poGuides.GetGuides();
+    }
+    public LiveData<List<EPolicyContents>> GetPolicyContents(String sParentIDxx){
+        return poGuides.getPolicyContents(sParentIDxx);
+    }
+    public LiveData<List<EPolicyMenus>> GetPolicyMenus(){
+        return poGuides.getPolicyMenus();
+    }
+    public LiveData<List<EArticleHead>> GetArticles(){
+        return poGuides.getArticleMenu();
+    }
+    public LiveData<List<EArticleDetails>> GetArticleDetails(String sArticleIDxx){
+        return poGuides.getArticleDetails(sArticleIDxx);
     }
 }

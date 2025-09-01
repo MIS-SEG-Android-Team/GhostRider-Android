@@ -1,55 +1,33 @@
 package org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Adapter;
 
-
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textview.MaterialTextView;
-
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article1;
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article2;
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article3;
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article4;
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article5;
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article6;
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article7;
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article8;
-import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article9;
 import org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Model.Item;
 import org.rmj.g3appdriver.R;
 
 import java.util.List;
 
 public class itemAdapter extends RecyclerView.Adapter<itemAdapter.ViewHolder> {
-    Context context;
-    List<Item> items;
+    private Context context;
+    private List<Item> items;
+    private OnViewArticle callback;
 
-    public itemAdapter(Context context, List<Item> items) {
+    public interface OnViewArticle{
+        void OnViewSubtitle(String subTitlexx);
+        void OmViewArticle(String sCodexx, String sTitlexx, int sImagexx, String sSubTitlexx);
+    }
+
+    public itemAdapter(Context context, List<Item> items, OnViewArticle callback) {
         this.context = context;
         this.items = items;
+        this.callback = callback;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView,subtitle;
-        TextView title,  description;
-        public ViewHolder(View view) {
-            super(view);
-            imageView = view.findViewById(R.id.cardImage);
-            title = view.findViewById(R.id.title);
-           subtitle = view.findViewById(R.id.infoIcon);
-       description = view.findViewById(R.id.description);
-        }
-    }
     public void updateList(List<Item> newList) {
         items = newList;
         notifyDataSetChanged();
@@ -65,65 +43,17 @@ public class itemAdapter extends RecyclerView.Adapter<itemAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         Item item = items.get(position);
         int resId = context.getResources().getIdentifier(item.image.replace(".png", ""), "drawable", context.getPackageName());
-        holder.imageView.setImageResource(resId);
+
         holder.title.setText(item.title);
         holder.description.setText(item.description);
+        holder.imageView.setImageResource(resId);
+
         holder.subtitle.setOnClickListener(v->{
+            callback.OnViewSubtitle(item.subtitle);
+        });
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        LayoutInflater inflater = LayoutInflater.from(context);
-
-        View dialogView = inflater.inflate(R.layout.custom_layout, null);
-
-        builder.setView(dialogView);
-        MaterialTextView dialogText = dialogView.findViewById(R.id.dialog_text);
-        dialogText.setText(item.subtitle);
-        AlertDialog alertDialog = builder.create();
-
-        // Optional: Make it non-cancelable
-        alertDialog.setCancelable(false);
-
-        // Set button click listener
-        MaterialButton button = dialogView.findViewById(R.id.dialog_button);
-        button.setOnClickListener(view -> alertDialog.dismiss());
-        alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent); // Remove default corners
-        alertDialog.show();
-  });
-    holder.itemView.setOnClickListener(v -> {
-
-        if (item.title.equals("Article 1")) {
-            Intent intent = new Intent(context, Activity_Article1.class);
-            context.startActivity(intent);
-        }
-        else if (item.title.equals("Article 2")) {
-            Intent intent = new Intent(context, Activity_Article2.class);
-            context.startActivity(intent);}
-        else if (item.title.equals("Article 3")) {
-                Intent intent = new Intent(context, Activity_Article3.class);
-                context.startActivity(intent);}
-        else if (item.title.equals("Article 4")) {
-                    Intent intent = new Intent(context, Activity_Article4.class);
-                    context.startActivity(intent);}
-        else if (item.title.equals("Article 5")) {
-                        Intent intent = new Intent(context, Activity_Article5.class);
-                        context.startActivity(intent);
-        }
-        else if (item.title.equals("Article 6")) {
-            Intent intent = new Intent(context, Activity_Article6.class);
-            context.startActivity(intent);
-        }
-        else if (item.title.equals("Article 7")) {
-            Intent intent = new Intent(context, Activity_Article7.class);
-            context.startActivity(intent);
-        }
-        else if (item.title.equals("Article 8")) {
-            Intent intent = new Intent(context, Activity_Article8.class);
-            context.startActivity(intent);
-        }
-        else if (item.title.equals("Article 9")) {
-            Intent intent = new Intent(context, Activity_Article9.class);
-            context.startActivity(intent);
-        }
+        holder.itemView.setOnClickListener(v -> {
+            callback.OmViewArticle(item.sCodexx, item.title, resId, item.subtitle);
         });
     }
 
@@ -131,5 +61,20 @@ public class itemAdapter extends RecyclerView.Adapter<itemAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView imageView,subtitle;
+        TextView title,  description;
+
+        public ViewHolder(View view) {
+
+            super(view);
+
+            imageView = view.findViewById(R.id.cardImage);
+            title = view.findViewById(R.id.title);
+            subtitle = view.findViewById(R.id.infoIcon);
+            description = view.findViewById(R.id.description);
+        }
     }
 }
