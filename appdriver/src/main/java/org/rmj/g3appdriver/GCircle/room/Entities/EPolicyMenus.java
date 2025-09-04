@@ -12,6 +12,8 @@ public class EPolicyMenus{
     public String sTransNoxx;
     @ColumnInfo(name = "sNamexx")
     public String sNamexx;
+    @ColumnInfo(name = "sDescription")
+    public String sDescription;
 
     @NonNull
     public String getsTransNoxx() {
@@ -28,5 +30,13 @@ public class EPolicyMenus{
 
     public void setsNamexx(String sNamexx) {
         this.sNamexx = sNamexx;
+    }
+
+    public String getsDescription() {
+        return sDescription;
+    }
+
+    public void setsDescription(String sDescription) {
+        this.sDescription = sDescription;
     }
 }

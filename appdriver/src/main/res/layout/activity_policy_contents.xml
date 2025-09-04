@@ -45,35 +45,43 @@
             android:orientation="horizontal"
             android:padding="8dp">
 
-            <!-- Left side: Title + Info + Description -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center_vertical">
 
                     <com.google.android.material.textview.MaterialTextView
-                        android:justificationMode="inter_word"
                         android:backgroundTint="#f67321"
                         android:id="@+id/titles"
                         android:gravity="end"
                         android:layout_gravity="center"
                         android:textColor="@color/black"
-
+                        android:padding="5dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="No Title"
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="4dp"/>
+
 
                 </LinearLayout>
 
+                <com.google.android.material.textview.MaterialTextView
+                    android:justificationMode="inter_word"
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -84,7 +92,9 @@
                 android:layout_marginStart="8dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/kayscope" />
+
         </LinearLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.recyclerview.widget.RecyclerView

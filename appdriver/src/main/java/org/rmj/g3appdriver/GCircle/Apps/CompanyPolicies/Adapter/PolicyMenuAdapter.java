@@ -1,5 +1,8 @@
 package org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Adapter;
 
+import android.os.Build;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +30,7 @@ public class PolicyMenuAdapter extends RecyclerView.Adapter<PolicyMenuAdapter.VH
     private List<EPolicyMenus> laMenusFiltered;
 
     public interface OnViewGuide{
-        void OnView(String sMenuTitle, String sMenuIDxx);
+        void OnView(String sMenuTitle, String sDescriptxx, String sMenuIDxx);
     }
 
     public PolicyMenuAdapter(List<EPolicyMenus> laMenus, OnViewGuide callback) {
@@ -52,11 +55,18 @@ public class PolicyMenuAdapter extends RecyclerView.Adapter<PolicyMenuAdapter.VH
     @Override
     public void onBindViewHolder(@NonNull VHUserGuide holder, int position) {
 
-        holder.file_title.setText(laMenusFiltered.get(position).getsNamexx());
+        Spanned htmlTitle;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            htmlTitle = Html.fromHtml(laMenusFiltered.get(position).getsNamexx(), Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            htmlTitle = Html.fromHtml(laMenusFiltered.get(position).getsNamexx());
+        }
+
+        holder.file_title.setText(htmlTitle);
         holder.mcv_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.OnView(laMenusFiltered.get(position).getsNamexx(), laMenusFiltered.get(position).getsTransNoxx());
+                callback.OnView(laMenusFiltered.get(position).getsNamexx(), laMenusFiltered.get(position).getsDescription(), laMenusFiltered.get(position).getsTransNoxx());
             }
         });
     }

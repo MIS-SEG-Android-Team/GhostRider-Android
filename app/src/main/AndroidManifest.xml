@@ -66,9 +66,6 @@
             android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Menus"
             android:exported="false" />
         <activity
-            android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_MainArticle"
-            android:exported="false" />
-        <activity
             android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Article_Details"
             android:exported="false" />
         <activity

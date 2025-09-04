@@ -80,14 +80,17 @@ public class Activity_Menus extends AppCompatActivity {
 
                             poAdapter = new PolicyMenuAdapter(ePolicyMenus, new PolicyMenuAdapter.OnViewGuide() {
                                 @Override
-                                public void OnView(String sMenuTitle, String sMenuIDxx) {
+                                public void OnView(String sMenuTitle, String sDescriptxx, String sMenuIDxx) {
                                     if (!sMenuIDxx.equals("003")){
                                         Intent intent = new Intent(Activity_Menus.this, Activity_Policy_Contents.class);
                                         intent.putExtra("sMenuTitle", sMenuTitle);
                                         intent.putExtra("sMenuIDxx", sMenuIDxx);
                                         startActivity(intent);
                                     }else {
-                                        Intent intent = new Intent(Activity_Menus.this, Activity_MainArticle.class);
+                                        Intent intent = new Intent(Activity_Menus.this, Activity_Policy_Contents.class);
+                                        intent.putExtra("sMenuTitle", sMenuTitle);
+                                        intent.putExtra("sMenuDescription", sDescriptxx);
+                                        intent.putExtra("sMenuIDxx", sMenuIDxx);
                                         startActivity(intent);
                                     }
                                 }

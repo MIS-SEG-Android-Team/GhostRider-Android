@@ -156,6 +156,7 @@ public class UserGuides {
                 EPolicyMenus loPolicyMenu = new EPolicyMenus();
                 loPolicyMenu.setsTransNoxx(loMenu.getString("sTransNoxx"));
                 loPolicyMenu.setsNamexx(loMenu.getString("sNamexx"));
+                loPolicyMenu.setsDescription(loMenu.getString("sDescriptxx"));
 
                 dCompanyPolicy.savePolicyMenus(loPolicyMenu);
 

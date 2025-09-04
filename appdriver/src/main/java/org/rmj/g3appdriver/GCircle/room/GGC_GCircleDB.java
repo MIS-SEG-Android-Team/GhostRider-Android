@@ -16,6 +16,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -324,7 +325,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
             instance = Room.databaseBuilder(context.getApplicationContext(),
-                     GGC_GCircleDB.class, "GGC_ISysDBF.db")
+                            GGC_GCircleDB.class, "GGC_ISysDBF.db")
                     .allowMainThreadQueries()
                     .addCallback(roomCallBack)
                     .addMigrations(MIGRATION_V45)
@@ -388,17 +389,17 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS Barcode_Detail " +
                     "(barcode_id TEXT NOT NULL, nEntryNox INTEGER NOT NULL, " +
-                    "sDescript TEXT, " +
+                    "sSerialID TEXT, sDescript TEXT, " +
                     "PRIMARY KEY(barcode_id, nEntryNox))");
 
             //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS User_Guides " +
-                    "(sTransNox TEXT NOT NULL, sTitlexx TEXT, sURlxx TEXT, " +
-                    "PRIMARY KEY(sTransNox))");
+                    "(sTransNox TEXT NOT NULL, type TEXT NOT NULL, sTitlexx TEXT, sURlxx TEXT, " +
+                    "PRIMARY KEY(sTransNox, type))");
 
             //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS Policy_Menus " +
-                    "(sTransNoxx TEXT NOT NULL, sNamexx TEXT, " +
+                    "(sTransNoxx TEXT NOT NULL, sNamexx TEXT, sDescription TEXT, " +
                     "PRIMARY KEY(sTransNoxx))");
 
             //Add the new table
@@ -430,6 +431,9 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             }
             if (!CheckColumnExists(database, "Barcode", "description")){
                 database.execSQL("ALTER TABLE Barcode ADD COLUMN description TEXT");
+            }
+            if (!CheckColumnExists(database, "Barcode_Detail", "sSerialID")){
+                database.execSQL("ALTER TABLE Barcode_Detail ADD COLUMN sSerialID TEXT");
             }
         }
     };
