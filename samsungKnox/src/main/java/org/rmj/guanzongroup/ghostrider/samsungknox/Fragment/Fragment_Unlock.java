@@ -73,6 +73,7 @@ public class Fragment_Unlock extends Fragment implements ViewModelCallBack {
     public void OnRequestSuccess(String args, String args1, String args2, String args3) {
         dialog.dismiss();
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_message_24);
         loMessage.setMessage(args);
         loMessage.setTitle("Unlock Device");
         loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
@@ -83,6 +84,7 @@ public class Fragment_Unlock extends Fragment implements ViewModelCallBack {
     public void OnRequestFailed(String message) {
         dialog.dismiss();
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setMessage(message);
         loMessage.setTitle("Unlock Device");
         loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());

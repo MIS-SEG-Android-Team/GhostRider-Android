@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.divider.MaterialDivider;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.R;
@@ -34,30 +35,40 @@ public class  MessageBox {
     private MaterialButton btnNegative;
     private MaterialTextView lblTitle;
     private MaterialTextView lblMsgxx;
-    private MaterialDivider midBorder;
+    private ShapeableImageView msg_icon;
 
     private final Context context;
 
     public MessageBox(Context context){
-        // Must be, at all times, pass Activity Context.
         this.context = Objects.requireNonNull(context);
     }
     public void initDialog(){
+
         AlertDialog.Builder poBuilder = new AlertDialog.Builder(context);
+
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_message_box, null);
+
         poBuilder.setCancelable(false)
                 .setView(view);
+
         poDialogx = poBuilder.create();
         poDialogx.setCancelable(false);
 
+        msg_icon = view.findViewById(R.id.msg_icon);
         lblTitle = view.findViewById(R.id.lbl_dialogTitle);
         lblMsgxx = view.findViewById(R.id.lbl_dialogMessage);
-        midBorder = view.findViewById(R.id.view_midBorder);
         btnPositive = view.findViewById(R.id.btn_dialogPositive);
         btnPositive.setVisibility(View.GONE);
         btnNegative = view.findViewById(R.id.btn_dialogNegative);
-        midBorder.setVisibility(View.GONE);
         btnNegative.setVisibility(View.GONE);
+    }
+
+    public void setIcon(int psIconx) {
+        try {
+            msg_icon.setImageResource(psIconx);
+        } catch(NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     public void setMessage(String psMessage) {
@@ -81,17 +92,14 @@ public class  MessageBox {
         btnPositive.setText(psBtnPost);
         btnPositive.setOnClickListener(view -> {
             listener.OnButtonClick(view, poDialogx);
-//            isDialogShown = false;
         });
     }
 
     public void setNegativeButton(String psBtnNegt, final DialogButton listener) {
-        midBorder.setVisibility(View.VISIBLE);
         btnNegative.setVisibility(View.VISIBLE);
         btnNegative.setText(psBtnNegt);
         btnNegative.setOnClickListener(view -> {
             listener.OnButtonClick(view, poDialogx);
-//            isDialogShown = false;
         });
     }
 

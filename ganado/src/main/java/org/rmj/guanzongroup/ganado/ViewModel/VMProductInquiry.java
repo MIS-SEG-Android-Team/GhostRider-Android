@@ -57,6 +57,7 @@ public class VMProductInquiry extends AndroidViewModel implements GanadoUI {
     public LiveData<String> GetModelID() {
         return psModelID;
     }
+
     public LiveData<List<EMCColor>> GetModelColor(String ModelID){
         return poApp.GetModelColor(ModelID);
     }
@@ -69,12 +70,15 @@ public class VMProductInquiry extends AndroidViewModel implements GanadoUI {
     public InquiryInfo getModel() {
         return poModel;
     }
+
     public void setBrandID(String args) {
         this.psBrandID.setValue(args);
     }
+
     public void setModelID(String args) {
         this.psModelID.setValue(args);
     }
+
     public void GetMinimumDownpayment(String ModelID, OnRetrieveInstallmentInfo listener) {
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override

@@ -120,42 +120,6 @@ public class DownloadPostDCPWithoutRemCodeTest {
     }
 
     @Test
-    public void test02DownloadDCP() throws Exception{
-//        poDcp.ImportDcpMaster("M00117001404", "2022-02-22", new DcpManager.OnActionCallback() {
-//            @Override
-//            public void OnSuccess(String args) {
-//                isSuccess = true;
-//            }
-//
-//            @Override
-//            public void OnFailed(String message) {
-//                isSuccess = false;
-//            }
-//        });
-//        assertTrue(isSuccess);
-    }
-
-    @Test
-    public void test03ValidatePostCollection() throws Exception{
-//        poDcp.ValidatePostCollection(new DcpManager.OnValidateCallback() {
-//            @Override
-//            public void OnSuccess(boolean hasNV, String args) {
-//                if(hasNV){
-//                    isSuccess = true;
-//                } else {
-//                    isSuccess = false;
-//                }
-//            }
-//
-//            @Override
-//            public void OnFailed(String message) {
-//                isSuccess = false;
-//            }
-//        });
-//        assertTrue(isSuccess);
-    }
-
-    @Test
     public void test04PostLRDCPCollectionWithoutRemCode() throws Exception{
         poDcp.PostLRDCPCollection(new DcpManager.OnActionCallback() {
             @Override

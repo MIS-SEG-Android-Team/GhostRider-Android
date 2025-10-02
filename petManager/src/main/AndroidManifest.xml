@@ -25,6 +25,12 @@
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
         <activity
+            android:name=".Activity.Activity_LoanItems"
+            android:label="Payroll, Employee and Time Manager"
+            android:screenOrientation="userPortrait"
+            android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
             android:name=".Activity.Activity_EmployeeApplicationSearch"
             android:label="Payroll, Employee and Time Manager"
             android:screenOrientation="userPortrait"

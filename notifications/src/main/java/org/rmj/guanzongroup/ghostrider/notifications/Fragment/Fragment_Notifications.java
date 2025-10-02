@@ -3,13 +3,13 @@ package org.rmj.guanzongroup.ghostrider.notifications.Fragment;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,15 +28,10 @@ import java.util.Objects;
  * create an instance of this fragment.
  */
 public class Fragment_Notifications extends Fragment {
-
     private VMNotifications mViewModel;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -75,14 +70,33 @@ public class Fragment_Notifications extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mViewModel = new ViewModelProvider(requireActivity()).get(VMNotifications.class);
         View view = inflater.inflate(R.layout.fragment_notifications, container, false);
 
-        ViewPager viewPager = view.findViewById(R.id.viewpager);
+        mViewModel = new ViewModelProvider(requireActivity()).get(VMNotifications.class);
+
+        ViewPager2 viewPager = view.findViewById(R.id.viewpager);
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
 
-        viewPager.setAdapter(new ApplicationPageAdapter(getChildFragmentManager()));
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addTab(tabLayout.newTab().setText("Payslip"));
+        tabLayout.addTab(tabLayout.newTab().setText("Message"));
+        tabLayout.addTab(tabLayout.newTab().setText("Notification"));
+
+        viewPager.setAdapter(new ApplicationPageAdapter(getChildFragmentManager(), getLifecycle()));
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         mViewModel.GetUnreadPayslipCount().observe(requireActivity(), new Observer<Integer>() {
             @Override
@@ -103,7 +117,6 @@ public class Fragment_Notifications extends Fragment {
                 }
             }
         });
-
         mViewModel.GetUnreadMessagesCount().observe(requireActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer count) {
@@ -123,7 +136,6 @@ public class Fragment_Notifications extends Fragment {
                 }
             }
         });
-
         mViewModel.GetUnreadNotificationCount().observe(requireActivity(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer count) {
@@ -146,34 +158,23 @@ public class Fragment_Notifications extends Fragment {
         return view;
     }
 
-    private static class ApplicationPageAdapter extends FragmentStatePagerAdapter {
-
-        private final String[] lsTitle = new String[]{"Payslip", "Message", "Notification"};
-
+    private static class ApplicationPageAdapter extends FragmentStateAdapter {
         private final Fragment[] loFragments = new Fragment[]{
                 new Fragment_PayslipList(),
                 new Fragment_MessageUsers(),
                 new Fragment_NotificationList()};
-
-        public ApplicationPageAdapter(@NonNull FragmentManager fm) {
-            super(fm);
+        public ApplicationPageAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+            super(fragmentManager, lifecycle);
         }
 
         @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             return loFragments[position];
         }
-
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return loFragments.length;
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return lsTitle[position];
         }
     }
 }

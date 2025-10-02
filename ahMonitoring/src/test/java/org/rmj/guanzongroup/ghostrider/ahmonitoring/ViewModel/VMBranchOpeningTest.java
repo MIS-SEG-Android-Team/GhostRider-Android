@@ -21,8 +21,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.rmj.g3appdriver.GRider.Database.DataAccessObject.DBranchOpeningMonitor;
-import org.rmj.g3appdriver.GRider.Database.Entities.EEmployeeInfo;
+
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchOpeningMonitor;
+import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 

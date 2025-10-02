@@ -12,7 +12,6 @@
 package org.rmj.guanzongroup.ghostrider.ahmonitoring.ViewModel;
 
 import android.app.Application;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -89,48 +88,38 @@ public class VMInventory extends AndroidViewModel {
     }
 
     public void GetBranchList(OnGetBranchListListener listener){
-        new GetBranchTask(listener).execute();
-    }
+        //new GetBranchTask(listener).execute();
 
-    private class GetBranchTask extends AsyncTask<Void, Void, List<EBranchInfo>>{
-
-        private final OnGetBranchListListener listener;
-
-        private String message;
-
-        public GetBranchTask(OnGetBranchListListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            listener.OnLoad();
-        }
-
-        @Override
-        protected List<EBranchInfo> doInBackground(Void... voids) {
-            List<EBranchInfo> loList = poSys.GetBranchesForInventory();
-            if(loList == null){
-                message = poSys.getMessage();
-                return null;
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                listener.OnLoad();
             }
-            return loList;
-        }
 
-        @Override
-        protected void onPostExecute(List<EBranchInfo> eBranchInfos) {
-            super.onPostExecute(eBranchInfos);
-            if(eBranchInfos == null){
-                listener.OnFailed(message);
-            } else {
-                listener.OnRetrieve(eBranchInfos);
+            @Override
+            public Object DoInBackground(Object args) {
+                List<EBranchInfo> loList = poSys.GetBranchesForInventory();
+                if(loList == null){
+                    message = poSys.getMessage();
+                    return null;
+                }
+                return loList;
             }
-        }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                List<EBranchInfo> eBranchInfos = (List<EBranchInfo>) object;
+                if(eBranchInfos == null){
+                    listener.OnFailed(message);
+                } else {
+                    listener.OnRetrieve(eBranchInfos);
+                }
+            }
+        });
     }
 
     public void CheckBranchInventory(String fsVal, OnCheckLocalRecords callback){
-//        new CheckLocalRecordsTask(callback).execute(fsVal);
+
         TaskExecutor.Execute(fsVal, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -165,49 +154,8 @@ public class VMInventory extends AndroidViewModel {
 
     }
 
-//    private class CheckLocalRecordsTask extends AsyncTask<String, Void, Boolean>{
-//
-//        private final OnCheckLocalRecords callback;
-//
-//        private String message;
-//
-//        public CheckLocalRecordsTask(OnCheckLocalRecords callback) {
-//            this.callback = callback;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            callback.OnCheck();
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... strings) {
-//            if(!poSys.CheckInventoryRecord(strings[0])){
-//                message = poSys.getMessage();
-//                return false;
-//            }
-//
-//            if(!poConn.isDeviceConnected()){
-//                message = "Unable to proceed to random stock inventory without connectivity";
-//                return false;
-//            }
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean isSuccess) {
-//            super.onPostExecute(isSuccess);
-//            if(!isSuccess){
-//                callback.OnInventoryFinished(message);
-//            } else {
-//                callback.OnProceed();
-//            }
-//        }
-//    }
-
     public void DownloadInventory(String BranchCd, OnDownloadInventory poCallback){
-//        new DownloadInventoryTask(callback).execute(BranchCd);
+
         TaskExecutor.Execute(BranchCd, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -242,50 +190,8 @@ public class VMInventory extends AndroidViewModel {
         });
     }
 
-//    private class DownloadInventoryTask extends AsyncTask<String, Void, Boolean>{
-//
-//        private final OnDownloadInventory poCallback;
-//
-//        private String message;
-//
-//        public DownloadInventoryTask(OnDownloadInventory poCallback) {
-//            this.poCallback = poCallback;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            poCallback.OnRequest("Random Stock Inventory", "Downloading inventory details. Please wait...");
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... strings) {
-//            if(!poConn.isDeviceConnected()){
-//                message = poConn.getMessage();
-//                return false;
-//            }
-//
-//            if(!poSys.ImportInventory(strings[0])){
-//                message = poSys.getMessage();
-//                return false;
-//            }
-//
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean isSuccess) {
-//            super.onPostExecute(isSuccess);
-//            if(!isSuccess){
-//                poCallback.OnFailed(message);
-//            } else {
-//                poCallback.OnSuccessResult();
-//            }
-//        }
-//    }
-
     public void PostInventory(String BranchCD, String Remarks, OnSaveInventoryMaster callback){
-//        new SaveInventoryTask(BranchCD, callback).execute(Remarks);
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
 
             @Override
@@ -324,53 +230,4 @@ public class VMInventory extends AndroidViewModel {
             }
         });
     }
-
-//    private class SaveInventoryTask extends AsyncTask<String, Void, Boolean>{
-//
-//        private final String BranchCd;
-//        private final OnSaveInventoryMaster callback;
-//
-//        private String message;
-//
-//        public SaveInventoryTask(String BranchCd, OnSaveInventoryMaster callback){
-//            this.BranchCd = BranchCd;
-//            this.callback = callback;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            callback.OnSave();
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... strings) {
-//            String lsResult = poSys.SaveMasterForPosting(BranchCd, strings[0]);
-//            if(lsResult == null){
-//                message = poSys.getMessage();
-//                return false;
-//            }
-//
-//            if(!poConn.isDeviceConnected()){
-//                message = "Your inventory has been save to local device.";
-//                return false;
-//            }
-//
-//            if(!poSys.UploadInventory(BranchCd)){
-//                message = poSys.getMessage();
-//                return false;
-//            }
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean isSuccess) {
-//            super.onPostExecute(isSuccess);
-//            if(!isSuccess){
-//                callback.OnFailed(message);
-//            } else {
-//                callback.OnSuccess();
-//            }
-//        }
-//    }
 }

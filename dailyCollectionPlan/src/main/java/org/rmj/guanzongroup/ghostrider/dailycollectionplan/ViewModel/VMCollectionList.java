@@ -80,7 +80,6 @@ public class VMCollectionList extends AndroidViewModel {
     }
 
     public void DownloadDCP(ImportParams foVal, OnActionCallback callback){
-//        new DownloadDcpTask(callback).execute(foVal);
         TaskExecutor.Execute(foVal, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -175,6 +174,7 @@ public class VMCollectionList extends AndroidViewModel {
     }
 
     public void CheckDcpForPosting(OnCheckDcpForPosting callback){
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {

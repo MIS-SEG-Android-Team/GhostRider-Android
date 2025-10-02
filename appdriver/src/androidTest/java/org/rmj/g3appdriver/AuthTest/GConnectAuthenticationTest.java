@@ -50,7 +50,7 @@ public class GConnectAuthenticationTest {
 
     @Test
     public void test01LoginAccount() {
-        UserAuthInfo loInfo = new UserAuthInfo("mikegarcia8748@gmail.com", "123456", "09171870011");
+        UserAuthInfo loInfo = new UserAuthInfo("mikegarcia8748@gmail.com", "123456");
         int lnResult = poSys.DoAction(loInfo);
         if(lnResult == 1){
             isSuccess = true;

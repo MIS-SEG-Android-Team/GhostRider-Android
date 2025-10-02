@@ -26,7 +26,6 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeLeave;
 import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.lib.Notifications.data.SampleData;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.OnCheckEmployeeApplicationListener;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_AreaPerformanceMonitoring;
@@ -52,7 +51,6 @@ public class Fragment_Home_AH extends Fragment {
     private CircularProgressIndicator mcIndicator,spIndicator,joIndicator;
     private RecyclerView rvBranchOpen;
     private RecyclerView rvCompnyAnouncemnt, rvLeaveApp, rvBusTripApp;
-    private MessageBox loMessage;
 
     public static Fragment_Home_AH newInstance() {
         return new Fragment_Home_AH();
@@ -70,12 +68,12 @@ public class Fragment_Home_AH extends Fragment {
         initGoals();
         initBranchOpening();
         initCompanyNotice();
+
         return view;
     }
 
     private void initWidgets(){
 
-        loMessage = new MessageBox(getActivity());
         lblFullNme = view.findViewById(R.id.lblEmpNme);
         lblDept = view.findViewById(R.id.lblEmpPosition);
         CashCount = view.findViewById(R.id.cv_cashCount);

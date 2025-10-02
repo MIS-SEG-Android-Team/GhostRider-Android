@@ -11,13 +11,25 @@
 
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments;
 
+import static android.app.Activity.RESULT_OK;
+import static androidx.core.content.ContextCompat.checkSelfPermission;
 import static org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants.GetPaymentTypeIndex;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,10 +42,14 @@ import com.google.android.material.textview.MaterialTextView;
 import  com.google.android.material.checkbox.MaterialCheckBox;
 
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -44,11 +60,14 @@ import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.PaidDCP;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_Transaction;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogCheckPayment;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogDisclosure;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.OnInitializeCameraCallback;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.VMPaidTransaction;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.ViewModelCallback;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -78,6 +97,88 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
     private MaterialButton btnAmort, btnRBlnce, btnClear;
     private MaterialButton btnConfirm;
 
+    private DialogDisclosure dialogDisclosure;
+    private final ActivityResultLauncher<Intent> poCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+
+        if(result.getResultCode() == RESULT_OK) {
+
+            try {
+
+                //TODO: 1. GET COORDINATES OF CAPTURED IMAGE'S PROPERTIES,
+                // NOTE: TO GET THIS PROPERLY. ENABLE MANUALLY THE TAG LOCATION SETTINGS ON CAMERA WITHIN THE APP
+                @SuppressLint({"NewApi", "LocalSuppress"}) ExifInterface exifInterface =
+                        new ExifInterface(
+                                Objects.requireNonNull(requireContext().getContentResolver().openInputStream(
+                                        MediaStore.setRequireOriginal(Uri.fromFile(new File(poPaid.getFilePath())))
+                                ))
+                        );
+
+                //TODO: 2. SET IMAGE COORDINATES, IF NOT EMPTY
+                if (exifInterface.getLatLong() != null){
+
+                    Log.d("DCP Fragment", "Image Longitude is " + String.valueOf(Objects.requireNonNull(exifInterface.getLatLong())[1])
+                            + " and Image Latitude is " + String.valueOf(exifInterface.getLatLong()[0]));
+
+                    poPaid.setLatitude(String.valueOf(exifInterface.getLatLong()[0]));
+                    poPaid.setLongtude(String.valueOf(exifInterface.getLatLong()[1]));
+                }
+
+                //TODO: 3. VALIDATE SAVED COORDINATES
+                if (poPaid.getLongtude() == null || poPaid.getLatitude() == null){
+                    InitMessage(0, R.drawable.baseline_error_24, "Unable to get location coordinates. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
+                        @Override
+                        public void OnPositive() {}
+
+                        @Override
+                        public void OnNegative() {}
+                    });
+                    return;
+                }
+
+                if (poPaid.getLongtude().isEmpty() || poPaid.getLatitude().isEmpty()){
+                    InitMessage(0, R.drawable.baseline_error_24, "Location coordinates is empty. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
+                        @Override
+                        public void OnPositive() {}
+
+                        @Override
+                        public void OnNegative() {}
+                    });
+                    return;
+                }
+
+                if (poPaid.getLongtude().equalsIgnoreCase("0.00000000000") || poPaid.getLatitude().equalsIgnoreCase("0.00000000000")) {
+                    InitMessage(0, R.drawable.baseline_error_24, "Location coordinates is invalid. Please inform your superior for this matter.", "Okay", "", new OnDialogButtonCallback() {
+                        @Override
+                        public void OnPositive() {}
+
+                        @Override
+                        public void OnNegative() {}
+                    });
+                    return;
+                }
+
+                mViewModel.SavePaymentInfo(poPaid, Fragment_PaidTransaction.this);
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }else {
+
+            InitMessage(0, R.drawable.baseline_error_24, "Error capturing image", "Okay", "", new OnDialogButtonCallback() {
+                @Override
+                public void OnPositive() {}
+                @Override
+                public void OnNegative() {}
+            });
+        }
+    });
+
+    private interface OnDialogButtonCallback{
+        void OnPositive();
+        void OnNegative();
+    }
+
     public static Fragment_PaidTransaction newInstance() {
         return new Fragment_PaidTransaction();
     }
@@ -86,11 +187,15 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(this).get(VMPaidTransaction.class);
+
         View view = inflater.inflate(R.layout.fragment_paid_transaction, container, false);
+
+        mViewModel = new ViewModelProvider(this).get(VMPaidTransaction.class);
         poPaid = new PaidDCP();
         poMessage = new MessageBox(requireActivity());
         poDialog = new LoadDialog(requireActivity());
+        dialogDisclosure = new DialogDisclosure(requireActivity());
+
         initWidgets(view);
 
         String Remarksx = Activity_Transaction.getInstance().getRemarksCode();
@@ -124,13 +229,16 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
                 SimpleDateFormat loFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
                 String lsDayDuex = detail.getDueDatex().split("-")[2];
+
                 //Check here if the due date is on the maximum days per month
                 // if true check the maximum day of month and set it as the due date for this current month...
+
                 if(lsDayDuex.equalsIgnoreCase("31")) {
                     LocalDate lastDayOfMonth = LocalDate.parse(AppConstants.CURRENT_DATE(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                             .with(TemporalAdjusters.lastDayOfMonth());
                     lsDayDuex = String.valueOf(lastDayOfMonth.getDayOfMonth());
                 }
+
                 String lsCrtYear = new SimpleDateFormat("yyyy", Locale.getDefault()).format(Calendar.getInstance().getTime());
                 String lsCrtMnth = new SimpleDateFormat("MM", Locale.getDefault()).format(Calendar.getInstance().getTime());
                 String lsDueDate = lsCrtYear + "-" + lsCrtMnth + "-" + lsDayDuex;
@@ -235,7 +343,9 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
 
         cbCheckPymnt.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked){
+
                 DialogCheckPayment loPayment = new DialogCheckPayment(getActivity());
+
                 mViewModel.getBankNameList().observe(getViewLifecycleOwner(), strings -> {
                     loPayment.initDialog(strings, new DialogCheckPayment.OnCheckPaymentDialogListener() {
                         @Override
@@ -266,6 +376,15 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
         });
 
         btnConfirm.setOnClickListener(v -> {
+
+            if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+
+                ShowDCPDisclosure();
+                return;
+            }
+
             poPaid.setRemarks(Remarksx);
             poPaid.setPayment(GetPaymentTypeIndex(spnType.getText().toString()));
             poPaid.setPrNoxxx(Objects.requireNonNull(txtPrNoxx.getText()).toString());
@@ -274,10 +393,44 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
             poPaid.setDscount(FormatUIText.getParseDouble(Objects.requireNonNull(txtRebate.getText()).toString()));
             poPaid.setOthersx(FormatUIText.getParseDouble(Objects.requireNonNull(txtOthers.getText()).toString()));
             poPaid.setTotAmnt(FormatUIText.getParseDouble(Objects.requireNonNull(txtTotAmnt.getText()).toString()));
-            mViewModel.SavePaymentInfo(poPaid, Fragment_PaidTransaction.this);
+
+            InitializeCamera();
+
         });
 
         return view;
+    }
+
+    @Override
+    public void OnStartSaving() {
+        poDialog.initDialog("Daily Collection Plan", "Posting transaction.Please wait...", false);
+        poDialog.show();
+    }
+
+    @Override
+    public void OnSuccessResult() {
+        poDialog.dismiss();
+
+         InitMessage(0, R.drawable.baseline_message_24, "Collection info has been save.", "Okay", "", new OnDialogButtonCallback() {
+             @Override
+             public void OnPositive() { requireActivity().finish(); }
+
+             @Override
+             public void OnNegative() {}
+         });
+    }
+
+    @Override
+    public void OnFailedResult(String message) {
+        poDialog.dismiss();
+
+        InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+            @Override
+            public void OnPositive() { requireActivity().finish(); }
+
+            @Override
+            public void OnNegative() {}
+        });
     }
 
     private void initWidgets(View v){
@@ -306,38 +459,126 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
         txtOthers.addTextChangedListener(new OnAmountEnterTextWatcher(txtOthers));
     }
 
-    @Override
-    public void OnStartSaving() {
-        poDialog.initDialog("Daily Collection Plan", "Posting transaction.Please wait...", false);
-        poDialog.show();
-    }
+    private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnDialogButtonCallback callback){
 
-    @Override
-    public void OnSuccessResult() {
-        poDialog.dismiss();
-        poMessage.initDialog();
-        poMessage.setTitle("Transaction Success");
-        poMessage.setMessage("Collection save successfully");
-        poMessage.setPositiveButton("Okay", (view, dialog) -> {
-            dialog.dismiss();
-            requireActivity().finish();
-        });
-        poMessage.show();
-    }
-
-    @Override
-    public void OnFailedResult(String message) {
-        poDialog.dismiss();
         poMessage.initDialog();
         poMessage.setTitle("Daily Collection Plan");
+        poMessage.setIcon(statusIcon);
         poMessage.setMessage(message);
-        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+
+        poMessage.setPositiveButton(posText, (view, dialog) -> {
             dialog.dismiss();
-            if(message.equalsIgnoreCase("Collection info has been save.")){
-                requireActivity().finish();
+            callback.OnPositive();
+        });
+
+        if (messageType == 1){
+            poMessage.setNegativeButton(negText, (view, dialog) -> {
+                dialog.dismiss();
+                callback.OnNegative();
+
+            });
+        }
+
+        poMessage.show();
+    }
+
+    private void ShowDCPDisclosure(){
+
+        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
+            @Override
+            public void onAccept() {
+                dialogDisclosure.dismiss();
+
+                Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                appSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                appSettings.setData(Uri.parse("package:" + requireActivity().getPackageName()));
+                startActivity(appSettings);
+            }
+
+            @Override
+            public void onDecline() {
+                dialogDisclosure.dismiss();
+
+                MessageBox loMessage = new MessageBox(requireActivity());
+                loMessage.setIcon(R.drawable.baseline_error_24);
+                loMessage.initDialog();
+                loMessage.setTitle("Disclosure");
+                loMessage.setMessage("Disclosure denied. Selfie log cancelled.");
+                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                    }
+                });
+
+                loMessage.show();
             }
         });
-        poMessage.show();
+
+        dialogDisclosure.setMessage("Guanzon Circle requires location and camera permission to take selfie log when the app is in use.");
+        dialogDisclosure.show();
+    }
+
+    private void InitializeCamera(){
+
+        LocationManager locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            Toast.makeText(requireActivity(), "Please enable your location service.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        InitMessage(0, R.drawable.baseline_message_24, "Please take a selfie with the customer or within the area of the customer.", "Okay", "", new OnDialogButtonCallback() {
+            @Override
+            public void OnPositive() {
+
+                mViewModel.InitCameraLaunch(requireActivity(), poPaid.getTransNox(), new OnInitializeCameraCallback() {
+                    @Override
+                    public void OnInit() {
+                        poDialog.initDialog("Daily Collection Plan", "Initializing camera. Please wait...", false);
+                        poDialog.show();
+                    }
+
+                    @Override
+                    public void OnSuccess(Intent intent, String[] args) {
+                        poDialog.dismiss();
+
+                        poPaid.setFilePath(args[0]);
+                        poPaid.setFileName(args[1]);
+                        poPaid.setLatitude(args[2]);
+                        poPaid.setLongtude(args[3]);
+
+                        poCamera.launch(intent);
+                    }
+
+                    @Override
+                    public void OnFailed(String message, Intent intent, String[] args) {
+                        poDialog.dismiss();
+
+                        InitMessage(1, R.drawable.baseline_contact_support_24, message + "\n Proceed taking selfie?", "Continue", "Cancel", new OnDialogButtonCallback() {
+                            @Override
+                            public void OnPositive() {
+
+                                poPaid.setFilePath(args[0]);
+                                poPaid.setFileName(args[1]);
+                                poPaid.setLatitude(args[2]);
+                                poPaid.setLongtude(args[3]);
+
+                                poCamera.launch(intent);
+                            }
+
+                            @Override
+                            public void OnNegative() {}
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void OnNegative() {
+
+            }
+        });
     }
 
     private class OnAmountEnterTextWatcher implements TextWatcher{
@@ -413,8 +654,8 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
         }
     }
 
-    private static String getDecimalFormattedString(String value)
-    {
+    private static String getDecimalFormattedString(String value) {
+
         StringTokenizer lst = new StringTokenizer(value, ".");
         String str1 = value;
         String str2 = "";
@@ -449,4 +690,5 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
         }
 
     }
+
 }

@@ -16,8 +16,6 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Update;
-
 import org.rmj.g3appdriver.GCircle.room.Entities.EAreaPerformance;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchPerformance;
 
@@ -31,9 +29,6 @@ public interface DAreaPerformance {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertBulkData(List<EAreaPerformance> areaPerformances);
-
-    @Update
-    void update(EAreaPerformance areaPerformance);
 
     @Query("SELECT sEmpLevID FROM User_Info_Master")
     int GetUserLevel();

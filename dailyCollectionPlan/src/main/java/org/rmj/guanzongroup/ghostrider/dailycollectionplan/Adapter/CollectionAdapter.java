@@ -116,7 +116,7 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
             itemView.setOnClickListener(new SingleClickListener() {
                 @Override
                 public void onSingleClick(View v) {
-                    int position = getAdapterPosition();
+                    int position = getBindingAdapterPosition();
                     if(position != RecyclerView.NO_POSITION){
                         listener.OnClick(position);
                     }
@@ -124,14 +124,14 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
             });
 
             lblAdd1xx.setOnClickListener(view -> {
-                int position = getAdapterPosition();
+                int position = getBindingAdapterPosition();
                 if(position != RecyclerView.NO_POSITION){
                     listener.OnAddressClickListener("Sample", null);
                 }
             });
 
             lblMobile.setOnClickListener(view -> {
-                int position = getAdapterPosition();
+                int position = getBindingAdapterPosition();
                 if(position != RecyclerView.NO_POSITION){
                     listener.OnMobileNoClickListener(loPlan.getMobileNo());
                 }

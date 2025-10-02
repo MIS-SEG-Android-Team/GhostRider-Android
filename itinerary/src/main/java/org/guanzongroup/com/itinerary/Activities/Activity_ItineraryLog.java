@@ -65,7 +65,7 @@ public class Activity_ItineraryLog extends AppCompatActivity {
         poDialog = new MessageBox(Activity_ItineraryLog.this);
 
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Employee Itinerary");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         lblUser = findViewById(R.id.lbl_username);
@@ -103,6 +103,7 @@ public class Activity_ItineraryLog extends AppCompatActivity {
                         public void OnFailed(String message) {
                             poLoad.dismiss();
                             poDialog.initDialog();
+                            poDialog.setIcon(R.drawable.baseline_error_24);
                             poDialog.setTitle("Employee Itinerary");
                             poDialog.setMessage(message);
                             poDialog.setPositiveButton("Okay", (view, dialog) -> {
@@ -127,6 +128,7 @@ public class Activity_ItineraryLog extends AppCompatActivity {
                         public void OnSuccess(String args) {
                             poLoad.dismiss();
                             poDialog.initDialog();
+                            poDialog.setIcon(R.drawable.baseline_message_24);
                             poDialog.setTitle("Employee Itinerary");
                             poDialog.setMessage(args);
                             poDialog.setPositiveButton("Okay", (view, dialog) -> {
@@ -139,6 +141,7 @@ public class Activity_ItineraryLog extends AppCompatActivity {
                         public void OnFailed(String message) {
                             poLoad.dismiss();
                             poDialog.initDialog();
+                            poDialog.setIcon(R.drawable.baseline_error_24);
                             poDialog.setTitle("Employee Itinerary");
                             poDialog.setMessage(message);
                             poDialog.setPositiveButton("Okay", (view, dialog) -> {
@@ -241,6 +244,7 @@ public class Activity_ItineraryLog extends AppCompatActivity {
                     public void OnSuccess(String args) {
                         poLoad.dismiss();
                         poDialog.initDialog();
+                        poDialog.setIcon(R.drawable.baseline_message_24);
                         poDialog.setTitle("Employee Itinerary");
                         poDialog.setMessage(args);
                         poDialog.setPositiveButton("Okay", (view, dialog) -> {
@@ -253,6 +257,7 @@ public class Activity_ItineraryLog extends AppCompatActivity {
                     public void OnFailed(String message) {
                         poLoad.dismiss();
                         poDialog.initDialog();
+                        poDialog.setIcon(R.drawable.baseline_error_24);
                         poDialog.setTitle("Employee Itinerary");
                         poDialog.setMessage(message);
                         poDialog.setPositiveButton("Okay", (view, dialog) -> {

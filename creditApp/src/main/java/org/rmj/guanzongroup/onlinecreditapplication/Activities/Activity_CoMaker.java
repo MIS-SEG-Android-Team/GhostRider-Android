@@ -294,6 +294,7 @@ public class Activity_CoMaker extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
                 poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
@@ -307,7 +308,7 @@ public class Activity_CoMaker extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_CoMaker);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Co-Maker Info");
+        getSupportActionBar().setTitle("");
 
         tieLastname = findViewById(R.id.tie_cap_cmrLastname);
         tieFrstname = findViewById(R.id.tie_cap_cmrFirstname);

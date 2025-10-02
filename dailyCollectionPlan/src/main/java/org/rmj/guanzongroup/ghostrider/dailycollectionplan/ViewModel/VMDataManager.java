@@ -20,13 +20,11 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplicationDocuments;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
-import org.rmj.g3appdriver.GCircle.room.Repositories.RBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RCreditApplication;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RCreditApplicationDocument;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RDailyCollectionPlan;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RImageInfo;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
-import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
@@ -38,7 +36,6 @@ public class VMDataManager extends AndroidViewModel {
     private final RImageInfo poImage;
     private final RDailyCollectionPlan poDcp;
     private final RCreditApplication poCreditApp;
-    private final RBranchLoanApplication poLoan;
     private final RCreditApplicationDocument poDocs;
 
     public interface OnDataFetchListener{
@@ -53,7 +50,6 @@ public class VMDataManager extends AndroidViewModel {
         this.poDcp = new RDailyCollectionPlan(instance);
         this.poLog = new SelfieLog(instance);
         this.poCreditApp = new RCreditApplication(instance);
-        this.poLoan = new RBranchLoanApplication(instance);
         this.poDocs = new RCreditApplicationDocument(instance);
     }
 

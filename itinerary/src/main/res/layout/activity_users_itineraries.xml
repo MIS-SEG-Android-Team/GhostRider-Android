@@ -48,7 +48,7 @@
                     android:id="@+id/img_bg_guanzon_orange"
                     android:layout_width="0dp"
                     android:layout_height="150dp"
-                    android:src="@drawable/bg_samsungknox"
+                    android:src="@drawable/gradient_header_background"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

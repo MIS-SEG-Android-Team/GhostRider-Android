@@ -85,19 +85,24 @@
             app:defaultValue="false"
             app:summary="@string/summary_settings_dMode"/>
 
-        <Preference
-            app:key="appHelpPrefs"
-            app:icon="@drawable/ic_settings_help"
-            app:title="Help"
-            app:iconSpaceReserved="false"
-            app:defaultValue="false"/>
+<!--        <Preference-->
+<!--            app:key="appHelpPrefs"-->
+<!--            app:icon="@drawable/ic_settings_help"-->
+<!--            app:title="Help"-->
+<!--            app:iconSpaceReserved="false"-->
+<!--            app:defaultValue="false"/>-->
 
-        <Preference
-            app:key="appAbout"
-            app:icon="@drawable/ic_settings_about"
-            app:title="About GhostRider"
-            app:iconSpaceReserved="false"
-            app:defaultValue="false"/>
+<!--        <Preference-->
+<!--            app:key="appAbout"-->
+<!--            app:icon="@drawable/ic_settings_about"-->
+<!--            app:title="About GhostRider"-->
+<!--            app:iconSpaceReserved="false"-->
+<!--            app:defaultValue="false"/><Preference-->
+<!--            app:key="appAbout"-->
+<!--            app:icon="@drawable/ic_settings_about"-->
+<!--            app:title="About GhostRider"-->
+<!--            app:iconSpaceReserved="false"-->
+<!--            app:defaultValue="false"/>-->
 
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

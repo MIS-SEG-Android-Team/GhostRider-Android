@@ -26,6 +26,7 @@ public class ImportBranch implements ImportInstance {
 
     @Override
     public void ImportData(ImportDataCallback callback) {
+
         if(!poSys.ImportBranches()){
             callback.OnFailedImportData(poSys.getMessage());
         } else {

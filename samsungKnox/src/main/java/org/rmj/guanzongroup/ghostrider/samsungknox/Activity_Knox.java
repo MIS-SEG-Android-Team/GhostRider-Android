@@ -16,8 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -46,10 +47,12 @@ public class Activity_Knox extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        ViewPager viewPager = findViewById(R.id.viewpager_knox);
-        viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), getKnoxFragment(position)));
-    }
+        ViewPager2 viewPager = findViewById(R.id.viewpager_knox);
+        FragmentAdapter loAdapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
 
+        loAdapter.initFragments(getKnoxFragment(position));
+        viewPager.setAdapter(loAdapter);
+    }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){
@@ -57,27 +60,31 @@ public class Activity_Knox extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
+    }
 
-    private static class FragmentAdapter extends FragmentStatePagerAdapter{
-        private final List<Fragment> fragment = new ArrayList<>();
-
-        public FragmentAdapter(@NonNull FragmentManager fm, Fragment fragment) {
-            super(fm);
+    private static class FragmentAdapter extends FragmentStateAdapter {
+        private List<Fragment> fragment = new ArrayList<>();
+        public FragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+            super(fragmentManager, lifecycle);
+        }
+        public void initFragments(Fragment fragment){
             this.fragment.add(fragment);
         }
 
         @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             return fragment.get(position);
         }
-
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return fragment.size();
         }
     }
-
     private Fragment getKnoxFragment(int position){
         Fragment[] knoxFragments = {
                 new Fragment_Upload(),
@@ -87,11 +94,5 @@ public class Activity_Knox extends AppCompatActivity {
                 new Fragment_GetOfflinePin(),
                 new Fragment_GetStatus()};
         return knoxFragments[position];
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
 }

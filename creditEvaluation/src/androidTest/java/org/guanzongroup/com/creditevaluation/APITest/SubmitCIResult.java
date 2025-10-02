@@ -27,7 +27,7 @@ public class SubmitCIResult {
 
     private GCircleApi poApis;
 
-    private static final String LIVE_LOGIN = "https://restgk.guanzongroup.com.ph/security/mlogin.php";
+    private static final String LIVE_LOGIN = "https://apps.guanzongroup.com.ph/security/mlogin.php";
     private static final String LOCAL_LOGIN = "http://192.168.10.141/security/mlogin.php";
 
     private static Map<String, String> headers = new HashMap<>();

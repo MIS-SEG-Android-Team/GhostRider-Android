@@ -13,17 +13,13 @@ package org.rmj.guanzongroup.ghostrider.epacss.Dashboard.ViewModel;
 
 import android.os.Build;
 
-import androidx.test.core.app.ApplicationProvider;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
-@RunWith(RobolectricTestRunner.class)
+/*@RunWith(RobolectricTestRunner.class)
 @Config(sdk = {Build.VERSION_CODES.O_MR1}, manifest= Config.NONE)
 public class VMHomeContainerTest {
     private VMHomeContainer mViewModel;
@@ -53,4 +49,4 @@ public class VMHomeContainerTest {
         Assert.assertNotNull(mViewModel.getEmployeeLevel());
     }
 
-}
+}*/

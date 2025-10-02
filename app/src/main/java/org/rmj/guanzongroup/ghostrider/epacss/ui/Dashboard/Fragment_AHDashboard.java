@@ -11,7 +11,7 @@ import androidx.annotation.experimental.UseExperimental;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
@@ -90,8 +90,12 @@ public class Fragment_AHDashboard extends Fragment {
                 new Fragment_AreaMonitor(),
                 new Fragment_Notifications()};
 
-        ViewPager viewPager = view.findViewById(R.id.viewpager);
-        viewPager.setAdapter(new FragmentAdapter(getChildFragmentManager(), loFragments));
+        ViewPager2 viewPager = view.findViewById(R.id.viewpager);
+        FragmentAdapter loAdapter = new FragmentAdapter(getChildFragmentManager(), getLifecycle());
+
+        loAdapter.initFragments(loFragments);
+        viewPager.setAdapter(loAdapter);
+
         BottomNavigationView botNav = view.findViewById(R.id.botNav);
         botNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()){

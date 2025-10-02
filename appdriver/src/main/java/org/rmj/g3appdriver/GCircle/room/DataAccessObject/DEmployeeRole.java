@@ -34,9 +34,6 @@ public interface DEmployeeRole {
     @Query("SELECT * FROM xxxAOEmpRole WHERE sObjectNm=:fsVal")
     EEmployeeRole GetEmployeeRole(String fsVal);
 
-    @Query("DELETE FROM xxxAOEmpRole")
-    void DeleteEmployeeRole();
-
     @Query("SELECT * FROM xxxAOEmpRole " +
             "WHERE cRecdStat = '1' AND sParentxx = '' " +
             "ORDER BY sSeqnceCd ASC")
@@ -47,24 +44,4 @@ public interface DEmployeeRole {
             "ORDER BY sSeqnceCd ASC")
     LiveData<List<EEmployeeRole>> getChildRoles();
 
-    @Query("UPDATE xxxAOEmpRole SET " +
-            "cObjectTP=:ObjectTP, " +
-            "sObjectDs=:ObjectDs, " +
-            "sParentxx=:Parentxx, " +
-            "cHasChild=:HasChild, " +
-            "sSeqnceCD=:SeqnceCD, " +
-            "cRecdStat=:RecdStat, " +
-            "dTimeStmp=:TimeStmp " +
-            "WHERE sObjectNm=:ObjectNm")
-    void updateEmployeeRole(String ObjectNm,
-                            String ObjectTP,
-                            String ObjectDs,
-                            String Parentxx,
-                            String HasChild,
-                            String SeqnceCD,
-                            String RecdStat,
-                            String TimeStmp);
-
-    @Query("DELETE FROM xxxAOEmpRole")
-    void clearEmployeeRole();
 }

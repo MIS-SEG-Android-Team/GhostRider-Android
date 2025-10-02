@@ -48,8 +48,9 @@ public class Fragment_Inventory extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         mViewModel = new ViewModelProvider(this).get(VMInventory.class);
 //        mViewModel.getRandomItemList().observe(getViewLifecycleOwner(), randomItems -> {
 //            LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -64,5 +65,4 @@ public class Fragment_Inventory extends Fragment {
 //            }));
 //        });
     }
-
 }

@@ -61,10 +61,6 @@ public class RBranchPerformance {
         return poDao.getAllBranchPerformanceInfoByBranch(branchCD);
     }
 
-    public LiveData<DBranchPerformance.MonthlyPieChart> get12MonthBranchPieChartData(String sBranchCd, String fsValue1, String fsValue2) {
-        return poDao.get12MonthBranchPieChartData(sBranchCd, fsValue1, fsValue2);
-    }
-
     public boolean ImportData(){
         try{
             int lsUserLvl = poDao.GetUserLevel();

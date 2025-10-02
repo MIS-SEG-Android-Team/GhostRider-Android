@@ -4,7 +4,7 @@ public class DcpAPIs {
 
     private boolean isUnitTest = false;
 
-    private static final String LIVE = "https://restgk.guanzongroup.com.ph/";
+    private static final String LIVE = "https://apps.guanzongroup.com.ph/";
     private static final String LOCAL = "http://192.168.10.141/";
 
     private String URL_DOWNLOAD_DCP = "integsys/dcp/dcp_download.php";

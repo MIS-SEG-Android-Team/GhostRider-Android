@@ -14,7 +14,6 @@ package org.rmj.guanzongroup.petmanager.ViewModel;
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.app.Application;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -29,6 +28,8 @@ import org.rmj.g3appdriver.lib.Etc.Branch;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLeave;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeOB;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 import java.util.List;
 
@@ -39,6 +40,12 @@ public class VMEmployeeApplications extends AndroidViewModel {
     private final EmployeeLeave poLeave;
     private final EmployeeOB poBuss;
     private final Branch poBranch;
+
+    private final EmployeeLeave loLeave;
+    private final ConnectionUtil loConn;
+    private final EmployeeOB poBusTrip;
+
+    private String message;
 
     private final MutableLiveData<Integer> pnLeave = new MutableLiveData<>();
 
@@ -55,6 +62,10 @@ public class VMEmployeeApplications extends AndroidViewModel {
         this.poBranch = new Branch(instance);
         this.poBuss = new EmployeeOB(instance);
         this.pnLeave.setValue(0);
+
+        this.loLeave = new EmployeeLeave(instance);
+        this.loConn = new ConnectionUtil(instance);
+        this.poBusTrip = new EmployeeOB(instance);
     }
 
     public void setApplicationType(int fnVal){
@@ -73,78 +84,61 @@ public class VMEmployeeApplications extends AndroidViewModel {
         return poBuss.GetApproveOBApplications();
     }
 
-    public LiveData<List<EEmployeeLeave>> getEmployeeLeaveForApprovalList(){
-        return poLeave.GetLeaveApplicationsForApproval();
-    }
-
     public LiveData<EBranchInfo> getUserBranchInfo(){
         return poBranch.getUserBranchInfo();
     }
 
     public void  DownloadLeaveForApproval(OnDownloadApplicationListener listener){
-        new DownloadLeaveTask(instance, listener).execute();
-    }
 
-    private static class DownloadLeaveTask extends AsyncTask<Void, Void, Boolean>{
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                listener.OnDownload("PET Manager","Downloading leave applications. Please wait...");
+            }
 
-        private final EmployeeLeave loLeave;
-        private final ConnectionUtil loConn;
-        private final EmployeeOB poBusTrip;
-        private final OnDownloadApplicationListener mListener;
+            @Override
+            public Object DoInBackground(Object args) {
+                try{
+                    if (!loConn.isDeviceConnected()) {
+                        message = loConn.getMessage();
+                        return false;
+                    }
 
-        private String message;
+                    if(!loLeave.ImportApplications()){
+                        message = loLeave.getMessage();
+                        Log.e(TAG, message);
+                    }
 
-        public DownloadLeaveTask(Application instance, OnDownloadApplicationListener listener){
-            this.loLeave = new EmployeeLeave(instance);
-            this.loConn = new ConnectionUtil(instance);
-            this.poBusTrip = new EmployeeOB(instance);
-            this.mListener = listener;
-        }
+                    Thread.sleep(1000);
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mListener.OnDownload("PET Manager","Downloading leave applications. Please wait...");
-        }
+                    if(!poBusTrip.ImportApplications()){
+                        message = poBusTrip.getMessage();
+                        Log.e(TAG, message);
+                    }
 
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try{
-                if (!loConn.isDeviceConnected()) {
-                    message = loConn.getMessage();
+                    return true;
+                } catch (Exception e){
+                    e.printStackTrace();
+                    message = getLocalMessage(e);
                     return false;
                 }
+            }
 
-                if(!loLeave.ImportApplications()){
-                    message = loLeave.getMessage();
-                    Log.e(TAG, message);
+            @Override
+            public void OnPostExecute(Object object) {
+
+                Boolean isSuccess = (Boolean) object;
+
+                if(isSuccess){
+                    listener.OnDownloadSuccess();
+                } else {
+                    listener.OnDownloadFailed(message);
                 }
 
-                Thread.sleep(1000);
-
-                if(!poBusTrip.ImportApplications()){
-                    message = poBusTrip.getMessage();
-                    Log.e(TAG, message);
-                }
-
-                return true;
-            } catch (Exception e){
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return false;
             }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(isSuccess){
-                mListener.OnDownloadSuccess();
-            } else {
-                mListener.OnDownloadFailed(message);
-            }
-        }
+        });
     }
+
 }
 
 

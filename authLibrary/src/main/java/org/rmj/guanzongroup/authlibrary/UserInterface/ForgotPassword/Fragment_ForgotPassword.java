@@ -78,15 +78,14 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
         return v;
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         try {
             mViewModel = new ViewModelProvider(this).get(VMForgotPassword.class);
             lblVersion.setText(poConfigx.getVersionInfo());
-            btnSendEmail.setOnClickListener(view -> {
+            btnSendEmail.setOnClickListener(v -> {
                 String email = Objects.requireNonNull(tieEmail.getText()).toString().trim();
                 //mViewModel.RequestPassword(email, Fragment_ForgotPassword.this);
                 mViewModel.RequestPassword(email, new VMForgotPassword.RequestPasswordCallback() {
@@ -101,9 +100,10 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
                     @Override
                     public void OnSuccessRequest() {
                         poDialog.dismiss();
+                        poMsgBox.setIcon(R.drawable.baseline_message_24);
                         poMsgBox.setTitle("Result");
                         poMsgBox.setMessage("Successfully sent request.");
-                        poMsgBox.setPositiveButton("OK", new MessageBox.DialogButton() {
+                        poMsgBox.setPositiveButton("Okay", new MessageBox.DialogButton() {
                             @Override
                             public void OnButtonClick(View view, AlertDialog dialog) {
                                 dialog.dismiss();
@@ -116,9 +116,10 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
                     @Override
                     public void OnFailedRequest(String message) {
                         poDialog.dismiss();
+                        poMsgBox.setIcon(R.drawable.baseline_error_24);
                         poMsgBox.setTitle("Result");
                         poMsgBox.setMessage("Failed to send request: " + message);
-                        poMsgBox.setPositiveButton("OK", new MessageBox.DialogButton() {
+                        poMsgBox.setPositiveButton("Okay", new MessageBox.DialogButton() {
                             @Override
                             public void OnButtonClick(View view, AlertDialog dialog) {
                                 dialog.dismiss();
@@ -144,6 +145,7 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
     public void OnSuccessRequest() {
         poDialog.dismiss();
         poMsgBox.initDialog();
+        poMsgBox.setIcon(R.drawable.baseline_message_24);
         poMsgBox.setTitle("Forgot Password");
         poMsgBox.setMessage("You'll be receiving an email from MIS, Please check your email account");
         poMsgBox.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());
@@ -154,6 +156,7 @@ public class Fragment_ForgotPassword extends Fragment implements VMForgotPasswor
     public void OnFailedRequest(String message) {
         poDialog.dismiss();
         poMsgBox.initDialog();
+        poMsgBox.setIcon(R.drawable.baseline_error_24);
         poMsgBox.setTitle("Forgot Password");
         poMsgBox.setMessage(message);
         poMsgBox.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());

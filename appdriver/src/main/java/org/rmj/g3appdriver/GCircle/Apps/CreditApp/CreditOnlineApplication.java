@@ -375,8 +375,10 @@ public class CreditOnlineApplication {
             loGocas.PurchaseInfo().setAccountTerm(foVal.getAccTermxx());
             loGocas.PurchaseInfo().setDateApplied(AppConstants.DATE_MODIFIED());
             loGocas.PurchaseInfo().setMonthlyAmortization(foVal.getMonthlyAm());
+            loGocas.PurchaseInfo().setRemarks(foVal.getsRemarks());
 
             lsTransNo = CreateUniqueIDForApplicant();
+
             ECreditApplicantInfo loApp = new ECreditApplicantInfo();
             loApp.setTransNox(lsTransNo);
             loApp.setPurchase(loGocas.PurchaseInfo().toJSONString());
@@ -386,6 +388,8 @@ public class CreditOnlineApplication {
             loApp.setCreatedx(AppConstants.DATE_MODIFIED());
             loApp.setTransact(AppConstants.CURRENT_DATE());
             loApp.setTranStat("0");
+            loApp.setRemarksx(loGocas.PurchaseInfo().getRemarks());
+
             poDao.Save(loApp);
 
             Log.d(TAG, "New credit online application has been created.");
@@ -516,6 +520,7 @@ public class CreditOnlineApplication {
 
     public boolean InitializeMcInstallmentTerms(DMcModel.McDPInfo args){
         try{
+
             org.json.simple.JSONObject loJson = new org.json.simple.JSONObject();
             loJson.put("sModelIDx", args.ModelIDx);
             loJson.put("sModelNme", args.ModelNme);
@@ -527,6 +532,7 @@ public class CreditOnlineApplication {
             loJson.put("nLastPrce", args.LastPrce);
 
             poPrice.setModelInfo(loJson);
+
             return true;
         } catch (Exception e){
             e.printStackTrace();

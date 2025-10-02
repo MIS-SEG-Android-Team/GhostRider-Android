@@ -106,6 +106,7 @@ public class Fragment_GetOfflinePin extends Fragment implements ViewModelCallBac
     public void OnRequestFailed(String message) {
         dialog.dismiss();
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_error_24);
         loMessage.setMessage(message);
         loMessage.setTitle("Knox Get PIN");
         loMessage.setPositiveButton("Okay", (view, msgDialog) -> msgDialog.dismiss());

@@ -14,7 +14,6 @@ package org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel;
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.app.Application;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -23,12 +22,16 @@ import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.ApprovalCode;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.model.SCA;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.pojo.CreditAppInfo;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Etc.ViewModelCallback;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.pojo.CreditApp;
 
 public class VMCreditAppApproval extends AndroidViewModel {
+
     private final ConnectionUtil poConn;
     private final SCA poSys;
+    private String message;
 
     public VMCreditAppApproval(@NonNull Application application) {
         super(application);
@@ -37,125 +40,120 @@ public class VMCreditAppApproval extends AndroidViewModel {
     }
 
     public void LoadApplication(String args, String args1, String args2, OnLoadApplicationListener listener){
-        new LoadApplicationTask(listener).execute(args, args1, args2);
+
+        String[] params = {args, args1, args2};
+
+        TaskExecutor.Execute(params, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                listener.OnLoad("Approval Code", "Loading Credit Application. Please wait...");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                try {
+                    if(!poConn.isDeviceConnected()){
+                        message = poConn.getMessage();
+                        return null;
+                    }
+
+                    String[] listargs = (String[]) args;
+
+                    String
+                            sSystemCD = listargs[0],
+                            lsTransNo = listargs[1],
+                            lsBrnchCd = listargs[2];
+
+                    CreditAppInfo loApp = poSys.LoadApplication(sSystemCD, lsBrnchCd, lsTransNo);
+                    if(loApp == null){
+                        message = poSys.getMessage();
+                        return null;
+                    }
+
+                    return loApp;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    message = getLocalMessage(e);
+                    return null;
+                }
+
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                CreditAppInfo result = (CreditAppInfo) object;
+
+                if(result == null){
+                    listener.OnLoadFailed(message);
+                } else {
+                    listener.OnLoadSuccess(result);
+                }
+
+            }
+        });
     }
 
     public void ApproveApplication(CreditApp.Application foParams, ViewModelCallback listener){
-        new ApproveRequestTask(listener).execute(foParams);
-    }
 
-    private class LoadApplicationTask extends AsyncTask<String, Void, CreditAppInfo>{
+        TaskExecutor.Execute(foParams, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                listener.OnLoadData("Approval Code", "Sending approval request. Please wait...");
+            }
 
-        private final OnLoadApplicationListener listener;
+            @Override
+            public Object DoInBackground(Object args) {
 
-        private String message;
+                try{
 
-        public LoadApplicationTask(OnLoadApplicationListener listener) {
-            this.listener = listener;
-        }
+                    CreditApp.Application params = (CreditApp.Application) args;
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            listener.OnLoad("Approval Code", "Loading Credit Application. Please wait...");
-        }
+                    if(!params.isDataValid()){
+                        message = params.getMessage();
+                        return null;
+                    }
 
-        @Override
-        protected CreditAppInfo doInBackground(String... args) {
-            try {
-                if(!poConn.isDeviceConnected()){
-                    message = poConn.getMessage();
+                    if(!poConn.isDeviceConnected()){
+                        message = poConn.getMessage();
+                        return null;
+                    }
+
+                    String lsCode = poSys.GenerateCode(params);
+
+                    if(lsCode == null){
+                        message = poSys.getMessage();
+                        return null;
+                    }
+
+                    return lsCode;
+                } catch (Exception e){
+                    e.printStackTrace();
+                    message = getLocalMessage(e);
                     return null;
                 }
 
-                String
-                sSystemCD = args[0],
-                lsTransNo = args[1],
-                lsBrnchCd = args[2];
+            }
 
-                CreditAppInfo loApp = poSys.LoadApplication(sSystemCD, lsBrnchCd, lsTransNo);
-                if(loApp == null){
-                    message = poSys.getMessage();
-                    return null;
+            @Override
+            public void OnPostExecute(Object object) {
+
+                String result = object.toString();
+
+                if(result == null){
+                    listener.OnFailedResult(message);
+                } else {
+                    listener.OnSuccessResult(result);
                 }
 
-                return loApp;
-            } catch (Exception e) {
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return null;
             }
-        }
-
-        @Override
-        protected void onPostExecute(CreditAppInfo result) {
-            super.onPostExecute(result);
-            if(result == null){
-                listener.OnLoadFailed(message);
-            } else {
-                listener.OnLoadSuccess(result);
-            }
-        }
+        });
     }
 
     public interface OnLoadApplicationListener{
         void OnLoad(String Title, String Message);
         void OnLoadSuccess(CreditAppInfo args);
         void OnLoadFailed(String message);
-    }
-
-    private class ApproveRequestTask extends AsyncTask<CreditApp.Application, Void, String>{
-
-        private final ViewModelCallback listener;
-
-        private String message;
-
-        public ApproveRequestTask(ViewModelCallback listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            listener.OnLoadData("Approval Code", "Sending approval request. Please wait...");
-        }
-
-        @Override
-        protected String doInBackground(CreditApp.Application... params) {
-            try{
-                if(!params[0].isDataValid()){
-                    message = params[0].getMessage();
-                    return null;
-                }
-
-                if(!poConn.isDeviceConnected()){
-                    message = poConn.getMessage();
-                    return null;
-                }
-
-                String lsCode = poSys.GenerateCode(params[0]);
-
-                if(lsCode == null){
-                    message = poSys.getMessage();
-                    return null;
-                }
-
-                return lsCode;
-            } catch (Exception e){
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if(result == null){
-                listener.OnFailedResult(message);
-            } else {
-                listener.OnSuccessResult(result);
-            }
-        }
     }
 }

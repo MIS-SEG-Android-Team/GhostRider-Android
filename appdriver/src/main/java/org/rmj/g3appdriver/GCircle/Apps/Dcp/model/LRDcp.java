@@ -13,22 +13,11 @@ import androidx.lifecycle.LiveData;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.rmj.apprdiver.util.LRUtil;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.obj.RClientUpdate;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.AddressUpdate;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.CustomerNotAround;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.ImportParams;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.LoanUnit;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.MobileUpdate;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.OtherRemCode;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.PaidDCP;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.PromiseToPay;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.Remittance;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DAddressUpdate;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMobileUpdate;
 import org.rmj.g3appdriver.GCircle.room.Entities.EClientUpdate;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
@@ -78,6 +67,7 @@ public class LRDcp {
     protected final RClientUpdate poClient;
     protected final DCPFileManager poReader;
     protected final RCollectionRemittance poRemit;
+    protected final DLRDcp poDCP;
 
     protected String message;
 
@@ -98,6 +88,7 @@ public class LRDcp {
         this.poClient = new RClientUpdate(instance);
         this.poReader = new DCPFileManager(instance);
         this.poRemit = new RCollectionRemittance(instance);
+        this.poDCP = GGC_GCircleDB.getInstance(instance).DcpDao();
         this.CURRENT_DATE = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
     }
 
@@ -107,6 +98,10 @@ public class LRDcp {
 
     public LiveData<DEmployeeInfo.EmployeeBranch> GetUserInfo(){
         return poUser.GetEmployeeBranch();
+    }
+
+    public LiveData<EDCPCollectionMaster> GetPostedDCP(){
+        return poDCP.GetLatestPostedDcp();
     }
 
     public boolean SaveTransaction(Object args){
@@ -228,6 +223,26 @@ public class LRDcp {
                         loData.put("sRemarksx", detail.getRemarksx());
                         params.put("sRemCodex", detail.getRemCodex());
                         params.put("dModified", detail.getModified());
+
+                        //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
+                        loImage = poDao.GetDcpImageForPosting(
+                                detail.getTransNox(),
+                                detail.getAcctNmbr());
+
+                        if(loImage != null){
+
+                            if(!poConfig.getTestStatus()){
+                                loData.put("sImageNme", loImage.getImageNme());
+                                loData.put("sSourceCD", loImage.getSourceCD());
+                                loData.put("nLongitud", loImage.getLongitud());
+                                loData.put("nLatitude", loImage.getLatitude());
+
+                                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                                if(lsImageID == null){
+                                    Log.e(TAG, poImage.getMessage());
+                                }
+                            }
+                        }
                         break;
 
                     case "CNA":
@@ -247,6 +262,26 @@ public class LRDcp {
                             Log.e(TAG, message);
                         } else {
                             loData.put("Mobile", mobile);
+                        }
+
+                        //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
+                        loImage = poDao.GetDcpImageForPosting(
+                                detail.getTransNox(),
+                                detail.getAcctNmbr());
+
+                        if(loImage != null){
+
+                            if(!poConfig.getTestStatus()){
+                                loData.put("sImageNme", loImage.getImageNme());
+                                loData.put("sSourceCD", loImage.getSourceCD());
+                                loData.put("nLongitud", loImage.getLongitud());
+                                loData.put("nLatitude", loImage.getLatitude());
+
+                                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                                if(lsImageID == null){
+                                    Log.e(TAG, poImage.getMessage());
+                                }
+                            }
                         }
 
                         break;
@@ -310,12 +345,13 @@ public class LRDcp {
                         break;
 
                     default:
+
                         loImage = poDao.GetDcpImageForPosting(
                                 detail.getTransNox(),
                                 detail.getAcctNmbr());
 
                         if(loImage != null){
-                            Log.d(TAG, "Not visited image found.");
+
                             if(!poConfig.getTestStatus()){
                                 loData.put("sImageNme", loImage.getImageNme());
                                 loData.put("sSourceCD", loImage.getSourceCD());
@@ -327,8 +363,6 @@ public class LRDcp {
                                     Log.e(TAG, poImage.getMessage());
                                 }
                             }
-                        } else {
-                            Log.e(TAG, "Not visited image not found.");
                         }
                 }
                 loData.put("sRemarksx", detail.getRemarksx());
@@ -364,16 +398,6 @@ public class LRDcp {
                 message = getLocalMessage(e);
                 return false;
             }
-
-//
-//            ParcelFileDescriptor pfd = instance.getContentResolver().
-//                    openFileDescriptor(uri, "w");
-//            FileOutputStream fileOutputStream =
-//                    new FileOutputStream(pfd.getFileDescriptor());
-//            fileOutputStream.write(loArray.toString().getBytes());
-//            // Let the document provider know you're done by closing the stream.
-//            fileOutputStream.close();
-//            pfd.close();
 
             return true;
         } catch (Exception e){
@@ -412,6 +436,8 @@ public class LRDcp {
                 message = SERVER_NO_RESPONSE;
                 return false;
             }
+
+            Log.d(TAG, lsResponse);
 
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
@@ -597,13 +623,8 @@ public class LRDcp {
         }
     }
 
-    /**
-     * this method is use by splashscreen to start location tracking service
-     * @return
-     */
-    public boolean HasCollection(){
-        EDCPCollectionMaster loMaster = poDao.GetColletionMasterForPosting();
-        return loMaster != null;
+    public void UpdateCollection(EDCPCollectionDetail foVal){
+        poDao.UpdateCollectionDetail(foVal);
     }
 
     public boolean HasRemittedCollection(){
@@ -743,19 +764,41 @@ public class LRDcp {
                 EImageInfo loImage;
 
                 switch (lsRemCode) {
-                    case "PAY":
+
+                    case "PAY": //requires selfie
                         loData.put("sPRNoxxxx", detail.getPRNoxxxx());
                         loData.put("nTranAmtx", detail.getTranAmtx());
                         loData.put("nDiscount", detail.getDiscount());
                         loData.put("nOthersxx", detail.getOthersxx());
                         loData.put("cTranType", detail.getTranType());
                         loData.put("nTranTotl", detail.getTranTotl());
-                        loData.put("sRemarksx", detail.getRemarksx());
-                        params.put("sRemCodex", detail.getRemCodex());
-                        params.put("dModified", detail.getModified());
+                        loData.put("sBankIDxx", detail.getBankIDxx());
+                        loData.put("sCheckDte", detail.getCheckDte());
+                        loData.put("sCheckNox", detail.getCheckNox());
+                        loData.put("sCheckAct", detail.getCheckAct());
+
+                        //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
+                        loImage = poDao.GetDcpImageForPosting(
+                                detail.getTransNox(),
+                                detail.getAcctNmbr());
+
+                        if(loImage != null){
+
+                            if(!poConfig.getTestStatus()){
+                                loData.put("sImageNme", loImage.getImageNme());
+                                loData.put("sSourceCD", loImage.getSourceCD());
+                                loData.put("nLatitude", loImage.getLatitude());
+                                loData.put("nLongitud", loImage.getLongitud());
+
+                                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                                if(lsImageID == null){
+                                    Log.e(TAG, poImage.getMessage());
+                                }
+                            }
+                        }
                         break;
 
-                    case "CNA":
+                    case "CNA": //requires selfie
                         String lsClientID = detail.getClientID();
 
                         JSONObject address = poAddress.GetAddressDetailForPosting(lsClientID);
@@ -772,6 +815,26 @@ public class LRDcp {
                             Log.e(TAG, message);
                         } else {
                             loData.put("Mobile", mobile);
+                        }
+
+                        //TODO ADD IMAGE POSTING FOR CUSTOMER NOT AROUND
+                        loImage = poDao.GetDcpImageForPosting(
+                                detail.getTransNox(),
+                                detail.getAcctNmbr());
+
+                        if(loImage != null){
+
+                            if(!poConfig.getTestStatus()){
+                                loData.put("sImageNme", loImage.getImageNme());
+                                loData.put("sSourceCD", loImage.getSourceCD());
+                                loData.put("nLongitud", loImage.getLongitud());
+                                loData.put("nLatitude", loImage.getLatitude());
+
+                                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                                if(lsImageID == null){
+                                    Log.e(TAG, poImage.getMessage());
+                                }
+                            }
                         }
 
                         break;
@@ -835,12 +898,13 @@ public class LRDcp {
                         break;
 
                     default:
+
                         loImage = poDao.GetDcpImageForPosting(
                                 detail.getTransNox(),
                                 detail.getAcctNmbr());
 
                         if(loImage != null){
-                            Log.d(TAG, "Not visited image found.");
+
                             if(!poConfig.getTestStatus()){
                                 loData.put("sImageNme", loImage.getImageNme());
                                 loData.put("sSourceCD", loImage.getSourceCD());
@@ -852,10 +916,9 @@ public class LRDcp {
                                     Log.e(TAG, poImage.getMessage());
                                 }
                             }
-                        } else {
-                            Log.e(TAG, "Not visited image not found.");
                         }
                 }
+
                 loData.put("sRemarksx", detail.getRemarksx());
                 params.put("sRemCodex", detail.getRemCodex());
                 params.put("dModified", detail.getModified());
@@ -868,6 +931,7 @@ public class LRDcp {
                 params.put("dReceived", "");
                 params.put("sUserIDxx", poSession.getUserID());
                 params.put("sDeviceID", poDevice.getDeviceID());
+
                 Log.d(TAG, "DCP posting data: " + params);
 
                 String lsResponse = WebClient.sendRequest(

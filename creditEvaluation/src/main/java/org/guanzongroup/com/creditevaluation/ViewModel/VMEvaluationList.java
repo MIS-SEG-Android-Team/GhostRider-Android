@@ -52,55 +52,7 @@ public class VMEvaluationList extends AndroidViewModel {
         }
     }
 
-    /*public class AddApplicationInfoTask extends AsyncTask<String, Void, Boolean> {
 
-        private final ConnectionUtil poConn;
-        private final ViewModelCallback callback;
-
-        private String message;
-
-        public AddApplicationInfoTask(Application application, ViewModelCallback callback) {
-            this.poConn = new ConnectionUtil(application);
-            this.callback = callback;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            callback.OnStartSaving();
-        }
-
-        @Override
-        protected Boolean doInBackground(String... args) {
-            try {
-                if (!poConn.isDeviceConnected()) {
-                    message = poConn.getMessage();
-                    return false;
-                }
-
-                String transno = args[0];
-                if(!poSys.AddApplication(transno)){
-                    message = poSys.getMessage();
-                    return false;
-                }
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if (!isSuccess) {
-                callback.OnFailedResult(message);
-            } else {
-                callback.OnSuccessResult();
-            }
-        }
-    }*/
     public class AddApplicationInfoTask{
         private final ConnectionUtil poConn;
         private final ViewModelCallback callback;
@@ -168,52 +120,7 @@ public class VMEvaluationList extends AndroidViewModel {
     public void DownloadForCIApplications(OnImportCallBack callBack){
         new DownloadForCIApplications(callBack).execute();
     }
-    /*private class DownloadForCIApplications extends AsyncTask<Void, Void, Boolean> {
 
-        private final OnImportCallBack callback;
-
-        private String message;
-
-        public DownloadForCIApplications(OnImportCallBack callback) {
-            this.callback = callback;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            callback.onStartImport();
-        }
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                if (!poConn.isDeviceConnected()) {
-                    message = poConn.getMessage();
-                }
-
-                if(!poSys.DownloadForCIApplications()){
-                    message = poSys.getMessage();
-                    return false;
-                }
-
-                return true;
-            } catch (Exception e){
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return false;
-            }
-        }
-
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess){
-                callback.onImportFailed(message);
-            } else {
-                callback.onSuccessImport();
-            }
-        }
-    }*/
     private class DownloadForCIApplications{
         private final OnImportCallBack callback;
         private String message;

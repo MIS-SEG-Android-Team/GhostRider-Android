@@ -81,50 +81,13 @@ public class VMApplicantDocuments extends AndroidViewModel {
             }
         });
     }
-//    private class InitializeDocumentsTask extends AsyncTask<String, Void, Boolean> {
-//
-//        private final OnInitializeCreditAppDocuments listener;
-//
-//        public InitializeDocumentsTask(OnInitializeCreditAppDocuments listener) {
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... transnox) {
-//            try {
-//                if (!poApp.InitializeApplicantDocuments(transnox[0])) {
-//                    message = poApp.getMessage();
-//                    return false;
-//                }
-//
-//                return true;
-//            } catch (NullPointerException e) {
-//                e.printStackTrace();
-//                message = getLocalMessage(e);
-//                return null;
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                message = getLocalMessage(e);
-//                return null;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean isSuccess) {
-//            super.onPostExecute(isSuccess);
-//            if (!isSuccess) {
-//                listener.OnFailed(message);
-//            } else {
-//                listener.OnSuccess();
-//            }
-//        }
-//    }
+
     public LiveData<List<DCreditApplicationDocuments.ApplicationDocument>> GetCreditAppDocuments(String args) {
         return poApp.GetApplicantDocumentsList(args);
     }
 
     public void SaveDocumentScan(CreditAppDocs args, OnSaveCreditAppDocument listener) {
-//        new SaveDocumentTask(listener).execute(args);
+
         TaskExecutor.Execute(args, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
@@ -164,42 +127,3 @@ public class VMApplicantDocuments extends AndroidViewModel {
         });
     }
 }
-//    private class SaveDocumentTask extends AsyncTask<CreditAppDocs, Void, Boolean>{
-//
-//        private final OnSaveCreditAppDocument listener;
-//
-//        public SaveDocumentTask(OnSaveCreditAppDocument listener) {
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(CreditAppDocs... info) {
-//            try{
-//                String lsResult = poApp.SaveDocumentInfo(info[0]);
-//                if(lsResult == null){
-//                    message = poApp.getMessage();
-//                    return false;
-//                }
-//
-//                if(!poConn.isDeviceConnected()){
-//                    return true;
-//                }
-//
-//                if(!poApp.UploadDocument(lsResult)){
-//                    message = poApp.getMessage();
-//                    return false;
-//                }
-//                return true;
-//            } catch (Exception e){
-//                e.printStackTrace();
-//                message = getLocalMessage(e);
-//                return false;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean isSuccess) {
-//            super.onPostExecute(isSuccess);
-//        }
-//    }
-//}

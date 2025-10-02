@@ -11,6 +11,7 @@ public class LoanInfo {
     private double sDownPaymt = 0;
     private int sAccTermxx = 0;
     private double sMonthlyAm = 0;
+    private String sRemarks = "";
 
     private String message;
 
@@ -108,6 +109,14 @@ public class LoanInfo {
 
     public void setMonthlyAm(double sMonthlyAm) {
         this.sMonthlyAm = sMonthlyAm;
+    }
+
+    public String getsRemarks(){
+        return sRemarks;
+    }
+
+    public void setsRemarks(String sRemarks){
+        this.sRemarks = sRemarks;
     }
 
     public boolean isDataValid(){

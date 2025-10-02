@@ -27,10 +27,8 @@ import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMProperties;
 import java.util.Objects;
 
 public class Activity_Properties extends AppCompatActivity {
-
     private VMProperties mViewModel;
     private MessageBox poMessage;
-
     private TextInputEditText txtLot1, txtLot2, txtLot3;
     private MaterialCheckBox cb4Wheels, cb3Wheels, cb2Wheels, cbAircon, cbRefxx, cbTelevsn;
     private MaterialButton btnPrvs, btnNext;
@@ -41,10 +39,14 @@ public class Activity_Properties extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_properties);
+
         mViewModel = new ViewModelProvider(Activity_Properties.this).get(VMProperties.class);
         poMessage = new MessageBox(Activity_Properties.this);
-        setContentView(R.layout.activity_properties);
+
         initWidgets();
+
         mViewModel.InitializeApplication(getIntent());
         mViewModel.GetApplication().observe(Activity_Properties.this, app -> {
             try {
@@ -141,6 +143,7 @@ public class Activity_Properties extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
                 poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
@@ -156,7 +159,7 @@ public class Activity_Properties extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_Properties);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Properties Info");
+        getSupportActionBar().setTitle("");
 
         txtLot1 = findViewById(R.id.tie_cap_propertyLot1);
         txtLot2 = findViewById(R.id.tie_cap_propertyLot2);

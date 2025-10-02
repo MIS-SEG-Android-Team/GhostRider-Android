@@ -79,6 +79,8 @@ public class Barangay {
             params.put("bsearch", true);
             params.put("descript", "All");
 
+            Log.d(TAG, params.toString());
+
             EBarangayInfo loObj = poDao.GetLatestBarangayInfo();
             if(loObj != null) {
                 params.put("timestamp", loObj.getTimeStmp());

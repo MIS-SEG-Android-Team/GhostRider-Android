@@ -13,6 +13,7 @@ package org.rmj.guanzongroup.ghostrider.epacss.ViewModel;
 
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
+import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
 import android.widget.Toast;
@@ -22,18 +23,19 @@ import androidx.lifecycle.AndroidViewModel;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
-import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
+import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.room.Entities.ETokenInfo;
 import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
+import org.rmj.g3appdriver.etc.GMSUtility;
 import org.rmj.g3appdriver.lib.Etc.Barangay;
 import org.rmj.g3appdriver.lib.Etc.Branch;
 import org.rmj.g3appdriver.lib.Etc.Province;
 import org.rmj.g3appdriver.lib.Etc.Town;
-import org.rmj.g3appdriver.lib.Ganado.Obj.Ganado;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnLoadApplicationListener;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 import org.rmj.guanzongroup.ghostrider.epacss.BuildConfig;
 
@@ -46,12 +48,12 @@ public class VMSplashScreen extends AndroidViewModel {
     private final AppConfigPreference poConfig;
     private final EmployeeMaster poUser;
     private final EmployeeSession poSession;
-    private Ganado poGanado;
 
     private String message;
 
     public VMSplashScreen(@NonNull Application application) {
-        super(application); 
+        super(application);
+
         this.instance = application;
         this.poConn = new ConnectionUtil(instance);
         this.poConfig = AppConfigPreference.getInstance(instance);
@@ -62,6 +64,7 @@ public class VMSplashScreen extends AndroidViewModel {
         this.poConfig.setUpdateLocally(false);
         this.poConfig.setTestCase(false);
         this.poConfig.setupAppVersionInfo(BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME, "");
+
         ETokenInfo loToken = new ETokenInfo();
         loToken.setTokenInf("temp_token");
         CheckConnection();
@@ -79,7 +82,7 @@ public class VMSplashScreen extends AndroidViewModel {
         });
     }
 
-    private void CheckConnection(){
+    public void CheckConnection(){
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
@@ -104,12 +107,14 @@ public class VMSplashScreen extends AndroidViewModel {
     }
 
     public void InitializeData(OnInitializeCallback mListener){
+
         TaskExecutor loTask = new TaskExecutor();
         loTask.setOnLoadApplicationListener(new OnLoadApplicationListener() {
             @Override
             public Object DoInBackground() {
                 try{
                     if(poConn.isDeviceConnected()){
+
                         if(!new Branch(instance).ImportBranches()){
                             Log.e(TAG, "Unable to import branches");
                         }
@@ -136,10 +141,11 @@ public class VMSplashScreen extends AndroidViewModel {
                         }
                         loTask.publishProgress(4);
 
-                        LRDcp loDcp = new LRDcp(instance);
-                        if(loDcp.HasCollection()){
-                            loTask.publishProgress(5);
+                        Thread.sleep(1000);
+                        if (!new EmployeeLoan(instance).ImportLoanTypes()){
+                            Log.e(TAG, "Unable to import loan types");
                         }
+                        loTask.publishProgress(5);
 
                         if(!poSession.isLoggedIn()){
                             return 2;
@@ -176,8 +182,6 @@ public class VMSplashScreen extends AndroidViewModel {
                 }
                 if(progress < 5) {
                     mListener.OnProgress(lsArgs, progress);
-                } else {
-                    mListener.OnHasDCP();
                 }
             }
 
@@ -202,7 +206,6 @@ public class VMSplashScreen extends AndroidViewModel {
 
     public interface OnInitializeCallback {
         void OnProgress(String args, int progress);
-        void OnHasDCP();
         void OnSuccess();
         void OnNoSession();
         void OnFailed(String message);

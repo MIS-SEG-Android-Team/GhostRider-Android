@@ -89,6 +89,7 @@ public class EmployeeOB extends PetMngr {
                     loOB.setDeptName(loJson.getString("sDeptName"));
                     loOB.setDateFrom(loJson.getString("dDateFrom"));
                     loOB.setDateThru(loJson.getString("dDateThru"));
+                    loOB.setDapprove("");
                     loOB.setRemarksx(loJson.getString("sRemarksx"));
                     loOB.setTranStat(loJson.getString("cTranStat"));
                     loOB.setTimeStmp(loJson.getString("dTimeStmp"));
@@ -105,6 +106,7 @@ public class EmployeeOB extends PetMngr {
                         loDetail.setDeptName(loJson.getString("sDeptName"));
                         loDetail.setDateFrom(loJson.getString("dDateFrom"));
                         loDetail.setDateThru(loJson.getString("dDateThru"));
+                        loDetail.setDapprove("");
                         loDetail.setRemarksx(loJson.getString("sRemarksx"));
                         loDetail.setTranStat(loJson.getString("cTranStat"));
                         loDetail.setTimeStmp(loJson.getString("dTimeStmp"));
@@ -169,6 +171,7 @@ public class EmployeeOB extends PetMngr {
                     loOB.setDeptName(loJson.getString("sDeptName"));
                     loOB.setDateFrom(loJson.getString("dDateFrom"));
                     loOB.setDateThru(loJson.getString("dDateThru"));
+                    loOB.setDapprove("");
                     loOB.setRemarksx(loJson.getString("sRemarksx"));
                     loOB.setTranStat(loJson.getString("cTranStat"));
                     loOB.setTimeStmp(loJson.getString("dTimeStmp"));
@@ -185,6 +188,7 @@ public class EmployeeOB extends PetMngr {
                         loDetail.setDeptName(loJson.getString("sDeptName"));
                         loDetail.setDateFrom(loJson.getString("dDateFrom"));
                         loDetail.setDateThru(loJson.getString("dDateThru"));
+                        loDetail.setDapprove("");
                         loDetail.setRemarksx(loJson.getString("sRemarksx"));
                         loDetail.setTranStat(loJson.getString("cTranStat"));
                         loDetail.setTimeStmp(loJson.getString("dTimeStmp"));
@@ -219,6 +223,7 @@ public class EmployeeOB extends PetMngr {
             loDetail.setDapprove(foVal.getDateAppv());
             loDetail.setTranStat(foVal.getTranStat());
             loDetail.setSendStat("1");
+
             poDao.update(loDetail);
             return loDetail.getTransNox();
         } catch (Exception e){
@@ -245,6 +250,7 @@ public class EmployeeOB extends PetMngr {
             param.put("sApproved", foVal.getApproved());
             param.put("dApproved", foVal.getDateAppv());
             param.put("cTranStat", foVal.getTranStat());
+
             String lsResponse = WebClient.sendRequest(
                     poApi.getUrlConfirmObApplication(),
                     param.toString(), poHeaders.getHeaders());
@@ -252,7 +258,9 @@ public class EmployeeOB extends PetMngr {
                 message = SERVER_NO_RESPONSE;
                 return false;
             }
+
             Log.d(TAG,lsResponse);
+
             JSONObject loResponse = new JSONObject(lsResponse);
             String result = loResponse.getString("result");
             if (result.equalsIgnoreCase("success")) {
@@ -342,63 +350,6 @@ public class EmployeeOB extends PetMngr {
     @Override
     public String getMessage() {
         return message;
-    }
-
-    public boolean UploadApprovals() {
-        try{
-            List<EEmployeeBusinessTrip> loApprovals = poDao.GetUnpostedApprovals();
-            if(loApprovals == null){
-                message = "No unposted approval found";
-                Log.e(TAG, message);
-                return false;
-            }
-
-            if(loApprovals.size() == 0){
-                message = "No unposted approval found";
-                Log.e(TAG, message);
-                return false;
-            }
-
-            for(int x = 0; x < loApprovals.size(); x++){
-                EEmployeeBusinessTrip loDetail = loApprovals.get(x);
-                JSONObject param = new JSONObject();
-                param.put("sTransNox", loDetail.getTransNox());
-                param.put("dAppldFrx", loDetail.getAppldFrx());
-                param.put("dAppldTox", loDetail.getAppldTox());
-                param.put("sApproved", loDetail.getApproved());
-                param.put("dApproved", loDetail.getDapprove());
-                param.put("cTranStat", loDetail.getTranStat());
-                String lsResponse = WebClient.sendRequest(
-                        poApi.getUrlConfirmObApplication(),
-                        param.toString(), poHeaders.getHeaders());
-                if (lsResponse == null) {
-                    message = SERVER_NO_RESPONSE;
-                    Log.e(TAG, message);
-                    return false;
-                }
-
-                JSONObject loResponse = new JSONObject(lsResponse);
-                String result = loResponse.getString("result");
-                if (result.equalsIgnoreCase("success")) {
-                    poDao.updateObApprovalPostedStatus(loDetail.getTransNox());
-                    if (loDetail.getTranStat().equalsIgnoreCase("1")) {
-                        message = "Business trip has been approve successfully.";
-                    } else {
-                        message = "Business trip has been disapprove successfully.";
-                    }
-                    Log.d(TAG, message);
-                } else {
-                    JSONObject loError = loResponse.getJSONObject("error");
-                    message = getErrorMessage(loError);
-                    Log.e(TAG, message);
-                }
-            }
-            return true;
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return false;
-        }
     }
 
     public LiveData<List<EEmployeeBusinessTrip>> GetOBApplicationList() {

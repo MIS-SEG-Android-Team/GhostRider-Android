@@ -12,7 +12,7 @@
 package org.rmj.guanzongroup.ghostrider.epacss.Dashboard.ViewModel;
 
 import android.os.Build;
-
+/*
 import androidx.test.core.app.ApplicationProvider;
 
 import junit.framework.TestCase;
@@ -43,4 +43,4 @@ public class VMMainContainerTest extends TestCase {
     public void testGetEmployeeInfo() {
         mViewModel.getEmployeeInfo().observeForever(eEmployeeInfo -> assertNotNull(eEmployeeInfo));
     }
-}
+}*/

@@ -19,8 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.tasks.OnSuccessListener;
-import com.google.android.play.core.tasks.Task;
+import com.google.android.gms.tasks.*;
 
 public class UpdateChecker {
     private static final String TAG = UpdateChecker.class.getSimpleName();

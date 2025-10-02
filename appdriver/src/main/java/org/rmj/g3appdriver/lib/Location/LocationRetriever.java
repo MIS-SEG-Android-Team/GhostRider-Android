@@ -7,31 +7,17 @@ import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+
 import org.rmj.g3appdriver.GCircle.room.Entities.EGLocatorSysLog;
 import org.rmj.g3appdriver.GCircle.room.Repositories.DeviceLocationRecords;
 import org.rmj.g3appdriver.dev.Device.Telephony;
 
 public class LocationRetriever {
     private static final String TAG = LocationRetriever.class.getSimpleName();
-
     private final Application instance;
-    private Activity activity;
 
-    private String message;
-    private String nLatitude;
-    private String nLongitde;
-    boolean isSuccess;
-    int lnResult = 0;
-
-    public interface LocationRetrieveCallback{
-        void OnRetrieve(String message, double latitude, double longitude);
-        void OnFailed(String message);
-    }
-
-    public LocationRetriever(Application application, Activity activity) {
-        this.instance = application;
-        this.activity = activity;
-    }
 
     public LocationRetriever(Application application) {
         this.instance = application;
@@ -51,63 +37,10 @@ public class LocationRetriever {
         void OnRetrieve(double args, double args1);
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public String getLatitude() {
-        return nLatitude;
-    }
-
-    public String getLongitude() {
-        return nLongitde;
-    }
-
-    @SuppressLint("MissingPermission")
-    public boolean HasLocation(){
-        try {
-            String lsCompx = android.os.Build.MANUFACTURER.toLowerCase();
-            iLocationRetriever location;
-            if (!lsCompx.equalsIgnoreCase("huawei")) {
-                location = new GmsLocationRetriever();
-            } else {
-                location = new HmsLocationRetriever();
-            }
-
-            location.GetLocation(instance, new OnRetrieveLocationListener() {
-                @Override
-                public void OnRetrieve(String latitude, String longitude) {
-                    isSuccess = true;
-                    nLatitude = latitude;
-                    nLongitde = longitude;
-                    lnResult = 1;
-                }
-
-                @Override
-                public void OnFailed(String fsMsg, String latitude, String longitude) {
-                    isSuccess = false;
-                    nLatitude = latitude;
-                    nLongitde = longitude;
-                    message = fsMsg;
-                    lnResult = 1;
-                }
-            });
-
-            while(lnResult < 1) {
-                Log.d(TAG, "waiting location result...");
-                Thread.sleep(1000);
-            }
-
-            return isSuccess;
-        } catch (Exception e){
-            e.printStackTrace();
-            message = "Failed retrieving current location. " + e.getMessage();
-            return false;
-        }
-    }
-
     public void GetLocationOnBackgroud(){
+
         try{
+
             String lsCompx = android.os.Build.MANUFACTURER;
 
             iLocationRetriever location;
@@ -132,7 +65,10 @@ public class LocationRetriever {
                     lsService = "0";
                     lsRemarks = "Location service is not enabled.";
                 }
+
                 loSys.saveCurrentLocation(args, args1, lsService, lsRemarks);
+
+                Log.d(TAG, loSys.getMessage());
             });
         } catch (Exception e){
             e.printStackTrace();

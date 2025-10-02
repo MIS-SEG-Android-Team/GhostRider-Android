@@ -39,7 +39,9 @@ public class GmsLocationRetriever implements LocationRetriever.iLocationRetrieve
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
+
                 locationResult.getLastLocation();
+
                 double latitude = locationResult.getLastLocation().getLatitude();
                 double longitude = locationResult.getLastLocation().getLongitude();
                 listener.OnRetrieve(latitude, longitude);

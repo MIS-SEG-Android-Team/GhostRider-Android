@@ -78,19 +78,18 @@ public class AdapterClientSearchList extends RecyclerView.Adapter<AdapterClientS
     }
 
     public static class ClientListHolder extends RecyclerView.ViewHolder{
-
         EDCPCollectionDetail loDetail;
         MaterialTextView lblAccNox, lblClientNm, lblAddress;
 
         public ClientListHolder(@NonNull View itemView, OnAdapterClickListener listener) {
             super(itemView);
+
             lblAccNox = itemView.findViewById(R.id.lbl_AccountNo);
             lblClientNm = itemView.findViewById(R.id.lbl_clientNm);
             lblAddress = itemView.findViewById(R.id.lbl_addressx);
 
-
             itemView.setOnClickListener(v -> {
-                if(getAdapterPosition() != RecyclerView.NO_POSITION){
+                if(getBindingAdapterPosition() != RecyclerView.NO_POSITION){
                     listener.OnClick(loDetail);
                 }
             });

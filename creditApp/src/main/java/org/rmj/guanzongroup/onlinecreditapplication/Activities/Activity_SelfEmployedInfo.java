@@ -200,6 +200,7 @@ public class Activity_SelfEmployedInfo extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Credit Online Application");
                 poMessage.setMessage(message);
                 poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
@@ -213,7 +214,7 @@ public class Activity_SelfEmployedInfo extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar_SelfEmployedInfo);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Self Employed Info");
+        getSupportActionBar().setTitle("");
 
         spnBussNtr = findViewById(R.id.spn_businessNature);
         spnBussTyp = findViewById(R.id.spn_businessType);

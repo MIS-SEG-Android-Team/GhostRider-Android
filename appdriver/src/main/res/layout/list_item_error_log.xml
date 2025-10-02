@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtv_transaction"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Transaction No"
+            android:paddingVertical="10dp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="0.50"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtv_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="1900-01-01"
+            android:paddingVertical="10dp"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            app:layout_constraintStart_toEndOf="@+id/mtv_transaction"
+            app:layout_constraintWidth_percent="0.50"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_messageerror"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:text="No message"
+        android:elevation="10dp"
+        android:justificationMode="inter_word"
+        android:textAlignment="textStart"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="?attr/colorOnPrimary"/>
+
+</LinearLayout>

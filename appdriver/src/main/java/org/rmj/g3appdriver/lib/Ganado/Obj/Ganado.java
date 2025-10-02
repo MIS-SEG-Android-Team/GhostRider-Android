@@ -26,11 +26,9 @@ import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.etc.LocationInfo;
 import org.rmj.g3appdriver.lib.Etc.Relation;
 import org.rmj.g3appdriver.lib.Ganado.pojo.ClientInfo;
 import org.rmj.g3appdriver.lib.Ganado.pojo.InquiryInfo;
-import org.rmj.g3appdriver.utils.GeoLocator;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -312,28 +310,6 @@ public class Ganado {
                     loDetail.setTimeStmp(loJson.getString("dTimeStmp"));
                     poDao.Update(loDetail);
                     Log.d(TAG, "Inquiry record has been updated!");
-//                    Date ldDate1 = SQLUtil.toDate(loDetail.getTimeStmp(), SQLUtil.FORMAT_TIMESTAMP);
-//                    Date ldDate2 = SQLUtil.toDate((String) loJson.get("dTimeStmp"), SQLUtil.FORMAT_TIMESTAMP);
-//                    if (!ldDate1.equals(ldDate2)) {
-//                        loDetail.setTransNox(loJson.getString("sTransNox"));
-//                        loDetail.setTransact(loJson.getString("dTransact"));
-//                        loDetail.setGanadoTp(loJson.getString("cGanadoTp"));
-//                        loDetail.setPaymForm(loJson.getString("cPaymForm"));
-//                        loDetail.setClientNm(loJson.getString("sClientNm"));
-//                        loDetail.setClntInfo(loJson.getString("sCltInfox"));
-//                        loDetail.setProdInfo(loJson.getString("sPrdctInf"));
-//                        loDetail.setPaymInfo(loJson.getString("sPaymInfo"));
-//                        loDetail.setTargetxx(loJson.getString("dTargetxx"));
-//                        loDetail.setFollowUp(loJson.getString("dFollowUp"));
-//                        loDetail.setRemarksx(loJson.getString("sRemarksx"));
-//                        loDetail.setReferdBy(loJson.getString("sReferdBy"));
-//                        loDetail.setRelatnID(loJson.getString("sRelatnID"));
-//                        loDetail.setCreatedx(loJson.getString("dCreatedx"));
-//                        loDetail.setTranStat(loJson.getString("cTranStat"));
-//                        loDetail.setTimeStmp(loJson.getString("dTimeStmp"));
-//                        poDao.Update(loDetail);
-//                        Log.d(TAG, "Inquiry record has been updated!");
-//                    }
                 }
             }
 
@@ -363,7 +339,7 @@ public class Ganado {
         Log.d(TAG, lsUniqIDx);
         return lsUniqIDx;
     }
-    public void InitGeoLocation(){
+    public Boolean InitGeoLocation(){
         if (ActivityCompat.checkSelfPermission(instance, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(instance, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
@@ -374,6 +350,7 @@ public class Ganado {
             Location location1 = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
             Location location2 = locManager.getLastKnownLocation(LocationManager. PASSIVE_PROVIDER);
+
             if (location != null) {
                 nLatitude = String.valueOf(location.getLatitude());
                 nLongitude = String.valueOf(location.getLongitude());
@@ -385,8 +362,13 @@ public class Ganado {
                 nLongitude = String.valueOf(location2.getLongitude());
             }else{
                 message = "Unable to Trace your location";
+                return false;
             }
 
+            return true;
+        }else {
+            message = "Please allow app permission for location";
+            return false;
         }
     }
 

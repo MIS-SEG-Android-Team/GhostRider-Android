@@ -43,7 +43,7 @@
         <item name="android:background">#30000000</item>
     </style>
 
-    <style name="GhostRiderMaterialTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
+    <style name="GhostRiderMaterialTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar"/>
     <style name="GhostRiderMaterialTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.DayNight" />
 
     <style name="TextInputStyle.Edittext">

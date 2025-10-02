@@ -15,7 +15,6 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.RoomWarnings;
 import androidx.room.Update;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchLoanApplication;
@@ -30,9 +29,6 @@ public interface DCreditApplication {
 
     @Insert
     void Save(ECreditApplication creditApplication);
-
-    @Update
-    void Update(ECreditApplication creditApplication);
 
     @Insert
     void Save(ECreditApplicantInfo creditApplicantInfo);
@@ -76,9 +72,6 @@ public interface DCreditApplication {
     @Query("SELECT * FROM Credit_Online_Application WHERE sTransNox =:fsVal")
     ECreditApplication GetCreditOnlineApplication(String fsVal);
 
-    @Query("SELECT * FROM Credit_Online_Application WHERE sTransNox =:fsVal")
-    LiveData<ECreditApplication> GetCreditApplication(String fsVal);
-
     @Query("SELECT * FROM Credit_Applicant_Info WHERE sTransNox =:fsVal")
     LiveData<ECreditApplicantInfo> GetApplicantInfo(String fsVal);
 
@@ -109,9 +102,6 @@ public interface DCreditApplication {
     @Query("SELECT * FROM Credit_Online_Application_List WHERE sTransNox =:args")
     EBranchLoanApplication GetBranchApplication(String args);
 
-    @Query("SELECT * FROM Credit_Online_Application WHERE sTransNox =:TransNox")
-    ECreditApplication getLoanInfoOfTransNox(String TransNox);
-
     @Query("SELECT * FROM Credit_Online_Application WHERE cSendStat = '0'")
     List<ECreditApplication> GetApplicationsForUpload();
 
@@ -122,32 +112,12 @@ public interface DCreditApplication {
             "WHERE sTransNox =:oldTransNox")
     void updateSentLoanAppl(String oldTransNox, String TransNox, String DateTime);
 
-    @Query("UPDATE Credit_Online_Application_List SET " +
-            "sTransNox =:TransNox " +
-            "WHERE sTransNox =:oldTransNox")
-    void updateApplicationListTransNox(String oldTransNox, String TransNox);
-
-    @Query("UPDATE Credit_Online_Application_List SET " +
-            "sTransNox =:TransNox " +
-            "WHERE sTransNox =:oldTransNox")
-    void updateApplicationImageTransNox(String oldTransNox, String TransNox);
-
-    @Query("UPDATE Credit_Online_Application_Documents SET " +
-            "sTransNox =:TransNox " +
-            "WHERE sTransNox =:oldTransNox")
-    void updateApplicationDocsTransNox(String oldTransNox, String TransNox);
-
     @Query("SELECT * FROM Credit_Online_Application WHERE cSendStat <> '1'")
     List<ECreditApplication> getUnsentLoanApplication();
 
-//    @Query("UPDATE Credit_Online_Application SET sFileLoct = (SELECT sFileLoct FROM Image_Information WHERE sSourceNo =:TransNox) WHERE sTransNox =:TransNox")
-//    void updateApplicantImageStat(String TransNox);
-
     @Query("Select a.sGOCASNox, " +
             "a.sTransNox, " +
-            "b.sBranchNm, " +
             "a.dCreatedx, " +
-            "a.sDetlInfo, " +
             "a.sClientNm, " +
             "a.cWithCIxx, " +
             "a.cSendStat, " +
@@ -163,9 +133,6 @@ public interface DCreditApplication {
             "ORDER BY a.dCreatedx DESC")
     LiveData<List<ApplicationLog>> getApplicationHistory();
 
-    @Query("Select * From Credit_Applicant_Info WHERE cTranStat = 0 " +
-            "GROUP BY sTransNox ")
-    LiveData<List<ECreditApplicantInfo>> getAllCreditApp();
 
     @Query("SELECT sUserIDxx FROM User_Info_Master")
     String GetUserID();
@@ -173,9 +140,8 @@ public interface DCreditApplication {
     class ApplicationLog{
         public String sGOCASNox;
         public String sTransNox;
-        public String sBranchNm;
         public String dCreatedx;
-        public String sDetlInfo;
+
         public String sClientNm;
         public String cWithCIxx;
         public String cSendStat;
@@ -183,25 +149,4 @@ public interface DCreditApplication {
         public String dReceived;
         public String dVerified;
     }
-
-    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
-    @Query("SELECT a.sGOCASNox," +
-            "a.sTransNox," +
-            "b.sBranchNm," +
-            "a.dCreatedx," +
-            "a.sDetlInfo," +
-            "a.sClientNm," +
-            "a.cWithCIxx," +
-            "a.cSendStat," +
-            "a.cTranStat," +
-            "a.dReceived," +
-            "a.dVerified " +
-            "FROM Credit_Online_Application a " +
-            "LEFT JOIN Branch_Info b " +
-            "ON a.sBranchCd = b.sBranchCd " +
-            "WHERE cTranStat != 4 " +
-            "AND a.sBranchCd =:BranchID " +
-            "AND sCreatedx = (SELECT sUserIDxx From User_Info_Master) " +
-            "ORDER BY a.dCreatedx DESC" )
-    LiveData<List<ApplicationLog>> getApplicationByBranch(String BranchID);
 }

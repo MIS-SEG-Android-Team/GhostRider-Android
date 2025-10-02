@@ -175,18 +175,6 @@ public class EmployeeSession {
         return pref.getBoolean(KEY_IS_LOGGEDIN, false);
     }
 
-    public void setIsFirstLaunched(boolean isFirstLaunched){
-        editor.putBoolean(KEY_IS_FIRST_LAUNCHED, isFirstLaunched);
-
-        editor.commit();
-
-        Log.e(TAG, "Is app first launched.");
-    }
-
-    public boolean isFirstLaunch(){
-        return pref.getBoolean(KEY_IS_FIRST_LAUNCHED, true);
-    }
-
     public String getUserID(){
         return pref.getString(KEY_USER_ID, "");
     }
@@ -227,13 +215,6 @@ public class EmployeeSession {
         return pref.getString(KEY_EMP_LVL, "");
     }
 
-    public void setEmployeeLevel(String val){
-        editor.putString(KEY_EMP_LVL, val);
-        if(editor.commit()){
-            Log.e(TAG, "Employee Level for this session has been set.");
-        }
-    }
-
     public void setDepartment(String val){
         editor.putString(KEY_DEPT_ID, val);
         if(editor.commit()){
@@ -241,8 +222,5 @@ public class EmployeeSession {
         }
     }
 
-    public String getAutoLogStatus(){
-        return pref.getString(KEY_AUTO_LOG, "0");
-    }
 }
 

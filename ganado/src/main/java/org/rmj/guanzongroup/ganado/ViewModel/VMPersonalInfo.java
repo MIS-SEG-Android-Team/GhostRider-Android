@@ -38,8 +38,12 @@ public class VMPersonalInfo extends AndroidViewModel implements GanadoUI {
         this.poModel = new ClientInfo();
         this.poTown = new Town(application);
     }
-    public void InitLocation(){
-        this.poApp.InitGeoLocation();
+    public String GetMessage(){
+        return message;
+    }
+    public Boolean InitLocation(){
+        message = this.poApp.getMessage();
+        return this.poApp.InitGeoLocation();
     }
     public ClientInfo getModel() {
         return poModel;
@@ -47,6 +51,7 @@ public class VMPersonalInfo extends AndroidViewModel implements GanadoUI {
     public LiveData<List<ERelation>> getRelation() {
         return poApp.GetRelations();
     }
+
     @Override
     public void InitializeApplication(Intent params) {
         TransNox = params.getStringExtra("sTransNox");

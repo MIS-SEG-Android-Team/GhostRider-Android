@@ -15,6 +15,7 @@ import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.MobileUpdate;
 
 public class MobileUpdateTest extends TestCase {
     private MobileUpdate infoModel;
@@ -27,7 +28,10 @@ public class MobileUpdateTest extends TestCase {
 
     @Before
     public void setUp() {
-        infoModel = new MobileUpdate(STRING_TWO, FAKE_MOBILE, STRING_ONE, FAKE_REMARKS);
+        infoModel = new MobileUpdate();
+        infoModel.setPrimaryx(STRING_TWO);
+        infoModel.setMobileNo(FAKE_MOBILE);
+        infoModel.setRemarksx(FAKE_REMARKS);
     }
 
     @Test

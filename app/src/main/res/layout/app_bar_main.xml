@@ -35,7 +35,7 @@
 
     </LinearLayout>
 
-    <org.rmj.g3appdriver.etc.NonSwipeableViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewpager"
         android:layout_width="0dp"
         android:layout_height="0dp"

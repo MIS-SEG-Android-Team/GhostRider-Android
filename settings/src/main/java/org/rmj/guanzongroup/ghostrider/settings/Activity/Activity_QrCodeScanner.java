@@ -45,7 +45,7 @@ public class Activity_QrCodeScanner extends AppCompatActivity implements ZXingSc
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Dexter.withActivity(this)
+            Dexter.withContext(this)
                     .withPermission(Manifest.permission.CAMERA)
                     .withListener(new PermissionListener() {
                         @Override

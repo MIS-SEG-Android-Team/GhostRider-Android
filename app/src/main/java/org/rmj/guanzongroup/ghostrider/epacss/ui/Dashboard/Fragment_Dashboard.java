@@ -11,7 +11,7 @@ import androidx.annotation.experimental.UseExperimental;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
@@ -41,7 +41,7 @@ public class Fragment_Dashboard extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
     private VMDashboard mViewModel;
     private BottomNavigationView botNav;
 
@@ -90,7 +90,11 @@ public class Fragment_Dashboard extends Fragment {
 
 
         viewPager = view.findViewById(R.id.viewpager);
-        viewPager.setAdapter(new FragmentAdapter(getChildFragmentManager(), loFragments));
+        FragmentAdapter loAdapter = new FragmentAdapter(getChildFragmentManager(), getLifecycle());
+        loAdapter.initFragments(loFragments);
+
+        loAdapter.initFragments(loFragments);
+        viewPager.setAdapter(loAdapter);
 
         botNav = view.findViewById(R.id.botNav);
         botNav.setOnItemSelectedListener(item -> {

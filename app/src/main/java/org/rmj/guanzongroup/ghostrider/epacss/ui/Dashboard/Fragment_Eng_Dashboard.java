@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -23,7 +23,6 @@ public class Fragment_Eng_Dashboard extends Fragment {
     private VMHomeEngineering mViewModel;
     private String mParam1;
     private String mParam2;
-    private ViewPager viewPager;
 
     public static Fragment_Eng_Dashboard newInstance(String param1, String param2) {
         Fragment_Eng_Dashboard fragment = new Fragment_Eng_Dashboard();
@@ -53,8 +52,13 @@ public class Fragment_Eng_Dashboard extends Fragment {
                 new Fragment_PanaloContainer(),
                 new Fragment_Notifications()};
 
-        ViewPager viewpager = view.findViewById(R.id.viewpager);
-        viewpager.setAdapter(new FragmentAdapter(getChildFragmentManager(), loFragments));
+        ViewPager2 viewpager = view.findViewById(R.id.viewpager);
+        FragmentAdapter loAdapter = new FragmentAdapter(getChildFragmentManager(), getLifecycle());
+        loAdapter.initFragments(loFragments);
+
+        loAdapter.initFragments(loFragments);
+        viewpager.setAdapter(loAdapter);
+
         BottomNavigationView botNav = view.findViewById(R.id.botNav);
         botNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()){

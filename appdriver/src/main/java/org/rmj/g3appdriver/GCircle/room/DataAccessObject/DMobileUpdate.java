@@ -25,21 +25,14 @@ public interface DMobileUpdate {
     EMobileUpdate GetMobileUpdate(String fsVal);
 
     @Query("SELECT sTransNox, " +
-            "sClientID, " +
-            "cReqstCDe, " +
             "sMobileNo, " +
-            "cPrimaryx, " +
-            "sRemarksx, " +
-            "cTranStat FROM Mobile_Update_Request WHERE sClientID =:fsVal")
+            "cPrimaryx " +
+            "FROM Mobile_Update_Request WHERE sClientID =:fsVal")
     LiveData<List<MobileUpdateInfo>> GetMobileUpdateInfo(String fsVal);
 
     class MobileUpdateInfo{
         public String sTransNox;
-        public String sClientID;
-        public String cReqstCDe;
         public String sMobileNo;
         public String cPrimaryx;
-        public String sRemarksx;
-        public String cTranStat;
     }
 }

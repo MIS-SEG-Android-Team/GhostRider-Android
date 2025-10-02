@@ -48,12 +48,16 @@ public class Activity_ClientInfo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_client_info);
+
         initWidgets();
 
         poMessage = new MessageBox(Activity_ClientInfo.this);
         poDialogx = new LoadDialog(Activity_ClientInfo.this);
+
         mViewModel.InitializeApplication(getIntent());
+
         mViewModel.InitLocation();
 
         mViewModel.getRelation().observe(Activity_ClientInfo.this, eRelations->{
@@ -74,6 +78,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
             }
         });
         spinner_relation.setOnItemClickListener(new Activity_ClientInfo.OnItemClickListener(spinner_relation));
+
         mViewModel.GetTownProvinceList().observe(Activity_ClientInfo.this, new Observer<List<DTownInfo.TownProvinceInfo>>() {
             @Override
             public void onChanged(List<DTownInfo.TownProvinceInfo> loList) {
@@ -102,6 +107,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
                         }
                     });
                     ArrayAdapter<String> adapters1 = new ArrayAdapter<>(Activity_ClientInfo.this, android.R.layout.simple_spinner_dropdown_item, string.toArray(new String[0]));
+
                     txtMunicipl.setAdapter(adapters1);
                     txtMunicipl.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -127,6 +133,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
                 }
             }
         });
+
         txtBirthDt.setOnClickListener(v -> {
             final Calendar newCalendar = Calendar.getInstance();
             @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
@@ -147,6 +154,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
             StartTime.getDatePicker().setMaxDate(new Date().getTime());
             StartTime.show();
         });
+
         rgGender.setOnCheckedChangeListener((radioGroup, i) -> {
             if (i == R.id.rb_male) {
                 mViewModel.getModel().setGenderCd("0");
@@ -155,7 +163,9 @@ public class Activity_ClientInfo extends AppCompatActivity {
                 mViewModel.getModel().setGenderCd("1");
             }
         });
+
         btnContinue.setOnClickListener(v ->{
+
             mViewModel.InitLocation();
 
             mViewModel.getModel().setFrstName(txtFrstNm.getText().toString());
@@ -167,50 +177,63 @@ public class Activity_ClientInfo extends AppCompatActivity {
             mViewModel.getModel().setEmailAdd(txtEmailAdd.getText().toString());
             mViewModel.getModel().setMobileNo(txtMobileNo.getText().toString());
 
-            mViewModel.SaveData(new VMPersonalInfo.OnSaveInquiry() {
-                @Override
-                public void OnSave() {
-                    poDialogx.initDialog("BENTA", "Saving inquiry. Please wait...", false);
-                    poDialogx.show();
-                }
+            if (!mViewModel.InitLocation()){
+                poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
+                poMessage.setTitle("BENTA");
+                poMessage.setMessage(mViewModel.GetMessage());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                    dialog.dismiss();
+                });
+                poMessage.show();
+            }else {
+                mViewModel.SaveData(new VMPersonalInfo.OnSaveInquiry() {
+                    @Override
+                    public void OnSave() {
+                        poDialogx.initDialog("BENTA", "Saving inquiry. Please wait...", false);
+                        poDialogx.show();
+                    }
+                    @Override
+                    public void OnSuccess(String args) {
+                        poDialogx.dismiss();
 
-                @Override
-                public void OnSuccess(String args) {
-                    poDialogx.dismiss();
-                    poMessage.initDialog();
-                    poMessage.setTitle("BENTA");
-                    poMessage.setMessage(args);
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                        dialog.dismiss();
-                        Intent loIntent = new Intent(Activity_ClientInfo.this, Activity_BrandSelection.class);
-                        loIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_message_24);
+                        poMessage.setTitle("BENTA");
+                        poMessage.setMessage(args);
+                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                            dialog.dismiss();
+                            Intent loIntent = new Intent(Activity_ClientInfo.this, Activity_Inquiries.class);
+                            loIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        startActivity(loIntent);
-                        overridePendingTransition(org.rmj.g3appdriver.R.anim.anim_intent_slide_in_right, org.rmj.g3appdriver.R.anim.anim_intent_slide_out_left);
+                            startActivity(loIntent);
+                            overridePendingTransition(org.rmj.g3appdriver.R.anim.anim_intent_slide_in_right, org.rmj.g3appdriver.R.anim.anim_intent_slide_out_left);
 
-                        finish();
-                    });
-                    poMessage.show();
-                }
+                            finish();
+                        });
+                        poMessage.show();
+                    }
+                    @Override
+                    public void OnFailed(String message) {
+                        poDialogx.dismiss();
 
-
-                @Override
-                public void OnFailed(String message) {
-                    poDialogx.dismiss();
-
-                    poMessage.initDialog();
-                    poMessage.setTitle("BENTA");
-                    poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                }
-            });
+                        poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_error_24);
+                        poMessage.setTitle("BENTA");
+                        poMessage.setMessage(message);
+                        poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                        poMessage.show();
+                    }
+                });
+            }
         });
     }
     private void initWidgets() {
+
         toolbar = findViewById(R.id.toolbar_PersonalInfo);
         mViewModel = new ViewModelProvider(Activity_ClientInfo.this).get(VMPersonalInfo.class);
         poMessage = new MessageBox(Activity_ClientInfo.this);
+
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -243,7 +266,9 @@ public class Activity_ClientInfo extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private class OnItemClickListener implements AdapterView.OnItemClickListener {
+
         private final View loView;
+
         public OnItemClickListener(View loView) {
             this.loView = loView;
         }
@@ -251,7 +276,9 @@ public class Activity_ClientInfo extends AppCompatActivity {
         @SuppressLint("ResourceAsColor")
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
             if(loView == spinner_relation){
+
                 mViewModel.getRelation().observe(Activity_ClientInfo.this, relations->{
                     mViewModel.getModel().setsReltionx(relations.get(i).getRelatnID());
 

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="20dp"
+    android:orientation="vertical"
+    android:focusable="false"
+    android:focusableInTouchMode="false"
+    android:focusedByDefault="false">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:focusedByDefault="false">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/mcb_barcodecb"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/baseline_subdirectory_arrow_right_24"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:focusedByDefault="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mtv_barcode"
+            app:layout_constraintBottom_toBottomOf="@+id/mtv_barcode"
+            app:layout_constraintWidth_percent="0.1"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/mtv_barcode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="No item/s included"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:focusedByDefault="false"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/mcb_barcodecb"
+            app:layout_constraintWidth_percent="0.8"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

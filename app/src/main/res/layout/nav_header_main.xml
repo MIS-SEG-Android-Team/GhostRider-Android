@@ -19,6 +19,7 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         style="@style/Navigation_Header_Banner"
+        android:id="@+id/img_banner"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:adjustViewBounds="true"

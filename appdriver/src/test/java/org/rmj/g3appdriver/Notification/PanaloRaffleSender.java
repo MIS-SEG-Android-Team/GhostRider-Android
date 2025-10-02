@@ -2,15 +2,12 @@ package org.rmj.g3appdriver.Notification;
 
 import static org.junit.Assert.assertTrue;
 
-import android.util.Log;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Test;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.utils.SQLUtil;
-
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +18,7 @@ public class PanaloRaffleSender {
 
     @Test
     public void test01SenderNotification() throws Exception{
-        String sURL = "https://restgk.guanzongroup.com.ph/notification/send_request.php";
+        String sURL = "https://apps.guanzongroup.com.ph/notification/send_request.php";
         Calendar calendar = Calendar.getInstance();
         //Create the header section needed by the API
         Map<String, String> headers =
@@ -66,7 +63,7 @@ public class PanaloRaffleSender {
 
     @Test
     public void test02SendDataNotification() throws Exception{
-        String sURL = "https://restgk.guanzongroup.com.ph/notification/send_request.php";
+        String sURL = "https://apps.guanzongroup.com.ph/notification/send_request.php";
         Calendar calendar = Calendar.getInstance();
         //Create the header section needed by the API
         Map<String, String> headers =
@@ -144,7 +141,7 @@ public class PanaloRaffleSender {
 
     @Test
     public void test02PaySlipNotification() throws Exception{
-        String sURL = "https://restgk.guanzongroup.com.ph/notification/send_request_system.php";
+        String sURL = "https://apps.guanzongroup.com.ph/notification/send_request_system.php";
         Calendar calendar = Calendar.getInstance();
         //Create the header section needed by the API
         Map<String, String> headers =

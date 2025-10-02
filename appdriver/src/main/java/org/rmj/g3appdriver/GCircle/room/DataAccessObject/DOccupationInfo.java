@@ -37,27 +37,15 @@ public interface DOccupationInfo {
     @Query("SELECT * FROM Occupation_Info ORDER BY dTimeStmp DESC LIMIT 1")
     EOccupationInfo GetLatestDataInfo();
 
-    @Query("SELECT COUNT(*) FROM Occupation_Info")
-    Integer GetOccupationRecordsCount();
-
     @Query("SELECT * FROM Occupation_Info WHERE sOccptnID=:fsVal")
     EOccupationInfo GetOccupationInfo(String fsVal);
 
     @Query("SELECT * FROM Occupation_Info")
     LiveData<List<EOccupationInfo>> getAllOccupationInfo();
 
-    @Query("SELECT * FROM Occupation_Info WHERE sOccptnNm = :OccupationName")
-    LiveData<EOccupationInfo> getOccupationInfo(String OccupationName);
-
-    @Query("SELECT sOccptnNm FROM Occupation_Info")
-    LiveData<String[]> getOccupationNameList();
-
     @Query("SELECT MAX(dTimeStmp) FROM Occupation_Info")
     String getLatestDataTime();
 
     @Query("SELECT sOccptnNm FROM Occupation_Info WHERE sOccptnID=:ID")
     String getOccupationName(String ID);
-
-    @Query("SELECT sOccptnNm FROM Occupation_Info WHERE sOccptnID=:ID")
-    LiveData<String> getLiveOccupationName(String ID);
 }

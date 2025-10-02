@@ -51,6 +51,7 @@ public class NMM_Regular implements iNotification {
         try{
             RemoteMessageParser loParser = new RemoteMessageParser(foVal);
             String lsMesgIDx = loParser.getValueOf("transno");
+
             if(poDao.CheckNotificationIfExist(lsMesgIDx) >= 1){
                 String lsStatus = loParser.getValueOf("status");
                 poDao.updateNotificationStatusFromOtherDevice(lsMesgIDx, lsStatus);

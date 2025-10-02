@@ -1,7 +1,11 @@
 package org.rmj.guanzongroup.ghostrider.notifications.Activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +18,7 @@ import com.google.android.material.textview.MaterialTextView;
 import org.rmj.g3appdriver.GCircle.room.Entities.ENotificationMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ENotificationRecipient;
 import org.rmj.g3appdriver.etc.FormatUIText;
+import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_Browser;
 import org.rmj.guanzongroup.ghostrider.notifications.R;
 import org.rmj.guanzongroup.ghostrider.notifications.ViewModel.VMViewNotification;
 
@@ -56,6 +61,26 @@ public class Activity_ViewNotification extends AppCompatActivity {
                     lblSendr.setText(master.getCreatrNm() == null ? "null" : "SYSTEM");
                     lblBodyx.setText(master.getMessagex());
                     lblDatex.setText("Date Created: " + FormatUIText.getParseDateTime(master.getCreatedx()));
+
+                    lblBodyx.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            int lnStart = master.getMessagex().indexOf("[");
+                            int lnEnd = master.getMessagex().indexOf("]");
+
+                            String subsTringVal = master.getMessagex().substring(lnStart + 1, lnEnd);
+                            Uri uri = Uri.parse(subsTringVal);
+
+                            Log.d(TAG, uri.toString());
+
+                            Intent loIntent = new Intent(Activity_ViewNotification.this, Activity_Browser.class);
+                            loIntent.putExtra("url_link",uri.toString());
+
+                            startActivity(loIntent);
+                            overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+                        }
+                    });
                 } catch (Exception e){
                     e.printStackTrace();
                 }

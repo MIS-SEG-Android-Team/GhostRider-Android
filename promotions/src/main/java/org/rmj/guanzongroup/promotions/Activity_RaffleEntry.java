@@ -155,6 +155,7 @@ public class Activity_RaffleEntry extends AppCompatActivity implements RaffleEnt
     public void OnSuccessEntry() {
         dialog.dismiss();
         loMessage.initDialog();
+        loMessage.setIcon(R.drawable.baseline_message_24);
         loMessage.setTitle("Raffle Entry");
         loMessage.setMessage("Information has been sent to server. Please inform the customer to wait for SMS with link attachment");
         loMessage.setPositiveButton("Okay", (view, msgDialog) -> {

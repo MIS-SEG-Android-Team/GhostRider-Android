@@ -72,6 +72,7 @@ public class Fragment_NotificationList extends Fragment {
                     if(list.size() == 0){
                         recyclerView.setVisibility(View.GONE);
                         ln_empty.setVisibility(View.VISIBLE);
+
                         return;
                     }
                     recyclerView.setVisibility(View.VISIBLE);

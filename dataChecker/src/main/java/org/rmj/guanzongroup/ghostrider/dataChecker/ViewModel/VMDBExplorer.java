@@ -20,16 +20,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.provider.DocumentsContract;
-import android.provider.OpenableColumns;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.lifecycle.AndroidViewModel;
 
 import org.json.JSONObject;
@@ -38,27 +33,37 @@ import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.utils.SQLUtil;
-import org.rmj.g3appdriver.utils.SecUtil;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 import org.rmj.guanzongroup.ghostrider.dataChecker.Obj.DCPData;
 import org.rmj.guanzongroup.ghostrider.dataChecker.Obj.FileUtil;
 import org.rmj.guanzongroup.ghostrider.dataChecker.Obj.UserInfo;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
 
 public class VMDBExplorer extends AndroidViewModel {
     private static final String TAG = VMDBExplorer.class.getSimpleName();
 
     private final Application instance;
-
     public static final int PICK_DB_FILE = 101;
+
+    private String psOwner;
+    private ArrayList<DCPData> poDCPData;
+    private UserInfo poUserInfo;
+
+    private final GCircleApi poApi;
+    private final AppConfigPreference loConfig;
+
+    public VMDBExplorer(@NonNull Application application) {
+        super(application);
+
+        this.instance = application;
+        this.loConfig = AppConfigPreference.getInstance(instance);
+        this.poApi = new GCircleApi(instance);
+    }
 
     public interface FindDatabaseCallback{
         void OnFind(Intent findDB);
@@ -77,111 +82,67 @@ public class VMDBExplorer extends AndroidViewModel {
         void OnPostFailed(String message);
     }
 
-    public VMDBExplorer(@NonNull Application application) {
-        super(application);
-        this.instance = application;
-    }
-
     public void ExploreDb(Uri data, ExploreDatabaseCallback callback){
-        new ParseDBData(data, callback).execute();
-    }
 
-    private class ParseDBData extends AsyncTask<Void, Void, String>{
+        TaskExecutor.Execute(data, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
 
-        private final Uri poData;
-        private ExploreDatabaseCallback callback;
-
-        private String psOwner;
-        private ArrayList<DCPData> poDCPData;
-        private UserInfo poUserInfo;
-
-        public ParseDBData(Uri data, ExploreDatabaseCallback callback) {
-            this.poData = data;
-            this.callback = callback;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            String result;
-            try {
-                //stablishing the connection
-                SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(FileUtil.from(instance, poData), null);
-
-                //working with query and results.
-                psOwner = getDataOwner(db);
-
-                poDCPData = getDCPData(db);
-
-                poUserInfo = getUserInfo(db);
-
-                result = "success";
-            } catch (SQLiteCantOpenDatabaseException | IOException e) {
-                Log.d(TAG, "Error opening sqlite database: " + e.getMessage());
-                return "error";
-            }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if(s.equalsIgnoreCase("success")){
-                callback.OnDataOwnerRetrieve(psOwner);
-
-                callback.OnDCPListRetrieve(poDCPData);
-
-                callback.OnOwnerInfoRetrieve(poUserInfo);
-            } else {
-                callback.OnFailedRetrieveInfo("unable to retrieve data.");
             }
 
-        }
+            @Override
+            public Object DoInBackground(Object args) {
+
+                Uri data = (Uri) args;
+
+                try {
+                    //stablishing the connection
+                    SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(FileUtil.from(instance, data), null);
+
+                    //working with query and results.
+                    psOwner = getDataOwner(db);
+
+                    poDCPData = getDCPData(db);
+
+                    poUserInfo = getUserInfo(db);
+
+                    return "success";
+                } catch (SQLiteCantOpenDatabaseException | IOException e) {
+                    Log.d(TAG, "Error opening sqlite database: " + e.getMessage());
+                    return "error";
+                }
+
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if(object.toString().equalsIgnoreCase("success")){
+                    callback.OnDataOwnerRetrieve(psOwner);
+
+                    callback.OnDCPListRetrieve(poDCPData);
+
+                    callback.OnOwnerInfoRetrieve(poUserInfo);
+                } else {
+                    callback.OnFailedRetrieveInfo("unable to retrieve data.");
+                }
+
+            }
+        });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void FindDatabase(FindDatabaseCallback callback){
+
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
-//        intent.setType("text/plain");
-//        intent.setType("file/*");
 
-        // Optionally, specify a URI for the file that should appear in the
-        // system file picker when it loads.
         try {
             intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, new URI(instance.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         callback.OnFind(intent);
-    }
-
-    @SuppressLint("Range")
-    private String getFileName(Uri uri){
-        String uriString = uri.toString();
-        File myFile = new File(uriString);
-        String path = myFile.getAbsolutePath();
-        String displayName = null;
-
-        if (uriString.startsWith("content://")) {
-            Cursor cursor = null;
-            try {
-                cursor = instance.getContentResolver().query(uri, null, null, null, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
-            } finally {
-                cursor.close();
-            }
-        } else if (uriString.startsWith("file://")) {
-            displayName = myFile.getName();
-        }
-        return displayName;
     }
 
     @SuppressLint("Range")
@@ -360,236 +321,172 @@ public class VMDBExplorer extends AndroidViewModel {
         return loInfo;
     }
 
-    private HashMap<String, String> initHttpHeaders(UserInfo info) {
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        Calendar calendar = Calendar.getInstance();
-
-
-        //TODO: Change Values on user testing and production
-        String lsUserIDx = info.UserID;
-        String lsClientx = info.ClientId;
-        String lsLogNoxx = info.LogNumber;
-        String lsTokenxx = info.AppToken;
-        String lsProduct = "gRider";
-        String lsDevcIDx = "355d1cbe24df1e1d";
-        String lsDateTme = SQLUtil.dateFormat(calendar.getTime(), "yyyyMMddHHmmss");
-        String lsDevcMdl = Build.MODEL;
-        String lsMobileN = info.MobileNo;
-
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("Accept", "application/json");
-        headers.put("Content-Type", "application/json");
-        headers.put("g-api-id", lsProduct);
-        headers.put("g-api-client", lsClientx);
-        headers.put("g-api-imei", lsDevcIDx);
-        headers.put("g-api-model", "");
-        headers.put("g-api-mobile", "09171870011");
-        headers.put("g-api-token", lsTokenxx);
-        headers.put("g-api-user", lsUserIDx);
-        headers.put("g-api-key", lsDateTme);
-        String hash_toLower = SecUtil.md5Hex(headers.get("g-api-imei") + headers.get("g-api-key"));
-        hash_toLower = hash_toLower.toLowerCase();
-        headers.put("g-api-hash", hash_toLower);
-        headers.put("g-api-log", lsLogNoxx);
-        return headers;
-    }
-
     public void PostCollectionDetail(ArrayList<DCPData> dcpData, UserInfo foUser, OnPostCollectionListener listener){
-        new PostCollectionTask(dcpData, foUser, listener).execute();
-    }
+        //new PostCollectionTask(dcpData, foUser, listener).execute();
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                listener.OnPost("Posting DCP details. Please wait...");
+            }
 
-    private class PostCollectionTask extends AsyncTask<String, Integer, String>{
+            @Override
+            public Object DoInBackground(Object args) {
 
-        private final OnPostCollectionListener mListener;
-        private final List<DCPData> poDcp;
-        private final UserInfo poUser;
-        private final GCircleApi poApi;
-        private final AppConfigPreference loConfig;
+                try {
 
-        public PostCollectionTask(List<DCPData> foDcp, UserInfo foUser, OnPostCollectionListener listener) {
-            this.poDcp = foDcp;
-            this.poUser = foUser;
-            this.mListener = listener;
-            this.loConfig = AppConfigPreference.getInstance(instance);
-            this.poApi = new GCircleApi(instance);
-        }
+                    boolean[] isDataSent = new boolean[dcpData.size()];
+                    String[] reason = new String[dcpData.size()];
 
-        @Override
-        protected void onPreExecute() {
-            mListener.OnPost("Posting DCP details. Please wait...");
-            super.onPreExecute();
-        }
+                    for (int x = 0; x < dcpData.size(); x++) {
 
-        @SuppressLint("NewApi")
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-                boolean[] isDataSent = new boolean[poDcp.size()];
-                String[] reason = new String[poDcp.size()];
-                for (int x = 0; x < poDcp.size(); x++) {
-                    publishProgress(x);
-                    try {
-                        reason[x] = "reason is unknown \n";
-                        DCPData loDetail = poDcp.get(x);
+                        try {
+                            reason[x] = "reason is unknown \n";
+                            DCPData loDetail = dcpData.get(x);
 
-                        JSONObject loData = new JSONObject();
+                            JSONObject loData = new JSONObject();
 
-                        if (!loDetail.sRemCodex.isEmpty()) {
+                            if (!loDetail.sRemCodex.isEmpty()) {
 
-                            if (loDetail.sRemCodex.equalsIgnoreCase("PAY")) {
-                                loData.put("sPRNoxxxx", loDetail.sPRNoxxxx);
-                                loData.put("nTranAmtx", loDetail.nTranAmtx);
-                                loData.put("nDiscount", loDetail.nDiscount);
-                                loData.put("nOthersxx", loDetail.nOthersxx);
-                                loData.put("cTranType", loDetail.cTranType);
-                                loData.put("nTranTotl", loDetail.nTranTotl);
-//                                               Added by Jonathan 07/27/2021
-                                loData.put("sRemarksx", loDetail.sRemarksx);
-                            } else if (loDetail.sRemCodex.equalsIgnoreCase("PTP")) {
-                                //Required parameters for Promise to pay..
-                                loData.put("cApntUnit", loDetail.cApntUnit);
-                                loData.put("sBranchCd", loDetail.sBranchCd);
-                                loData.put("dPromised", loDetail.dPromised);
+                                if (loDetail.sRemCodex.equalsIgnoreCase("PAY")) {
+                                    loData.put("sPRNoxxxx", loDetail.sPRNoxxxx);
+                                    loData.put("nTranAmtx", loDetail.nTranAmtx);
+                                    loData.put("nDiscount", loDetail.nDiscount);
+                                    loData.put("nOthersxx", loDetail.nOthersxx);
+                                    loData.put("cTranType", loDetail.cTranType);
+                                    loData.put("nTranTotl", loDetail.nTranTotl);
+                                    loData.put("sRemarksx", loDetail.sRemarksx);
 
-                                loData.put("sImageNme", loDetail.sImageNme);
-                                loData.put("sSourceCD", loDetail.sSourceCD);
-                                loData.put("nLongitud", loDetail.nLongitud);
-                                loData.put("nLatitude", loDetail.nLatitude);
+                                } else if (loDetail.sRemCodex.equalsIgnoreCase("PTP")) {
 
-                            } else if (loDetail.sRemCodex.equalsIgnoreCase("LUn") ||
-                                    loDetail.sRemCodex.equalsIgnoreCase("TA") ||
-                                    loDetail.sRemCodex.equalsIgnoreCase("FO")) {
+                                    //Required parameters for Promise to pay..
+                                    loData.put("cApntUnit", loDetail.cApntUnit);
+                                    loData.put("sBranchCd", loDetail.sBranchCd);
+                                    loData.put("dPromised", loDetail.dPromised);
 
-                                //TODO: replace JSON parameters get the parameters which is being generated by RClientUpdate...
-                                loData.put("sLastName", loDetail.sLastName);
-                                loData.put("sFrstName", loDetail.sFrstName);
-                                loData.put("sMiddName", loDetail.sMiddName);
-                                loData.put("sSuffixNm", loDetail.sSuffixNm);
-                                loData.put("sHouseNox", loDetail.sHouseNox);
-                                loData.put("sAddressx", loDetail.sAddressx);
-                                loData.put("sTownIDxx", loDetail.sTownIDxx);
-                                loData.put("cGenderxx", loDetail.cGenderxx);
-                                loData.put("cCivlStat", loDetail.cCivlStat);
-                                loData.put("dBirthDte", loDetail.dBirthDte);
-                                loData.put("dBirthPlc", loDetail.dBirthPlc);
-                                loData.put("sLandline", loDetail.sLandline);
-                                loData.put("sMobileNo", loDetail.sMobileNo);
-                                loData.put("sEmailAdd", loDetail.sEmailAdd);
-
-                                loData.put("sImageNme", loDetail.sImageNme);
-                                loData.put("sSourceCD", loDetail.sSourceCD);
-                                if(loDetail.nLongitud != null &&
-                                        loDetail.nLatitude != null) {
+                                    loData.put("sImageNme", loDetail.sImageNme);
+                                    loData.put("sSourceCD", loDetail.sSourceCD);
                                     loData.put("nLongitud", loDetail.nLongitud);
                                     loData.put("nLatitude", loDetail.nLatitude);
+
+                                } else if (loDetail.sRemCodex.equalsIgnoreCase("LUn") ||
+                                        loDetail.sRemCodex.equalsIgnoreCase("TA") ||
+                                        loDetail.sRemCodex.equalsIgnoreCase("FO")) {
+
+                                    //TODO: replace JSON parameters get the parameters which is being generated by RClientUpdate...
+                                    loData.put("sLastName", loDetail.sLastName);
+                                    loData.put("sFrstName", loDetail.sFrstName);
+                                    loData.put("sMiddName", loDetail.sMiddName);
+                                    loData.put("sSuffixNm", loDetail.sSuffixNm);
+                                    loData.put("sHouseNox", loDetail.sHouseNox);
+                                    loData.put("sAddressx", loDetail.sAddressx);
+                                    loData.put("sTownIDxx", loDetail.sTownIDxx);
+                                    loData.put("cGenderxx", loDetail.cGenderxx);
+                                    loData.put("cCivlStat", loDetail.cCivlStat);
+                                    loData.put("dBirthDte", loDetail.dBirthDte);
+                                    loData.put("dBirthPlc", loDetail.dBirthPlc);
+                                    loData.put("sLandline", loDetail.sLandline);
+                                    loData.put("sMobileNo", loDetail.sMobileNo);
+                                    loData.put("sEmailAdd", loDetail.sEmailAdd);
+
+                                    loData.put("sImageNme", loDetail.sImageNme);
+                                    loData.put("sSourceCD", loDetail.sSourceCD);
+
+                                    if(loDetail.nLongitud != null &&
+                                            loDetail.nLatitude != null) {
+                                        loData.put("nLongitud", loDetail.nLongitud);
+                                        loData.put("nLatitude", loDetail.nLatitude);
+                                    } else {
+                                        loData.put("nLongitud", "0.0");
+                                        loData.put("nLatitude", "0.0");
+                                    }
                                 } else {
-                                    loData.put("nLongitud", "0.0");
-                                    loData.put("nLatitude", "0.0");
+                                    loData.put("sImageNme", loDetail.sImageNme);
+                                    loData.put("sSourceCD", loDetail.sSourceCD);
+                                    loData.put("nLongitud", loDetail.nLongitud);
+                                    loData.put("nLatitude", loDetail.nLatitude);
                                 }
+
+                                loData.put("sRemarksx", loDetail.sRemarksx);
                             } else {
-                                loData.put("sImageNme", loDetail.sImageNme);
-                                loData.put("sSourceCD", loDetail.sSourceCD);
-                                loData.put("nLongitud", loDetail.nLongitud);
-                                loData.put("nLatitude", loDetail.nLatitude);
+                                loData.put("sRemarksx", "Not visited");
                             }
 
-                            loData.put("sRemarksx", loDetail.sRemarksx);
-                        } else {
-                            loData.put("sRemarksx", "Not visited");
-                        }
+                            JSONObject loJson = new JSONObject();
 
-                        JSONObject loJson = new JSONObject();
-                        loJson.put("sTransNox", loDetail.sTransNox);
-                        loJson.put("nEntryNox", loDetail.nEntryNox);
-                        loJson.put("sAcctNmbr", loDetail.sAcctNmbr);
-                        if (loDetail.sRemCodex.isEmpty()) {
-                            loJson.put("sRemCodex", "NV");
-                            loJson.put("dModified", new AppConstants().DATE_MODIFIED);
-                        } else {
-                            loJson.put("sRemCodex", loDetail.sRemCodex);
-                            loJson.put("dModified", loDetail.dModified);
-                        }
+                            loJson.put("sTransNox", loDetail.sTransNox);
+                            loJson.put("nEntryNox", loDetail.nEntryNox);
+                            loJson.put("sAcctNmbr", loDetail.sAcctNmbr);
 
-                        loJson.put("sJsonData", loData);
-                        loJson.put("dReceived", "");
-
-                        loJson.put("sUserIDxx", "GAP021003973");
-//                        loJson.put("sUserIDxx", poUser.UserID);
-                        loJson.put("sDeviceID", "355d1cbe24df1e1d");
-//                        params[x] = loJson.toString() + " \n";
-                        String lsResponse1 = WebClient.sendRequest(poApi.getUrlDcpSubmit(), loJson.toString(), HttpHeaders.getInstance(instance).getHeaders());
-                        if (lsResponse1 == null) {
-                            reason[x] = "Server no response \n";
-                            isDataSent[x] = false;
-                        } else {
-                            JSONObject loResponse = new JSONObject(lsResponse1);
-
-                            String result = loResponse.getString("result");
-                            if (result.equalsIgnoreCase("success")) {
-                                if (loDetail.sRemCodex.isEmpty()) {
-//                                    poDcp.updateCollectionDetailStatusWithRemarks(loDetail.sTransNox, loDetail.nEntryNox, sRemarksx);
-                                } else {
-//                                    poDcp.updateCollectionDetailStatus(loDetail.sTransNox, loDetail.nEntryNox);
-                                }
-                                isDataSent[x] = true;
+                            if (loDetail.sRemCodex.isEmpty()) {
+                                loJson.put("sRemCodex", "NV");
+                                loJson.put("dModified", new AppConstants().DATE_MODIFIED);
                             } else {
-                                JSONObject loError = loResponse.getJSONObject("error");
-                                String lsMessage = getErrorMessage(loError);
+                                loJson.put("sRemCodex", loDetail.sRemCodex);
+                                loJson.put("dModified", loDetail.dModified);
+                            }
+
+                            loJson.put("sJsonData", loData);
+                            loJson.put("dReceived", "");
+
+                            loJson.put("sUserIDxx", "GAP021003973");
+                            loJson.put("sDeviceID", "355d1cbe24df1e1d");
+
+                            String lsResponse1 = WebClient.sendRequest(poApi.getUrlDcpSubmit(), loJson.toString(), HttpHeaders.getInstance(instance).getHeaders());
+
+                            if (lsResponse1 == null) {
+                                reason[x] = "Server no response \n";
                                 isDataSent[x] = false;
-                                reason[x] = lsMessage + "\n";
-                            }
-                        }
-
-                        boolean allDataSent = true;
-                        for (boolean b : isDataSent) {
-                            if (!b) {
-                                allDataSent = false;
-                                break;
-                            }
-                        }
-
-                        if (allDataSent) {
-                            JSONObject loparam = new JSONObject();
-                            loparam.put("sTransNox", poDcp.get(0).sTransNox);
-                            String lsResponse2 = WebClient.sendRequest(poApi.getUrlPostDcpMaster(), loparam.toString(), HttpHeaders.getInstance(instance).getHeaders());
-                            if (lsResponse2 == null) {
-//                                lsResult = AppConstants.LOCAL_EXCEPTION_ERROR("Server no response on posting DCP master detail. Tap 'Okay' to create dcp file for backup");
                             } else {
-                                JSONObject loResponse = new JSONObject(lsResponse2);
+
+                                JSONObject loResponse = new JSONObject(lsResponse1);
+
                                 String result = loResponse.getString("result");
                                 if (result.equalsIgnoreCase("success")) {
-//                                    poDcp.updateSentPostedDCPMaster(laCollDetl.get(0).sTransNox);
-//                                    lsResult = loResponse.toString();
+                                    isDataSent[x] = true;
                                 } else {
                                     JSONObject loError = loResponse.getJSONObject("error");
-//                                    lsResult = loError.toString();
+                                    String lsMessage = getErrorMessage(loError);
+                                    isDataSent[x] = false;
+                                    reason[x] = lsMessage + "\n";
                                 }
                             }
+
+                            boolean allDataSent = true;
+                            for (boolean b : isDataSent) {
+                                if (!b) {
+                                    allDataSent = false;
+                                    break;
+                                }
+                            }
+
+                            if (allDataSent) {
+
+                                JSONObject loparam = new JSONObject();
+                                loparam.put("sTransNox", dcpData.get(0).sTransNox);
+
+                                WebClient.sendRequest(poApi.getUrlPostDcpMaster(), loparam.toString(), HttpHeaders.getInstance(instance).getHeaders());
+
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            reason[x] = e.getMessage() + "\n";
                         }
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-//                        isDataSent[x] = false;
-                        reason[x] = e.getMessage() + "\n";
-                    }
-
-                    Thread.sleep(1000);
+                        Thread.sleep(1000);
                     }
                 } catch (Exception e){
-                e.printStackTrace();
-            }
-            return null;
-        }
+                    e.printStackTrace();
+                }
+                return null;
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            mListener.OnPostSuccess("");
-//            mListener.OnPostFailed("");
-        }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                listener.OnPostSuccess("");
+            }
+        });
     }
+
 }

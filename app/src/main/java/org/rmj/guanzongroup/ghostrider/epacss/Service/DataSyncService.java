@@ -23,8 +23,8 @@ import android.util.Log;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.ApprovalCode;
 import org.rmj.g3appdriver.GCircle.Apps.Itinerary.Obj.EmployeeItinerary;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLeave;
+import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeOB;
-import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
 import org.rmj.g3appdriver.GCircle.Apps.CashCount.CashCount;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditOnlineApplication;
 import org.rmj.g3appdriver.GCircle.room.Repositories.DeviceLocationRecords;
@@ -146,6 +146,12 @@ public class DataSyncService extends BroadcastReceiver {
                     } else {
                         message = loApp.getMessage();
                         Log.e(TAG, message);
+                    }
+                    Thread.sleep(1000);
+
+                    EmployeeLoan loEmpLoan = new EmployeeLoan(instance);
+                    if (loEmpLoan.UploadPendingEntries()){
+                        Log.d(TAG, "Employee Loans uploading finished.");
                     }
                     Thread.sleep(1000);
 

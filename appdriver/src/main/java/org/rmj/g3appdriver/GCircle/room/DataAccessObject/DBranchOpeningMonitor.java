@@ -33,12 +33,8 @@ public interface  DBranchOpeningMonitor {
     LiveData<List<EBranchOpenMonitor>> getBranchOpeningForDate(String dTransact);
 
     @Query("SELECT a.sBranchNm," +
-            "b.sBranchCD, " +
-            "b.dTransact, " +
             "b.sTimeOpen, " +
-            "b.sOpenNowx, " +
-            "b.dSendDate, " +
-            "b.dNotified " +
+            "b.sOpenNowx " +
             "FROM Branch_Info a " +
             "LEFT JOIN Branch_Opening b " +
             "ON a.sBranchCd = b.sBranchCD " +
@@ -47,12 +43,8 @@ public interface  DBranchOpeningMonitor {
     LiveData<List<BranchOpeningInfo>> GetBranchOpeningInfoForDashBoard(String dTransact);
 
     @Query("SELECT a.sBranchNm," +
-            "b.sBranchCD, " +
-            "b.dTransact, " +
             "b.sTimeOpen, " +
-            "b.sOpenNowx, " +
-            "b.dSendDate, " +
-            "b.dNotified " +
+            "b.sOpenNowx " +
             "FROM Branch_Info a " +
             "LEFT JOIN Branch_Opening b " +
             "ON a.sBranchCd = b.sBranchCD " +
@@ -62,11 +54,7 @@ public interface  DBranchOpeningMonitor {
 
     class BranchOpeningInfo{
         public String sBranchNm;
-        public String sBranchCD;
-        public String dTransact;
         public String sTimeOpen;
         public String sOpenNowx;
-        public String dSendDate;
-        public String dNotified;
     }
 }

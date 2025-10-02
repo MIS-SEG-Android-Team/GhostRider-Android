@@ -14,8 +14,6 @@ package org.rmj.guanzongroup.ghostrider.ahmonitoring.ViewModel;
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.app.Application;
-import android.os.AsyncTask;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -112,59 +110,6 @@ public class VMAreaMonitor extends AndroidViewModel {
                 listener.OnSuccess();
             }
         });
-//        new ImportDataTask(listener).execute();
-    }
 
-    private class ImportDataTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final OnImportPerformanceListener mListener;
-
-        private String message;
-
-        public ImportDataTask(OnImportPerformanceListener listener) {
-            this.mListener = listener;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mListener.OnImport();
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try{
-                if(!poConn.isDeviceConnected()){
-                    message = poConn.getMessage();
-                    return false;
-                }
-
-                if(!poSys.ImportData()){
-                    message = poSys.getMessage();
-                    return false;
-                }
-
-                if(!loBranch.ImportData()){
-                    message = loBranch.getMessage();
-                    return false;
-                }
-                return true;
-            } catch (Exception e){
-                e.printStackTrace();
-                message = getLocalMessage(e);
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess){
-                mListener.OnFailed(message);
-                return;
-            }
-
-            mListener.OnSuccess();
-        }
     }
 }

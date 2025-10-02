@@ -31,11 +31,11 @@
 <!--        android:title="@string/sActionMenu_imageLog"-->
 <!--        app:showAsAction="never" />-->
 
-    <item
-        android:id="@+id/action_export_dcp"
-        android:orderInCategory="100"
-        android:title="@string/sActionMenu_exportFile"
-        app:showAsAction="never" />
+<!--    <item-->
+<!--        android:id="@+id/action_export_dcp"-->
+<!--        android:orderInCategory="100"-->
+<!--        android:title="@string/sActionMenu_exportFile"-->
+<!--        app:showAsAction="never" />-->
 
     <item
         android:id="@+id/action_clear_dcp"

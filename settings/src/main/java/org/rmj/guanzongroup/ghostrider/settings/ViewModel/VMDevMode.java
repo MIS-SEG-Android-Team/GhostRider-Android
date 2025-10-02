@@ -12,7 +12,6 @@
 package org.rmj.guanzongroup.ghostrider.settings.ViewModel;
 
 import android.app.Application;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -20,91 +19,107 @@ import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.Etc.DevTools;
+import org.rmj.g3appdriver.etc.AppConfigPreference;
+import org.rmj.g3appdriver.utils.ConnectionUtil;
+import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 public class VMDevMode extends AndroidViewModel {
 
     private final Application instance;
+    private final AppConfigPreference poConfig;
     private final DevTools poTool;
+    private final ConnectionUtil poConnection;
+
+    private String message;
 
     public interface OnChangeListener {
-        void OnChanged(String args);
+        void OnChanged(String args, Boolean isSuccess);
     }
 
     public VMDevMode(@NonNull Application application) {
         super(application);
+
         this.instance = application;
         this.poTool = new DevTools(instance);
+        this.poConnection = new ConnectionUtil(instance);
+        this.poConfig = AppConfigPreference.getInstance(application);
     }
 
     public LiveData<EEmployeeInfo> GetUserInfo(){
         return poTool.GetUserInfo();
     }
 
-    public void SaveChanges(EEmployeeInfo args, OnChangeListener callback){
-        new SaveChangesTask(callback).execute(args);
+    public void SaveChanges(EEmployeeInfo args, String ipserver, OnChangeListener callback){
+
+        TaskExecutor.Execute(args, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isReachable(ipserver)){
+                    message = "IP server "+ ipserver +" is not reachable";
+                    return false;
+                }
+
+                poConfig.setAppServer(ipserver);
+
+                EEmployeeInfo eEmployeeInfos = (EEmployeeInfo) args;
+
+                if(!poTool.Update(eEmployeeInfos)){
+                    message = poTool.getMessage();
+                    return false;
+                }
+
+                return true;
+
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                Boolean isSuccess = (Boolean) object;
+
+                if(!isSuccess){
+                    callback.OnChanged(message, isSuccess);
+                } else {
+                    callback.OnChanged("Changes Saved!", isSuccess);
+                }
+
+            }
+        });
     }
 
-    private class SaveChangesTask extends AsyncTask<EEmployeeInfo, Void, Boolean>{
+    public void RestoreDefault(String ipserver, OnChangeListener callback){
 
-        private final OnChangeListener callback;
+        TaskExecutor.Execute(ipserver, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
 
-        private String message;
+                String ipServer = (String) args;
+                poConfig.setAppServer(ipServer);
 
-        public SaveChangesTask(OnChangeListener callback) {
-            this.callback = callback;
-        }
+                if(!poTool.SetDefault()){
+                    message = poTool.getMessage();
+                    return false;
+                }
 
-        @Override
-        protected Boolean doInBackground(EEmployeeInfo... eEmployeeInfos) {
-            if(!poTool.Update(eEmployeeInfos[0])){
-                message = poTool.getMessage();
-                return false;
+                return true;
+
             }
-            return true;
-        }
 
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess){
-                callback.OnChanged(message);
-            } else {
-                callback.OnChanged("Changes Saved!");
+            @Override
+            public void OnPostExecute(Object object) {
+
+                Boolean isSuccess = (Boolean) object;
+
+                if(!isSuccess){
+                    callback.OnChanged(message, isSuccess);
+                } else {
+                    callback.OnChanged("Account restored to default.", isSuccess);
+                }
+
             }
-        }
+        });
     }
 
-    public void RestoreDefault(OnChangeListener callback){
-        new RestoreSessionInfoTask(callback).execute();
-    }
-
-    private class RestoreSessionInfoTask extends AsyncTask<Void, Void, Boolean>{
-
-        private final OnChangeListener callback;
-
-        private String message;
-
-        public RestoreSessionInfoTask(OnChangeListener callback){
-            this.callback = callback;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            if(!poTool.SetDefault()){
-                message = poTool.getMessage();
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            super.onPostExecute(isSuccess);
-            if(!isSuccess){
-                callback.OnChanged(message);
-            } else {
-                callback.OnChanged("Account restored to default.");
-            }
-        }
-    }
 }

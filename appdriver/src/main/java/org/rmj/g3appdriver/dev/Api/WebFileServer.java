@@ -119,29 +119,6 @@ public class WebFileServer {
     }
 
     /**
-     * DownloadFile
-     * @param fsAcsToken Access Token
-     * @param fsFileType File Type
-     * @param fsFileOwnr Universal Identifier for this file (sSerialID)
-     * @param fsFileName File Name withount path
-     * @param fsSourceCd Source Code
-     * @param fsSourceNo Source No/Reference No
-     * @param fsUniqueVl Additional Information that will make this file unique
-     * @return JSONObject
-     */
-    public static JSONObject DownloadFile(String fsAcsToken, String fsFileType, String fsFileOwnr,
-                                            String fsFileName, String fsSourceCd, String fsSourceNo,
-                                            String fsUniqueVl){
-        return WebFile.DownloadFile(fsAcsToken,
-                fsFileType,
-                fsFileOwnr,
-                fsFileName,
-                fsSourceCd,
-                fsSourceNo,
-                fsUniqueVl);
-    }
-
-    /**
      * CheckFile
      * @param fsAcsToken Access Token
      * @param fsSourceCd Source Code

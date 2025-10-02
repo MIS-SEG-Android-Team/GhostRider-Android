@@ -57,20 +57,4 @@ public class VMBranchList extends AndroidViewModel {
             });
         }
     }
-
-    /*private class ImportCriteriaTask extends AsyncTask<Void, Void, Boolean>{
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            if (!poConn.isDeviceConnected()){
-                Log.e("Error", poConn.getMessage());
-                return false;
-            }
-            if (!poSys.ImportPacitaRules()){
-                Log.e("Error", poSys.getMessage());
-                return false;
-            }
-            return true;
-        }
-    }*/
 }

@@ -25,7 +25,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 public class Fragment_MessageUsersTest {
-    private static final String URL_QUICK_SEARCH = "https://restgk.guanzongroup.com.ph/integsys/paramqry/cash_count_rqst_officer.php";
+    private static final String URL_QUICK_SEARCH = "https://apps.guanzongroup.com.ph/integsys/paramqry/cash_count_rqst_officer.php";
 
     @Before
     public void setUp() throws Exception {

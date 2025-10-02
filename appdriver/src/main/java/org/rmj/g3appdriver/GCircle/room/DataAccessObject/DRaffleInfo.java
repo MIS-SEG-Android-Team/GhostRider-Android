@@ -54,6 +54,4 @@ public interface DRaffleInfo {
             "ORDER BY sReferNme")
     LiveData<String[]> getRaffleBasisDesc();
 
-    @Query("SELECT * FROM PromoLocal_Detail")
-    LiveData<ERaffleInfo> getRaffleInfo();
 }

@@ -303,6 +303,7 @@ public class Fragment_LoanUnit extends Fragment {
             @Override
             public void OnSuccessResult() {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_message_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage("Collection detail has been save.");
                 poMessage.setPositiveButton("Okay", (view, dialog) -> {
@@ -315,6 +316,7 @@ public class Fragment_LoanUnit extends Fragment {
             @Override
             public void OnFailedResult(String message) {
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
                 poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
@@ -350,6 +352,7 @@ public class Fragment_LoanUnit extends Fragment {
             public void OnFailed(String message, Intent intent, String[] args) {
                 poDialog.dismiss();
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_contact_support_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message + "\n Proceed taking selfie log?");
                 poMessage.setPositiveButton("Continue", (view, dialog) -> {

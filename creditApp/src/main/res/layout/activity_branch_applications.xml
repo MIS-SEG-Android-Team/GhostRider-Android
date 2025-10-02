@@ -19,9 +19,11 @@
     tools:context=".Activities.Activity_BranchApplications"
     android:theme="@style/GhostRiderMaterialTheme"
     tools:ignore="MissingDefaultResource">
+
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header_background"
         android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -49,6 +51,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
+
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -70,6 +73,7 @@
                         android:textSize="15sp"
                         android:fontFamily="@font/roboto_light"/>
                 </LinearLayout>
+
             </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider
@@ -83,11 +87,14 @@
                 android:orientation="vertical"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="15dp">
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Search Client Name"
+                    android:textColorHint="@color/guanzon_text_grey"
                     style="@style/TextInputStyleHeaders">
+
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/txt_branch_search"
                         style="@style/TextInputStyle.Edittext"
@@ -96,7 +103,9 @@
                         android:fontFamily="@font/roboto"
                         android:imeOptions="actionDone"
                         android:inputType="textCapWords"
-                        android:maxLines="1" />
+                        android:maxLines="1"
+                        android:textColor="@color/guanzon_text_grey"
+                        android:background="@color/white"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 

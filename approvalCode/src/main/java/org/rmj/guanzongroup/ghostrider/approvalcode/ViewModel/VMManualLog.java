@@ -99,66 +99,6 @@ public class VMManualLog extends AndroidViewModel {
         });
     }
 
-//    private class GenerateCodeTask extends AsyncTask<ManualTimeLog, Void, String>{
-//
-//        private final OnGenerateApprovalCodeListener listener;
-//
-//        private String message;
-//
-//        public GenerateCodeTask(OnGenerateApprovalCodeListener listener) {
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            listener.OnGenerate("Approval Code", "Generating approval code. Please wait...");
-//        }
-//
-//        @Override
-//        protected String doInBackground(ManualTimeLog... manualTimeLogs) {
-//            try {
-//                if (!manualTimeLogs[0].isDataValid()) {
-//                    message = manualTimeLogs[0].getMessage();
-//                    return null;
-//                }
-//
-//                String lsCode = poSys.GenerateCode(manualTimeLogs[0]);
-//
-//                if(lsCode == null){
-//                    message = poSys.getMessage();
-//                    return null;
-//                }
-//
-//                if(!poConn.isDeviceConnected()){
-//                    message = poConn.getMessage();
-//                    Log.e(TAG, message);
-//                }
-//
-//                if(!poSys.Upload(lsCode)){
-//                    message = poSys.getMessage();
-//                    Log.e(TAG, message);
-//                }
-//
-//                return lsCode;
-//            } catch (Exception e){
-//                e.printStackTrace();
-//                message = e.getMessage();
-//                return null;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            super.onPostExecute(result);
-//            if(result == null){
-//                listener.OnFailed(message);
-//            } else {
-//                listener.OnSuccess(result);
-//            }
-//        }
-//    }
-
     public interface OnGenerateApprovalCodeListener{
         void OnGenerate(String title, String message);
         void OnSuccess(String args);

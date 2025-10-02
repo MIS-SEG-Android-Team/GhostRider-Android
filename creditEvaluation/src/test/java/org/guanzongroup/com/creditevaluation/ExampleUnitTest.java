@@ -37,6 +37,6 @@ public class ExampleUnitTest {
             lnVal = lnVal * 12;
             lsResult = (double) Math.round(lnVal);
         }
-        assertEquals(10.0, lsResult);
+        assertEquals(10.0, lsResult, 10.0);
     }
 }

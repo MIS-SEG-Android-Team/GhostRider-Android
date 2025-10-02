@@ -67,6 +67,7 @@ public class DialogBranchSelection {
         loAdapter = new AdapterInventoryBranch(area, (BranchCode, BranchName) -> {
             try{
                 poMessage.initDialog();
+                poMessage.setIcon(R.drawable.baseline_contact_support_24);
                 poMessage.setTitle("Branch Selected");
                 poMessage.setMessage("You selected " + BranchName + ". Continue Selfie log?");
                 poMessage.setPositiveButton("Yes", (view12, dialog) -> {
@@ -86,6 +87,7 @@ public class DialogBranchSelection {
                 loAdapter = new AdapterInventoryBranch(area, (BranchCode, BranchName) -> {
                     try{
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_contact_support_24);
                         poMessage.setTitle("Branch Selected");
                         poMessage.setMessage("You selected " + BranchName + ". Continue Selfie log?");
                         poMessage.setPositiveButton("Yes", (view12, dialog) -> {
@@ -103,6 +105,7 @@ public class DialogBranchSelection {
                 loAdapter = new AdapterInventoryBranch(all, (BranchCode, BranchName) -> {
                     try{
                         poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_contact_support_24);
                         poMessage.setTitle("Branch Selected");
                         poMessage.setMessage("You selected " + BranchName + ". Continue Selfie log?");
                         poMessage.setPositiveButton("Yes", (view12, dialog) -> {

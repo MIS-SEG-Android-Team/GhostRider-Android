@@ -55,6 +55,7 @@ public class Dialog_ClientSearch {
         MaterialButton btnCancel = view.findViewById(R.id.btn_cancel);
 
         AdapterClientSearchList loAdapter = new AdapterClientSearchList(collectionDetails, detail -> listener.OnSelect(poDialogx, detail));
+
         LinearLayoutManager loManage = new LinearLayoutManager(context);
         loManage.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setAdapter(loAdapter);

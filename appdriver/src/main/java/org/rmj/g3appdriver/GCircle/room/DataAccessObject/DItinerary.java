@@ -27,9 +27,6 @@ public interface DItinerary {
     @Query("SELECT * FROM Employee_Itinerary WHERE sTransNox =:TransNox")
     EItinerary GetItineraryForUpload(String TransNox);
 
-    @Query("SELECT * FROM Employee_Itinerary WHERE cSendStat = 0")
-    List<EItinerary> GetUnsentItineraryList();
-
     @Query("SELECT * FROM Employee_Itinerary " +
             "WHERE sEmployID = (SELECT sEmployID FROM User_Info_Master) " +
             "AND strftime('%Y-%m-%d', datetime('now', 'localtime')) = dTransact " +

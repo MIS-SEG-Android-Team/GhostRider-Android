@@ -77,8 +77,7 @@ public class DCP_Constants {
             "Transferred/Assumed",
             "False Ownership",
             "Did not Pay",
-            "Not Visited",
-            "Others"};
+            "Not Visited"};
 
     public static String[] PAYMENT_TYPE = {
             "Select Payment Type",

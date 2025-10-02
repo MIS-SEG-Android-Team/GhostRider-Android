@@ -37,18 +37,6 @@ public interface DBarangayInfo {
     @Query("SELECT * FROM Barangay_Info ORDER BY dTimeStmp DESC LIMIT 1")
     EBarangayInfo GetLatestBarangayInfo();
 
-    @Query("SELECT COUNT(*) FROM Barangay_Info")
-    Integer GetBarangayRecordCount();
-
-    @Query("SELECT * FROM Barangay_Info WHERE sBrgyIDxx=:fsVal")
-    EBarangayInfo CheckIfExist(String fsVal);
-
-    @Query("SELECT * FROM Barangay_Info")
-    LiveData<List<EBarangayInfo>> getAllBarangayInfo();
-
-    @Query("DELETE FROM Barangay_Info")
-    void deleteAllBarangayInfo();
-
     @Query("SELECT MAX(dTimeStmp) FROM Barangay_Info")
     String getLatestDataTime();
 
@@ -60,9 +48,6 @@ public interface DBarangayInfo {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertBulkBarangayData(List<EBarangayInfo> barangayInfoList);
-
-    @Query("SELECT sBrgyName FROM Barangay_Info WHERE sBrgyIDxx = :fsID")
-    LiveData<String> getBarangayInfoFromID(String fsID);
 
     @Query("SELECT a.sBrgyName, " +
             "b.sTownName, " +

@@ -323,39 +323,3 @@ public class VMCashCounter extends AndroidViewModel {
     }
 
 }
-//    private class GetBranchesTask extends AsyncTask<Void, Void, List<EBranchInfo>>{
-//
-//        private final OnGetBranchesList listener;
-//
-//        private String message;
-//
-//        public GetBranchesTask(OnGetBranchesList listener) {
-//            this.listener = listener;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            listener.OnLoad();
-//        }
-//
-//        @Override
-//        protected List<EBranchInfo> doInBackground(Void... voids) {
-//            List<EBranchInfo> loList = poSys.GetBranchesForCashCount();
-//            if(loList == null){
-//                message = poSys.getMessage();
-//                return null;
-//            }
-//            return loList;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(List<EBranchInfo> eBranchInfos) {
-//            super.onPostExecute(eBranchInfos);
-//            if(eBranchInfos == null){
-//                listener.OnFailed(message);
-//            } else {
-//                listener.OnRetrieve(eBranchInfos);
-//            }
-//        }
-//    }

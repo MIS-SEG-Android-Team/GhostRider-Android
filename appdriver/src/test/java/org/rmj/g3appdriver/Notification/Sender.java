@@ -19,7 +19,7 @@ public class Sender {
 
     @Test
     public void test01SenderNotification() throws Exception{
-        String sURL = "https://restgk.guanzongroup.com.ph/notification/send_request_system.php";
+        String sURL = "https://apps.guanzongroup.com.ph/notification/send_request_system.php";
         Calendar calendar = Calendar.getInstance();
         //Create the header section needed by the API
         Map<String, String> headers =
@@ -64,7 +64,7 @@ public class Sender {
 
     @Test
     public void test02SendDataNotification() throws Exception{
-        String sURL = "https://restgk.guanzongroup.com.ph/notification/send_request_system.php";
+        String sURL = "https://apps.guanzongroup.com.ph/notification/send_request_system.php";
         Calendar calendar = Calendar.getInstance();
         //Create the header section needed by the API
         Map<String, String> headers =

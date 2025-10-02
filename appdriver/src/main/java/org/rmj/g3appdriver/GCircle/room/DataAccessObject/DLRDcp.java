@@ -67,6 +67,9 @@ public interface DLRDcp {
     @Query("UPDATE LR_DCP_Collection_Master SET cSendStat = '1', cTranStat = '2', dSendDate =:DatePostd, dModified =:DatePostd WHERE sTransNox =:TransNox")
     void UpdatePostedDcpMaster(String TransNox, String DatePostd);
 
+    @Query("SELECT * FROM  LR_DCP_Collection_Master ORDER BY dSendDate, dModified DESC LIMIT 1")
+    LiveData<EDCPCollectionMaster> GetLatestPostedDcp();
+
     @Query("SELECT * FROM LR_DCP_Collection_Detail WHERE sTransNox =:TransNox AND sRemCodex == ''")
     List<EDCPCollectionDetail> GetNotVisitedCollection(String TransNox);
 
@@ -88,9 +91,6 @@ public interface DLRDcp {
 
     @Query("SELECT * FROM LR_DCP_Collection_Detail WHERE sTransNox =:fsVal AND sRemCodex = 'PAY'")
     List<EDCPCollectionDetail> GetPaidCollections(String fsVal);
-
-    @Query("SELECT SUM(nAmountxx) FROM LR_DCP_Remittance WHERE sTransNox=:fsVal")
-    double GetRemittedCollection(String fsVal);
 
     @Query("SELECT SUM(nAmountxx) FROM LR_DCP_Remittance " +
             "WHERE sTransNox =:fsVal " +

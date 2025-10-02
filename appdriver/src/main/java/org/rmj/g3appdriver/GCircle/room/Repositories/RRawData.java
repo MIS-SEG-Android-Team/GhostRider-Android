@@ -27,14 +27,6 @@ public class RRawData {
         rawDao = GGCGriderDB.RawDao();
     }
 
-    public LiveData<DRawDao.McAmortInfo> getMonthlyAmortInfo(String ModelID, int Term){
-        return rawDao.getMonthlyAmort(ModelID, Term);
-    }
-
-    public LiveData<DRawDao.McDPInfo> getDownpayment(String ModelID){
-        return rawDao.getDownpayment(ModelID);
-    }
-
     public LiveData<DRawDao.AppLocalData> getAppLocalData(){
         return rawDao.getAppLocalData();
     }

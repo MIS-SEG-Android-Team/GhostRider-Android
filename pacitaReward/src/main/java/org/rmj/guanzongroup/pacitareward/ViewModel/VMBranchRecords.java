@@ -38,44 +38,7 @@ public class VMBranchRecords extends AndroidViewModel {
     public void initializeRecords(String sBranchcd, BranchRecordsCallBack mListener){
         new OnInitializeRecords(mListener).execute(sBranchcd);
     }
-    /*public class OnInitializeRecords extends AsyncTask<String, Void, Boolean>{
-        private BranchRecordsCallBack mListener;
-        private OnInitializeRecords(BranchRecordsCallBack mListener){
-            this.mListener = mListener;
-        }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mListener.onInitialize("Loading Branch Records. Please wait . . .");
-        }
-
-        @Override
-        protected Boolean doInBackground(String... branchCd) {
-            Boolean importResult = posys.ImportPacitaEvaluations(branchCd[0]);
-
-            if (!poConn.isDeviceConnected()){
-                message = poConn.getMessage();
-                return false;
-            }
-            if (!importResult){
-                message = posys.getMessage();
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-
-            if (aBoolean == false){
-                mListener.onError(message);
-            }else {
-                mListener.onSuccess(message);
-            }
-        }
-    }*/
     public class OnInitializeRecords{
         private BranchRecordsCallBack mListener;
         private OnInitializeRecords(BranchRecordsCallBack mListener){

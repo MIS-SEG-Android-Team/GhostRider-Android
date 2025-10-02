@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/banner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardElevation="10dp"
+        app:cardCornerRadius="8dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <!-- Left side: Title + Info + Description -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:backgroundTint="#f67321"
+                        android:id="@+id/title1"
+                        android:gravity="end"
+                        android:textColor="@color/black"
+                        android:padding="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="COMPANY RULES"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="4dp"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:backgroundTint="#f67321"
+                        android:id="@+id/title2"
+                        android:gravity="end"
+                        android:textColor="@color/black"
+                        android:padding="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="AND REGULATIONS"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="4dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Right side: Image -->
+            <ImageView
+                android:id="@+id/cardImage"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/kayscope" />
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_menu"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/banner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

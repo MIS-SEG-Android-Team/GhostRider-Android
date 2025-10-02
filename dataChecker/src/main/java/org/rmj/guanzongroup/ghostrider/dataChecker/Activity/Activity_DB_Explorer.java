@@ -13,6 +13,8 @@ package org.rmj.guanzongroup.ghostrider.dataChecker.Activity;
 
 import static org.rmj.guanzongroup.ghostrider.dataChecker.ViewModel.VMDBExplorer.PICK_DB_FILE;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +26,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -54,15 +57,50 @@ public class Activity_DB_Explorer extends AppCompatActivity {
     private ArrayList<DCPData> poDcp = new ArrayList<>();
     private UserInfo poUser;
 
+    private ActivityResultLauncher<Intent> poLaunch;
+
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_db_explorer);
+
         mViewModel = new ViewModelProvider(this).get(VMDBExplorer.class);
+        poLaunch = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if(result.getResultCode() == RESULT_OK){
+                Uri dbData = result.getData().getData();
+                mViewModel.ExploreDb(dbData, new VMDBExplorer.ExploreDatabaseCallback() {
+                    @Override
+                    public void OnDataOwnerRetrieve(String DataOwner) {
+                        txtDataName.setText(DataOwner);
+                    }
+
+                    @Override
+                    public void OnDCPListRetrieve(ArrayList<DCPData> dcpData) {
+                        poDcp = dcpData;
+                        LinearLayoutManager loManager = new LinearLayoutManager(Activity_DB_Explorer.this);
+                        loManager.setOrientation(RecyclerView.VERTICAL);
+                        recyclerView.setAdapter(new DCPDataAdapter(dcpData));
+                        recyclerView.setLayoutManager(loManager);
+                    }
+
+                    @Override
+                    public void OnOwnerInfoRetrieve(UserInfo info) {
+                        poUser = info;
+                    }
+
+                    @Override
+                    public void OnFailedRetrieveInfo(String message) {
+
+                    }
+                });
+            }
+        });
+
         setupWidgets();
 
-        btnFind.setOnClickListener(v -> mViewModel.FindDatabase(findDB -> startActivityForResult(findDB, PICK_DB_FILE)));
+        btnFind.setOnClickListener(v -> mViewModel.FindDatabase(findDB -> poLaunch.launch(findDB)));
         btnPost.setOnClickListener(v -> mViewModel.PostCollectionDetail(poDcp, poUser, new VMDBExplorer.OnPostCollectionListener() {
             @Override
             public void OnPost(String message) {

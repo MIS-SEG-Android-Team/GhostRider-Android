@@ -186,8 +186,4 @@ public class AppVersion {
             return null;
         }
     }
-
-    public String GetVersionName(){
-        return poConfig.getVersionName();
-    }
 }

@@ -11,43 +11,9 @@
 
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplicantInfo;
-
-import java.util.List;
 
 @Dao
 public interface DCreditApplicantInfo {
 
-    @Insert
-    void insert(ECreditApplicantInfo creditApplicantInfo);
-
-    @Update
-    void update(ECreditApplicantInfo creditApplicantInfo);
-
-    @Query("SELECT * FROM Credit_Applicant_Info WHERE sTransNox = :TransNox")
-    LiveData<ECreditApplicantInfo> getCreditApplicantInfo(String TransNox);
-
-    @Query("SELECT * FROM Credit_Applicant_Info")
-    LiveData<List<ECreditApplicantInfo>> getCreditApplicantList();
-
-    @Query("SELECT sAppMeans FROM Credit_Applicant_Info WHERE sTransNox = :TransNox")
-    LiveData<String> getAppMeansInfo(String TransNox);
-
-    @Query("SELECT * FROM Credit_Applicant_Info WHERE sTransNox =:TransNox")
-    ECreditApplicantInfo getCurrentCreditApplicantInfo(String TransNox);
-
-    @Query("UPDATE Credit_Applicant_Info SET sResidnce =:Residence WHERE sTransNox =:TransNox")
-    void updateApplicantResidenceInfo(String TransNox, String Residence);
-
-        @Query("UPDATE Credit_Applicant_Info SET sOthrInfo =:OtherInfo WHERE sTransNox =:TransNox")
-    void updateOtherInfo(String TransNox, String OtherInfo);
-
-    @Query("DELETE FROM Credit_Applicant_Info")
-    void deleteAllCreditApp();
 }

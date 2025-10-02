@@ -22,6 +22,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header_background"
         android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -207,7 +208,6 @@
                         android:layout_height="wrap_content"
                         android:inputType="textCapWords|textAutoComplete"
                         style="@style/AutoCompleteStyleTheme"
-                        android:maxLength="50"
                         android:imeOptions="actionNext"
                         android:nextFocusForward="@id/txt_downpayment"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -258,6 +258,23 @@
                         android:focusedByDefault="false"
                         android:inputType="number|none"
                         android:maxLength="50"
+                        android:layout_marginBottom="10dp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Remarks"
+                    style="@style/TextInputStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txt_remarks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine|textCapWords"
+                        android:maxLength="50"
+                        android:lines="3"
+                        android:maxLines="5"
                         android:layout_marginBottom="10dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 

@@ -12,10 +12,8 @@
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
@@ -47,6 +45,8 @@ import org.rmj.g3appdriver.dev.Api.WebFileServer;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.DayCheck;
 import org.rmj.g3appdriver.utils.FileRemover;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Adapter.CollectionLogAdapter;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.VMCollectionLog;
@@ -61,11 +61,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class Activity_LogCollection extends AppCompatActivity {
-    private static final String TAG = Activity_LogCollection.class.getSimpleName();
-
     private VMCollectionLog mViewModel;
-
-    private MaterialTextView    txtNoLog,
+    private MaterialTextView txtNoLog,
                         txtNoName,
                         lblTotRemit,
                         lblCashOH,
@@ -79,18 +76,24 @@ public class Activity_LogCollection extends AppCompatActivity {
     private TextInputLayout tilSearch;
     private LinearLayout linearCashInfo;
     private MaterialButton btnRemit;
-
     private List<EDCPCollectionDetail> filteredCollectionDetlx;
-
-    private String psCltCheck;
-    private String psCltCashx;
+    private ConnectionUtil poConn;
+    private EmployeeSession poUser;
+    private AppConfigPreference poConfig;
+    private String message;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(VMCollectionLog.class);
+
         setContentView(R.layout.activity_collection_log);
+
+        mViewModel = new ViewModelProvider(this).get(VMCollectionLog.class);
+        poConn = new ConnectionUtil(this);
+        poUser = EmployeeSession.getInstance(this);
+        poConfig = AppConfigPreference.getInstance(this);
+
         initWidgets();
 
         mViewModel.getAllAddress().observe(Activity_LogCollection.this, eAddressUpdates -> {
@@ -277,16 +280,31 @@ public class Activity_LogCollection extends AppCompatActivity {
             }
         });
     }
-
     @Override
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getViewModelStore().clear();
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void initWidgets(){
         MaterialToolbar toolbar = findViewById(R.id.toolbar_collectionLog);
-        toolbar.setTitle("Daily Collection Plan");
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -327,78 +345,41 @@ public class Activity_LogCollection extends AppCompatActivity {
             }
         });
     }
-
-    private void checkDcpImages(List<EDCPCollectionDetail> poDcpList, OnDCPDownloadListener callBack) {
-        new DownloadDcpImageTask(getApplication(), callBack).execute(poDcpList);
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        getViewModelStore().clear();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private boolean deleteOldImageSchedule() {
         if(DayCheck.isMonday())
             return FileRemover.execute(Environment.getExternalStorageDirectory() + "/Android/data/org.rmj.guanzongroup.ghostrider.epacss/files/DCP");
         else
             return false;
     }
-
-    private static class DownloadDcpImageTask extends AsyncTask<List<EDCPCollectionDetail>, Void, String> {
-
-        private final ConnectionUtil poConn;
-        private final EmployeeSession poUser;
-        private final AppConfigPreference poConfig;
-        private final OnDCPDownloadListener callBack;
-
-        DownloadDcpImageTask(Application application, OnDCPDownloadListener callBack) {
-            this.poConn = new ConnectionUtil(application);
-            this.poUser = EmployeeSession.getInstance(application);
-            this.poConfig = AppConfigPreference.getInstance(application);
-            this.callBack = callBack;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            callBack.onDowload();
-        }
-
-        @Override
-        protected String doInBackground(List<EDCPCollectionDetail>... lists) {
-            String lsResult = "";
-            List<EDCPCollectionDetail> loDcpList = lists[0];
-            try {
-                if (!poConn.isDeviceConnected()) {
-                    lsResult = AppConstants.NO_INTERNET();
-                } else {
-                    String lsClient = WebFileServer.RequestClientToken(poConfig.ProducID(), poUser.getClientId(), poUser.getUserID());
-                    String lsAccess = WebFileServer.RequestAccessToken(lsClient);
-
-                    if (lsClient.isEmpty() || lsAccess.isEmpty()) {
-                        lsResult = AppConstants.LOCAL_EXCEPTION_ERROR("Failed to request generated Client or Access token.");
+    private void checkDcpImages(List<EDCPCollectionDetail> poDcpList, OnDCPDownloadListener callBack) {
+        TaskExecutor.Execute(poDcpList, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callBack.onDowload();
+            }
+            @Override
+            public Object DoInBackground(Object args) {
+                String lsResult = "";
+                List<EDCPCollectionDetail> loDcpList = (List<EDCPCollectionDetail>) args;
+                try {
+                    if (!poConn.isDeviceConnected()) {
+                        message = AppConstants.NO_INTERNET();
+                        return false;
                     } else {
-                        if(loDcpList.size() > 0) {
-                            for(int x = 0 ; x < loDcpList.size(); x++) {
-                                File loFile = new File(loDcpList.get(x).getImageNme());
-                                if(loFile.exists()) {
-                                    continue;
-                                } else {
-                                    loFile.mkdirs();
+                        String lsClient = WebFileServer.RequestClientToken(poConfig.ProducID(), poUser.getClientId(), poUser.getUserID());
+                        String lsAccess = WebFileServer.RequestAccessToken(lsClient);
+
+                        if (lsClient.isEmpty() || lsAccess.isEmpty()) {
+                            message = AppConstants.LOCAL_EXCEPTION_ERROR("Failed to request generated Client or Access token.");
+                            return false;
+                        } else {
+                            if(loDcpList.size() > 0) {
+                                for(int x = 0 ; x < loDcpList.size(); x++) {
+                                    File loFile = new File(loDcpList.get(x).getImageNme());
+                                    if(loFile.exists()) {
+                                        continue;
+                                    } else {
+                                        loFile.mkdirs();
 //                                    org.json.simple.JSONObject loDownload = WebFileServer.DownloadFile(lsAccess,
 //                                            "0020",
 //                                            loDcpList.get(x).getAcctNmbr(),
@@ -459,26 +440,31 @@ public class Activity_LogCollection extends AppCompatActivity {
 //
 //                                    Thread.sleep(1000);
 
+                                    }
                                 }
-                            }
-                        } else {
+                            } else {
 
+                            }
                         }
                     }
+                } catch (Exception e) {
+                    message = AppConstants.LOCAL_EXCEPTION_ERROR(e.getMessage());
+                    return false;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                lsResult = AppConstants.LOCAL_EXCEPTION_ERROR(e.getMessage());
+
+                return true;
             }
-            return lsResult;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-        }
+            @Override
+            public void OnPostExecute(Object object) {
+                Boolean aBoolean = (Boolean) object;
+                if (aBoolean){
+                    callBack.onSuccess(message);
+                }else {
+                    callBack.onFailed(message);
+                }
+            }
+        });
     }
-
     public interface OnDCPDownloadListener {
         void onDowload();
         void onSuccess(String message);

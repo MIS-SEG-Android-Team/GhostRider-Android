@@ -11,14 +11,10 @@
 
 package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 
-import android.database.Cursor;
-
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Update;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 
@@ -30,9 +26,6 @@ public interface DEmployeeInfo {
 
     @Query("DELETE FROM User_Info_Master")
     void RemoveSessions();
-
-    @Update
-    void update(EEmployeeInfo employee);
 
     @Query("SELECT * FROM User_Info_Master")
     LiveData<EEmployeeInfo> getEmployeeInfo();
@@ -48,9 +41,6 @@ public interface DEmployeeInfo {
 
     @Query("SELECT sEmployID FROM User_Info_Master")
     LiveData<String> getEmployID();
-
-    @Query("SELECT * FROM User_Info_Master")
-    Cursor getUserInfo();
 
     @Query("SELECT strftime('%H:%M:%S', 'now', 'localtime') - strftime('%H:%M:%S', dLoginxxx) AS Session FROM User_Info_Master")
     Integer getLoginDate();
@@ -71,11 +61,8 @@ public interface DEmployeeInfo {
     String getEmployeeID();
 
     @Query("SELECT a.sUserIDxx, " +
-            "a.sEmailAdd, " +
             "a.sUserName, " +
-            "a.nUserLevl, " +
             "a.sDeptIDxx, " +
-            "a.sPositnID, " +
             "a.sEmpLevID," +
             "a.sEmployID," +
             "b.sBranchCd, " +
@@ -87,11 +74,8 @@ public interface DEmployeeInfo {
 
     class EmployeeBranch{
         public String sUserIDxx;
-        public String sEmailAdd;
         public String sUserName;
-        public String nUserLevl;
         public String sDeptIDxx;
-        public String sPositnID;
         public String sEmpLevID;
         public String sEmployID;
         public String sBranchCd;

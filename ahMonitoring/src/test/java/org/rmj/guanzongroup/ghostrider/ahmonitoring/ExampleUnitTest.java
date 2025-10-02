@@ -41,7 +41,7 @@ public class ExampleUnitTest {
         String lsVal = "13,470.75";
         int lnVal = 0;
         lnVal = Integer.parseInt(lsVal.replace(",", ""));
-        assertEquals(13470.75, lnVal);
+        assertEquals(13470.75, lnVal, 13470.75);
     }
 
     @Test

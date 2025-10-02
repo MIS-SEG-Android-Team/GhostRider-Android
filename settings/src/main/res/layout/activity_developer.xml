@@ -38,27 +38,49 @@
         android:id="@+id/linear_layout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appbarlayout">
 
-        <TextView
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="@font/roboto_medium"
-            android:text="Test Mode"
-            android:textSize="15sp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/sm_TestMode"
-            android:layout_width="0dp"
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_medium"
+                android:text="Change Connection"
+                android:textSize="15sp" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/sm_TestMode"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".2"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/TextInputStyle"
+            android:id="@+id/til_ipadd"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight=".2"
-            android:gravity="center" />
+            android:hint="IP Address"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_ipadd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 
@@ -69,6 +91,7 @@
         android:orientation="vertical"
         android:gravity="center_vertical"
         android:padding="10dp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/linear_layout1">
 
         <TextView
@@ -86,10 +109,12 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linear_layout4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linear_layout3">

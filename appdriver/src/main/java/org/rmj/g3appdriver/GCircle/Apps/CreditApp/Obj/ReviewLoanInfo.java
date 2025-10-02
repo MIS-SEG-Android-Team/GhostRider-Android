@@ -69,7 +69,9 @@ public class ReviewLoanInfo implements CreditApp {
             ECreditApplicantInfo poInfo = args;
             List<ReviewAppDetail> loListDetl = new ArrayList<>();
             GOCASApplication loGOCas = new GOCASApplication();
+
             loGOCas.setData(new GoCasBuilder(poInfo).getConstructedDetailedInfo());
+
             loListDetl.add(new ReviewAppDetail(true, "Purchase Info", "", ""));
             loListDetl.add(new ReviewAppDetail(false, "", "Branch", loGOCas.PurchaseInfo().getPreferedBranch()));
 
@@ -452,11 +454,6 @@ public class ReviewLoanInfo implements CreditApp {
                     loListDetl.add(new ReviewAppDetail(false, "", "Province", loAddrs.sProvName));
                     loListDetl.add(new ReviewAppDetail(false, "", "Town/City", loAddrs.sTownName));
 
-                    // Concatenated Type of Address
-                    // String lsBizTown = loAddrs.sTownName + ", " + loAddrs.sProvName;
-                    // String lsBizAdrs = loGOCas.SpouseMeansInfo().SelfEmployedInfo().getBusinessAddress() + ", " + lsBizTown;
-                    // loListDetl.add(new ReviewAppDetail(false, "", "Business Address", lsBizAdrs));
-
                     int lnBizType = Integer.parseInt(loGOCas.SpouseMeansInfo().SelfEmployedInfo().getBusinessType());
                     loListDetl.add(new ReviewAppDetail(false, "", "Business Type", CreditAppConstants.BUSINESS_TYPE[lnBizType]));
 
@@ -487,11 +484,6 @@ public class ReviewLoanInfo implements CreditApp {
                     loListDetl.add(new ReviewAppDetail(false, "", "Pension Source", lsSource[lnSource]));
                     loListDetl.add(new ReviewAppDetail(false, "", "Pension Income", FormatUIText.getCurrencyUIFormat(String.valueOf(loGOCas.SpouseMeansInfo().PensionerInfo().getAmount()))));
 
-//                        if(loGOCas.SpouseMeansInfo().getOtherIncomeNature() != null) {
-//                            loListDetl.add(new ReviewAppDetail(true, "Other Source of Income", "", ""));
-//                            loListDetl.add(new ReviewAppDetail(false, "", "Nature of Income", loGOCas.SpouseMeansInfo().getOtherIncomeNature()));
-//                            loListDetl.add(new ReviewAppDetail(false, "", "Range of Income", String.valueOf(loGOCas.SpouseMeansInfo().getOtherIncomeAmount())));
-//                        }
                 }
                 // Spouse Pension Info End
 
@@ -640,6 +632,7 @@ public class ReviewLoanInfo implements CreditApp {
 
             loListDetl.add(new ReviewAppDetail(false, "", "House Type", parseHouseType(coResIdx.get("cHouseTyp").toString())));
             loListDetl.add(new ReviewAppDetail(false, "", "Has Garage", parseGarage(coResIdx.get("cGaragexx").toString())));
+
             loListDetail = loListDetl;
             return loListDetail;
 
@@ -649,7 +642,6 @@ public class ReviewLoanInfo implements CreditApp {
             return null;
         }
     }
-
 
     @Override
     public int Validate(Object args) {
@@ -670,9 +662,12 @@ public class ReviewLoanInfo implements CreditApp {
                     loInfo.getCreatedx());
 
             if(loExist == null) {
+
                 String lsTransNo = CreateUniqueID();
+
                 ECreditApplication loDetail = new ECreditApplication();
                 GoCasBuilder loModel = new GoCasBuilder(loInfo);
+
                 loDetail.setTransNox(lsTransNo);
                 loDetail.setBranchCd(loInfo.getBranchCd());
                 loDetail.setClientNm(loInfo.getClientNm());
@@ -686,7 +681,12 @@ public class ReviewLoanInfo implements CreditApp {
                 loDetail.setTimeStmp(AppConstants.DATE_MODIFIED());
                 loDetail.setTranStat("0");
                 loDetail.setSendStat("0");
+                loDetail.setRemarksx(loInfo.getRemarksx());
+
+                Log.d(TAG, loDetail.getDetlInfo());
+
                 poDao.Save(loDetail);
+
                 return lsTransNo;
             }
 

@@ -14,10 +14,8 @@ package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.RawQuery;
-import androidx.room.Update;
 import androidx.sqlite.db.SupportSQLiteQuery;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ECodeApproval;
@@ -32,17 +30,8 @@ public interface DApprovalCode {
     @Insert
     void SaveSCARequest(ESCA_Request foVal);
 
-    @Update
-    void UpdateSCARequest(ESCA_Request foVal);
-
-    @Insert
-    void insert(ECodeApproval codeApproval);
-
-    @Update
-    void update(ECodeApproval codeApproval);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertBulkData(List<ESCA_Request> requestList);
+    @Query("DELETE FROM xxxSCA_Request")
+    void clear();
 
     @Query("SELECT * FROM XXXSCA_REQUEST WHERE sSCACodex =:TransNox")
     ESCA_Request GetApprovalCode(String TransNox);
@@ -52,19 +41,6 @@ public interface DApprovalCode {
 
     @Query("SELECT * FROM System_Code_Approval WHERE sApprCode =:fsVal AND cSendxxxx != '1'")
     ECodeApproval GetCodeApproval(String fsVal);
-
-    @Query("SELECT * FROM System_Code_Approval ORDER BY dTransact DESC LIMIT 1")
-    LiveData<ECodeApproval> getCodeApprovalEntry();
-
-    @Query("SELECT * FROM xxxSCA_Request " +
-            "WHERE cSCATypex = '1' " +
-            "AND cRecdStat = '1' ORDER BY sSCATitle")
-    LiveData<List<ESCA_Request>> getSCA_AuthReference();
-
-    @Query("SELECT * FROM xxxSCA_Request " +
-            "WHERE cSCATypex = '2' " +
-            "AND cRecdStat = '1' ORDER BY sSCATitle")
-    LiveData<List<ESCA_Request>> getSCA_AuthName();
 
     @RawQuery(observedEntities = ESCA_Request.class)
     LiveData<List<ESCA_Request>> getAuthorizedFeatures(SupportSQLiteQuery sqLiteQuery);
@@ -77,7 +53,4 @@ public interface DApprovalCode {
 
     @Query("UPDATE System_Code_Approval SET sTransNox=:NTransNo,  cSendxxxx = '1' WHERE sTransNox =:TransNox")
     void UpdateUploaded(String TransNox, String NTransNo);
-
-    @Query("SELECT COUNT(*) FROM System_Code_Approval WHERE cSendxxxx = '0'")
-    Integer getUnpostedApprovalCode();
 }

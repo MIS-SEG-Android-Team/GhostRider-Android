@@ -3,7 +3,6 @@ package org.rmj.g3appdriver.GCircle.room.DataAccessObject;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -19,9 +18,6 @@ public interface DCreditOnlineApplicationCI {
     @Insert
     void SaveApplicationInfo(ECreditOnlineApplicationCI foCI);
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void SaveCreditApplication(EBranchLoanApplication foVal);
-
     @Update
     void UpdateApplication(ECreditOnlineApplicationCI foVal);
 
@@ -33,15 +29,6 @@ public interface DCreditOnlineApplicationCI {
 
     @Query("SELECT * FROM Credit_Online_Application_CI WHERE sTransNox=:fsVal")
     ECreditOnlineApplicationCI GetApplication(String fsVal);
-
-    @Query("SELECT * FROM Credit_Online_Application_CI WHERE sTransNox =:TransNox")
-    ECreditOnlineApplicationCI CheckIfExist(String TransNox);
-
-    @Query("SELECT * FROM Credit_Online_Application_CI WHERE cTranStat = '0'")
-    LiveData<List<ECreditOnlineApplicationCI>> getForEvaluationList();
-
-    @Query("SELECT * FROM Credit_Online_Application_CI WHERE cTranStat = '1' AND cRcmdtnx1 IS NOT NULL")
-    LiveData<List<ECreditOnlineApplicationCI>> getForPreviewResultList();
 
     @Query("SELECT * FROM Credit_Online_Application_CI WHERE sTransNox=:TransNox")
     ECreditOnlineApplicationCI getApplication(String TransNox);
@@ -75,21 +62,6 @@ public interface DCreditOnlineApplicationCI {
 
     @Query("UPDATE Credit_Online_Application_CI SET sIncmFndg=:Findings WHERE sTransNox =:TransNox")
     void updateIncomeEvaluation(String TransNox, String Findings);
-
-    @Query("UPDATE Credit_Online_Application_CI SET cHasRecrd =:val WHERE sTransNox =:TransNox")
-    void UpdateRecordInfo(String TransNox, String val);
-
-    @Query("UPDATE Credit_Online_Application_CI SET sRecrdRem =:val WHERE sTransNox =:TransNox")
-    void UpdateRecordRemarks(String TransNox, String val);
-
-    @Query("UPDATE Credit_Online_Application_CI SET sPrsnBrgy =:val WHERE sTransNox =:TransNox")
-    void UpdatePresentBarangay(String TransNox, String val);
-
-    @Query("UPDATE Credit_Online_Application_CI SET sPrsnPstn =:val WHERE sTransNox =:TransNox")
-    void UpdatePosition(String TransNox, String val);
-
-    @Query("UPDATE Credit_Online_Application_CI SET sPrsnNmbr =:val WHERE sTransNox =:TransNox")
-    void UpdateContact(String TransNox, String val);
 
     @Query("UPDATE Credit_Online_Application_CI SET sNeighBr1 =:val WHERE sTransNox =:TransNox")
     void UpdateNeighbor1(String TransNox, String val);

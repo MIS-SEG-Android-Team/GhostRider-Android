@@ -16,8 +16,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.view.LayoutInflater;
@@ -62,14 +64,15 @@ public class Fragment_Log_OtherTransactions extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_other_transactions_log, container, false);
-        mViewModel = ViewModelProviders.of(this).get(VMLogOtherTransactions.class);
+        mViewModel = new ViewModelProvider(this).get(VMLogOtherTransactions.class);
         initWidgets(view);
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         txtAcctNo.setText(Activity_TransactionDetail.acctNox);
         txtClientName.setText(Activity_TransactionDetail.fullNme);
         txtClientAddress.setText(Activity_TransactionDetail.clientAddress);
@@ -83,7 +86,7 @@ public class Fragment_Log_OtherTransactions extends Fragment {
                     .observe(getViewLifecycleOwner(), eImageInfo -> {
                         try {
                             setPic(eImageInfo.getFileLoct());
-                            ivTransImage.setOnClickListener(view -> {
+                            ivTransImage.setOnClickListener(v -> {
                                 poDialogx = new DialogDisplayImage(getActivity(),
                                         Activity_TransactionDetail.acctNox, eImageInfo.getFileLoct());
                                 poDialogx.initDialog(dialog -> {
@@ -104,7 +107,6 @@ public class Fragment_Log_OtherTransactions extends Fragment {
             divDivider.setVisibility(View.GONE);
             floatRemarks.setVisibility(View.VISIBLE);
         }
-
     }
 
     private void initWidgets(View v) {

@@ -229,6 +229,17 @@
                                 android:textSize="11sp"/>
                         </LinearLayout>
 
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/txtyourmnmdp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="The required Minimum Down Payment is at least"
+                            android:textStyle="italic"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/roboto_light_italic"
+                            android:textColor="@color/cross_red"
+                            android:layout_marginVertical="5dp"/>
+
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/TextInputStyle"
                             android:layout_width="match_parent"

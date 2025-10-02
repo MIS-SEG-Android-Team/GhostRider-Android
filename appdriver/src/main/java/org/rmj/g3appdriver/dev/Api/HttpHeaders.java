@@ -103,6 +103,9 @@ public class HttpHeaders {
         hash_toLower = hash_toLower.toLowerCase();
         headers.put("g-api-hash", hash_toLower);
         headers.put("g-api-log", lsLogNoxx);
+
+        Log.d(TAG, headers.toString());
+
         return headers;
     }
 

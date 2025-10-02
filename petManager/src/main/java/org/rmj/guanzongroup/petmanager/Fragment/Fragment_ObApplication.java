@@ -195,12 +195,14 @@ public class Fragment_ObApplication extends Fragment {
                 mLastClickTime = SystemClock.elapsedRealtime();
                 infoModel.setDateFrom(FormatUIText.formatTextToData(Objects.requireNonNull(txtDateFrom.getText()).toString()));
                 infoModel.setDateThru(FormatUIText.formatTextToData(Objects.requireNonNull(txtDateTo.getText()).toString()));
+                infoModel.setDateAppv(""); //avoid null index parameter on upload
                 infoModel.setRemarksx(Objects.requireNonNull(txtRemarks.getText()).toString());
                 mViewModel.saveObLeave(infoModel, new VMObApplication.OnSubmitOBLeaveListener() {
                     @Override
                     public void onSuccess() {
                         poProgress.dismiss();
                         loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_message_24);
                         loMessage.setPositiveButton("Okay", (v, dialog) -> {
                             dialog.dismiss();
                             txtBranchDestination.setText("");
@@ -219,6 +221,7 @@ public class Fragment_ObApplication extends Fragment {
                     public void onFailed(String message) {
                         poProgress.dismiss();
                         loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_error_24);
                         loMessage.setPositiveButton("Okay", (v, dialog) -> dialog.dismiss());
                         loMessage.setTitle("PET Manager");
                         loMessage.setMessage(message);

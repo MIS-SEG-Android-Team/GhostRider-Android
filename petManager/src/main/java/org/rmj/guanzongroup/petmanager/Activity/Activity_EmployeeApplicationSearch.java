@@ -23,7 +23,7 @@ public class Activity_EmployeeApplicationSearch  extends AppCompatActivity {
         recyclerView = findViewById(R.id.empapp_list);
 
         setSupportActionBar(toolbar); //set object toolbar as default action bar for activity
-        getSupportActionBar().setTitle("OB Application List"); //set default title for action bar
+        getSupportActionBar().setTitle(""); //set default title for action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //set back button to toolbar
         getSupportActionBar().setDisplayShowHomeEnabled(true); //enable the back button set on toolbar
 

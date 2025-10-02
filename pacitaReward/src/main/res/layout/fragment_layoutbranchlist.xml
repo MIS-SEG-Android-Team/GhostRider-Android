@@ -22,7 +22,10 @@
             android:layout_height="match_parent"
             android:textSize="15sp"
             android:imeOptions="actionNext"
-            android:maxLength="20"/>
+            android:maxLength="20"
+            android:drawableStart="@drawable/ic_name_search"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/footer_dark_grey"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView

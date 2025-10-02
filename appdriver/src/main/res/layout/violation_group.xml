@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/violationName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Violation Name"
+        android:textSize="18sp"
+        android:textColor="#000000"
+        android:padding="4dp"
+        android:textStyle="bold" />
+</LinearLayout>

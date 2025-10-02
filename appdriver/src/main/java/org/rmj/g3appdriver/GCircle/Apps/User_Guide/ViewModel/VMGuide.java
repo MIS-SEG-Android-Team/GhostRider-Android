@@ -1,0 +1,180 @@
+package org.rmj.g3appdriver.GCircle.Apps.User_Guide.ViewModel;
+
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Object.UserGuides;
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleDetails;
+import org.rmj.g3appdriver.GCircle.room.Entities.EArticleHead;
+import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyContents;
+import org.rmj.g3appdriver.GCircle.room.Entities.EPolicyMenus;
+import org.rmj.g3appdriver.utils.ConnectionUtil;
+import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
+
+import java.util.List;
+
+public class VMGuide extends AndroidViewModel {
+
+    private ConnectionUtil poConnection;
+    private UserGuides poGuides;
+    private String message;
+
+    public interface OnDownloadGuides{
+        void OnDownloading();
+        void OnSuccess();
+        void OnFailed(String message);
+    }
+
+    public interface OnUploadGuide{
+        void OnSuccess();
+        void OnFailed(String message);
+    }
+
+    public VMGuide(@NonNull Application application) {
+        super(application);
+
+        this.poConnection = new ConnectionUtil(application);
+        this.poGuides = new UserGuides(application);
+    }
+
+    public void DownloadGuides(OnDownloadGuides callback){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnDownloading();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isDeviceConnected()){
+                    message = poConnection.getMessage();
+                    return false;
+                }
+
+                if (!poGuides.DownloadGuides()){
+                    message = poGuides.GetMessage();
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if (!(Boolean) object){
+                    callback.OnFailed(message);
+                }else{
+                    callback.OnSuccess();
+                }
+            }
+        });
+    }
+    public void DownloadPolicySummary(OnDownloadGuides callback){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnDownloading();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                try{
+
+                    if (!poConnection.isDeviceConnected()){
+                        message = poConnection.getMessage();
+                        return false;
+                    }
+
+                    if (!poGuides.DownloadPolicyMenus()){
+                        message = poGuides.GetMessage();
+                        return false;
+                    }
+                    Thread.sleep(1000);
+
+                    if (!poGuides.DownloadPolicySummaryDisciplinary()){
+                        message = poGuides.GetMessage();
+                        return false;
+                    }
+                    Thread.sleep(1000);
+
+                    if (!poGuides.DownloadArticles()){
+                        message = poGuides.GetMessage();
+                        return false;
+                    }
+
+                    return true;
+                }catch (Exception e){
+                    message = e.getMessage();
+                    return false;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if (!(Boolean) object){
+                    callback.OnFailed(message);
+                }else{
+                    callback.OnSuccess();
+                }
+            }
+        });
+    }
+    public void UploadGuide(String fileloc, String filename, OnUploadGuide callback){
+
+        TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isDeviceConnected()){
+                    message = poConnection.getMessage();
+                    return false;
+                }
+
+                if (!poGuides.UploadGuide(fileloc, filename)){
+                    message = poGuides.GetMessage();
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if(!(Boolean) object){
+                    callback.OnFailed(message);
+                }else {
+                    callback.OnSuccess();
+                }
+            }
+        });
+    }
+
+    public LiveData<List<EGuides>> GetGuides(){
+        return poGuides.GetGuides();
+    }
+    public LiveData<List<EPolicyContents>> GetPolicyContents(String sParentIDxx){
+        return poGuides.getPolicyContents(sParentIDxx);
+    }
+    public LiveData<List<EPolicyMenus>> GetPolicyMenus(){
+        return poGuides.getPolicyMenus();
+    }
+    public LiveData<List<EArticleHead>> GetArticles(){
+        return poGuides.getArticleMenu();
+    }
+    public LiveData<List<EArticleDetails>> GetArticleDetails(String sArticleIDxx){
+        return poGuides.getArticleDetails(sArticleIDxx);
+    }
+}

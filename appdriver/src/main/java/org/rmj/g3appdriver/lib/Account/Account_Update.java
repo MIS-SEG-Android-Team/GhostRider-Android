@@ -59,7 +59,7 @@ public class Account_Update {
 
     public void account_update(final String oldpswd, final String newpswd){
 
-        String sURL = "https://restgk.guanzongroup.com.ph/security/acctupdate.php";
+        String sURL = "https://apps.guanzongroup.com.ph/security/acctupdate.php";
         Calendar calendar = Calendar.getInstance();
 
         Map<String, String> headers =new HashMap<String, String>();
