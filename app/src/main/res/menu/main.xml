@@ -17,18 +17,27 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_baseline_settings_24"
+        app:showAsAction="withText" />
 
     <item
         android:id="@+id/action_manual"
         android:orderInCategory="100"
         android:icon="@drawable/baseline_menu_book_24"
         android:title="User Guide"
-        app:showAsAction="never"/>
+        app:showAsAction="withText"/>
+
+    <item
+        android:id="@+id/action_error"
+        android:orderInCategory="100"
+        android:icon="@drawable/baseline_info_24"
+        android:title="Error Logs"
+        app:showAsAction="withText"/>
 
     <item
         android:id="@+id/action_logout"
         android:orderInCategory="100"
+        android:icon="@drawable/ic_dashboard_logout"
         android:title="@string/action_logout"
-        app:showAsAction="never" />
+        app:showAsAction="withText" />
 </menu>

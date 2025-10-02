@@ -91,11 +91,15 @@ public class Activity_SplashScreen extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
                         Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        Log.d("FIREBASE TOKEEN", task.getResult());
+                        Log.d("FIREBASE TOKEEN", task.getException().getMessage());
                         return;
                     }
 
                     // Get new FCM registration token
                     String token = task.getResult();
+
+                    Log.d("FIREBASE TOKEEN", token);
 
                     mViewModel.SaveFirebaseToken(token);
                     AppConfigPreference.getInstance(Activity_SplashScreen.this).setAppToken(token);

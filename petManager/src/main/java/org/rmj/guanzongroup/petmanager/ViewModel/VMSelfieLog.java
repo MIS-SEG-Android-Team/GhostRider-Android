@@ -28,6 +28,7 @@ import androidx.lifecycle.MutableLiveData;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSelfieLog;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
+import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESelfieLog;
 import org.rmj.g3appdriver.lib.Etc.Branch;
 import org.rmj.g3appdriver.etc.AppConstants;
@@ -444,5 +445,9 @@ public class VMSelfieLog extends AndroidViewModel {
                 }
             }
         });
+    }
+
+    public void SaveError(String source, String message){
+        poSys.SaveError(source, message);
     }
 }

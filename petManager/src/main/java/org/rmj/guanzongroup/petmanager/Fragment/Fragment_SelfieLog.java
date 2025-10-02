@@ -119,7 +119,7 @@ public class Fragment_SelfieLog extends Fragment {
                 poSelfie.setBranchCode(eEmployeeInfo.sBranchCd);
 
             } catch (NullPointerException e){
-                e.printStackTrace();
+                mViewModel.SaveError("Selfie Log", e.getMessage());
             }
         });
 
@@ -143,7 +143,7 @@ public class Fragment_SelfieLog extends Fragment {
                     mViewModel.SetSelectedDate(lsDate);
 
                 } catch (Exception e){
-                    e.printStackTrace();
+                    mViewModel.SaveError("Selfie Log", e.getMessage());
                 }
             }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
             StartTime.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
@@ -184,7 +184,7 @@ public class Fragment_SelfieLog extends Fragment {
                                     try{
                                         lblBranch.setText(eBranchInfo.getBranchNm());
                                     } catch (Exception e){
-                                        e.printStackTrace();
+                                        mViewModel.SaveError("Selfie Log", e.getMessage());
                                     }
                                 });
                             }
@@ -195,7 +195,9 @@ public class Fragment_SelfieLog extends Fragment {
 
                                 InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
                                     @Override
-                                    public void OnPositive() {}
+                                    public void OnPositive() {
+                                        mViewModel.SaveError("Selfie Log", message);
+                                    }
                                     @Override
                                     public void OnNegative() {}
                                 });
@@ -260,7 +262,9 @@ public class Fragment_SelfieLog extends Fragment {
 
                                     InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
                                         @Override
-                                        public void OnPositive() {}
+                                        public void OnPositive() {
+                                            mViewModel.SaveError("Selfie Log", message);
+                                        }
                                         @Override
                                         public void OnNegative() {}
                                     });
@@ -275,7 +279,7 @@ public class Fragment_SelfieLog extends Fragment {
                     recyclerView.setAdapter(logAdapter);
                 });
             } catch (Exception e){
-                e.printStackTrace();
+                mViewModel.SaveError("Selfie Log", e.getMessage());
             }
         });
 
@@ -396,14 +400,16 @@ public class Fragment_SelfieLog extends Fragment {
 
                     InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
                         @Override
-                        public void OnPositive() {}
+                        public void OnPositive() {
+                            mViewModel.SaveError("Selfie Log", message);
+                        }
                         @Override
                         public void OnNegative() {}
                     });
                 }
             });
         } catch(RuntimeException e) {
-            e.printStackTrace();
+            mViewModel.SaveError("Selfie Log", e.getMessage());
         }
     }
 
@@ -447,6 +453,9 @@ public class Fragment_SelfieLog extends Fragment {
                 InitMessage(1, R.drawable.baseline_error_24, message + "\n Proceed taking selfie log?", "Continue", "Cancel", new OnDialogButtonCallback() {
                     @Override
                     public void OnPositive() {
+
+                        mViewModel.SaveError("Selfie Log", message);
+
                         poSelfie.setLocation(args[0]);
                         poSelfie.setFileName(args[1]);
                         poSelfie.setLongitude(args[2]);
@@ -520,6 +529,7 @@ public class Fragment_SelfieLog extends Fragment {
                     @Override
                     public void OnPositive() {
                         if(!requireActivity().getClass().getSimpleName().equalsIgnoreCase("Activity_Main")) {
+                            mViewModel.SaveError("Selfie Log", message);
                             requireActivity().finish();
                         }
                     }
@@ -634,7 +644,9 @@ public class Fragment_SelfieLog extends Fragment {
 
                                 InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
                                     @Override
-                                    public void OnPositive() {}
+                                    public void OnPositive() {
+                                        mViewModel.SaveError("Selfie Log", message);
+                                    }
 
                                     @Override
                                     public void OnNegative() {}
@@ -650,7 +662,7 @@ public class Fragment_SelfieLog extends Fragment {
                         });
                     }
                 } catch (Exception e){
-                    e.printStackTrace();
+                    mViewModel.SaveError("Selfie Log", e.getMessage());
                 }
             }
         });

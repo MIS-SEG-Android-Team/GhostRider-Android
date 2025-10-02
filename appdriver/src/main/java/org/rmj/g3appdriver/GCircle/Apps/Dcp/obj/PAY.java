@@ -12,6 +12,7 @@ import org.rmj.apprdiver.util.LRUtil;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.PaidDCP;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
+import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.etc.AppConstants;
 
@@ -58,6 +59,8 @@ public class PAY extends LRDcp {
             loDetail.setTranTotl(foVal.getTotAmnt());
             loDetail.setRemarksx(foVal.getRemarks());
             loDetail.setTranStat("2");
+            loDetail.setLatitude(Double.parseDouble(foVal.getLatitude()));
+            loDetail.setLongitud(Double.parseDouble(foVal.getLongtude()));
             loDetail.setModified(AppConstants.DATE_MODIFIED());
 
             String lsImageID = poImage.SaveDcpImage(
@@ -112,11 +115,15 @@ public class PAY extends LRDcp {
             loData.put("nDiscount", loDetail.getDiscount());
             loData.put("nOthersxx", loDetail.getOthersxx());
             loData.put("cTranType", loDetail.getTranType());
+            loData.put("sRemarksx", loDetail.getRemarksx());
             loData.put("nTranTotl", loDetail.getTranTotl());
             loData.put("sBankIDxx", loDetail.getBankIDxx());
             loData.put("sCheckDte", loDetail.getCheckDte());
             loData.put("sCheckNox", loDetail.getCheckNox());
             loData.put("sCheckAct", loDetail.getCheckAct());
+            loData.put("nLatitude", loDetail.getLatitude());
+            loData.put("nLongitud", loDetail.getLongitud());
+            loData.put("sImageNme", loDetail.getImageNme());
 
             JSONObject params = new JSONObject();
             params.put("sTransNox", loDetail.getTransNox());
@@ -126,7 +133,6 @@ public class PAY extends LRDcp {
             params.put("dModified", loDetail.getModified());
             params.put("sJsonData", loData);
             params.put("dReceived", "");
-            loData.put("sRemarksx", loDetail.getRemarksx());
             params.put("sUserIDxx", poSession.getUserID());
             params.put("sDeviceID", poDevice.getDeviceID());
 
@@ -151,6 +157,7 @@ public class PAY extends LRDcp {
             loDetail.setSendStat("1");
             loDetail.setSendDate(AppConstants.DATE_MODIFIED());
             loDetail.setModified(AppConstants.DATE_MODIFIED());
+
             poDao.UpdateCollectionDetail(loDetail);
             return true;
 

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Created by Android Team MIS-SEG Year 2021
+  ~ Copyright (c) 2021. Guanzon Central Office
+  ~ Guanzon Bldg., Perez Blvd., Dagupan City, Pangasinan 2400
+  ~ Project name : GhostRider_Android
+  ~ Module : GhostRider_Android.g3appdriver
+  ~ Electronic Personnel Access Control Security System
+  ~ project file created : 4/24/21 3:19 PM
+  ~ project file last modified : 4/24/21 3:17 PM
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/siv_icon"
+        android:layout_width="35dp"
+        android:layout_height="30dp"
+        android:src="@drawable/baseline_info_details"
+        android:elevation="10dp"
+        android:scaleType="centerCrop"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintHorizontal_bias="0.001"
+        app:layout_constraintVertical_bias="0.0001"
+        app:layout_constraintStart_toStartOf="@+id/mcv_message"
+        app:layout_constraintEnd_toEndOf="@+id/mcv_message"
+        app:layout_constraintTop_toTopOf="@+id/mcv_message"
+        app:layout_constraintBottom_toBottomOf="@+id/mcv_message"/>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mcv_message"
+        android:layout_width="0dp"
+        android:layout_height="155dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.25">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:layout_margin="15dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/mtv_message"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="No message"
+                android:layout_marginVertical="5dp"
+                android:layout_gravity="center"
+                android:gravity="center|start"/>
+
+        </ScrollView>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@+id/mcv_message"
+        app:layout_constraintStart_toStartOf="@+id/mcv_message"
+        app:layout_constraintEnd_toEndOf="@+id/mcv_message">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:layout_margin="10dp"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:fadeScrollbars="false">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/layout_labels"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintWidth_percent="0.5">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Log ID:"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Source Transaction:"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Log Date:"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_detail"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/layout_labels"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/mtv_errId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="N/A"
+                        android:alpha="0.5"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/mtv_sourcetrans"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="N/A"
+                        android:alpha="0.5"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/mtv_logdate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="N/A"
+                        android:alpha="0.5"/>
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

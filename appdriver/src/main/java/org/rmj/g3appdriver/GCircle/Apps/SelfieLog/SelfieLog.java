@@ -16,6 +16,7 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 import static org.rmj.g3appdriver.lib.Firebase.CrashReportingUtil.reportException;
 
 import android.app.Application;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -23,8 +24,10 @@ import androidx.lifecycle.LiveData;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSelfieLog;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
+import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESelfieLog;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
@@ -38,6 +41,9 @@ import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.lib.Firebase.CrashReportingUtil;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -46,6 +52,7 @@ public class SelfieLog {
     private static final String TAG = SelfieLog.class.getSimpleName();
 
     private final DSelfieLog poDao;
+    private final DErrorLogs poLogs;
 
     private final EmployeeMaster poUser;
 
@@ -57,6 +64,7 @@ public class SelfieLog {
 
     public SelfieLog(Application instance){
         this.poDao = GGC_GCircleDB.getInstance(instance).SelfieDao();
+        this.poLogs = GGC_GCircleDB.getInstance(instance).errorLogsDao();
         this.poUser = new EmployeeMaster(instance);
         this.poImage = new RImageInfo(instance);
         this.poApi = new GCircleApi(instance);
@@ -70,10 +78,6 @@ public class SelfieLog {
 
     public LiveData<DEmployeeInfo.EmployeeBranch> GetUserInfo(){
         return poUser.GetEmployeeBranch();
-    }
-
-    public LiveData<List<ESelfieLog>> GetAllEmployeeTimeLog(String fsVal){
-        return poDao.getAllEmployeeTimeLog(fsVal);
     }
 
     public LiveData<List<DSelfieLog.LogTime>> GetAllTimeLog(String args){
@@ -281,6 +285,27 @@ public class SelfieLog {
         }
         Log.d(TAG, lsUniqIDx);
         return lsUniqIDx;
+    }
+
+    private String getCurrentDate(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
+        }
+    }
+
+    public void SaveError(String source, String message){
+
+        EErrorLogs logs = new EErrorLogs();
+        logs.setnErrorLogID(poLogs.GetErrorLogCount() + 1);
+        logs.setsMessagex(message);
+        logs.setdLogDate(getCurrentDate());
+        logs.setsSourceTransNo(source);
+        logs.setcRead("0");
+
+        poLogs.SaveErrorLogs(logs);
     }
 
     public static class SelfieLogDetail{

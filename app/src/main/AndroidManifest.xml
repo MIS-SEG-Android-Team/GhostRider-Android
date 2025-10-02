@@ -94,6 +94,9 @@
             android:launchMode="singleTop"
             android:screenOrientation="userPortrait"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar" />
+        <activity
+            android:name="org.rmj.g3appdriver.GCircle.Apps.ErrorList.Activity.Activity_ErrorLogs"
+            android:exported="true"/>
 
         <service
             android:name=".Service.DataDownloadService"

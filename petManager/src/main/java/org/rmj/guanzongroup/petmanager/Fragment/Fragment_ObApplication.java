@@ -195,6 +195,7 @@ public class Fragment_ObApplication extends Fragment {
                 mLastClickTime = SystemClock.elapsedRealtime();
                 infoModel.setDateFrom(FormatUIText.formatTextToData(Objects.requireNonNull(txtDateFrom.getText()).toString()));
                 infoModel.setDateThru(FormatUIText.formatTextToData(Objects.requireNonNull(txtDateTo.getText()).toString()));
+                infoModel.setDateAppv(""); //avoid null index parameter on upload
                 infoModel.setRemarksx(Objects.requireNonNull(txtRemarks.getText()).toString());
                 mViewModel.saveObLeave(infoModel, new VMObApplication.OnSubmitOBLeaveListener() {
                     @Override

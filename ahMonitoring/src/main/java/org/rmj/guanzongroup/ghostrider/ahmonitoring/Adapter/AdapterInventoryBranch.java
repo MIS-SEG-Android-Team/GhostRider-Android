@@ -84,7 +84,7 @@ public class AdapterInventoryBranch extends RecyclerView.Adapter<AdapterInventor
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             final FilterResults results = new FilterResults();
-            Log.e("Search Query ", String.valueOf(constraint));
+
             if(constraint.length() == 0){
                 paBranchFilter = paBranch;
             } else {

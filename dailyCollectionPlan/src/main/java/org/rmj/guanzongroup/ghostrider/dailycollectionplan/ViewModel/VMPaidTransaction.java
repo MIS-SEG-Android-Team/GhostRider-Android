@@ -247,21 +247,13 @@ public class VMPaidTransaction extends AndroidViewModel {
 
             @Override
             public Object DoInBackground(Object args) {
+
                 String lsResult = poSys.SavePaidTransaction((PaidDCP) args);
                 if(lsResult == null){
                     message = poSys.getMessage();
                     return false;
                 }
 
-                if(!poConn.isDeviceConnected()){
-                    message = "Payment info has been save to local device.";
-                    return true;
-                }
-
-                if(!poSys.UploadPaidTransaction(lsResult)){
-                    message = poSys.getMessage();
-                    return false;
-                }
                 return true;
             }
 

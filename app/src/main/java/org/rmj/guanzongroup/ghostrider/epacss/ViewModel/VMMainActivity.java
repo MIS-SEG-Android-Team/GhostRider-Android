@@ -22,10 +22,12 @@ import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeRole;
+import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.lib.Panalo.Obj.ILOVEMYJOB;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -48,6 +50,7 @@ public class VMMainActivity extends AndroidViewModel {
     private Bitmap bmp;
     private String message;
     private LRDcp poDCP;
+
 
     public VMMainActivity(@NonNull Application application) {
         super(application);
@@ -76,6 +79,10 @@ public class VMMainActivity extends AndroidViewModel {
 
     public LiveData<EDCPCollectionMaster> getLatestPostedDCP(){
         return poDCP.GetPostedDCP();
+    }
+
+    public LiveData<Integer> GetNewErrors(){
+        return poUser.GetNewErrors();
     }
 
     public Fragment GetUserFragments(EEmployeeInfo args) {

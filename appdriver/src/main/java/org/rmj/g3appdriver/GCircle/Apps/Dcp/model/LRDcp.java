@@ -764,16 +764,18 @@ public class LRDcp {
                 EImageInfo loImage;
 
                 switch (lsRemCode) {
-                    case "PAY":
+
+                    case "PAY": //requires selfie
                         loData.put("sPRNoxxxx", detail.getPRNoxxxx());
                         loData.put("nTranAmtx", detail.getTranAmtx());
                         loData.put("nDiscount", detail.getDiscount());
                         loData.put("nOthersxx", detail.getOthersxx());
                         loData.put("cTranType", detail.getTranType());
                         loData.put("nTranTotl", detail.getTranTotl());
-                        loData.put("sRemarksx", detail.getRemarksx());
-                        params.put("sRemCodex", detail.getRemCodex());
-                        params.put("dModified", detail.getModified());
+                        loData.put("sBankIDxx", detail.getBankIDxx());
+                        loData.put("sCheckDte", detail.getCheckDte());
+                        loData.put("sCheckNox", detail.getCheckNox());
+                        loData.put("sCheckAct", detail.getCheckAct());
 
                         //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
                         loImage = poDao.GetDcpImageForPosting(
@@ -785,8 +787,8 @@ public class LRDcp {
                             if(!poConfig.getTestStatus()){
                                 loData.put("sImageNme", loImage.getImageNme());
                                 loData.put("sSourceCD", loImage.getSourceCD());
-                                loData.put("nLongitud", loImage.getLongitud());
                                 loData.put("nLatitude", loImage.getLatitude());
+                                loData.put("nLongitud", loImage.getLongitud());
 
                                 String lsImageID = poImage.UploadImage(loImage.getTransNox());
                                 if(lsImageID == null){
@@ -796,7 +798,7 @@ public class LRDcp {
                         }
                         break;
 
-                    case "CNA":
+                    case "CNA": //requires selfie
                         String lsClientID = detail.getClientID();
 
                         JSONObject address = poAddress.GetAddressDetailForPosting(lsClientID);
@@ -916,6 +918,7 @@ public class LRDcp {
                             }
                         }
                 }
+
                 loData.put("sRemarksx", detail.getRemarksx());
                 params.put("sRemCodex", detail.getRemCodex());
                 params.put("dModified", detail.getModified());
@@ -928,6 +931,7 @@ public class LRDcp {
                 params.put("dReceived", "");
                 params.put("sUserIDxx", poSession.getUserID());
                 params.put("sDeviceID", poDevice.getDeviceID());
+
                 Log.d(TAG, "DCP posting data: " + params);
 
                 String lsResponse = WebClient.sendRequest(

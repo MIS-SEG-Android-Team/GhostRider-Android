@@ -54,6 +54,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeLeave;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeRole;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DFileCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGanadoOnline;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGuides;
@@ -128,6 +129,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeLeave;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeRole;
+import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.Entities.EFileCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGLocatorSysLog;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGanadoOnline;
@@ -242,7 +244,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EPolicyMenus.class,
         EPolicyContents.class,
         EArticleHead.class,
-        EArticleDetails.class}, version = 45, exportSchema = false)
+        EArticleDetails.class,
+        EErrorLogs.class}, version = 46, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -321,6 +324,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DGuides userguideDao();
     public abstract DCompanyPolicy policyDao();
     public abstract DArticle articleDao();
+    public abstract DErrorLogs errorLogsDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
@@ -328,7 +332,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                             GGC_GCircleDB.class, "GGC_ISysDBF.db")
                     .allowMainThreadQueries()
                     .addCallback(roomCallBack)
-                    .addMigrations(MIGRATION_V45)
+                    .addMigrations(MIGRATION_V46)
                     .build();
         }
         return instance;
@@ -363,7 +367,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
         }
     }
 
-    static final Migration MIGRATION_V45 = new Migration(44, 45) {
+    static final Migration MIGRATION_V46 = new Migration(45, 46) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
 
@@ -416,6 +420,12 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             database.execSQL("CREATE TABLE IF NOT EXISTS Article_Details " +
                     "(sCodexx TEXT NOT NULL, sContentxx TEXT, " +
                     "PRIMARY KEY(sCodexx))");
+
+            // Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Error_Logs` " +
+                    "(`nErrorLogID` INTEGER NOT NULL, `sSourceTransNo` TEXT, " +
+                    "`sMessagex` TEXT, `dLogDate` TEXT, `cRead` TEXT, "+
+                    "PRIMARY KEY(`nErrorLogID`))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");

@@ -83,6 +83,7 @@ public class Fragment_Log_CustomerNotAround extends Fragment {
         txtTransNo.setText(Activity_TransactionDetail.transNox);
         txtTransTp.setText(Activity_TransactionDetail.psTransTp);
         mViewModel.setClientID(Activity_TransactionDetail.clientID);
+
         //Image Location
         mViewModel.getImageLocation(Activity_TransactionDetail.acctNox, Activity_TransactionDetail.imgNme)
                 .observe(getViewLifecycleOwner(), eImageInfo -> {

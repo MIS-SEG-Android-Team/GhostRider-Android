@@ -414,6 +414,8 @@ public class EmployeeLeave extends PetMngr {
                     params.toString(),
                     poHeaders.getHeaders());
 
+            Log.d(TAG, lsResponse);
+
             if(lsResponse == null) {
                 message = SERVER_NO_RESPONSE;
                 return false;

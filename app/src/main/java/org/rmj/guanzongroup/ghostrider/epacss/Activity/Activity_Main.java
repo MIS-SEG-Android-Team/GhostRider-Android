@@ -11,9 +11,11 @@
 
 package org.rmj.guanzongroup.ghostrider.epacss.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -25,8 +27,10 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -35,11 +39,15 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.badge.BadgeUtils;
+import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
+import org.rmj.g3appdriver.GCircle.Apps.ErrorList.Activity.Activity_ErrorLogs;
 import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeRole;
@@ -79,6 +87,8 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     private Intent loIntent;
     private boolean cSlfiex;
 
+    private MaterialToolbar toolbar;
+
     private ShapeableImageView img_banner;
     private ImageView imgDept;
     private MaterialTextView lblDept;
@@ -93,6 +103,8 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
 
     private AppConfigPreference loConfig;
 
+    private BadgeDrawable loBadge;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +114,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
         mViewModel = new ViewModelProvider(this).get(VMMainActivity.class);
         poNetRecvr = mViewModel.getInternetReceiver();
         loConfig = AppConfigPreference.getInstance(this);
+        loBadge = BadgeDrawable.create(Activity_Main.this);
 
         initWidgets();
         InitUserFeatures();
@@ -125,9 +138,11 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 e.printStackTrace();
             }
         });
+
     }
 
     private void InitUserFeatures(){
+
         mViewModel.getEmployeeRole().observe(this, roles -> {
 
             try{
@@ -209,8 +224,9 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     }
 
     private void initWidgets(){
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         /*Edited by mike*/
@@ -370,10 +386,41 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
         super.onDestroy();
     }
 
+    @SuppressLint("RestrictedApi")
+    @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        //shows icon beside text
+        if (menu instanceof MenuBuilder){
+            ((MenuBuilder) menu).setOptionalIconsVisible(true);
+        }
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        mViewModel.GetNewErrors().observe(Activity_Main.this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+
+                if (integer > 0){
+
+                    loBadge.setNumber(integer);
+                    loBadge.setBackgroundColor(Color.RED);
+                    loBadge.setBadgeTextColor(Color.WHITE);
+
+                    BadgeUtils.attachBadgeDrawable(loBadge, toolbar, R.id.action_error);
+                }
+
+            }
+        });
+
+        loBadge.setNumber(1);
+        loBadge.setBackgroundColor(Color.RED);
+        loBadge.setBadgeTextColor(Color.WHITE);
+
+        BadgeUtils.attachBadgeDrawable(loBadge, toolbar, R.id.action_error);
+
         return true;
     }
 
@@ -427,6 +474,9 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
             loMessage.setTitle("Account Session");
             loMessage.setMessage("Are you sure you want to end session/logout?");
             loMessage.show();
+        } else if (item.getItemId() == R.id.action_error) {
+            startActivity(new Intent(Activity_Main.this, Activity_ErrorLogs.class));
+            overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
         }
         return super.onOptionsItemSelected(item);
     }
