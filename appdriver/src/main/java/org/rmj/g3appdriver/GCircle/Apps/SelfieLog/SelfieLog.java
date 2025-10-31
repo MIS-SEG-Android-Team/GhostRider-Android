@@ -99,7 +99,6 @@ public class SelfieLog {
 
             return true;
         } catch (Exception e){
-            e.printStackTrace();
             message = getLocalMessage(e);
             reportException(poSession.getUserID(), e.getLocalizedMessage());
             return false;
@@ -153,7 +152,6 @@ public class SelfieLog {
 
             return 3;
         } catch (Exception e){
-            e.printStackTrace();
             message = getLocalMessage(e);
             reportException(poSession.getUserID(), message);
             return 0;
@@ -173,7 +171,7 @@ public class SelfieLog {
             loSelfie.setLogTimex(AppConstants.DATE_MODIFIED());
             loSelfie.setSendStat("0");
 
-            if(foVal.getBranchCode().isEmpty()){
+            if(foVal.getBranchCode() == null || foVal.getBranchCode().isEmpty()){
                 String lsBranchCd = poSession.getBranchCode();
                 loSelfie.setBranchCd(lsBranchCd);
                 loSelfie.setReqCCntx("2");
@@ -196,9 +194,9 @@ public class SelfieLog {
             Log.d(TAG, "Selfie log info has been save.");
             return lsTransNo;
         } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
+            message = e.getLocalizedMessage();
             reportException(poSession.getUserID(), message);
+            e.printStackTrace();
             return null;
         }
     }
@@ -260,9 +258,9 @@ public class SelfieLog {
 
             return true;
         } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
+            message = e.getLocalizedMessage();
             reportException(poSession.getUserID(), message);
+            e.printStackTrace();
             return false;
         }
     }
@@ -280,7 +278,7 @@ public class SelfieLog {
             loBuilder.append(lsPadNumx);
             lsUniqIDx = loBuilder.toString();
         } catch (Exception e){
-            e.printStackTrace();
+            message = e.getMessage();
             Log.e(TAG, e.getMessage());
         }
         Log.d(TAG, lsUniqIDx);

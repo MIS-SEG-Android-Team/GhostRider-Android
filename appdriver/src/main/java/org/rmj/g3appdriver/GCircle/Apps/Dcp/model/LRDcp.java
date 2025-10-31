@@ -531,7 +531,7 @@ public class LRDcp {
             }
 
             String lsTransNox = loMaster.getTransNox();
-            int lnEntryNox = poDao.GetNewEntryNox();
+            int lnEntryNox = poDao.GetNewEntryNox(lsTransNox);
 
             if(fsVal == null){
                 message = "Please enter name of client.";
@@ -567,7 +567,9 @@ public class LRDcp {
 
             JSONArray laJson = loResponse.getJSONArray("data");
             for(int x = 0; x < laJson.length(); x++) {
+
                 JSONObject loJson = laJson.getJSONObject(x);
+
                 EDCPCollectionDetail loDetail = new EDCPCollectionDetail();
                 loDetail.setTransNox(lsTransNox);
                 loDetail.setEntryNox(lnEntryNox);

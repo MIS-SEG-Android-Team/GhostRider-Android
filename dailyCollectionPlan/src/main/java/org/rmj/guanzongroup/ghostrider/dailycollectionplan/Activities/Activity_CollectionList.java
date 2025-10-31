@@ -511,6 +511,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                                             detail.getAcctNmbr() + " to list of collection?");
                                     poMessage.setPositiveButton("Yes", (view, msgDialog) -> {
                                         clientList.dismiss();
+
                                         mViewModel.AddCollection(detail, new VMCollectionList.OnActionCallback() {
                                             @Override
                                             public void OnLoad() {
@@ -525,7 +526,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                                                 poMessage.initDialog();
                                                 poMessage.setIcon(R.drawable.baseline_message_24);
                                                 poMessage.setTitle("Daily Collection Plan");
-                                                poMessage.setMessage( detail.getFullName() + " has been added to collection list.");
+                                                poMessage.setMessage( detail.getFullName() + " has been added to collection list.\nEntry Number is " + String.valueOf(detail.getEntryNox()));
                                                 poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
                                                 poMessage.show();
                                             }

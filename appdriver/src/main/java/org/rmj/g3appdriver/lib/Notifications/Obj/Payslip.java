@@ -77,6 +77,8 @@ public class Payslip extends NMM_Regular {
                 file.mkdirs();
             }
 
+            Log.d(TAG, url.toString());
+
             String fieldValue = c.getHeaderField("Content-Disposition");
             String filename = fieldValue.substring(fieldValue.indexOf("filename=\"") + 10, fieldValue.length() - 1);
 

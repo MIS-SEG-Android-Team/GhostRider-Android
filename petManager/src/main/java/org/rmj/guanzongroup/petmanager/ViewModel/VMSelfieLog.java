@@ -339,8 +339,8 @@ public class VMSelfieLog extends AndroidViewModel {
                     message = logDetail.getBranchCode();
                     return 1;
                 } catch (Exception e){
+                    message = e.getMessage();
                     e.printStackTrace();
-                    message = getLocalMessage(e);
                     return 0;
                 }
             }
@@ -386,8 +386,8 @@ public class VMSelfieLog extends AndroidViewModel {
 
                     return true;
                 } catch (Exception e){
-                    e.printStackTrace();
                     message = e.getMessage();
+                    e.printStackTrace();
                     return false;
                 }
             }
