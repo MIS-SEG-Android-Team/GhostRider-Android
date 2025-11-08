@@ -50,6 +50,7 @@ import com.google.android.material.textview.MaterialTextView;
 
 
 import org.json.JSONObject;
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionDetail;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
@@ -328,13 +329,36 @@ public class Activity_CollectionList extends AppCompatActivity {
             }
 
             @Override
-            public void OnFailed(String message) {
+            public void OnFailed(String code, String message) {
                 poDialogx.dismiss();
+
                 poMessage.initDialog();
                 poMessage.setIcon(R.drawable.baseline_error_24);
                 poMessage.setTitle("Daily Collection Plan");
                 poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
+                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+
+                    dialog.dismiss();
+
+                    if (code.equals("40026")){ //Record not found
+
+                        //ask user to read the user guide
+                        poMessage.initDialog();
+                        poMessage.setIcon(R.drawable.baseline_contact_support_24);
+                        poMessage.setTitle("Daily Collection Plan");
+                        poMessage.setMessage("Open user guide to fix dcp downloading issue. Continue?");
+
+                        poMessage.setPositiveButton("Okay", (subview, subdialog) -> {
+
+                            subdialog.dismiss();
+
+                            Intent loIntent = new Intent(Activity_CollectionList.this, Activity_Manual.class);
+                            loIntent.putExtra("transnox", ""); //put imported files transaction no to get the pdf link
+                            startActivity(loIntent);
+
+                        });
+                    }
+                });
                 poMessage.show();
             }
         });
@@ -368,7 +392,7 @@ public class Activity_CollectionList extends AppCompatActivity {
             }
 
             @Override
-            public void OnFailed(String message) {
+            public void OnFailed(String code, String message) {
                 poDialogx.dismiss();
                 poMessage.initDialog();
                 poMessage.setIcon(R.drawable.baseline_error_24);
@@ -407,7 +431,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                 }
 
                 @Override
-                public void OnFailed(String message) {
+                public void OnFailed(String code, String message) {
                     poDialogx.dismiss();
                     poMessage.initDialog();
                     poMessage.setIcon(R.drawable.baseline_error_24);
@@ -532,7 +556,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                                             }
 
                                             @Override
-                                            public void OnFailed(String message) {
+                                            public void OnFailed(String code, String message) {
                                                 poDialogx.dismiss();
                                                 poMessage.initDialog();
                                                 poMessage.setIcon(R.drawable.baseline_error_24);

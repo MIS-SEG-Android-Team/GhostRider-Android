@@ -70,6 +70,7 @@ public class LRDcp {
     protected final DLRDcp poDCP;
 
     protected String message;
+    protected String lscode;
 
     private String CURRENT_DATE;
 
@@ -94,6 +95,9 @@ public class LRDcp {
 
     public String getMessage() {
         return message;
+    }
+    public String getErrorCode() {
+        return lscode;
     }
 
     public LiveData<DEmployeeInfo.EmployeeBranch> GetUserInfo(){
@@ -444,6 +448,7 @@ public class LRDcp {
             if(lsResult.equalsIgnoreCase("error")){
                 JSONObject loError = loResponse.getJSONObject("error");
                 message = getErrorMessage(loError);
+                lscode = loError.getString("code");
                 return false;
             }
 
