@@ -27,4 +27,7 @@ public interface DGuides {
     @Query("SELECT * FROM User_Guides")
     LiveData<List<EGuides>> GetGuides();
 
+    @Query("SELECT sURlxx FROM User_Guides WHERE sTransNox = :fsTransNox")
+    String GetURLByTrans(String fsTransNox);
+
 }

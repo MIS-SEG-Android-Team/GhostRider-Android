@@ -347,6 +347,7 @@ public class UserGuides {
     public LiveData<List<EGuides>> GetGuides(){
         return dGuides.GetGuides();
     }
+    public String GetURLByTrans(String fsTransNox){ return dGuides.GetURLByTrans(fsTransNox);}
     public LiveData<List<EPolicyContents>> getPolicyContents(String sParentIDxx){
         return dCompanyPolicy.getPolicyContents(sParentIDxx);
     }

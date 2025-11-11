@@ -342,21 +342,29 @@ public class Activity_CollectionList extends AppCompatActivity {
 
                     if (code.equals("40026")){ //Record not found
 
-                        //ask user to read the user guide
-                        poMessage.initDialog();
-                        poMessage.setIcon(R.drawable.baseline_contact_support_24);
-                        poMessage.setTitle("Daily Collection Plan");
-                        poMessage.setMessage("Open user guide to fix dcp downloading issue. Continue?");
+                        MessageBox loMessage = new MessageBox(Activity_CollectionList.this);
+                        loMessage.initDialog();
 
-                        poMessage.setPositiveButton("Okay", (subview, subdialog) -> {
+                        //ask user to read the user guide
+                        loMessage.initDialog();
+                        loMessage.setIcon(R.drawable.baseline_contact_support_24);
+                        loMessage.setTitle("Daily Collection Plan");
+                        loMessage.setMessage("Open user guide to fix dcp downloading issue. Continue?");
+
+                        loMessage.setPositiveButton("View", (subview, subdialog) -> {
 
                             subdialog.dismiss();
 
                             Intent loIntent = new Intent(Activity_CollectionList.this, Activity_Manual.class);
-                            loIntent.putExtra("transnox", ""); //put imported files transaction no to get the pdf link
+                            loIntent.putExtra("transnox", "MX01202511114"); //pass transaction no of pdf link for no dcp record
                             startActivity(loIntent);
 
                         });
+
+                        loMessage.setNegativeButton("Cancel", (subview, subdialog) -> {
+                            subdialog.dismiss();
+                        });
+                        loMessage.show();
                     }
                 });
                 poMessage.show();
