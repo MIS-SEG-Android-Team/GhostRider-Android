@@ -106,6 +106,8 @@ public class VMLocalData extends AndroidViewModel {
         dataList.add(new LocalData("Province Data", poAppData.Province_Data, poApi.getUrlImportProvince()));
         dataList.add(new LocalData("Country Data", poAppData.Country_Data, poApi.getUrlImportCountry()));
         dataList.add(new LocalData("Relation Data", poAppData.Relation_Data, poApi.getUrlDownloadRelation()));
+        dataList.add(new LocalData("LR DCP Master Data", poAppData.LR_DCP_Collection_Master, poApi.getUrlDownloadDcp()));
+        dataList.add(new LocalData("LR DCP Detail Data", poAppData.LR_DCP_Collection_Detail, poApi.getUrlDownloadDcp()));
         loDataList.setValue(dataList);
     }
 

@@ -162,6 +162,7 @@ public class VMGuide extends AndroidViewModel {
         });
     }
 
+    public String GetURLByTrans(String fsTrans){ return poGuides.GetURLByTrans(fsTrans);}
     public LiveData<List<EGuides>> GetGuides(){
         return poGuides.GetGuides();
     }

@@ -120,6 +120,9 @@ public class Activity_Manual extends AppCompatActivity {
         InitObserver();
         InitListener();
 
+        //get intent param for automatic viewing from other class
+        OpenParam();
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -338,6 +341,18 @@ public class Activity_Manual extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+    }
+    private void OpenParam(){
+        if (getIntent().hasExtra("transnox")){
+
+            String transnox = getIntent().getStringExtra("transnox");
+            String sURLxx = mViewmodel.GetURLByTrans(transnox);
+
+            Intent loIntent = new Intent(Activity_Manual.this, Activity_PDFViewer.class);
+            loIntent.putExtra("pdf_url", sURLxx);
+            startActivity(loIntent);
+            overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+        }
     }
 
 }

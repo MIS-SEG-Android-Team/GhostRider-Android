@@ -38,12 +38,13 @@ public class VMCollectionList extends AndroidViewModel {
     private final ConnectionUtil poConn;
     private final AppConfigPreference poConfig;
 
+    private String pscode = "00000";
     private String message;
 
     public interface OnActionCallback {
         void OnLoad();
         void OnSuccess();
-        void OnFailed(String message);
+        void OnFailed(String code, String message);
     }
 
     public interface OnCheckDcpForPosting {
@@ -95,6 +96,10 @@ public class VMCollectionList extends AndroidViewModel {
 
                 if(!poSys.DownloadCollection((ImportParams) args)){
                     message = poSys.getMessage();
+
+                    if (poSys.getErrorCode() != null && !poSys.getErrorCode().isEmpty()){
+                        pscode = poSys.getErrorCode();
+                    }
                     return false;
                 }
                 return true;
@@ -106,7 +111,7 @@ public class VMCollectionList extends AndroidViewModel {
                 if(isSuccess){
                     callback.OnSuccess();
                 } else {
-                    callback.OnFailed(message);
+                    callback.OnFailed(pscode, message);
                 }
             }
         });
@@ -165,7 +170,7 @@ public class VMCollectionList extends AndroidViewModel {
             public void OnPostExecute(Object object) {
                 Boolean isSuccess = (Boolean) object;
                 if(!isSuccess){
-                    callback.OnFailed(message);
+                    callback.OnFailed(pscode, message);
                 } else {
                     callback.OnSuccess();
                 }
@@ -248,7 +253,7 @@ public class VMCollectionList extends AndroidViewModel {
             public void OnPostExecute(Object object) {
                 Boolean isSuccess = (Boolean) object;
                 if(!isSuccess){
-                    callback.OnFailed(message);
+                    callback.OnFailed(pscode, message);
                 } else {
                     callback.OnSuccess();
                 }
@@ -276,7 +281,7 @@ public class VMCollectionList extends AndroidViewModel {
             public void OnPostExecute(Object object) {
                 Boolean isSuccess = (Boolean) object;
                 if(!isSuccess){
-                    callback.OnFailed(message);
+                    callback.OnFailed(pscode, message);
                 } else {
                     callback.OnSuccess();
                 }

@@ -36,8 +36,8 @@ public interface DLRDcp {
     @Query("SELECT sEmployID FROM User_Info_Master")
     String GetEmployID();
 
-    @Query("SELECT COUNT (*) + 1 AS nEntryNox FROM LR_DCP_Collection_Detail")
-    int GetNewEntryNox();
+    @Query("SELECT COUNT (*) + 1 AS nEntryNox FROM LR_DCP_Collection_Detail WHERE sTransNox=:TransNox")
+    int GetNewEntryNox(String TransNox);
 
     @Query("SELECT * FROM LR_DCP_Collection_Detail WHERE sTransNox=:TransNox AND sAcctNmbr =:AccountNo")
     EDCPCollectionDetail GetCollectionForValidation(String TransNox, String AccountNo);

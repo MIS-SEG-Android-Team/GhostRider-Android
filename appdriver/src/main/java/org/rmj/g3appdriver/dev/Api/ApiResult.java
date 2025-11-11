@@ -13,7 +13,7 @@ public class ApiResult {
         String lsCode = args.getString("code");
         switch (lsCode){
             case "40020":
-                return "For security reasons, your session has expired. Please log in again.";
+                return "KAY Gandang Araw!\n\nMaaaring pakisara muna ang iyong Guanzon Circle app at muling buksan para maglogin.\nSalamat.";
 
             default:
                 String lsMessage = args.getString("message");
