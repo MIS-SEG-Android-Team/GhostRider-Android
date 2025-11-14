@@ -125,10 +125,6 @@ public class Dialog_File_Upload {
             case "application/pdf":
                 mtv_file.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(instance, R.drawable.baseline_picture_as_pdf_24), null, null, null);
                 break;
-
-
-
-                
             case "image/jpeg":
                 mtv_file.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(instance, R.drawable.baseline_image_24), null, null, null);
                 break;

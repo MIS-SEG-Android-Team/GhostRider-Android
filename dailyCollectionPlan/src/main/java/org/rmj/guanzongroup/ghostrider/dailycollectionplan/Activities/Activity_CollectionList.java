@@ -108,6 +108,40 @@ public class Activity_CollectionList extends AppCompatActivity {
         }
     });
 
+    private final ActivityResultLauncher<Intent> poImport = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result ->{
+        if (result.getResultCode() == RESULT_OK){
+            mViewModel.ImportFromFile(result.getData().getData(), new VMCollectionList.OnActionCallback() {
+                @Override
+                public void OnLoad() {
+                    poDialogx.initDialog("Daily Collection Plan", "Importing file", false);
+                    poDialogx.show();
+                }
+
+                @Override
+                public void OnSuccess() {
+                    poDialogx.dismiss();
+                }
+
+                @Override
+                public void OnFailed(String code, String message) {
+                    poDialogx.dismiss();
+
+                    ShowMessage(message, 2, new OnMessageButton() {
+                        @Override
+                        public void OnPositive() {
+
+                        }
+
+                        @Override
+                        public void OnNegative() {
+
+                        }
+                    });
+                }
+            });
+        }
+    });
+
     @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,6 +197,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                         // system file picker when it loads.
                         try {
                             intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, new URI(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString()));
+                            poImport.launch(intent);
                         } catch (URISyntaxException e) {
                             e.printStackTrace();
                         }
@@ -251,6 +286,7 @@ public class Activity_CollectionList extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         finish();
     }
 
@@ -332,42 +368,30 @@ public class Activity_CollectionList extends AppCompatActivity {
             public void OnFailed(String code, String message) {
                 poDialogx.dismiss();
 
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_error_24);
-                poMessage.setTitle("Daily Collection Plan");
-                poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                ShowMessage(message, 2, new OnMessageButton() {
+                    @Override
+                    public void OnPositive() {
+                        if (code.equals("40026")){ //Record not found
 
-                    dialog.dismiss();
+                            ShowMessage("Open user guide to fix dcp downloading issue. Continue?", 3, new OnMessageButton() {
+                                @Override
+                                public void OnPositive() {
+                                    Intent loIntent = new Intent(Activity_CollectionList.this, Activity_Manual.class);
+                                    loIntent.putExtra("transnox", "MX01202511114"); //pass transaction no of pdf link for no dcp record
+                                    startActivity(loIntent);
+                                }
 
-                    if (code.equals("40026")){ //Record not found
+                                @Override
+                                public void OnNegative() {}
+                            });
+                        }
+                    }
 
-                        MessageBox loMessage = new MessageBox(Activity_CollectionList.this);
-                        loMessage.initDialog();
+                    @Override
+                    public void OnNegative() {
 
-                        //ask user to read the user guide
-                        loMessage.initDialog();
-                        loMessage.setIcon(R.drawable.baseline_contact_support_24);
-                        loMessage.setTitle("Daily Collection Plan");
-                        loMessage.setMessage("Open user guide to fix dcp downloading issue. Continue?");
-
-                        loMessage.setPositiveButton("View", (subview, subdialog) -> {
-
-                            subdialog.dismiss();
-
-                            Intent loIntent = new Intent(Activity_CollectionList.this, Activity_Manual.class);
-                            loIntent.putExtra("transnox", "MX01202511114"); //pass transaction no of pdf link for no dcp record
-                            startActivity(loIntent);
-
-                        });
-
-                        loMessage.setNegativeButton("Cancel", (subview, subdialog) -> {
-                            subdialog.dismiss();
-                        });
-                        loMessage.show();
                     }
                 });
-                poMessage.show();
             }
         });
     }
@@ -385,73 +409,95 @@ public class Activity_CollectionList extends AppCompatActivity {
             @Override
             public void OnSuccess() {
                 poDialogx.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_message_24);
-                poMessage.setTitle("Daily Collection Plan");
-                poMessage.setMessage("Dcp posted successfully.");
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                    dialog.dismiss();
 
-                    if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
-                        stopService(loService);
+                ShowMessage("Dcp posted successfully.", 1, new OnMessageButton() {
+                    @Override
+                    public void OnPositive() {
+                        if (ScheduleTask.isServiceRunning(Activity_CollectionList.this, serviceName)){
+                            stopService(loService);
+                        }
+                    }
+
+                    @Override
+                    public void OnNegative() {
+
                     }
                 });
-                poMessage.show();
             }
 
             @Override
             public void OnFailed(String code, String message) {
                 poDialogx.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_error_24);
-                poMessage.setTitle("Daily Collection Plan");
-                poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                poMessage.show();
+
+                ShowMessage(message, 2, new OnMessageButton() {
+                    @Override
+                    public void OnPositive() {
+
+                    }
+
+                    @Override
+                    public void OnNegative() {
+
+                    }
+                });
             }
         });
     }
 
     private void ClearDCPRecords(){
-        poMessage.initDialog();
-        poMessage.setIcon(R.drawable.baseline_contact_support_24);
-        poMessage.setTitle("Daily Collection Plan");
-        poMessage.setMessage("WARNING, Clearing dcp records will erase your all your daily collection plan and collection remittance records on this device. \nClear records?");
-        poMessage.setPositiveButton("Clear", (view, dialog) -> {
-            dialog.dismiss();
-            mViewModel.ClearDCPRecords(new VMCollectionList.OnActionCallback() {
-                @Override
-                public void OnLoad() {
-                    poDialogx.initDialog("Daily Collection Plan",
-                            "Clearing records. Please wait...", false);
-                    poDialogx.show();
-                }
 
-                @Override
-                public void OnSuccess() {
-                    poDialogx.dismiss();
-                    poMessage.initDialog();
-                    poMessage.setIcon(R.drawable.baseline_message_24);
-                    poMessage.setTitle("Daily Collection Plan");
-                    poMessage.setMessage("Records cleared successfully.");
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                }
+        ShowMessage("WARNING, Clearing dcp records will erase your all your daily collection plan and collection remittance records on this device. \nClear records?", 3, new OnMessageButton() {
+            @Override
+            public void OnPositive() {
 
-                @Override
-                public void OnFailed(String code, String message) {
-                    poDialogx.dismiss();
-                    poMessage.initDialog();
-                    poMessage.setIcon(R.drawable.baseline_error_24);
-                    poMessage.setTitle("Daily Collection Plan");
-                    poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                }
-            });
+                mViewModel.ClearDCPRecords(new VMCollectionList.OnActionCallback() {
+                    @Override
+                    public void OnLoad() {
+                        poDialogx.initDialog("Daily Collection Plan", "Clearing records. Please wait...", false);
+                        poDialogx.show();
+                    }
+
+                    @Override
+                    public void OnSuccess() {
+                        poDialogx.dismiss();
+
+                        ShowMessage("Records cleared successfully.", 1, new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {
+
+                            }
+
+                            @Override
+                            public void OnNegative() {
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void OnFailed(String code, String message) {
+                        poDialogx.dismiss();
+
+                        ShowMessage(message, 2, new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {
+
+                            }
+
+                            @Override
+                            public void OnNegative() {
+
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void OnNegative() {
+
+            }
         });
-        poMessage.setNegativeButton("Cancel", (view, dialog) -> dialog.dismiss());
-        poMessage.show();
     }
 
     public void ShowPostCollection(){
@@ -471,6 +517,7 @@ public class Activity_CollectionList extends AppCompatActivity {
             @Override
             public void OnIncompleteDcp() {
                 poDialogx.dismiss();
+
                 DialogConfirmPost loPost = new DialogConfirmPost(Activity_CollectionList.this);
                 loPost.iniDialog(new DialogConfirmPost.DialogPostUnfinishedListener() {
                     @Override
@@ -490,17 +537,23 @@ public class Activity_CollectionList extends AppCompatActivity {
             @Override
             public void OnFailed(String message) {
                 poDialogx.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_error_24);
-                poMessage.setTitle("Daily Collection Plan");
-                poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                poMessage.show();
+
+                ShowMessage(message, 2, new OnMessageButton() {
+                    @Override
+                    public void OnPositive() {
+
+                    }
+
+                    @Override
+                    public void OnNegative() {
+
+                    }
+                });
             }
         });
     }
 
-    public void ShowTransaction(int position, List<EDCPCollectionDetail> collectionDetails){
+    private void ShowTransaction(int position, List<EDCPCollectionDetail> collectionDetails){
         DialogAccountDetail loDialog = new DialogAccountDetail(Activity_CollectionList.this);
         loDialog.initAccountDetail(Activity_CollectionList.this ,collectionDetails.get(position), (dialog, remarksCode) -> {
             Intent loIntent = new Intent(Activity_CollectionList.this, Activity_Transaction.class);
@@ -514,7 +567,7 @@ public class Activity_CollectionList extends AppCompatActivity {
         loDialog.show();
     }
 
-    public void ShowAddDcpCollection(){
+    private void ShowAddDcpCollection(){
         try {
             DialogAddCollection loDialog = new DialogAddCollection(Activity_CollectionList.this);
             loDialog.initDialog(new DialogAddCollection.OnDialogButtonClickListener() {
@@ -531,57 +584,73 @@ public class Activity_CollectionList extends AppCompatActivity {
                         @Override
                         public void OnSuccessDownload(List<EDCPCollectionDetail> detail) {
                             poDialogx.dismiss();
+
                             Dialog_ClientSearch loClient = new Dialog_ClientSearch(Activity_CollectionList.this);
                             loClient.initDialog(detail, new Dialog_ClientSearch.OnClientSelectListener() {
                                 @Override
                                 public void OnSelect(AlertDialog clientList, EDCPCollectionDetail detail) {
+
                                     // Validation if user accidentally tap on list on
-                                    poMessage.initDialog();
-                                    poMessage.setIcon(R.drawable.baseline_contact_support_24);
-                                    poMessage.setTitle("Add Collection");
-                                    poMessage.setMessage("Add " + detail.getFullName() + " with account number " +
-                                            detail.getAcctNmbr() + " to list of collection?");
-                                    poMessage.setPositiveButton("Yes", (view, msgDialog) -> {
-                                        clientList.dismiss();
+                                    ShowMessage("Add " + detail.getFullName() + " with account number " +
+                                            detail.getAcctNmbr() + " to list of collection?", 3, new OnMessageButton() {
+                                        @Override
+                                        public void OnPositive() {
+                                            clientList.dismiss();
 
-                                        mViewModel.AddCollection(detail, new VMCollectionList.OnActionCallback() {
-                                            @Override
-                                            public void OnLoad() {
-                                                msgDialog.dismiss();
-                                                poDialogx.initDialog("Daily Collection Plan", "Adding client to DCP list. Please wait...", false);
-                                                poDialogx.show();
-                                            }
+                                            mViewModel.AddCollection(detail, new VMCollectionList.OnActionCallback() {
+                                                @Override
+                                                public void OnLoad() {
+                                                    poDialogx.initDialog("Daily Collection Plan", "Adding client to DCP list. Please wait...", false);
+                                                    poDialogx.show();
+                                                }
 
-                                            @Override
-                                            public void OnSuccess() {
-                                                poDialogx.dismiss();
-                                                poMessage.initDialog();
-                                                poMessage.setIcon(R.drawable.baseline_message_24);
-                                                poMessage.setTitle("Daily Collection Plan");
-                                                poMessage.setMessage( detail.getFullName() + " has been added to collection list.\nEntry Number is " + String.valueOf(detail.getEntryNox()));
-                                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                                                poMessage.show();
-                                            }
+                                                @Override
+                                                public void OnSuccess() {
+                                                    poDialogx.dismiss();
 
-                                            @Override
-                                            public void OnFailed(String code, String message) {
-                                                poDialogx.dismiss();
-                                                poMessage.initDialog();
-                                                poMessage.setIcon(R.drawable.baseline_error_24);
-                                                poMessage.setTitle("Daily Collection Plan");
-                                                poMessage.setMessage(message);
-                                                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                                                poMessage.show();
-                                            }
-                                        });
+                                                    ShowMessage(detail.getFullName() + " has been added to collection list.\nEntry Number is " + String.valueOf(detail.getEntryNox()), 1, new OnMessageButton() {
+                                                        @Override
+                                                        public void OnPositive() {
+
+                                                        }
+
+                                                        @Override
+                                                        public void OnNegative() {
+
+                                                        }
+                                                    });
+                                                }
+
+                                                @Override
+                                                public void OnFailed(String code, String message) {
+                                                    poDialogx.dismiss();
+
+                                                    ShowMessage(message, 2, new OnMessageButton() {
+                                                        @Override
+                                                        public void OnPositive() {
+
+                                                        }
+
+                                                        @Override
+                                                        public void OnNegative() {
+
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void OnNegative() {
+
+                                        }
                                     });
-                                    poMessage.setNegativeButton("No", (view, msgDialog) -> msgDialog.dismiss());
-                                    poMessage.show();
                                 }
 
                                 @Override
                                 public void OnCancel(AlertDialog clientDialog) {
                                     clientDialog.dismiss();
+
                                     // Show Add collection dialog if user cancels search client list */
                                     loDialog.show();
                                 }
@@ -592,12 +661,18 @@ public class Activity_CollectionList extends AppCompatActivity {
                         @Override
                         public void OnFailedDownload(String message) {
                             poDialogx.dismiss();
-                            poMessage.initDialog();
-                            poMessage.setIcon(R.drawable.baseline_error_24);
-                            poMessage.setTitle("Daily Collection Plan");
-                            poMessage.setMessage(message);
-                            poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                            poMessage.show();
+
+                            ShowMessage(message, 2, new OnMessageButton() {
+                                @Override
+                                public void OnPositive() {
+
+                                }
+
+                                @Override
+                                public void OnNegative() {
+
+                                }
+                            });
                         }
                     });
                 }
@@ -613,8 +688,9 @@ public class Activity_CollectionList extends AppCompatActivity {
         }
     }
 
-    public void ShowDownloadDcp(){
+    private void ShowDownloadDcp(){
         boolean isTesting = mViewModel.IsTesting();
+
         if(isTesting){
             Dialog_DebugEntry loDebug = new Dialog_DebugEntry(Activity_CollectionList.this);
             loDebug.iniDialog(args -> {
@@ -633,7 +709,8 @@ public class Activity_CollectionList extends AppCompatActivity {
         }
     }
 
-    public void ShowDCPDisclosure(){
+    private void ShowDCPDisclosure(){
+
         dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
             @Override
             public void onAccept() {
@@ -655,23 +732,60 @@ public class Activity_CollectionList extends AppCompatActivity {
             public void onDecline() {
                 dialogDisclosure.dismiss();
 
-                MessageBox loMessage = new MessageBox(Activity_CollectionList.this);
-                loMessage.initDialog();
-                loMessage.setIcon(R.drawable.baseline_error_24);
-                loMessage.setTitle("Disclosure");
-                loMessage.setMessage("Disclosure denied. Download cancelled.");
-                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                ShowMessage("Disclosure denied. Download cancelled.", 1, new OnMessageButton() {
                     @Override
-                    public void OnButtonClick(View view, AlertDialog dialog) {
-                        dialog.dismiss();
+                    public void OnPositive() {
+
+                    }
+
+                    @Override
+                    public void OnNegative() {
+
                     }
                 });
-
-                loMessage.show();
             }
         });
 
         dialogDisclosure.setMessage("Guanzon Circle collects location data to enable downloading of DCP information when the app is in use.");
         dialogDisclosure.show();
+    }
+
+    private void ShowMessage(String fsMessagex, int fnMode, OnMessageButton fiCallback){
+        poMessage.initDialog();
+        poMessage.setTitle("Daily Collection Plan");
+        poMessage.setMessage(fsMessagex);
+
+        String lsPosText = "";
+        switch (fnMode){
+            case 1:
+                poMessage.setIcon(R.drawable.baseline_message_24);
+                lsPosText = "Okay";
+                break;
+            case 2:
+                poMessage.setIcon(R.drawable.baseline_error_24);
+                lsPosText = "Okay";
+                break;
+            case 3:
+                poMessage.setIcon(R.drawable.baseline_contact_support_24);
+                lsPosText = "Yes";
+
+                poMessage.setNegativeButton("No", (view, dialog) -> {
+                    dialog.dismiss();
+                    fiCallback.OnNegative();
+                });
+                break;
+        }
+
+        poMessage.setPositiveButton(lsPosText, (view, dialog) -> {
+            dialog.dismiss();
+            fiCallback.OnPositive();
+        });
+
+        poMessage.show();
+    }
+
+    private interface OnMessageButton{
+        void OnPositive();
+        void OnNegative();
     }
 }

@@ -159,7 +159,6 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_light"
             android:text="Import from File"
-            android:visibility="gone"
             tools:ignore="HardcodedText,UnusedAttribute" />
 
     </LinearLayout>

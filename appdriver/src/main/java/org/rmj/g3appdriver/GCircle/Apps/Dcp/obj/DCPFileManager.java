@@ -4,23 +4,55 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.app.Application;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
+import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
+import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class DCPFileManager {
     private static final String TAG = DCPFileManager.class.getSimpleName();
-
     private final Application instance;
-
     private String message;
+    private DErrorLogs poError;
+
+    private void SaveError(String source, String message){
+
+        EErrorLogs logs = new EErrorLogs();
+        logs.setnErrorLogID(poError.GetErrorLogCount() + 1);
+        logs.setsMessagex(message);
+        logs.setdLogDate(getCurrentDate());
+        logs.setsSourceTransNo(source);
+        logs.setcRead("0");
+
+        poError.SaveErrorLogs(logs);
+    }
+
+    private String getCurrentDate(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
+        }
+    }
 
     public DCPFileManager(Application instance) {
         this.instance = instance;
+        this.poError = GGC_GCircleDB.getInstance(instance).errorLogsDao();
     }
 
     public String getMessage() {
@@ -41,30 +73,20 @@ public class DCPFileManager {
 
             String lsResult = builder.toString();
 
-            JSONObject loJson = new JSONObject(lsResult);
-            return loJson.toString();
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return null;
-        }
-    }
+            JSONObject laJson = new JSONObject(lsResult);
+            return laJson.toString();
+        }catch (JSONException je){
+            je.printStackTrace();
+            message = "Could not read the file properly";
 
-    public boolean ExportToFile(Uri uri, String fsVal){
-        try{
-            ParcelFileDescriptor pfd = instance.getContentResolver().
-                    openFileDescriptor(uri, "w");
-            FileOutputStream fileOutputStream =
-                    new FileOutputStream(pfd.getFileDescriptor());
-            fileOutputStream.write(fsVal.getBytes());
-            // Let the document provider know you're done by closing the stream.
-            fileOutputStream.close();
-            pfd.close();
-            return true;
-        } catch (Exception e){
+            SaveError(TAG, getLocalMessage(je));
+            return null;
+        }  catch (Exception e){
             e.printStackTrace();
             message = getLocalMessage(e);
-            return false;
+
+            SaveError(TAG, getLocalMessage(e));
+            return null;
         }
     }
 }

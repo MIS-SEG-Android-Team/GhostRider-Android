@@ -12,6 +12,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.obj.RClientUpdate;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.ImportParams;
@@ -113,21 +114,21 @@ public class LRDcp {
     }
 
     public boolean ImportFromFile(Uri uri){
-        try{
+        try {
             String lsContent = poReader.ReadToJson(uri);
 
-            if(lsContent == null){
+            if (lsContent == null) {
                 message = poReader.getMessage();
                 return false;
             }
 
             JSONObject loJson = new JSONObject(lsContent);
-            if(!loJson.has("master")){
+            if (!loJson.has("master")) {
                 message = "File doesn't have any key for DCP. Invalid file.";
                 return false;
             }
 
-            if(!loJson.has("detail")){
+            if (!loJson.has("detail")) {
                 message = "File doesn't have any key for DCP. Invalid file.";
                 return false;
             }
@@ -136,7 +137,7 @@ public class LRDcp {
             String lsTransNo = joMaster.getString("sTransNox");
 
             EDCPCollectionMaster loMaster = poDao.GetMaster(lsTransNo);
-            if(loMaster != null){
+            if (loMaster != null) {
                 message = "Dcp already exist in this local device.";
                 return false;
             }
@@ -158,7 +159,7 @@ public class LRDcp {
             Log.d(TAG, "Lr dcp collection master has been saved.");
 
             JSONArray laJson = loJson.getJSONArray("detail");
-            for(int x = 0; x < laJson.length(); x++){
+            for (int x = 0; x < laJson.length(); x++) {
                 JSONObject joDetail = laJson.getJSONObject(x);
                 EDCPCollectionDetail dcpDetail = new EDCPCollectionDetail();
                 dcpDetail.setTransNox(lsTransNo);
@@ -186,12 +187,12 @@ public class LRDcp {
                 dcpDetail.setDelayAvg(joDetail.getDouble("nDelayAvg"));
                 dcpDetail.setMonAmort(joDetail.getDouble("nMonAmort"));
                 poDao.SaveDcpDetail(dcpDetail);
-                Log.d(TAG, "DCP account no. " +dcpDetail.getAcctNmbr() + " has been saved.");
+                Log.d(TAG, "DCP account no. " + dcpDetail.getAcctNmbr() + " has been saved.");
             }
             Log.d(TAG, "DCP has been imported from file successfully.");
 
             return true;
-        } catch (Exception e){
+        }catch (Exception e){
             e.printStackTrace();
             message = getLocalMessage(e);
             return false;

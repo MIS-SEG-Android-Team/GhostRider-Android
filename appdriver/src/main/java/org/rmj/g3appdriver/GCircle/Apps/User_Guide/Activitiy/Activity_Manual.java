@@ -126,6 +126,7 @@ public class Activity_Manual extends AppCompatActivity {
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.menu_guidelines, menu);
 
         //TODO ADD GUIDE, allow access to MIS Department only
@@ -133,7 +134,7 @@ public class Activity_Manual extends AppCompatActivity {
 
             //TODO AREA HEAD / SUPERVISORS
             if (Integer.parseInt(poSession.getEmployeeLevel()) > DeptCode.LEVEL_RANK_FILE){
-                menu.findItem(R.id.action_add_guideline).setEnabled(true);
+                menu.findItem(R.id.action_add_guideline).setVisible(true);
             }else {
 
                 //TODO RANKED LEVEL, DEVELOPERS ONLY
@@ -146,6 +147,7 @@ public class Activity_Manual extends AppCompatActivity {
         }else {
             menu.findItem(R.id.action_add_guideline).setVisible(false);
         }
+        menu.findItem(R.id.action_add_guideline).setVisible(true);
 
         return true;
     }
@@ -347,6 +349,21 @@ public class Activity_Manual extends AppCompatActivity {
 
             String transnox = getIntent().getStringExtra("transnox");
             String sURLxx = mViewmodel.GetURLByTrans(transnox);
+
+            if (sURLxx == null || sURLxx.isEmpty()){
+                InitMessage(0, R.drawable.baseline_error_24, "PDF not found. Please download to reload files", "Okay", "", new OnDialogButtonCallback() {
+                    @Override
+                    public void OnPositive() {
+
+                    }
+
+                    @Override
+                    public void OnNegative() {
+
+                    }
+                });
+                return;
+            }
 
             Intent loIntent = new Intent(Activity_Manual.this, Activity_PDFViewer.class);
             loIntent.putExtra("pdf_url", sURLxx);
