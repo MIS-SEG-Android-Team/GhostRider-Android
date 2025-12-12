@@ -126,7 +126,17 @@
                 android:layout_alignBottom="@+id/recyclerview_timeLog"
                 android:layout_centerHorizontal="true"
                 android:text="Select Branch"
-                app:layout_constraintBottom_toTopOf="@id/btn_takeSelfie"
+                app:layout_constraintBottom_toTopOf="@id/btn_detect"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_detect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Detect Face"
+                app:icon="@drawable/ic_camera_24"
+                app:layout_constraintBottom_toTopOf="@+id/btn_takeSelfie"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 

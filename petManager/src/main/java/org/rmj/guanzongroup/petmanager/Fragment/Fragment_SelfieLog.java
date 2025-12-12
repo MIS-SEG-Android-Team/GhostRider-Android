@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.media.FaceDetector;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -76,7 +77,7 @@ public class Fragment_SelfieLog extends Fragment {
 
     private MaterialTextView lblBranch;
     private TextInputEditText txtDate;
-    private MaterialButton btnCamera, btnBranch;
+    private MaterialButton btnCamera, btnBranch, btn_detect;
     private RecyclerView recyclerView;
 
     private final SelfieLog.SelfieLogDetail poSelfie = new SelfieLog.SelfieLogDetail();
@@ -87,6 +88,7 @@ public class Fragment_SelfieLog extends Fragment {
     private DialogDisclosure dialogDisclosure;
 
     private ActivityResultLauncher<Intent> poCamera;
+    private ActivityResultLauncher<Intent> poFaceDetect;
 
     private interface OnDialogButtonCallback{
         void OnPositive();
@@ -230,6 +232,15 @@ public class Fragment_SelfieLog extends Fragment {
             }
         });
 
+        btn_detect.setOnClickListener( v -> {
+            try{
+
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
         mViewModel.GetSelectedDate().observe(getViewLifecycleOwner(), date -> {
             try{
                 mViewModel.GetTimeLogForTheDay(date).observe(getViewLifecycleOwner(), eLog_selfies -> {
@@ -355,6 +366,7 @@ public class Fragment_SelfieLog extends Fragment {
     private void initWidgets(View view){
         lblBranch = view.findViewById(R.id.lbl_userBranch);
         btnCamera = view.findViewById(R.id.btn_takeSelfie);
+        btn_detect = view.findViewById(R.id.btn_detect);
         btnBranch = view.findViewById(R.id.btn_selectBranch);
         recyclerView = view.findViewById(R.id.recyclerview_timeLog);
         txtDate = view.findViewById(R.id.txt_selfieDate);
@@ -554,6 +566,13 @@ public class Fragment_SelfieLog extends Fragment {
     }
 
     private void InitActivityResultLaunchers(){
+
+        poFaceDetect = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult o) {
+
+            }
+        });
 
         poCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override

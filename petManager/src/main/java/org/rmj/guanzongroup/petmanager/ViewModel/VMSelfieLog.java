@@ -16,11 +16,7 @@ import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
-import android.net.Uri;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
-import androidx.exifinterface.media.ExifInterface;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -28,8 +24,6 @@ import androidx.lifecycle.MutableLiveData;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSelfieLog;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
-import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESelfieLog;
 import org.rmj.g3appdriver.lib.Etc.Branch;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.ImageFileCreator;
@@ -38,6 +32,7 @@ import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
 import org.rmj.g3appdriver.GCircle.Apps.CashCount.CashCount;
+import org.rmj.g3appdriver.lib.FacialRecognition.FRUtility;
 import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
 import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
 import org.rmj.g3appdriver.lib.Location.LocationRetriever;
@@ -51,6 +46,7 @@ public class VMSelfieLog extends AndroidViewModel {
 
     private final Application instance;
     private final SelfieLog poSys;
+    private final FRUtility poFR;
     private final CashCount poCash;
     private final Branch pobranch;
     private final ConnectionUtil poConn;
@@ -96,6 +92,7 @@ public class VMSelfieLog extends AndroidViewModel {
         this.poUser = new EmployeeMaster(instance);
         this.poSys = new SelfieLog(instance);
         this.pobranch = new Branch(instance);
+        this.poFR = new FRUtility(instance);
         this.poCash = new CashCount(instance);
         this.poConn = new ConnectionUtil(instance);
         this.poSession = EmployeeSession.getInstance(instance);
@@ -445,6 +442,15 @@ public class VMSelfieLog extends AndroidViewModel {
                 }
             }
         });
+    }
+
+    public void InitFaceMesh(Activity foActvity){
+        try{
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void SaveError(String source, String message){
