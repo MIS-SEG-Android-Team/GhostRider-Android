@@ -31,6 +31,7 @@ import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCounte
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_Inventory;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Activity.Activity_ApprovalCode;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Activity.Activity_ApprovalSelection;
+import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_Transaction_History;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_LogCollection;
 import org.rmj.guanzongroup.ghostrider.samsungknox.Activity_Knox;
@@ -156,6 +157,11 @@ public class ChildObject {
             case "manual log":
                 loIntent = new Intent(context, Activity_ApprovalCode.class);
                 loIntent.putExtra("sysCode", "2");
+                break;
+
+            case "by transaction":
+                loIntent = new Intent(context, Fragment_Transaction_History.class);
+                loIntent.putExtra("sysCode", "3");
                 break;
 
             case "random stock inventory":

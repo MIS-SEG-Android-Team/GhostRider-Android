@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/zxing_transparent"
+        app:cardUseCompatPadding="true">
+        
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/HeaderLabelBlack"
+                android:id="@+id/mtv_sourceno"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="GK0125000001"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/HeaderLabelBlack"
+                android:id="@+id/mtv_transactdt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="2025-15-15"
+                android:gravity="end"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintStart_toEndOf="@+id/mtv_sourceno"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/DescriptionHeaderStyle"
+                android:id="@+id/mtv_remarks"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Standard Supply and Installation of 100KWP for Honda Bauang La Union"
+                android:paddingHorizontal="10dp"
+                android:paddingBottom="5dp"
+                android:maxLines="1"
+                app:layout_constraintTop_toBottomOf="@+id/mtv_sourceno"
+                app:layout_constraintStart_toStartOf="@+id/mtv_sourceno"
+                app:layout_constraintEnd_toEndOf="@+id/mtv_transactdt"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
