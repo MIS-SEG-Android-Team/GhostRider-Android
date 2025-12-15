@@ -47,58 +47,67 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mViewModel.getApprovalCodes(mViewModel.getLatestStamp(), new VMApprovalSelection.onDownload() {
-            @Override
-            public void onFinished(String message) {
-                Toast.makeText(Activity_ApprovalSelection.this, message, Toast.LENGTH_LONG).show();
+        String lsSysType = getIntent().getStringExtra("sysCode");
 
-                String lsSysType = getIntent().getStringExtra("sysCode");
-                RecyclerView recyclerView = findViewById(R.id.recyclerview_approvalAuth);
+        switch (lsSysType){
 
-                mViewModel.getReferenceAuthList(lsSysType).observe(Activity_ApprovalSelection.this, requestList -> {
-                    if (requestList != null){
-                        List<ESCA_Request> rqstList = new ArrayList<>();
+            case "3":
+                break;
+            default:
+                mViewModel.getApprovalCodes(mViewModel.getLatestStamp(), new VMApprovalSelection.onDownload() {
+                    @Override
+                    public void onFinished(String message) {
+                        Toast.makeText(Activity_ApprovalSelection.this, message, Toast.LENGTH_LONG).show();
 
-                        if (requestList.size() > 0){
+                        RecyclerView recyclerView = findViewById(R.id.recyclerview_approvalAuth);
 
-                            for (int i = 0; i < requestList.size(); i++){
-                                ESCA_Request loRqst = requestList.get(i);
-                                String sSCACodex = loRqst.getSCACodex();
+                        mViewModel.getReferenceAuthList(lsSysType).observe(Activity_ApprovalSelection.this, requestList -> {
+                            if (requestList != null){
+                                List<ESCA_Request> rqstList = new ArrayList<>();
 
-                                ESCARqstEmp loVal = mViewModel.getRqstEmp(sSCACodex);
-                                //todo: add to filter approval list if:
-                                if (loVal != null){ //todo: has rows from table sca_emp_request
-                                    rqstList.add(loRqst);
-                                }else { //todo: by default, add approval list not existing on table sca_emp_request
-                                    if (mViewModel.getRqstExst(sSCACodex) == null){
-                                        rqstList.add(loRqst);
+                                if (requestList.size() > 0){
+
+                                    for (int i = 0; i < requestList.size(); i++){
+                                        ESCA_Request loRqst = requestList.get(i);
+                                        String sSCACodex = loRqst.getSCACodex();
+
+                                        ESCARqstEmp loVal = mViewModel.getRqstEmp(sSCACodex);
+                                        //todo: add to filter approval list if:
+                                        if (loVal != null){ //todo: has rows from table sca_emp_request
+                                            rqstList.add(loRqst);
+                                        }else { //todo: by default, add approval list not existing on table sca_emp_request
+                                            if (mViewModel.getRqstExst(sSCACodex) == null){
+                                                rqstList.add(loRqst);
+                                            }
+                                        }
                                     }
                                 }
+
+                                LinearLayoutManager manager = new LinearLayoutManager(Activity_ApprovalSelection.this);
+                                manager.setOrientation(RecyclerView.VERTICAL);
+
+                                recyclerView.setAdapter(new AdapterApprovalAuth(rqstList, (SystemCode, SCAType) -> {
+                                    Intent loIntentx = new Intent(Activity_ApprovalSelection.this, Activity_ApprovalCode.class);
+                                    if(SystemCode.equalsIgnoreCase("CA")) {
+                                        loIntentx.putExtra("sysCode", "1");
+                                    } else{
+                                        loIntentx.putExtra("sysCode", "0");
+                                    }
+                                    loIntentx.putExtra("systype", lsSysType);
+                                    loIntentx.putExtra("sSystemCd", SystemCode);
+                                    loIntentx.putExtra("sSCATypex", SCAType);
+                                    startActivity(loIntentx);
+                                    overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+                                }));
+
+                                recyclerView.setLayoutManager(manager);
                             }
-                        }
-
-                        LinearLayoutManager manager = new LinearLayoutManager(Activity_ApprovalSelection.this);
-                        manager.setOrientation(RecyclerView.VERTICAL);
-
-                        recyclerView.setAdapter(new AdapterApprovalAuth(rqstList, (SystemCode, SCAType) -> {
-                            Intent loIntentx = new Intent(Activity_ApprovalSelection.this, Activity_ApprovalCode.class);
-                            if(SystemCode.equalsIgnoreCase("CA")) {
-                                loIntentx.putExtra("sysCode", "1");
-                            } else{
-                                loIntentx.putExtra("sysCode", "0");
-                            }
-                            loIntentx.putExtra("systype", lsSysType);
-                            loIntentx.putExtra("sSystemCd", SystemCode);
-                            loIntentx.putExtra("sSCATypex", SCAType);
-                            startActivity(loIntentx);
-                            overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
-                        }));
-
-                        recyclerView.setLayoutManager(manager);
+                        });
                     }
                 });
-            }
-        });
+                break;
+
+        }
     }
 
     @Override

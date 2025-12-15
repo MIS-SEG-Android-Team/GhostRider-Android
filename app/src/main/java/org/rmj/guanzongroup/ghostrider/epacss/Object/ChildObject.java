@@ -160,7 +160,12 @@ public class ChildObject {
                 break;
 
             case "by transaction":
-                loIntent = new Intent(context, Fragment_Transaction_History.class);
+                loIntent = new Intent(context, Activity_ApprovalSelection.class);
+                loIntent.putExtra("sysCode", "3");
+                break;
+
+            case "by history":
+                loIntent = new Intent(context, Activity_ApprovalSelection.class);
                 loIntent.putExtra("sysCode", "3");
                 break;
 
