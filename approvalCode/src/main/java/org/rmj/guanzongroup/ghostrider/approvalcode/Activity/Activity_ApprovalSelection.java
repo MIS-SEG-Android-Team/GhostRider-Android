@@ -13,6 +13,7 @@ package org.rmj.guanzongroup.ghostrider.approvalcode.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,9 +23,11 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Etc.AdapterApprovalAuth;
+import org.rmj.guanzongroup.ghostrider.approvalcode.Etc.Adapter_CAS_ApprovalCode;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
 import org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel.VMApprovalSelection;
 
@@ -32,8 +35,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Activity_ApprovalSelection extends AppCompatActivity {
+
     public static final String TAG = Activity_ApprovalSelection.class.getSimpleName();
     private VMApprovalSelection mViewModel;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,7 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
         mViewModel = new ViewModelProvider(this).get(VMApprovalSelection.class);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar_approvalSelection);
+        recyclerView = findViewById(R.id.recyclerview_approvalAuth);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -52,14 +58,42 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
         switch (lsSysType){
 
             case "3":
+                mViewModel.importCASTransactions(new VMApprovalSelection.onDownload() {
+                    @Override
+                    public void onFinished(String message) {
+
+                        Toast.makeText(Activity_ApprovalSelection.this, message, Toast.LENGTH_LONG).show();
+
+                        mViewModel.getCASApprovalCodes().observe(Activity_ApprovalSelection.this, new Observer<List<ECASApprovalCode>>() {
+                            @Override
+                            public void onChanged(List<ECASApprovalCode> ecasApprovalCodes) {
+                                if (ecasApprovalCodes != null){
+
+                                    if (ecasApprovalCodes.size() > 0){
+
+                                        Adapter_CAS_ApprovalCode loAdapter  = new Adapter_CAS_ApprovalCode(ecasApprovalCodes, new Adapter_CAS_ApprovalCode.OnAuthItemClickListener() {
+                                            @Override
+                                            public void OnClick(String fsCode, String fsDescript) {
+
+                                            }
+                                        });
+                                        loAdapter.notifyDataSetChanged();
+
+                                        recyclerView.setAdapter(loAdapter);
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(Activity_ApprovalSelection.this, LinearLayoutManager.VERTICAL, false));
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
                 break;
             default:
                 mViewModel.getApprovalCodes(mViewModel.getLatestStamp(), new VMApprovalSelection.onDownload() {
                     @Override
                     public void onFinished(String message) {
-                        Toast.makeText(Activity_ApprovalSelection.this, message, Toast.LENGTH_LONG).show();
 
-                        RecyclerView recyclerView = findViewById(R.id.recyclerview_approvalAuth);
+                        Toast.makeText(Activity_ApprovalSelection.this, message, Toast.LENGTH_LONG).show();
 
                         mViewModel.getReferenceAuthList(lsSysType).observe(Activity_ApprovalSelection.this, requestList -> {
                             if (requestList != null){

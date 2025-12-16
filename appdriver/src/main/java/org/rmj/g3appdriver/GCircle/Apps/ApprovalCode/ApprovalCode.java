@@ -26,7 +26,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.apprdiver.util.MiscUtil;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
+import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
@@ -47,13 +49,12 @@ public class ApprovalCode {
     private static final String TAG = ApprovalCode.class.getSimpleName();
 
     private final DApprovalCode poDao;
-
+    private final DCASApprovalCode poCASDao;
     private final DSCARqstEmp poDaoRstEmp;
 
+
     public final Application instance;
-
     private final GCircleApi poApi;
-
     private final HttpHeaders poHeaders;
 
     private String message;
@@ -61,6 +62,7 @@ public class ApprovalCode {
     public ApprovalCode(Application instance) {
         this.instance = instance;
         this.poDao = GGC_GCircleDB.getInstance(instance).ApprovalDao();
+        this.poCASDao = GGC_GCircleDB.getInstance(instance).casapprovalDao();
         this.poDaoRstEmp = GGC_GCircleDB.getInstance(instance).scaRqstEmpDao();
         this.poApi = new GCircleApi(instance);
         this.poHeaders = HttpHeaders.getInstance(instance);
@@ -261,6 +263,49 @@ public class ApprovalCode {
         }
     }
 
+    public boolean ImportCASTransactions(){
+        try{
+            JSONObject params = new JSONObject();
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlCasTransactions(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+
+            JSONArray laDetail = loResponse.getJSONArray("detail");
+            for (int i = 0; i < laDetail.length(); i++) {
+
+                JSONObject loResult = laDetail.getJSONObject(i);
+
+                ECASApprovalCode loCASCode = new ECASApprovalCode();
+                loCASCode.setsSourceCD(loResult.getString("sSourceCD"));
+                loCASCode.setsDescript(loResult.getString("sDescript"));
+
+                poCASDao.SaveCASApprovalCode(loCASCode);
+            }
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
     public LiveData<List<ESCA_Request>> getAuthorizedFeatures(String fsVal){
 
         EEmployeeInfo loUser = poDao.GetUserInfo();
@@ -329,6 +374,11 @@ public class ApprovalCode {
 
         return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
     }
+
+    public LiveData<List<ECASApprovalCode>> getCASApprovalCodes(){
+        return poCASDao.getCASApprovalCodes();
+    }
+
 
     public String getLatestStamp(){
         return poDaoRstEmp.GetLatestStamp();

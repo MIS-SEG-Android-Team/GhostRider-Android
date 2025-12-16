@@ -20,6 +20,7 @@ import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_SCARequest;
 import org.rmj.g3appdriver.GCircle.ImportData.model.ImportDataCallback;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
+import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 
@@ -49,8 +50,29 @@ public class VMApprovalSelection extends AndroidViewModel {
         return poSys.getAuthorizedFeatures(Type);
     }
 
+    public LiveData<List<ECASApprovalCode>> getCASApprovalCodes(){
+        return poSys.getCASApprovalCodes();
+    }
+
     public String getLatestStamp(){
         return poSys.getLatestStamp();
+    }
+
+    public void importCASTransactions(onDownload foCallback){
+        TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
+                if (!poSys.ImportCASTransactions()){
+                    return poSys.getMessage();
+                }
+                return "CAS Transactions successfully downloaded";
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                foCallback.onFinished((String) object);
+            }
+        });
     }
 
     public ESCARqstEmp getRqstEmp(String sSCACode){
