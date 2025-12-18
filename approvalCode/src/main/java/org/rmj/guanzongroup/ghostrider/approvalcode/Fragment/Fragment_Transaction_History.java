@@ -68,7 +68,11 @@ public class Fragment_Transaction_History extends Fragment {
         ib_filter = v.findViewById(R.id.ib_filter);
         rcv_list = v.findViewById(R.id.rcv_list);
 
-        ImportTransactionRequests();
+        if (lsArgType.equals("3")){
+            ImportTransactionRequests();
+        }else {
+            InitTransactionRequests(GetLastMonth(), GetDateToday());
+        }
         InitListener();
 
         return v;
@@ -140,34 +144,50 @@ public class Fragment_Transaction_History extends Fragment {
 
     private void InitTransactionRequests(String lsStartDt, String lsEndDt){
 
-        mViewModel.getCASRequests(lsArgCode, lsStartDt, lsEndDt).observe(getViewLifecycleOwner(), new Observer<List<ECASRequests>>() {
-            @Override
-            public void onChanged(List<ECASRequests> ecasRequests) {
+        if (lsArgType.equals("3")){
 
-                if (ecasRequests != null){
-
-                    loAdapter = new Adapter_Transaction_History(ecasRequests, new Adapter_Transaction_History.OnItemClick() {
-                        @Override
-                        public void OnClick(ECASRequests loRequest) {
-                            Intent loIntent = new Intent(requireContext(), Activity_TransactionApproval_Details.class);
-                            loIntent.putExtra("transnox", loRequest.getsTransNox());
-                            loIntent.putExtra("mode", lsArgType);
-                            loIntent.putExtra("source", lsArgSource);
-
-                            startActivity(loIntent);
-                        }
-                    });
-                    loAdapter.notifyDataSetChanged();
-
-                    rcv_list.setAdapter(loAdapter);
-                    rcv_list.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
-
-                    if (!tie_search.getText().toString().isEmpty()){
-                        InitFilter(tie_search.getText().toString());
+            mViewModel.getCASRequests(lsArgCode, lsStartDt, lsEndDt).observe(getViewLifecycleOwner(), new Observer<List<ECASRequests>>() {
+                @Override
+                public void onChanged(List<ECASRequests> ecasRequests) {
+                    if (ecasRequests != null){
+                        InitAdapter(ecasRequests);
                     }
                 }
+            });
+        }else if (lsArgType.equals("4")){
+
+            mViewModel.GetCASHistory(lsArgCode, lsStartDt, lsEndDt).observe(getViewLifecycleOwner(), new Observer<List<ECASRequests>>() {
+                @Override
+                public void onChanged(List<ECASRequests> ecasRequests) {
+                    if (ecasRequests != null){
+                        InitAdapter(ecasRequests);
+                    }
+                }
+            });
+        }
+    }
+
+    private void InitAdapter(List<ECASRequests> faRequests){
+
+        loAdapter = new Adapter_Transaction_History(faRequests, new Adapter_Transaction_History.OnItemClick() {
+            @Override
+            public void OnClick(ECASRequests loRequest) {
+                Intent loIntent = new Intent(requireContext(), Activity_TransactionApproval_Details.class);
+                loIntent.putExtra("transnox", loRequest.getsTransNox());
+                loIntent.putExtra("mode", lsArgType);
+                loIntent.putExtra("source", lsArgSource);
+
+                startActivity(loIntent);
             }
         });
+        loAdapter.notifyDataSetChanged();
+
+        rcv_list.setAdapter(loAdapter);
+        rcv_list.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+
+        if (!tie_search.getText().toString().isEmpty()){
+            InitFilter(tie_search.getText().toString());
+        }
 
     }
 

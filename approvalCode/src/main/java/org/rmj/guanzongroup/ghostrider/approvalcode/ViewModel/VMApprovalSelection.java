@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_SCARequest;
 import org.rmj.g3appdriver.GCircle.ImportData.model.ImportDataCallback;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
@@ -28,12 +29,15 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.ApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 import java.util.List;
 
 public class VMApprovalSelection extends AndroidViewModel {
     public static final String TAG = VMApprovalSelection.class.getSimpleName();
+
+    private final EmployeeMaster poMaster;
     private final ApprovalCode poSys;
     private final DSCARqstEmp poDaoRstEmp;
     private final DApprovalCode poUser;
@@ -42,30 +46,66 @@ public class VMApprovalSelection extends AndroidViewModel {
     public VMApprovalSelection(@NonNull Application application) {
         super(application);
 
+        this.poMaster = new EmployeeMaster(application);
         this.poSys = new ApprovalCode(application);
         this.poDaoRstEmp = GGC_GCircleDB.getInstance(application).scaRqstEmpDao();
         this.poUser = GGC_GCircleDB.getInstance(application).ApprovalDao();
     }
 
     public String getDescription(String code){
-        return poSys.getDescription(code);
+        return poSys.GetDescription(code);
     }
 
     public LiveData<List<ESCA_Request>> getReferenceAuthList(String Type){
         return poSys.getAuthorizedFeatures(Type);
     }
     public LiveData<List<ECASApprovalCode>> getCASApprovalCodes(){
-        return poSys.getCASApprovalCodes();
+        return poSys.GetCASApprovalCodes();
     }
     public LiveData<List<ECASRequests>> getCASRequests(String fsSource, String dFrom, String dTo){
-        return poSys.getCASRequests(fsSource, dFrom, dTo);
+        return poSys.GetCASRequests(fsSource, dFrom, dTo);
     }
     public LiveData<ECASRequests> GetRequestDetail(String sTransNox){
         return poSys.GetRequestDetail(sTransNox);
     }
+    public LiveData<List<ECASRequests>> GetCASHistory(String fsSource, String dFrom, String dTo){
+        return poSys.GetCASHistory(fsSource, dFrom, dTo);
+    }
 
     public String getLatestStamp(){
         return poSys.getLatestStamp();
+    }
+
+    public void updateCASRequest(String fsAuthType, String fsTransNox,  String fscTranStat, OnApproval foCallback){
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                foCallback.OnLoad("CAS Approval", "Approving request . . .");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+                if (!poSys.VerifyUserMatrix(fsAuthType, poMaster.getEmployeeID())){
+                    lomessage = poSys.getMessage();
+                    return false;
+                }
+
+                if (!poSys.UpdateCASRequest(fsTransNox, poMaster.getEmployeeID(), fscTranStat)){
+                    lomessage = poSys.getMessage();
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                if (!(Boolean) object){
+                    foCallback.OnFailed(poSys.getMessage());
+                } else {
+                    foCallback.OnSuccess();
+                }
+            }
+        });
     }
 
     public void importCASTransactions(onDownload foCallback){
@@ -85,9 +125,11 @@ public class VMApprovalSelection extends AndroidViewModel {
         });
     }
     public void importCASRequests(String fsSrcCd, onDownload foCallback){
+
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
+
                 if (!poSys.ImportCASRequests(fsSrcCd)){
                     return poSys.getMessage();
                 }
@@ -148,5 +190,11 @@ public class VMApprovalSelection extends AndroidViewModel {
 
     public interface onDownload{
         void onFinished(String message);
+    }
+
+    public interface OnApproval{
+        void OnLoad(String fsTitle, String fsMessage);
+        void OnSuccess();
+        void OnFailed(String fsMessage);
     }
 }

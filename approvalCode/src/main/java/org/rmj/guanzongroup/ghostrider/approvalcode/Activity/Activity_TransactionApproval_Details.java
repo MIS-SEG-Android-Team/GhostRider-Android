@@ -3,28 +3,37 @@ package org.rmj.guanzongroup.ghostrider.approvalcode.Activity;
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
+import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
 import org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel.VMApprovalSelection;
+
+import java.util.Objects;
 
 public class Activity_TransactionApproval_Details extends AppCompatActivity {
 
     private String lsTransNox;
     private String lsMode;
 
+    private LoadDialog loDialog;
     private MessageBox loMessage;
     private VMApprovalSelection mViewModel;
 
     private MaterialTextView mtv_transactno, mtv_dtransact, mtv_status, mtv_sourceno, mtv_recipient, mtv_industry, mtv_source, mtv_remarks;
+    private MaterialToolbar toolbar;
     private MaterialButton btn_disapprove, btn_approve;
 
     @Override
@@ -33,6 +42,7 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
 
         setContentView(R.layout.layout_transactionapproval_details);
 
+        loDialog = new LoadDialog(this);
         loMessage = new MessageBox(this);
 
         if (!getIntent().hasExtra("transnox")){
@@ -66,6 +76,7 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
         lsTransNox = getIntent().getStringExtra("transnox");
         lsMode = getIntent().getStringExtra("mode");
 
+        toolbar = findViewById(R.id.toolbar);
         mtv_transactno = findViewById(R.id.mtv_transactno);
         mtv_dtransact = findViewById(R.id.mtv_dtransact);
         mtv_status = findViewById(R.id.mtv_status);
@@ -77,6 +88,10 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
 
         btn_disapprove = findViewById(R.id.btn_disapprove);
         btn_approve = findViewById(R.id.btn_approve);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Guanzon Circle");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (lsMode.equals("4")){
             btn_disapprove.setVisibility(View.GONE);
@@ -90,11 +105,44 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
 
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void InitDetails(){
+
         mViewModel.GetRequestDetail(lsTransNox).observe(Activity_TransactionApproval_Details.this, new Observer<ECASRequests>() {
             @Override
             public void onChanged(ECASRequests ecasRequests) {
 
+                if (ecasRequests == null){
+
+                    InitMessage(2, "Transaction details not found", new onMessageButton() {
+                        @Override
+                        public void onPositive() {
+                            finish();
+                        }
+
+                        @Override
+                        public void onNegative() {
+
+                        }
+                    });
+
+                    return;
+                }
+
+                //display transaction details
                 mtv_transactno.setText(ecasRequests.getsTransNox());
                 mtv_dtransact.setText(ecasRequests.getdTransact());
                 mtv_sourceno.setText(ecasRequests.getsSourceNo());
@@ -108,6 +156,7 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
                     mtv_source.setText(getIntent().getStringExtra("source"));
                 }
 
+                //display status description
                 switch (ecasRequests.getcTranStat()){
                     case "0":
                         mtv_status.setText("Pending");
@@ -121,6 +170,85 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
                         mtv_status.setTextColor(Color.RED);
                         break;
                 }
+
+                //Initialize object listeners
+                btn_approve.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ApproveRequest(ecasRequests.getsAuthType(), ecasRequests.getsTransNox(), "1");
+                    }
+                });
+
+                btn_disapprove.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ApproveRequest(ecasRequests.getsAuthType(), ecasRequests.getsTransNox(), "3");
+                    }
+                });
+
+            }
+        });
+    }
+
+    private void ApproveRequest(String fsAuthType, String fsTransNox, String fscTranStat){
+
+        InitMessage(3, "Are you sure you want to approve this request?", new onMessageButton() {
+            @Override
+            public void onPositive() {
+
+                mViewModel.updateCASRequest(fsAuthType, fsTransNox, fscTranStat, new VMApprovalSelection.OnApproval() {
+                    @Override
+                    public void OnLoad(String fsTitle, String fsMessage) {
+                        loDialog.initDialog(fsTitle, fsMessage, false);
+                        loDialog.show();
+                    }
+
+                    @Override
+                    public void OnSuccess() {
+                        loDialog.dismiss();
+
+                        String lsMessage = "";
+                        if (fscTranStat.equals("3")){
+                            lsMessage = "Request has been disapproved!";
+                        }else if (fscTranStat.equals("1")) {
+                            lsMessage = "Request has been approved!";
+                        }
+
+                        InitMessage(1, lsMessage, new onMessageButton() {
+                            @Override
+                            public void onPositive() {
+                                finish();
+                            }
+
+                            @Override
+                            public void onNegative() {
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void OnFailed(String fsMessage) {
+                        loDialog.dismiss();
+
+                        InitMessage(2, fsMessage, new onMessageButton() {
+                            @Override
+                            public void onPositive() {
+
+                            }
+
+                            @Override
+                            public void onNegative() {
+
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onNegative() {
+
             }
         });
     }

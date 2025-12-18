@@ -443,7 +443,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             // Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `CAS_Requests` " +
                     "(`sTransNox` TEXT NOT NULL, `dTransact` TEXT, `sSourceCD` TEXT," +
-                    "`sSourceNo` TEXT, `sDescript` TEXT, `sCompnyNm` TEXT, `sRemarksx` TEXT," +
+                    "`sSourceNo` TEXT, `sAuthType` TEXT, `sDescript` TEXT, `sCompnyNm` TEXT, `sRemarksx` TEXT," +
                     "`cTranStat` TEXT, `dApproved` TEXT, `sAppSrcNo` TEXT," +
                     "PRIMARY KEY(`sTransNox`))");
 

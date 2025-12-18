@@ -348,6 +348,7 @@ public class ApprovalCode {
                 loRequests.setdTransact(loResult.getString("dTransact"));
                 loRequests.setsSourceCD(loResult.getString("sSourceCD"));
                 loRequests.setsSourceNo(loResult.getString("sSourceNo"));
+                loRequests.setsAuthType(loResult.getString("sAuthType"));
                 loRequests.setsDescript(loResult.getString("sDescript"));
                 loRequests.setsCompnyNm(loResult.getString("sCompnyNm"));
                 loRequests.setsRemarksx(loResult.getString("sRemarksx"));
@@ -357,6 +358,77 @@ public class ApprovalCode {
 
                 poCASReqDao.SaveCASRequest(loRequests);
             }
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
+    public boolean VerifyUserMatrix(String fsAuthType, String fsEmployID){
+        try{
+            JSONObject params = new JSONObject();
+            params.put("sEmployID", "M02907000506");
+            params.put("sAuthType", fsAuthType);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlCasMatrix(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+            message = "User verified successfully";
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
+    public boolean UpdateCASRequest(String fsTransNox, String fsEmployID, String fscTranStat){
+        try{
+            JSONObject params = new JSONObject();
+            params.put("sEmployID", "M02907000506");
+            params.put("sTransNox", fsTransNox);
+            params.put("cTranStat", fscTranStat);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlCasApproval(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            System.out.println(lsResponse);
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+
+            poCASReqDao.UpdateRequest(loResponse.getString("sTransNox"), loResponse.getString("cTranStat"), loResponse.getString("dApproved"), loResponse.getString("sEmployID"));
 
             return true;
         } catch (Exception e){
@@ -434,17 +506,22 @@ public class ApprovalCode {
 
         return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
     }
-    public String getDescription(String code){
-        return poCASDao.getDescription(code);
-    }
-    public LiveData<List<ECASApprovalCode>> getCASApprovalCodes(){
+
+    public LiveData<List<ECASApprovalCode>> GetCASApprovalCodes(){
         return poCASDao.getCASApprovalCodes();
     }
-    public LiveData<List<ECASRequests>> getCASRequests(String fsSource, String dFrom, String dTo){
+    public LiveData<List<ECASRequests>> GetCASRequests(String fsSource, String dFrom, String dTo){
         return poCASReqDao.GetRequests(fsSource, dFrom, dTo);
+    }
+    public LiveData<List<ECASRequests>> GetCASHistory(String fsSource, String dFrom, String dTo){
+        return poCASReqDao.GetHistory(fsSource, dFrom, dTo);
     }
     public LiveData<ECASRequests> GetRequestDetail(String sTransNox){
         return poCASReqDao.GetRequestDetail(sTransNox);
+    }
+
+    public String GetDescription(String code){
+        return poCASDao.getDescription(code);
     }
     public String getLatestStamp(){
         return poDaoRstEmp.GetLatestStamp();

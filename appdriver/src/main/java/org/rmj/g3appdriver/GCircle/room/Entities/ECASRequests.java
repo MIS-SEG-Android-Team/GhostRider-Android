@@ -22,6 +22,9 @@ public class ECASRequests {
     @ColumnInfo(name = "sSourceNo")
     public String sSourceNo;
 
+    @ColumnInfo(name = "sAuthType")
+    public String sAuthType;
+
     @ColumnInfo(name = "sDescript")
     public String sDescript;
 
@@ -54,6 +57,10 @@ public class ECASRequests {
 
     public void setsSourceNo(String sSourceNo) {
         this.sSourceNo = sSourceNo;
+    }
+
+    public void setsAuthType(String sAuthType) {
+        this.sAuthType = sAuthType;
     }
 
     public void setsDescript(String sDescript) {
@@ -95,6 +102,10 @@ public class ECASRequests {
 
     public String getsSourceNo() {
         return sSourceNo;
+    }
+
+    public String getsAuthType() {
+        return sAuthType;
     }
 
     public String getsDescript() {
