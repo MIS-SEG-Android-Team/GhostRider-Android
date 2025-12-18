@@ -58,6 +58,7 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
         switch (lsSysType){
 
             case "3":
+            case "4":
                 mViewModel.importCASTransactions(new VMApprovalSelection.onDownload() {
                     @Override
                     public void onFinished(String message) {
@@ -75,6 +76,16 @@ public class Activity_ApprovalSelection extends AppCompatActivity {
                                             @Override
                                             public void OnClick(String fsCode, String fsDescript) {
 
+                                                Intent loIntentx = new Intent(Activity_ApprovalSelection.this, Activity_ApprovalCode.class);
+
+                                                //By Transaction (3)/ History(4)
+                                                loIntentx.putExtra("sysCode", lsSysType);
+                                                loIntentx.putExtra("systype", lsSysType);
+                                                loIntentx.putExtra("sSystemCd", fsCode);
+                                                loIntentx.putExtra("sSCATypex", fsDescript);
+
+                                                startActivity(loIntentx);
+                                                overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
                                             }
                                         });
                                         loAdapter.notifyDataSetChanged();

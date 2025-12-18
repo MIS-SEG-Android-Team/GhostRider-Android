@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_ApprovalEntry;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_CreditAppApproval;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_ManualLog;
+import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_Transaction_History;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
 import com.google.android.material.appbar.MaterialToolbar;
 
@@ -117,6 +118,17 @@ public class Activity_ApprovalCode extends AppCompatActivity {
             return new Fragment_ApprovalEntry();
         } else if(SysCode.equalsIgnoreCase("1")){
             return new Fragment_CreditAppApproval();
+        } else if(SysCode.equalsIgnoreCase("3") || SysCode.equalsIgnoreCase("4")){
+            Fragment_Transaction_History loFragment = new Fragment_Transaction_History();
+
+            Bundle lobundle = new Bundle();
+            lobundle.putString("type", psSystemType); //By Transaction (3)/ History(4)
+            lobundle.putString("code", psSystemCode); //POxx
+            lobundle.putString("source", psSCATypexxx); //Purchasing
+
+            loFragment.setArguments(lobundle);
+
+            return loFragment;
         } else {
             return new Fragment_ManualLog();
         }

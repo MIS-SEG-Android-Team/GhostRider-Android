@@ -21,6 +21,7 @@ import org.rmj.g3appdriver.GCircle.ImportData.model.ImportDataCallback;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
+import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 
@@ -46,12 +47,21 @@ public class VMApprovalSelection extends AndroidViewModel {
         this.poUser = GGC_GCircleDB.getInstance(application).ApprovalDao();
     }
 
+    public String getDescription(String code){
+        return poSys.getDescription(code);
+    }
+
     public LiveData<List<ESCA_Request>> getReferenceAuthList(String Type){
         return poSys.getAuthorizedFeatures(Type);
     }
-
     public LiveData<List<ECASApprovalCode>> getCASApprovalCodes(){
         return poSys.getCASApprovalCodes();
+    }
+    public LiveData<List<ECASRequests>> getCASRequests(String fsSource, String dFrom, String dTo){
+        return poSys.getCASRequests(fsSource, dFrom, dTo);
+    }
+    public LiveData<ECASRequests> GetRequestDetail(String sTransNox){
+        return poSys.GetRequestDetail(sTransNox);
     }
 
     public String getLatestStamp(){
@@ -66,6 +76,22 @@ public class VMApprovalSelection extends AndroidViewModel {
                     return poSys.getMessage();
                 }
                 return "CAS Transactions successfully downloaded";
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                foCallback.onFinished((String) object);
+            }
+        });
+    }
+    public void importCASRequests(String fsSrcCd, onDownload foCallback){
+        TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
+                if (!poSys.ImportCASRequests(fsSrcCd)){
+                    return poSys.getMessage();
+                }
+                return "CAS Requests successfully downloaded";
             }
 
             @Override

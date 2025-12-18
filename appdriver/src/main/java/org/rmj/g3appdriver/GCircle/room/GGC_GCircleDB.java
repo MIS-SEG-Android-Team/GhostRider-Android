@@ -37,6 +37,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchOpeningMonitor;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchPerformance;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASApprovalCode;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASRequests;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCIEvaluation;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCashCount;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DClientInfo;
@@ -113,6 +114,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchOpenMonitor;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchPerformance;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
+import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECIEvaluation;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECashCount;
 import org.rmj.g3appdriver.GCircle.room.Entities.EClientInfo;
@@ -248,7 +250,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EArticleHead.class,
         EArticleDetails.class,
         EErrorLogs.class,
-        ECASApprovalCode.class}, version = 46, exportSchema = false)
+        ECASApprovalCode.class,
+        ECASRequests.class}, version = 46, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -329,6 +332,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DArticle articleDao();
     public abstract DErrorLogs errorLogsDao();
     public abstract DCASApprovalCode casapprovalDao();
+    public abstract DCASRequests casrequestsDao();
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
@@ -435,6 +439,13 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             database.execSQL("CREATE TABLE IF NOT EXISTS `CAS_Approval_Code` " +
                     "(`sSourceCD` TEXT NOT NULL, `sDescript` TEXT, " +
                     "PRIMARY KEY(`sSourceCD`))");
+
+            // Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `CAS_Requests` " +
+                    "(`sTransNox` TEXT NOT NULL, `dTransact` TEXT, `sSourceCD` TEXT," +
+                    "`sSourceNo` TEXT, `sDescript` TEXT, `sCompnyNm` TEXT, `sRemarksx` TEXT," +
+                    "`cTranStat` TEXT, `dApproved` TEXT, `sAppSrcNo` TEXT," +
+                    "PRIMARY KEY(`sTransNox`))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");

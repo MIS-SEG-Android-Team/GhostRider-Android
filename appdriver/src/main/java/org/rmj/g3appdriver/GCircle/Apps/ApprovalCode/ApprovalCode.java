@@ -25,10 +25,13 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.apprdiver.util.MiscUtil;
+import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASApprovalCode;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASRequests;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
+import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
@@ -50,10 +53,12 @@ public class ApprovalCode {
 
     private final DApprovalCode poDao;
     private final DCASApprovalCode poCASDao;
+    private final DCASRequests poCASReqDao;
     private final DSCARqstEmp poDaoRstEmp;
 
 
-    public final Application instance;
+    public final EmployeeMaster poMaster;
+    private final Application instance;
     private final GCircleApi poApi;
     private final HttpHeaders poHeaders;
 
@@ -63,7 +68,9 @@ public class ApprovalCode {
         this.instance = instance;
         this.poDao = GGC_GCircleDB.getInstance(instance).ApprovalDao();
         this.poCASDao = GGC_GCircleDB.getInstance(instance).casapprovalDao();
+        this.poCASReqDao = GGC_GCircleDB.getInstance(instance).casrequestsDao();
         this.poDaoRstEmp = GGC_GCircleDB.getInstance(instance).scaRqstEmpDao();
+        this.poMaster = new EmployeeMaster(instance);
         this.poApi = new GCircleApi(instance);
         this.poHeaders = HttpHeaders.getInstance(instance);
     }
@@ -306,6 +313,59 @@ public class ApprovalCode {
         }
     }
 
+    public boolean ImportCASRequests(String fsSrcCd){
+        try{
+            JSONObject params = new JSONObject();
+            params.put("sEmployID", "M02907000506");
+            params.put("sSourceCD", fsSrcCd);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlCasRequests(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+
+            JSONArray laDetail = loResponse.getJSONArray("detail");
+            for (int i = 0; i < laDetail.length(); i++) {
+
+                JSONObject loResult = laDetail.getJSONObject(i);
+
+                ECASRequests loRequests = new ECASRequests();
+                loRequests.setsTransNox(loResult.getString("sTransNox"));
+                loRequests.setdTransact(loResult.getString("dTransact"));
+                loRequests.setsSourceCD(loResult.getString("sSourceCD"));
+                loRequests.setsSourceNo(loResult.getString("sSourceNo"));
+                loRequests.setsDescript(loResult.getString("sDescript"));
+                loRequests.setsCompnyNm(loResult.getString("sCompnyNm"));
+                loRequests.setsRemarksx(loResult.getString("sRemarksx"));
+                loRequests.setcTranStat(loResult.getString("cTranStat"));
+                loRequests.setdApproved(loResult.getString("dApproved"));
+                loRequests.setsAppSrcNo(loResult.getString("sAppSrcNo"));
+
+                poCASReqDao.SaveCASRequest(loRequests);
+            }
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
     public LiveData<List<ESCA_Request>> getAuthorizedFeatures(String fsVal){
 
         EEmployeeInfo loUser = poDao.GetUserInfo();
@@ -374,16 +434,21 @@ public class ApprovalCode {
 
         return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
     }
-
+    public String getDescription(String code){
+        return poCASDao.getDescription(code);
+    }
     public LiveData<List<ECASApprovalCode>> getCASApprovalCodes(){
         return poCASDao.getCASApprovalCodes();
     }
-
-
+    public LiveData<List<ECASRequests>> getCASRequests(String fsSource, String dFrom, String dTo){
+        return poCASReqDao.GetRequests(fsSource, dFrom, dTo);
+    }
+    public LiveData<ECASRequests> GetRequestDetail(String sTransNox){
+        return poCASReqDao.GetRequestDetail(sTransNox);
+    }
     public String getLatestStamp(){
         return poDaoRstEmp.GetLatestStamp();
     }
-
     public enum eSCA{
         MANUAL_LOG,
         SYSTEM_CODE,

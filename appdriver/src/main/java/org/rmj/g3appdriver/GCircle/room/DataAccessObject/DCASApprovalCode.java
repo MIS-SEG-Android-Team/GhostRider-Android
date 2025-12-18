@@ -17,4 +17,7 @@ public interface DCASApprovalCode {
 
     @Query("SELECT * FROM CAS_Approval_Code ORDER BY sDescript")
     LiveData<List<ECASApprovalCode>> getCASApprovalCodes();
+
+    @Query("SELECT sDescript FROM CAS_Approval_Code WHERE sSourceCD = :code")
+    String getDescription(String code);
 }

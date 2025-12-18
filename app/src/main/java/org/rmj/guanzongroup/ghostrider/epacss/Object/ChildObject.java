@@ -166,7 +166,7 @@ public class ChildObject {
 
             case "by history":
                 loIntent = new Intent(context, Activity_ApprovalSelection.class);
-                loIntent.putExtra("sysCode", "3");
+                loIntent.putExtra("sysCode", "4");
                 break;
 
             case "random stock inventory":
