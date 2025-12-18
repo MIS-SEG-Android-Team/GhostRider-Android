@@ -27,6 +27,8 @@ import org.rmj.apprdiver.util.SQLUtil;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcodeDetail;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASApprovalCode;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASRequests;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeBusinessTrip;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeLeave;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
@@ -56,7 +58,9 @@ public class EmployeeMaster {
     private final DGuides guidesDao;
     private final DBarcode barcodeDao;
     private final DBarcodeDetail barcodeDetailDao;
-    private DErrorLogs poError;
+    private final DErrorLogs poError;
+    private final DCASApprovalCode poCASCode;
+    private final DCASRequests poCASRequests;
 
     private DEmployeeLeave leaveDao;
     private DEmployeeBusinessTrip btripDao;
@@ -80,6 +84,9 @@ public class EmployeeMaster {
         this.barcodeDao = GGC_GCircleDB.getInstance(instance).barcodeDao();
         this.barcodeDetailDao = GGC_GCircleDB.getInstance(instance).barcodeDetailDao();
         this.poError = GGC_GCircleDB.getInstance(application.getApplicationContext()).errorLogsDao();
+        this.poCASCode = GGC_GCircleDB.getInstance(application.getApplicationContext()).casapprovalDao();
+        this.poCASRequests = GGC_GCircleDB.getInstance(application.getApplicationContext()).casrequestsDao();
+
         this.employeeInfo = poDao.getEmployeeInfo();
         this.poSession = EmployeeSession.getInstance(instance);
         this.poConfig = AppConfigPreference.getInstance(instance);
@@ -149,6 +156,9 @@ public class EmployeeMaster {
         barcodeDao.clearBarcode();
         barcodeDetailDao.clear();
         poError.Clear();
+
+        poCASCode.clear();
+        poCASRequests.clear();
 
         poSession.initUserLogout();
     }

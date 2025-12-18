@@ -15,6 +15,9 @@ public interface DCASApprovalCode {
     @Upsert
     void SaveCASApprovalCode(ECASApprovalCode loVal);
 
+    @Query("DELETE FROM CAS_Approval_Code")
+    void clear();
+
     @Query("SELECT * FROM CAS_Approval_Code ORDER BY sDescript")
     LiveData<List<ECASApprovalCode>> getCASApprovalCodes();
 

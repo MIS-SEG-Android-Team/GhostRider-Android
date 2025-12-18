@@ -15,6 +15,9 @@ public interface DCASRequests {
     @Upsert
     void SaveCASRequest(ECASRequests requests);
 
+    @Query("DELETE FROM CAS_Requests")
+    void clear();
+
     @Query("UPDATE CAS_Requests SET cTranStat = :fsStat, dApproved = :fdApproved, sAppSrcNo = :fsAppSrcNo  WHERE sTransNox = :fsTransNox ")
     void UpdateRequest(String fsTransNox, String fsStat, String fdApproved, String fsAppSrcNo);
 

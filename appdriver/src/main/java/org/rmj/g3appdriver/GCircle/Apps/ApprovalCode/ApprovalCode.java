@@ -313,10 +313,10 @@ public class ApprovalCode {
         }
     }
 
-    public boolean ImportCASRequests(String fsSrcCd){
+    public boolean ImportCASRequests(String fsEmployID, String fsSrcCd){
         try{
             JSONObject params = new JSONObject();
-            params.put("sEmployID", "M02907000506");
+            params.put("sEmployID", fsEmployID);
             params.put("sSourceCD", fsSrcCd);
 
             String lsResponse = WebClient.sendRequest(
@@ -370,7 +370,7 @@ public class ApprovalCode {
     public boolean VerifyUserMatrix(String fsAuthType, String fsEmployID){
         try{
             JSONObject params = new JSONObject();
-            params.put("sEmployID", "M02907000506");
+            params.put("sEmployID", fsEmployID);
             params.put("sAuthType", fsAuthType);
 
             String lsResponse = WebClient.sendRequest(
@@ -404,7 +404,7 @@ public class ApprovalCode {
     public boolean UpdateCASRequest(String fsTransNox, String fsEmployID, String fscTranStat){
         try{
             JSONObject params = new JSONObject();
-            params.put("sEmployID", "M02907000506");
+            params.put("sEmployID", fsEmployID);
             params.put("sTransNox", fsTransNox);
             params.put("cTranStat", fscTranStat);
 

@@ -130,7 +130,7 @@ public class VMApprovalSelection extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
-                if (!poSys.ImportCASRequests(fsSrcCd)){
+                if (!poSys.ImportCASRequests(poMaster.getEmployeeID(), fsSrcCd)){
                     return poSys.getMessage();
                 }
                 return "CAS Requests successfully downloaded";
