@@ -93,6 +93,11 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRawDao;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRelation;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRemittanceAccounts;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDCategories;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDImages;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDMaster;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDepartment;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSelfieLog;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSysConfig;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DToken;
@@ -170,6 +175,11 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ERelation;
 import org.rmj.g3appdriver.GCircle.room.Entities.ERemittanceAccounts;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESelfieLog;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESysConfig;
 import org.rmj.g3appdriver.GCircle.room.Entities.ETokenInfo;
@@ -251,7 +261,12 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EArticleDetails.class,
         EErrorLogs.class,
         ECASApprovalCode.class,
-        ECASRequests.class}, version = 46, exportSchema = false)
+        ECASRequests.class,
+        ESSDDepartments.class,
+        ESSDDCategories.class,
+        ESSDDMaster.class,
+        ESSDDetail.class,
+        ESSDDImages.class}, version = 46, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -333,6 +348,12 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DErrorLogs errorLogsDao();
     public abstract DCASApprovalCode casapprovalDao();
     public abstract DCASRequests casrequestsDao();
+    public abstract DSSDDepartment ssdDepartmentDao();
+    public abstract DSSDDCategories ssdCategoriesDao();
+    public abstract DSSDDMaster ssdMasterDao();
+    public abstract DSSDDetail ssdDetailDao();
+    public abstract DSSDDImages dssddImagesDao();
+
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
         if(instance == null){
@@ -446,6 +467,30 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                     "`sSourceNo` TEXT, `sAuthType` TEXT, `sDescript` TEXT, `sCompnyNm` TEXT, `sRemarksx` TEXT," +
                     "`cTranStat` TEXT, `dApproved` TEXT, `sAppSrcNo` TEXT," +
                     "PRIMARY KEY(`sTransNox`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Department` " +
+                    "(`sDeptIDxx` TEXT NOT NULL, `sDescript` TEXT, " +
+                    "PRIMARY KEY(`sDeptIDxx`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Categories` " +
+                    "(`sCategrID` TEXT NOT NULL, `sDescript` TEXT, `sMemoLink` TEXT, `nPageNumber` TEXT, " +
+                    "PRIMARY KEY(`sCategrID`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Master` " +
+                    "(`sTransNox` TEXT NOT NULL, `dTransact` TEXT, `cTranStat` TEXT, `sDeptIDxx` TEXT, " +
+                    "PRIMARY KEY(`sTransNox`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Detail` " +
+                    "(sTransNox TEXT NOT NULL, sCategrID TEXT NOT NULL, nRatingxx REAL, sRemarksx TEXT, dEvaluate TEXT, PRIMARY KEY(sTransNox, sCategrID))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Images` (" +
+                    "sTransNox TEXT NOT NULL, sReferNox TEXT, sCategrID TEXT, nEntryNox TEXT, " +
+                    "sScanndID TEXT, sImageNme TEXT, sMD5Hashx TEXT, sImagePth TEXT, dImgeDate TEXT, cImgeStat TEXT, PRIMARY KEY(sTransNox))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");

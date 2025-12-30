@@ -31,13 +31,14 @@ import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCounte
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_Inventory;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Activity.Activity_ApprovalCode;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Activity.Activity_ApprovalSelection;
-import org.rmj.guanzongroup.ghostrider.approvalcode.Fragment.Fragment_Transaction_History;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_LogCollection;
 import org.rmj.guanzongroup.ghostrider.samsungknox.Activity_Knox;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_BranchApplications;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_CreditApplications;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_IntroductoryQuestion;
+import org.rmj.guanzongroup.pacitareward.Activity.PacitaReward.Activity_BranchList;
+import org.rmj.guanzongroup.pacitareward.Activity.SSDD.Activity_SSDD_Evaluation;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Application;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_EmployeeLoanEntry;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Employee_Applications;
@@ -186,6 +187,12 @@ public class ChildObject {
                 break;
             case "itinerary entry":
                 loIntent = new Intent(context, Activity_ItineraryEntry.class);
+                break;
+            case "pacita evaluation":
+                loIntent = new Intent(context, Activity_BranchList.class);
+                break;
+            case "ssdd evaluation":
+                loIntent = new Intent(context, Activity_SSDD_Evaluation.class);
                 break;
             case "employee loan":
                 loIntent = new Intent(context, Activity_EmployeeLoanEntry.class);

@@ -111,6 +111,15 @@ public class GCircleApi extends WebApi {
     private static final String GET_PACITA_RULES = "gcircle/pacita/import_pacita_rules.php";
     private static final String GET_PACITA_EVALUATIONS = "gcircle/pacita/import_pacita_evaluations.php";
     private static final String SUBMIT_PACITA_RESULT = "gcircle/pacita/submit_pacita_result.php";
+
+    private static final String GET_SSDD_DEPARTMENTS = "gcircle/ssdd/download_evaluation_departments.php";
+    private static final String GET_SSDD_CATEGORIES = "gcircle/ssdd/download_ssdd_categories.php";
+    private static final String SUBMIT_SSDD_EVALUATION = "gcircle/ssdd/submit_ssdd_evaluation.php";
+    private static final String SUBMIT_SSDD_IMAGES = "gcircle/ssdd/submit_ssdd_images.php";
+    private static final String GET_SSDD_MASTER = "gcircle/ssdd/download_evaluation_master.php";
+    private static final String GET_SSDD_DETAILS = "gcircle/ssdd/download_evaluation_detail.php";
+    private static final String GET_SSDD_IMAGE_CATEGORY = "gcircle/ssdd/download_category_image.php";
+
     private static final String URL_SUBMIT_INQUIRY = "gcircle/ganado/submit_inquiry.php";
     private static final String URL_DOWNLOAD_INQUIRIES = "gcircle/ganado/import_inquiries.php";
     private static final String URL_SUBMIT_BARCODE = "gcircle/general/submit_order.php";
@@ -1013,6 +1022,69 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + URL_DOWNLOAD_ARTICLE);
         return LIVE + URL_DOWNLOAD_ARTICLE;
+    }
+
+    public String getUrlSSDDepartments(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + GET_SSDD_DEPARTMENTS);
+            return LOCAL + GET_SSDD_DEPARTMENTS;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + GET_SSDD_DEPARTMENTS);
+        return LIVE + GET_SSDD_DEPARTMENTS;
+    }
+
+    public String getUrlSSDCategories(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + GET_SSDD_CATEGORIES);
+            return LOCAL + GET_SSDD_CATEGORIES;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + GET_SSDD_CATEGORIES);
+        return LIVE + GET_SSDD_CATEGORIES;
+    }
+
+    public String getUrlSSDMaster(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + GET_SSDD_MASTER);
+            return LOCAL + GET_SSDD_MASTER;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + GET_SSDD_MASTER);
+        return LIVE + GET_SSDD_MASTER;
+    }
+
+    public String getUrlSSDetails(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + GET_SSDD_DETAILS);
+            return LOCAL + GET_SSDD_DETAILS;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + GET_SSDD_DETAILS);
+        return LIVE + GET_SSDD_DETAILS;
+    }
+
+    public String getUrlSSDImageCategory(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + GET_SSDD_IMAGE_CATEGORY);
+            return LOCAL + GET_SSDD_IMAGE_CATEGORY;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + GET_SSDD_IMAGE_CATEGORY);
+        return LIVE + GET_SSDD_IMAGE_CATEGORY;
+    }
+
+    public String getUrlSubmitEvaluation(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + SUBMIT_SSDD_EVALUATION);
+            return LOCAL + SUBMIT_SSDD_EVALUATION;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + SUBMIT_SSDD_EVALUATION);
+        return LIVE + SUBMIT_SSDD_EVALUATION;
+    }
+
+    public String getUrlSubmitSSDDImage(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + SUBMIT_SSDD_IMAGES);
+            return LOCAL + SUBMIT_SSDD_IMAGES;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + SUBMIT_SSDD_IMAGES);
+        return LIVE + SUBMIT_SSDD_IMAGES;
     }
 
 }

@@ -18,7 +18,6 @@ import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_Browser;
 import org.rmj.guanzongroup.ghostrider.dataChecker.Activity.Activity_DB_Explorer;
 import org.rmj.guanzongroup.ghostrider.epacss.R;
-import org.rmj.guanzongroup.pacitareward.Activity.Activity_BranchList;
 import org.rmj.guanzongroup.ghostrider.settings.Activity.Activity_DigitalGcard;
 
 public class ParentObject {
@@ -71,7 +70,7 @@ public class ParentObject {
             case "employee itinerary":
                 lnIcon = R.drawable.ic_baseline_checklist_24;
                 break;
-            case "pacita evaluation":
+            case "company evaluation":
                 lnIcon = R.drawable.ic_rating_24;
                 break;
             case "product inquiry":
@@ -109,10 +108,6 @@ public class ParentObject {
 
             case "db explorer":
                 loIntent = new Intent(context, Activity_DB_Explorer.class);
-                break;
-
-            case "pacita evaluation":
-                loIntent = new Intent(context, Activity_BranchList.class);
                 break;
 
             default:

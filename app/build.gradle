@@ -139,7 +139,7 @@ dependencies {
     implementation project(':settings')
     implementation project(':creditApp')
     implementation project(':creditEvaluation')
-    implementation project(':pacitaReward')
+    implementation project(':evaluation')
     implementation project(':ganado')
     implementation project(':sales')
     
