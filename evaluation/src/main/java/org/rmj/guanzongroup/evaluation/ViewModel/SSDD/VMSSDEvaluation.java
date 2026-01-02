@@ -1,0 +1,138 @@
+package org.rmj.guanzongroup.evaluation.ViewModel.SSDD;
+
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+
+import org.rmj.g3appdriver.GCircle.Apps.SSDD.SSDDEvaluation;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
+import org.rmj.g3appdriver.utils.Task.TaskExecutor;
+
+import java.util.List;
+
+public class VMSSDEvaluation extends AndroidViewModel {
+
+    private String fsMessage;
+    private SSDDEvaluation loEvaluation;
+
+    public VMSSDEvaluation(@NonNull Application application) {
+        super(application);
+
+        this.loEvaluation = new SSDDEvaluation(application);
+    }
+
+    public LiveData<List<ESSDDepartments>> GetDepartments(){
+        return loEvaluation.GetDepartments();
+    }
+
+    public LiveData<List<ESSDDCategories>> GetCategories(){
+        return loEvaluation.GetCategories();
+    }
+
+    public LiveData<List<ESSDDMaster>> GetMasterList(String dFrom, String dTo, String sDeptIDxx, String cTranStat){
+        return loEvaluation.GetMasterList(dFrom, dTo, sDeptIDxx, cTranStat);
+    }
+
+    public interface OnDownloadCallback{
+        void OnLoad(String fsTitlexx, String fsMessage);
+        void OnSuccess();
+        void OnFailed(String fsMessage);
+    }
+
+    public void DownloadSSDDepartments(OnDownloadCallback focallback){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                focallback.OnLoad("Downloading Departments", "Please wait");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (loEvaluation.DownloadDepartments()){
+                    return true;
+                }else {
+                    fsMessage = loEvaluation.GetMessage();
+                    return false;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if ((Boolean) object){
+                    focallback.OnSuccess();
+                }else {
+                    focallback.OnFailed(fsMessage);
+                }
+            }
+        });
+    }
+
+    public void DownloadSSDDCategories(OnDownloadCallback focallback){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                focallback.OnLoad("Downloading Categories", "Please wait");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (loEvaluation.DownloadCategories()){
+                    return true;
+                }else {
+                    fsMessage = loEvaluation.GetMessage();
+                    return false;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if ((Boolean) object){
+                    focallback.OnSuccess();
+                }else {
+                    focallback.OnFailed(fsMessage);
+                }
+            }
+        });
+    }
+
+    public void DownloadMaster(String fsDeptIDxx, String fsDfrom, String fsDto, OnDownloadCallback focallback){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                focallback.OnLoad("Downloading Master", "Please wait");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (loEvaluation.DownloadMaster(fsDeptIDxx, fsDfrom, fsDto)){
+                    return true;
+                }else {
+                    fsMessage = loEvaluation.GetMessage();
+                    return false;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                if ((Boolean) object){
+                    focallback.OnSuccess();
+                }else {
+                    focallback.OnFailed(fsMessage);
+                }
+            }
+        });
+    }
+}

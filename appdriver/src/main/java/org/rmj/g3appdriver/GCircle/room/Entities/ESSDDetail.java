@@ -3,15 +3,16 @@ package org.rmj.g3appdriver.GCircle.room.Entities;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 
 @Entity(tableName = "SSDD_Detail", primaryKeys = {"sTransNox", "sCategrID"})
 public class ESSDDetail {
     
     @ColumnInfo(name = "sTransNox")
+    @NonNull
     public String sTransNox;
 
     @ColumnInfo(name = "sCategrID")
+    @NonNull
     public String sCategrID;
 
     @ColumnInfo(name = "nRatingxx")
