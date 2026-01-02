@@ -3,6 +3,9 @@
 
     <application>
         <activity
+            android:name=".Activity.SSDD.Activity_SSDD_Category"
+            android:exported="false" />
+        <activity
             android:name=".Activity.SSDD.Activity_SSDD_Evaluation"
             android:exported="false" />
         <activity

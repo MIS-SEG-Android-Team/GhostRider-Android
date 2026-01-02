@@ -97,12 +97,14 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
 
                 @Override
                 public void OnSuccess() {
+                    poDialog.dismiss();
                     Toast.makeText(Activity_SSDD_Evaluation.this, "Successfully downloaded", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void OnFailed(String fsMessage) {
 
+                    poDialog.dismiss();
                     InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {}
