@@ -40,6 +40,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     testImplementation 'org.json:json:20140107'
 
+    // Image Slider Dependencies
+    implementation 'com.github.smarteist:Android-Image-Slider:1.4.0'
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+
     implementation project(path: ':appDriver')
     implementation project(path: ':ahMonitoring')
 }

@@ -15,6 +15,9 @@ public interface DSSDDImages {
     @Upsert
     void Save(ESSDDImages foVal);
 
-    @Query("SELECT * FROM SSDD_Images")
-    LiveData<List<ESSDDImages>> GetSSDDImages();
+    @Query("SELECT * FROM SSDD_Images WHERE sReferNox= :fsTransNox AND sCategrID= :fsCategory")
+    LiveData<List<ESSDDImages>> GetCategoryImages(String fsTransNox, String fsCategory);
+
+    @Query("SELECT * FROM SSDD_Images WHERE sTransNox= :fsTransNox AND sCategrID= :fsCategory")
+    LiveData<ESSDDImages> GetImage(String fsTransNox, String fsCategory);
 }

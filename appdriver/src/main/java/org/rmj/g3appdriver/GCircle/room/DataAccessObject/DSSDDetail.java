@@ -17,4 +17,7 @@ public interface DSSDDetail {
 
     @Query("SELECT * FROM SSDD_Detail WHERE sTransNox= :fsTransNox")
     LiveData<List<ESSDDetail>> GetDetails(String fsTransNox);
+
+    @Query("SELECT * FROM SSDD_Detail WHERE sTransNox= :fsTransNox AND sCategrID= :fsCategory")
+    LiveData<ESSDDetail> GetCategoryDetail(String fsTransNox, String fsCategory);
 }

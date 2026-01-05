@@ -203,15 +203,17 @@
                         android:alpha="0.6"/>
 
                     <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/mtv_noimage"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="No image/s available"
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:textStyle="bold"
-                        android:alpha="0.2"/>
+                        android:alpha="0.2"
+                        android:visibility="visible"/>
 
-                    <androidx.recyclerview.widget.RecyclerView
+                    <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/rcv_images"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -254,7 +256,7 @@
                         android:id="@+id/mtv_dev"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="MIS@SEG"
+                        android:text="© All Rights Reserved MIS-SEG 2023"
                         android:gravity="center"
                         android:alpha="0.6"/>
 

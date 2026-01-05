@@ -12,10 +12,12 @@ import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDCategories;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDImages;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDepartment;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
@@ -41,6 +43,7 @@ public class SSDDEvaluation {
     private final DSSDDCategories poCatgDao;
     private final DSSDDMaster poMasterDao;
     private final DSSDDetail poDetailDao;
+    private final DSSDDImages poImagesDao;
 
     public SSDDEvaluation(Application poApp){
         this.poEmployee = new EmployeeMaster(poApp);
@@ -50,6 +53,7 @@ public class SSDDEvaluation {
         this.poCatgDao = GGC_GCircleDB.getInstance(poApp).ssdCategoriesDao();
         this.poMasterDao = GGC_GCircleDB.getInstance(poApp).ssdMasterDao();
         this.poDetailDao = GGC_GCircleDB.getInstance(poApp).ssdDetailDao();
+        this.poImagesDao = GGC_GCircleDB.getInstance(poApp).dssddImagesDao();
     }
 
     private String GenerateTransNox(){
@@ -129,8 +133,20 @@ public class SSDDEvaluation {
         return poDetailDao.GetDetails(fsTransNox);
     }
 
+    public LiveData<ESSDDetail> GetCategoryDetail(String fsTransNox, String fsCategory){
+        return poDetailDao.GetCategoryDetail(fsTransNox, fsCategory);
+    }
+
     public ESSDDepartments GetDepartment(String fsDeptIDxx){
         return poDeptDao.GetDepartment(fsDeptIDxx);
+    }
+
+    public LiveData<List<ESSDDImages>> GetCategoryImages(String fsTransNox, String fsCategory){
+        return poImagesDao.GetCategoryImages(fsTransNox, fsCategory);
+    }
+
+    public LiveData<ESSDDImages> GetImage(String fsTransNox, String fsCategory){
+        return poImagesDao.GetImage(fsTransNox, fsCategory);
     }
 
     public Boolean DownloadDepartments(){

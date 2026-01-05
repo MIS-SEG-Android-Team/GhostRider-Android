@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Apps.SSDD.SSDDEvaluation;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
@@ -49,6 +50,18 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
     public LiveData<List<ESSDDetail>> GetDetail(String fsTransNox) {
         return loEvaluation.GetDetail(fsTransNox);
+    }
+
+    public LiveData<ESSDDetail> GetCategoryDetail(String fsTransNox, String fsCategory){
+        return loEvaluation.GetCategoryDetail(fsTransNox, fsCategory);
+    }
+
+    public LiveData<List<ESSDDImages>> GetCategoryImages(String fsTransNox, String fsCategory){
+        return loEvaluation.GetCategoryImages(fsTransNox, fsCategory);
+    }
+
+    public LiveData<ESSDDImages> GetImage(String fsTransNox, String fsCategory){
+        return loEvaluation.GetImage(fsTransNox, fsCategory);
     }
 
     public ESSDDepartments GetDepartment(String fsDeptIDxx){
