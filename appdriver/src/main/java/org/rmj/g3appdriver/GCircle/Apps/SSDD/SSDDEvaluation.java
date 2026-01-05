@@ -3,6 +3,7 @@ package org.rmj.g3appdriver.GCircle.Apps.SSDD;
 import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 
 import android.app.Application;
+import android.os.Build;
 
 import androidx.lifecycle.LiveData;
 
@@ -13,14 +14,21 @@ import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDepartment;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class SSDDEvaluation {
 
@@ -32,6 +40,7 @@ public class SSDDEvaluation {
     private final DSSDDepartment poDeptDao;
     private final DSSDDCategories poCatgDao;
     private final DSSDDMaster poMasterDao;
+    private final DSSDDetail poDetailDao;
 
     public SSDDEvaluation(Application poApp){
         this.poEmployee = new EmployeeMaster(poApp);
@@ -40,6 +49,56 @@ public class SSDDEvaluation {
         this.poDeptDao = GGC_GCircleDB.getInstance(poApp).ssdDepartmentDao();
         this.poCatgDao = GGC_GCircleDB.getInstance(poApp).ssdCategoriesDao();
         this.poMasterDao = GGC_GCircleDB.getInstance(poApp).ssdMasterDao();
+        this.poDetailDao = GGC_GCircleDB.getInstance(poApp).ssdDetailDao();
+    }
+
+    private String GenerateTransNox(){
+
+        String lsTransNox = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            lsTransNox = "MX01" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
+                    poMasterDao.GetCount() + 1;
+        }else {
+            lsTransNox = "MX01" +
+                    new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
+                    poMasterDao.GetCount() + 1;
+        }
+
+        return lsTransNox;
+    }
+
+    private String GetCurrentDate(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
+        }
+    }
+
+    public String CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
+
+        for (ESSDDCategories loCategory : foCategories){
+
+            ESSDDetail loDetail = new ESSDDetail();
+            loDetail.setsTransNox(GenerateTransNox());
+            loDetail.setsCategrID(loCategory.getsCategrID());
+
+            poDetailDao.Save(loDetail);
+        }
+
+        String lsTransNox = GenerateTransNox();
+
+        ESSDDMaster loMaster = new ESSDDMaster();
+        loMaster.setsTransNox(lsTransNox);
+        loMaster.setdTransact(GetCurrentDate());
+        loMaster.setsDeptIDxx(fsDeptID);
+        loMaster.setcTranStat("0");
+
+        poMasterDao.Save(loMaster);
+
+        return lsTransNox;
     }
 
     public String GetMessage(){
@@ -54,8 +113,24 @@ public class SSDDEvaluation {
         return poCatgDao.GetCategories();
     }
 
+    public ESSDDCategories GetCategory(String fsCategory){
+        return poCatgDao.GetCategory(fsCategory);
+    }
+
     public LiveData<List<ESSDDMaster>> GetMasterList(String dFrom, String dTo, String sDeptIDxx, String cTranStat){
         return poMasterDao.GetMasterList(dFrom, dTo, sDeptIDxx, cTranStat);
+    }
+
+    public LiveData<ESSDDMaster> GetMaster(String fsTransNox, String fsDeptIDxx) {
+        return poMasterDao.GetMaster(fsTransNox, fsDeptIDxx);
+    }
+
+    public LiveData<List<ESSDDetail>> GetDetail(String fsTransNox) {
+        return poDetailDao.GetDetails(fsTransNox);
+    }
+
+    public ESSDDepartments GetDepartment(String fsDeptIDxx){
+        return poDeptDao.GetDepartment(fsDeptIDxx);
     }
 
     public Boolean DownloadDepartments(){

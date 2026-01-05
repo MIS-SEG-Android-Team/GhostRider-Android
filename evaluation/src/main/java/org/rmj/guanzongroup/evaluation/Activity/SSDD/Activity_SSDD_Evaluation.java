@@ -1,5 +1,6 @@
 package org.rmj.guanzongroup.evaluation.Activity.SSDD;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClic
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.etc.LoadDialog;
@@ -80,6 +82,7 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
         ImportData();
         InitObservers();
         InitFilterOptions();
+
     }
 
     private void ImportData(){
@@ -88,7 +91,7 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
         if (getIntent().hasExtra("dept_id")){
 
             //import data
-            mViewModel.DownloadMaster(getIntent().getStringExtra("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
+            mViewModel.DownloadEvaluation(getIntent().getStringExtra("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
                 @Override
                 public void OnLoad(String fsTitlexx, String fsMessage) {
                     poDialog.initDialog(fsTitlexx, fsMessage, false);
@@ -114,7 +117,6 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                     });
                 }
             });
-
         }{
 
             //import departments
@@ -151,8 +153,9 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
         //passed department id, load transaction history, else, load department list
         if (getIntent().hasExtra("dept_id")){
 
-            //initialize data
+            //initialize master list
             mViewModel.GetMasterList(lsDfrom, lsDto, getIntent().getStringExtra("dept_id"), lsTranstat).observe(Activity_SSDD_Evaluation.this, new Observer<List<ESSDDMaster>>() {
+                @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onChanged(List<ESSDDMaster> essddMasters) {
                     if (essddMasters == null){
@@ -185,6 +188,38 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
 
                     //show filtering option
                     ib_filter.setVisibility(View.VISIBLE);
+                }
+            });
+
+            //initialize categories
+            mViewModel.GetCategories().observe(Activity_SSDD_Evaluation.this, new Observer<List<ESSDDCategories>>() {
+                @Override
+                public void onChanged(List<ESSDDCategories> essddCategories) {
+
+                    fbtn_evaluate.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            if (essddCategories == null){
+
+                                InitMessage(1, R.drawable.baseline_error_24, "No categories found. Could not create evaluation.", "Okay", "", new onMessageButton() {
+                                    @Override
+                                    public void onPositive() {}
+
+                                    @Override
+                                    public void onNegative() {}
+                                });
+                                return;
+                            }
+
+                            String lsTransNox = mViewModel.CreateEvaluation(getIntent().getStringExtra("dept_id"), essddCategories);
+                            Intent loIntent = new Intent(Activity_SSDD_Evaluation.this, Activity_SSDD_Category.class);
+                            loIntent.putExtra("transnox", lsTransNox);
+                            loIntent.putExtra("deptid", lsTransNox);
+
+                            startActivity(loIntent);
+                        }
+                    });
                 }
             });
         }{

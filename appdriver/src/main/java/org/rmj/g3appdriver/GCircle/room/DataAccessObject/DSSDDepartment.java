@@ -15,6 +15,9 @@ public interface DSSDDepartment {
     @Upsert
     void Save(ESSDDepartments eeDepartment);
 
+    @Query("SELECT * FROM SSDD_Department WHERE sDeptIDxx= :fsDeptIDxx")
+    ESSDDepartments GetDepartment(String fsDeptIDxx);
+
     @Query("SELECT * FROM SSDD_Department")
     LiveData<List<ESSDDepartments>> GetDepartmentList();
 

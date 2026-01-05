@@ -19,9 +19,9 @@ import java.util.List;
 public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCategories.VHCategories> {
 
     private final OnItemClickListener foListener;
-    private final List<ESSDDCategories> laCategories;
+    private final List<SSDD_Evaluation_Categories> laCategories;
 
-    public Adapter_SSDDCategories(List<ESSDDCategories> laCategories, OnItemClickListener foListener) {
+    public Adapter_SSDDCategories(List<SSDD_Evaluation_Categories> laCategories, OnItemClickListener foListener) {
         this.laCategories = laCategories;
         this.foListener = foListener;
     }
@@ -35,8 +35,9 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
     @Override
     public void onBindViewHolder(@NonNull VHCategories holder, int position) {
 
-        holder.mtv_category.setText(laCategories.get(position).getsDescript());
+        holder.mtv_category.setText(laCategories.get(position).sCategry);
 
+        holder.rb_rate.setRating((float) laCategories.get(position).ldbl_rating);
         holder.rb_rate.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
@@ -49,7 +50,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
         holder.ib_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                foListener.OnDetails(laCategories.get(position));
+                foListener.OnDetails(laCategories.get(position).sCategryID);
             }
         });
 
@@ -69,7 +70,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
     public interface OnItemClickListener{
         void OnRate(float ffTotalRate);
         void OnCamera();
-        void OnDetails(ESSDDCategories foCategory);
+        void OnDetails(String fsCategoryID);
     }
 
     public static class VHCategories extends RecyclerView.ViewHolder{
@@ -87,6 +88,22 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
             tie_remarks = itemView.findViewById(R.id.tie_remarks);
             ib_camera = itemView.findViewById(R.id.rb_rate);
             ib_info = itemView.findViewById(R.id.ib_info);
+        }
+    }
+
+    public static class SSDD_Evaluation_Categories{
+        public String sCategryID;
+        public String sCategry;
+        public double ldbl_rating;
+        public String lsRemarks;
+        public String lsEvaluated;
+
+        public SSDD_Evaluation_Categories(String sCategryID, String sCategry, double ldbl_rating, String lsRemarks, String fsEvaluated){
+            this.sCategryID = sCategryID;
+            this.sCategry = sCategry;
+            this.ldbl_rating = ldbl_rating;
+            this.lsRemarks = lsRemarks;
+            this.lsEvaluated = fsEvaluated;
         }
     }
 }
