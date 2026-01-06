@@ -138,12 +138,12 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity {
                         //todo get device density width
                         int densWidth = (int) (vpage_images.getResources().getDisplayMetrics().xdpi);
 
-//                        //todo formula to retain padding (density width - ( 30% of density width ))
-//                        loViewPagerProperty.initSliderPadding(
-//                                new ViewPagerProperty.Padding_Property((int) (densWidth - (densWidth * 0.3)), (int) (densWidth - (densWidth * 0.3)),
-//                                        0, 0, false, false, 3));
-//
-//                        loViewPagerProperty.initSliderPageTransformer();
+                        //todo formula to retain padding (density width - ( 30% of density width ))
+                        loViewPagerProperty.initSliderPadding(
+                                new ViewPagerProperty.Padding_Property((int) (densWidth - (densWidth * 0.3)), (int) (densWidth - (densWidth * 0.3)),
+                                        0, 0, false, false, 3));
+
+                        loViewPagerProperty.initSliderPageTransformer();
 
                     }
                 });

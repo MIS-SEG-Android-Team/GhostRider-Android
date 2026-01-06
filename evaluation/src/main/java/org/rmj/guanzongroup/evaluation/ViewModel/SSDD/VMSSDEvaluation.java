@@ -141,4 +141,58 @@ public class VMSSDEvaluation extends AndroidViewModel {
             }
         });
     }
+
+    public void DownloadEvaluationDetails(String fsTransnox, OnDownloadCallback focallback){
+
+        TaskExecutor.Execute(fsTransnox, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                focallback.OnLoad("Downloading Details", "Please wait");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+                String lsPAram = (String) args;
+                if (loEvaluation.DownloadDetails(lsPAram)){
+                    return true;
+                }else {
+                    fsMessage = loEvaluation.GetMessage();
+                    return false;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                if ((Boolean) object){
+                    focallback.OnSuccess();
+                }else {
+                    focallback.OnFailed(fsMessage);
+                }
+            }
+        });
+    }
+
+    public void SubmitEvaluation(ESSDDMaster foMaster, List<ESSDDetail> faDetails, OnDownloadCallback foCallback){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+                return loEvaluation.SubmitEvaluation(foMaster, faDetails);
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                if ((Boolean) object){
+                    foCallback.OnSuccess();
+                }else {
+                    foCallback.OnFailed(loEvaluation.GetMessage());
+                }
+            }
+        });
+    }
 }

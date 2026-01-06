@@ -2,6 +2,7 @@ package org.rmj.guanzongroup.evaluation.Activity.SSDD;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
@@ -30,8 +32,11 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
     private MaterialTextView mtv_dept, mtv_evaluation, mtv_ratings;
     private RecyclerView rcv_adapter;
+    private MaterialButton btn_submit;
 
     private Adapter_SSDDCategories loAdapter;
+    private ESSDDMaster loMaster;
+    private List<ESSDDetail> laDetails;
 
     private interface onMessageButton{
         void onPositive();
@@ -51,6 +56,8 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         mtv_dept = findViewById(R.id.mtv_dept);
         mtv_evaluation = findViewById(R.id.mtv_evaluation);
         mtv_ratings = findViewById(R.id.mtv_ratings);
+        btn_submit = findViewById(R.id.btn_submit);
+
         rcv_adapter = findViewById(R.id.rcv_adapter);
 
         if (!getIntent().hasExtra("transnox")) {
@@ -73,6 +80,8 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             });
         }else {
             InitObservers();
+
+            btn_submit.setOnClickListener(v -> SubmitEvaluation() );
         }
     }
 
@@ -97,6 +106,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     });
                     return;
                 }
+                loMaster= essddMaster;
                 mtv_dept.setText(mViewModel.GetDepartment(essddMaster.getsDeptIDxx()).getsDescript());
             }
         });
@@ -172,10 +182,61 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                         ntotalEvaluated++;
                     }
                 }
+                laDetails= essdDetails;
 
                 //display text details
                 mtv_evaluation.setText(ntotalEvaluated + " out of " + essdDetails.size());
                 mtv_ratings.setText(String.format("%.1f", ldbl_totalRating / ntotalEvaluated));
+            }
+        });
+    }
+
+    private void SubmitEvaluation(){
+
+        if (loMaster == null){
+
+            InitMessage(1, R.drawable.baseline_error_24, "Master is empty", "Okay", "", new onMessageButton() {
+                @Override
+                public void onPositive() {
+
+                }
+
+                @Override
+                public void onNegative() {
+
+                }
+            });
+            return;
+        }else if (laDetails == null || laDetails.size() < 1){
+
+            InitMessage(1, R.drawable.baseline_error_24, "Details is empty", "Okay", "", new onMessageButton() {
+                @Override
+                public void onPositive() {
+
+                }
+
+                @Override
+                public void onNegative() {
+
+                }
+            });
+            return;
+        }
+
+        mViewModel.SubmitEvaluation(loMaster, laDetails, new VMSSDEvaluation.OnDownloadCallback() {
+            @Override
+            public void OnLoad(String fsTitlexx, String fsMessage) {
+
+            }
+
+            @Override
+            public void OnSuccess() {
+
+            }
+
+            @Override
+            public void OnFailed(String fsMessage) {
+
             }
         });
     }

@@ -15,6 +15,9 @@ public interface DSSDDetail {
     @Upsert
     void Save(ESSDDetail eeSSDDetail);
 
+    @Query("UPDATE SSDD_Detail SET sTransNox= :fsNewTransNox WHERE sTransNox= :fsOldTransNox ")
+    void Submit(String fsNewTransNox, String fsOldTransNox);
+
     @Query("SELECT * FROM SSDD_Detail WHERE sTransNox= :fsTransNox")
     LiveData<List<ESSDDetail>> GetDetails(String fsTransNox);
 

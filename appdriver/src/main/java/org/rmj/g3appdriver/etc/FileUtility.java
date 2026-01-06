@@ -1,5 +1,10 @@
 package org.rmj.g3appdriver.etc;
 
+/**
+ * Written By ggutoman
+ * Created Date 11/25/2025
+ * **/
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;

@@ -15,6 +15,9 @@ public interface DSSDDMaster {
     @Upsert
     void Save(ESSDDMaster eeMaster);
 
+    @Query("UPDATE SSDD_Master SET sTransNox= :fsNewTransNox, cTranStat= '1' WHERE sTransNox= :fsOldTransNox ")
+    void Submit(String fsNewTransNox, String fsOldTransNox);
+
     @Query("SELECT COUNT(*) FROM SSDD_Master")
     int GetCount();
 

@@ -158,13 +158,47 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onChanged(List<ESSDDMaster> essddMasters) {
+
                     if (essddMasters == null){
                         return;
                     }
+
+                    //initialize list adapter for history
                     Adapter_SSDDHistory loAdapter = new Adapter_SSDDHistory(essddMasters, new Adapter_SSDDHistory.OnItemClickListener() {
                         @Override
                         public void OnClick(ESSDDMaster loHistory) {
 
+                            //download details and proceed to evaluation category
+                            mViewModel.DownloadEvaluationDetails(loHistory.getsTransNox(), new VMSSDEvaluation.OnDownloadCallback() {
+                                @Override
+                                public void OnLoad(String fsTitlexx, String fsMessage) {
+                                    poDialog.initDialog(fsTitlexx, fsMessage, false);
+                                    poDialog.show();
+                                }
+
+                                @Override
+                                public void OnSuccess() {
+                                    poDialog.dismiss();
+
+                                    Intent loIntent = new Intent(Activity_SSDD_Evaluation.this, Activity_SSDD_Category.class);
+                                    loIntent.putExtra("transnox", loHistory.getsTransNox());
+                                    loIntent.putExtra("deptid", loHistory.getsDeptIDxx());
+
+                                    startActivity(loIntent);
+                                }
+
+                                @Override
+                                public void OnFailed(String fsMessage) {
+                                    poDialog.dismiss();
+                                    InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                                        @Override
+                                        public void onPositive() {}
+
+                                        @Override
+                                        public void onNegative() {}
+                                    });
+                                }
+                            });
                         }
                     });
                     loAdapter.notifyDataSetChanged();
