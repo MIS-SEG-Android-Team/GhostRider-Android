@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import org.rmj.g3appdriver.GCircle.Apps.ErrorList.ViewModel.VMErrorLogs;
 import org.rmj.g3appdriver.GCircle.Apps.SSDD.SSDDEvaluation;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
@@ -32,8 +33,8 @@ public class VMSSDEvaluation extends AndroidViewModel {
         return loEvaluation.GetDepartments();
     }
 
-    public LiveData<List<ESSDDCategories>> GetCategories(){
-        return loEvaluation.GetCategories();
+    public List<ESSDDCategories> GetCategoriesNonLive(){
+        return loEvaluation.GetCategoriesNonLive();
     }
 
     public ESSDDCategories GetCategory(String fsCategory){
@@ -79,7 +80,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         return loEvaluation.CreateEvaluation(fsDeptID, foCategories);
     }
 
-    public void DownloadSSDDepartments(OnDownloadCallback focallback){
+    public void DownloadDepartments(OnDownloadCallback focallback){
 
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
@@ -90,12 +91,41 @@ public class VMSSDEvaluation extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
-                if (loEvaluation.DownloadDepartments()){
-                    return true;
-                }else {
+                if (!loEvaluation.DownloadDepartments()){
                     fsMessage = loEvaluation.GetMessage();
                     return false;
                 }
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if ((Boolean) object){
+                    focallback.OnSuccess();
+                }else {
+                    focallback.OnFailed(fsMessage);
+                }
+            }
+        });
+    }
+
+    public void DownloadCategories(OnDownloadCallback focallback){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                focallback.OnLoad("Downloading Categories", "Please wait");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!loEvaluation.DownloadCategories()){
+                    fsMessage = loEvaluation.GetMessage();
+                    return false;
+                }
+                return true;
             }
 
             @Override
@@ -115,20 +145,18 @@ public class VMSSDEvaluation extends AndroidViewModel {
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
-                focallback.OnLoad("Downloading Master", "Please wait");
+                focallback.OnLoad("Downloading Evaluations", "Please wait");
             }
 
             @Override
             public Object DoInBackground(Object args) {
 
-                if (loEvaluation.DownloadMaster(fsDeptIDxx, fsDfrom, fsDto)){
-                    return true;
-                }else if (loEvaluation.DownloadCategories()){
-                    return true;
-                }else {
-                    fsMessage = loEvaluation.GetMessage();
+                //download previous transactions
+                if (!loEvaluation.DownloadMaster(fsDeptIDxx, fsDfrom, fsDto)){
+                    fsMessage= loEvaluation.GetMessage();
                     return false;
                 }
+                return true;
             }
 
             @Override

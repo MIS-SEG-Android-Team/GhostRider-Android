@@ -19,5 +19,5 @@ public interface DSSDDCategories {
     ESSDDCategories GetCategory(String fsCategrID);
 
     @Query("SELECT * FROM SSDD_Categories")
-    LiveData<List<ESSDDCategories>> GetCategories();
+    List<ESSDDCategories> GetCategoriesNonLive();
 }

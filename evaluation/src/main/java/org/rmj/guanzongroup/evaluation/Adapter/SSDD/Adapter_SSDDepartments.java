@@ -88,7 +88,7 @@ public class Adapter_SSDDepartments extends RecyclerView.Adapter<Adapter_SSDDepa
             }else {
                 List<ESSDDepartments> filterSearch = new ArrayList<>();
 
-                for (ESSDDepartments departments: filterSearch){
+                for (ESSDDepartments departments: laDepartments){
 
                     if (departments.getsDescript().toLowerCase().contains(constraint.toString().toLowerCase())){
                         filterSearch.add(departments);

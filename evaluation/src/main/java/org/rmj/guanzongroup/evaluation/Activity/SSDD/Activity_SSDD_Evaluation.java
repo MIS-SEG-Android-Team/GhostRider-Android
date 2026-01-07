@@ -24,7 +24,6 @@ import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClic
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.etc.LoadDialog;
@@ -79,18 +78,44 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
 
         lsTranstat = "*";
 
-        ImportData();
+        InitActivity();
         InitObservers();
-        InitFilterOptions();
+        InitListener();
 
     }
 
-    private void ImportData(){
+    private void InitActivity(){
 
-        //passed department id, download transaction history, else, download department list
+        //passed department id, download transaction history
         if (getIntent().hasExtra("dept_id")){
 
+            //show filtering option
+            ib_filter.setVisibility(View.VISIBLE);
+
+            //show button evaluate
+            fbtn_evaluate.setVisibility(View.VISIBLE);
+
             //import data
+            mViewModel.DownloadCategories(new VMSSDEvaluation.OnDownloadCallback() {
+                @Override
+                public void OnLoad(String fsTitlexx, String fsMessage) {
+                    poDialog.initDialog(fsTitlexx, fsMessage, false);
+                    poDialog.show();
+                }
+
+                @Override
+                public void OnSuccess() {
+                    poDialog.dismiss();
+                    Toast.makeText(Activity_SSDD_Evaluation.this, "Successfully downloaded", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void OnFailed(String fsMessage) {
+                    poDialog.dismiss();
+                    Toast.makeText(Activity_SSDD_Evaluation.this, "Failed to download categories", Toast.LENGTH_SHORT).show();
+                }
+            });
+
             mViewModel.DownloadEvaluation(getIntent().getStringExtra("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
                 @Override
                 public void OnLoad(String fsTitlexx, String fsMessage) {
@@ -108,19 +133,20 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                 public void OnFailed(String fsMessage) {
 
                     poDialog.dismiss();
-                    InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
-                        @Override
-                        public void onPositive() {}
-
-                        @Override
-                        public void onNegative() {}
-                    });
+                    Toast.makeText(Activity_SSDD_Evaluation.this, "Failed to download evaluations", Toast.LENGTH_SHORT).show();
                 }
             });
-        }{
 
-            //import departments
-            mViewModel.DownloadSSDDepartments(new VMSSDEvaluation.OnDownloadCallback() {
+        }else {
+
+            //show filtering option
+            ib_filter.setVisibility(View.GONE);
+
+            //show button evaluate
+            fbtn_evaluate.setVisibility(View.GONE);
+
+            //import data
+            mViewModel.DownloadDepartments(new VMSSDEvaluation.OnDownloadCallback() {
                 @Override
                 public void OnLoad(String fsTitlexx, String fsMessage) {
                     poDialog.initDialog(fsTitlexx, fsMessage, false);
@@ -129,13 +155,14 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
 
                 @Override
                 public void OnSuccess() {
-                    Toast.makeText(Activity_SSDD_Evaluation.this, "Successfully downloaded", Toast.LENGTH_SHORT).show();
+                    poDialog.dismiss();
                 }
 
                 @Override
                 public void OnFailed(String fsMessage) {
 
-                    InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                    poDialog.dismiss();
+                    InitMessage(1, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {}
 
@@ -145,7 +172,6 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                 }
             });
         }
-
     }
 
     private void InitObservers(){
@@ -160,6 +186,13 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                 public void onChanged(List<ESSDDMaster> essddMasters) {
 
                     if (essddMasters == null){
+                        InitMessage(1, R.drawable.baseline_error_24, "No transactions found", "Okay", "", new onMessageButton() {
+                            @Override
+                            public void onPositive() {}
+
+                            @Override
+                            public void onNegative() {}
+                        });
                         return;
                     }
 
@@ -220,50 +253,27 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                         public void afterTextChanged(Editable s) {}
                     });
 
-                    //show filtering option
-                    ib_filter.setVisibility(View.VISIBLE);
                 }
             });
 
-            //initialize categories
-            mViewModel.GetCategories().observe(Activity_SSDD_Evaluation.this, new Observer<List<ESSDDCategories>>() {
-                @Override
-                public void onChanged(List<ESSDDCategories> essddCategories) {
-
-                    fbtn_evaluate.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            if (essddCategories == null){
-
-                                InitMessage(1, R.drawable.baseline_error_24, "No categories found. Could not create evaluation.", "Okay", "", new onMessageButton() {
-                                    @Override
-                                    public void onPositive() {}
-
-                                    @Override
-                                    public void onNegative() {}
-                                });
-                                return;
-                            }
-
-                            String lsTransNox = mViewModel.CreateEvaluation(getIntent().getStringExtra("dept_id"), essddCategories);
-                            Intent loIntent = new Intent(Activity_SSDD_Evaluation.this, Activity_SSDD_Category.class);
-                            loIntent.putExtra("transnox", lsTransNox);
-                            loIntent.putExtra("deptid", lsTransNox);
-
-                            startActivity(loIntent);
-                        }
-                    });
-                }
-            });
         }{
-
             //initialize data
             mViewModel.GetDepartments().observe(Activity_SSDD_Evaluation.this, new Observer<List<ESSDDepartments>>() {
                 @Override
                 public void onChanged(List<ESSDDepartments> essdDepartments) {
 
                     if (essdDepartments == null){
+
+                        //if null, ask user to re download data
+                        InitMessage(2, R.drawable.baseline_error_24, "No departments found for evaluation. Re download data?", "Yes", "No", new onMessageButton() {
+                            @Override
+                            public void onPositive() {
+                                InitActivity();
+                            }
+
+                            @Override
+                            public void onNegative() {}
+                        });
                         return;
                     }
                     Adapter_SSDDepartments loAdapter = new Adapter_SSDDepartments(essdDepartments, new Adapter_SSDDepartments.OnItemClickListener() {
@@ -293,16 +303,13 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                         @Override
                         public void afterTextChanged(Editable s) {}
                     });
-
-                    //show filtering option
-                    ib_filter.setVisibility(View.GONE);
                 }
             });
         }
 
     }
 
-    private void InitFilterOptions(){
+    private void InitListener(){
 
         ib_filter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,7 +323,7 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
 
-                        if (item.getItemId() == R.id.action_by_date){
+                        if (item.getItemId() == R.id.action_by_date){ //filter by date
 
                             MaterialDatePicker.Builder<Pair<Long, Long>> loBuilder = MaterialDatePicker.Builder.dateRangePicker();
                             loBuilder.setTitleText("Select Date Range");
@@ -330,12 +337,12 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                                     lsDfrom = GetDateFormat(selection.first);
                                     lsDto = GetDateFormat(selection.second);
 
-                                    //ask user before downloadinh
-                                    InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Download transactions from " + lsDfrom + " to " + lsDto + "?",
+                                    //ask user before downloading
+                                    InitMessage(2, R.drawable.ic_baseline_confirmation_pin_24, "Download transactions from " + lsDfrom + " to " + lsDto + "?",
                                             "Yes", "No", new onMessageButton() {
                                                 @Override
                                                 public void onPositive() {
-                                                    ImportData();
+                                                    InitActivity();
                                                 }
 
                                                 @Override
@@ -348,20 +355,51 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
                             loPicker.show(getSupportFragmentManager(), "DATE_RANGE_PICKER");
 
                             return true;
-                        }else if (item.getItemId() == R.id.action_item_all){
+                        }else if (item.getItemId() == R.id.action_item_all){ //filter by status
                             lsTranstat = "*";
                             return true;
-                        }else if (item.getItemId() == R.id.action_item_open){
+                        }else if (item.getItemId() == R.id.action_item_open){ //filter by status
                             lsTranstat = "0";
                             return true;
-                        }else if (item.getItemId() == R.id.action_item_closed){
+                        }else if (item.getItemId() == R.id.action_item_closed){ //filter by status
                             lsTranstat = "1";
                             return true;
-                        }else if (item.getItemId() == R.id.action_item_posted){
+                        }else if (item.getItemId() == R.id.action_item_posted){ //filter by status
                             lsTranstat = "3";
                             return true;
                         }
                         return false;
+                    }
+                });
+            }
+        });
+
+        fbtn_evaluate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                InitMessage(2, R.drawable.ic_baseline_confirmation_pin_24, "Create a new evaluation?", "Yes", "No", new onMessageButton() {
+                    @Override
+                    public void onPositive() {
+
+                        if (mViewModel.GetCategoriesNonLive() == null){
+
+                            InitMessage(2, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new onMessageButton() {
+                                @Override
+                                public void onPositive() {
+                                    InitActivity();
+                                }
+
+                                @Override
+                                public void onNegative() {}
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onNegative() {
+
                     }
                 });
             }

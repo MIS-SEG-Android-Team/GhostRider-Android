@@ -57,6 +57,14 @@ public class ESSDDImages {
         this.sReferNox = sReferNox;
     }
 
+    public String getsCategrID() {
+        return sCategrID;
+    }
+
+    public void setsCategrID(String sCategrID) {
+        this.sCategrID = sCategrID;
+    }
+
     public String getnEntryNox() {
         return nEntryNox;
     }

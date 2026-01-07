@@ -131,8 +131,8 @@ public class SSDDEvaluation {
         return poDeptDao.GetDepartmentList();
     }
 
-    public LiveData<List<ESSDDCategories>> GetCategories(){
-        return poCatgDao.GetCategories();
+    public List<ESSDDCategories> GetCategoriesNonLive(){
+        return poCatgDao.GetCategoriesNonLive();
     }
 
     public ESSDDCategories GetCategory(String fsCategory){
@@ -200,7 +200,7 @@ public class SSDDEvaluation {
 
             return true;
         }catch (Exception e){
-            e.printStackTrace();
+            lsMessage= e.getMessage();
             return false;
         }
     }
@@ -209,7 +209,7 @@ public class SSDDEvaluation {
 
         try {
 
-            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDDepartments(), new JSONObject().toString(), poHeaders.getHeaders());
+            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDCategories(), new JSONObject().toString(), poHeaders.getHeaders());
             if (lsResponse == null){
                 lsMessage = "Server no response";
                 return false;
@@ -240,7 +240,7 @@ public class SSDDEvaluation {
 
             return true;
         }catch (Exception e){
-            e.printStackTrace();
+            lsMessage= e.getMessage();
             return false;
         }
     }
@@ -260,6 +260,7 @@ public class SSDDEvaluation {
                 lsMessage = "Server no response";
                 return false;
             }
+            Log.d("SSD Evaluation", lsResponse);
 
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
@@ -286,7 +287,7 @@ public class SSDDEvaluation {
 
             return true;
         }catch (Exception e){
-            e.printStackTrace();
+            lsMessage= e.getMessage();
             return false;
         }
     }
@@ -387,45 +388,81 @@ public class SSDDEvaluation {
 
     public Boolean SubmitImages(List<ESSDDImages> foImages){
 
-        //check image path, if existing
-        for (ESSDDImages loImage : foImages){
-
-            //convert image path into uri and get file
-            Uri loUri = Uri.parse(loImage.getsImagePth());
-            File loFile = poFile.GetFileFromUri(loUri);
-
-            //check if image file is exisiting
-            if (!loFile.exists()){
-                lsMessage= "File not found";
-                return false;
-            }
-
-            //check file extension if image type
-            if (poFile.GetMimeType(loUri).equals("image/jpeg") || poFile.GetMimeType(loUri).equals("image/png")){
-                lsMessage= "File is not valid as image type";
-                return false;
-            }
+        try {
 
             String lsClient = poToken.GetClientToken();
-
             if(lsClient == null){
-                lsMessage= "No generated client token to upload image.";
-                return null;
+                lsMessage= "No generated client token to upload image";
+                return false;
             }
 
-            WebFileServer.UploadFile(
-                    loImage.getsImagePth() + loImage.getsImageNme(),
-                    poToken.GetAccessToken(lsClient),
-                    poFile.GetMimeType(loUri),
-                    "",
-                    loImage.getsImageNme(),
-                    poSession.getUserID(),
-                    "SSDD",
-                    "",
-                    "");
+            //check image path, if existing
+            for (ESSDDImages loImage : foImages){
 
+                //convert image path into uri and get file
+                Uri loUri = Uri.parse(loImage.getsImagePth());
+                File loFile = poFile.GetFileFromUri(loUri);
 
+                //check if image file is exisiting
+                if (!loFile.exists()){
+                    Log.d("SSDD Image", "File not found for " + loImage.getsImageNme() + ".\nTransaction number: " + loImage.getsTransNox());
+                }
+
+                //check file extension if image type
+                if (poFile.GetMimeType(loUri).equals("image/jpeg") || poFile.GetMimeType(loUri).equals("image/png")){
+                    Log.d("SSDD Image", "File is not valid as image type for " + loImage.getsImageNme() + ".\nTransaction number: " + loImage.getsTransNox());
+                }
+
+//                String lsClient = poToken.GetClientToken();
+//                if(lsClient == null){
+//                    Log.d("SSDD Image", "No generated client token to upload image for " + loImage.getsImageNme() + ".\nTransaction number: " + loImage.getsTransNox());
+//                }
+
+                //save to database
+                JSONObject loParam = new JSONObject();
+                loParam.put("sReferNox", loImage.getsReferNox());
+                loParam.put("sCategrID", loImage.getsCategrID());
+                loParam.put("nEntryNox", loImage.getnEntryNox());
+                loParam.put("sScanndID", loImage.getsScanndID());
+                loParam.put("sImageNme", loImage.getsImageNme());
+                loParam.put("sMD5Hashx", loImage.getsMD5Hashx());
+                loParam.put("sImagePth", loImage.getsImagePth());
+                loParam.put("dImgeDate", loImage.getdImgeDate());
+
+                String lsResponse = WebClient.sendRequest(poApi.getUrlSubmitSSDDImage(), loParam.toString(), poHeaders.getHeaders());
+                if (lsResponse == null){
+                    lsMessage = "Server no response";
+                    return false;
+                }
+
+                JSONObject loResponse = new JSONObject(lsResponse);
+                String lsResult = loResponse.getString("result");
+
+                if(lsResult.equalsIgnoreCase("error")){
+                    JSONObject loError = loResponse.getJSONObject("error");
+                    lsMessage = getErrorMessage(loError);;
+                    return false;
+                }
+
+                Thread.sleep(1000);
+
+                //upload image
+                WebFileServer.UploadFile(
+                        loImage.getsImagePth() + loImage.getsImageNme(),
+                        poToken.GetAccessToken(lsClient),
+                        poFile.GetMimeType(loUri),
+                        "",
+                        loImage.getsImageNme(),
+                        poSession.getUserID(),
+                        "SSDD",
+                        "",
+                        "");
+            }
+
+            return true;
+        }catch (Exception e){
+            lsMessage = e.getMessage();
+            return false;
         }
-        return true;
     }
 }
