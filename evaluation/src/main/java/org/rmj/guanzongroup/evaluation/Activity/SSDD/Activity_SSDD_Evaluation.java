@@ -12,10 +12,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
+import org.rmj.guanzongroup.evaluation.Callback.OnSSDDItemClick;
 import org.rmj.guanzongroup.evaluation.Fragments.SSDD.Fragment_SSDD_Evaluation;
 import org.rmj.guanzongroup.evaluation.R;
 
-public class Activity_SSDD_Evaluation extends AppCompatActivity {
+public class Activity_SSDD_Evaluation extends AppCompatActivity implements OnSSDDItemClick {
 
     private ViewPager2 vpage_list;
 
@@ -34,33 +35,21 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity {
 
         Fragment_SSDD_Evaluation loFragment = new Fragment_SSDD_Evaluation();
 
-        Log.d("GAGANA KABA?", loFragment.IsViewReady().toString());
-
-        //inialize adapter for fragment
-        if (loFragment.IsViewReady()){
-
-            loFragment.InitFragment(new Fragment_SSDD_Evaluation.OnSSDDItemClick() {
-                @Override
-                public void OnSelectDepartment(ESSDDepartments loDepartment) {
-                    Bundle loBundle = new Bundle();
-                    loBundle.putString("dept_id", loDepartment.getsDeptIDxx());
-
-                    loFragment.setArguments(loBundle);
-                }
-
-                @Override
-                public void OnSelectEvaluation(ESSDDMaster loMaster) {
-
-                }
-            });
-        }
-
         //initialize adapter
         Fragment_SSDD_Adapter loAdapter = new Fragment_SSDD_Adapter(getSupportFragmentManager(), getLifecycle());
         loAdapter.InitFragment(loFragment);
         vpage_list.setAdapter(loAdapter);
 
-        Log.d("GAGANA KABA?", loFragment.IsViewReady().toString());
+    }
+
+    @Override
+    public void OnSelectDepartment(ESSDDepartments loDepartment) {
+        Log.d("GAGANA BA?", "GUMANA NGA");
+    }
+
+    @Override
+    public void OnSelectEvaluation(ESSDDMaster loMaster) {
+        Log.d("GAGANA BA?", "GUMANA NGA");
     }
 
     private static class Fragment_SSDD_Adapter extends FragmentStateAdapter {

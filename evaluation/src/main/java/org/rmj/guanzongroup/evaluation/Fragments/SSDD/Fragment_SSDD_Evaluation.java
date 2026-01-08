@@ -19,6 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,6 +37,7 @@ import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDHistory;
 import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDepartments;
+import org.rmj.guanzongroup.evaluation.Callback.OnSSDDItemClick;
 import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 
@@ -58,20 +61,11 @@ public class Fragment_SSDD_Evaluation extends Fragment{
     private FloatingActionButton fbtn_evaluate;
 
     private String lsDfrom, lsDto, lsTranstat;
-    private Boolean isViewReady= false;
-
-    public interface OnSSDDItemClick {
-        void OnSelectDepartment(ESSDDepartments loDepartment);
-        void OnSelectEvaluation(ESSDDMaster loMaster);
-    }
+    private OnSSDDItemClick callback;
 
     public interface OnMessageButton {
         void OnPositive();
         void OnNegative();
-    }
-
-    public static Fragment_SSDD_Evaluation newInstance(){
-        return new Fragment_SSDD_Evaluation();
     }
 
     @Nullable
@@ -95,20 +89,12 @@ public class Fragment_SSDD_Evaluation extends Fragment{
 
         lsTranstat = "*";
 
-        isViewReady = true;
-        InitListener();
+        callback = (OnSSDDItemClick) getActivity();
 
-        Log.d("GAGANA KABA?", isViewReady.toString());
+        InitListener();
+        InitFragment();
 
         return view;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        isViewReady = true;
-        Log.d("GAGANA KABA?", isViewReady.toString());
     }
 
     @Override
@@ -120,11 +106,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         }
     }
 
-    public Boolean IsViewReady(){
-        return isViewReady;
-    }
-
-    public void InitFragment(OnSSDDItemClick foCallback){
+    public void InitFragment(){
 
         if (loBundle == null){
 
@@ -159,7 +141,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                     Adapter_SSDDepartments loAdapter = new Adapter_SSDDepartments(essdDepartments, new Adapter_SSDDepartments.OnItemClickListener() {
                         @Override
                         public void OnClick(ESSDDepartments loDepartment) {
-                            foCallback.OnSelectDepartment(loDepartment);
+                            callback.OnSelectDepartment(loDepartment);
                         }
                     });
                     loAdapter.notifyDataSetChanged();
@@ -213,7 +195,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                                     @Override
                                     public void OnSuccess() {
                                         poDialog.dismiss();
-                                        foCallback.OnSelectEvaluation(loHistory);
+                                        callback.OnSelectEvaluation(loHistory);
                                     }
 
                                     @Override
@@ -242,6 +224,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
             }
             Toast.makeText(requireActivity(), "Invalid arguments. Department id not detected!", Toast.LENGTH_LONG).show();
         }
+
     }
 
     private void ReDownloadData(){
