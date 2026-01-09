@@ -37,13 +37,6 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
     @Override
     public void onBindViewHolder(@NonNull VHCategories holder, int position) {
 
-        //disable rating if already evaluated after
-        if (laCategories.get(position).lsEvaluated == null || laCategories.get(position).lsEvaluated.isEmpty()){
-            holder.view.setEnabled(true);
-        }else {
-            holder.view.setEnabled(false);
-        }
-
         holder.mtv_category.setText(laCategories.get(position).sCategry);
 
         holder.rb_rate.setRating((float) laCategories.get(position).ldbl_rating);
@@ -99,7 +92,6 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
 
     public static class VHCategories extends RecyclerView.ViewHolder{
 
-        private View view;
         private MaterialTextView mtv_category;
         private RatingBar rb_rate;
         private TextInputEditText tie_remarks;
@@ -107,8 +99,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
 
         public VHCategories(@NonNull View itemView) {
             super(itemView);
-
-            view = itemView;
+            
             mtv_category = itemView.findViewById(R.id.mtv_category);
             rb_rate = itemView.findViewById(R.id.rb_rate);
             tie_remarks = itemView.findViewById(R.id.tie_remarks);

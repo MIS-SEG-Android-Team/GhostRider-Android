@@ -72,6 +72,106 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
     }
 
+    private List<Adapter_SSDDCategories.SSDD_Evaluation_Categories> GetList(){
+
+        //initialize list for adapter
+        List<Adapter_SSDDCategories.SSDD_Evaluation_Categories> laCategories = new ArrayList<>();
+        for (ESSDDetail loDetal : laDetails){
+
+            Adapter_SSDDCategories.SSDD_Evaluation_Categories loCategory = new Adapter_SSDDCategories.SSDD_Evaluation_Categories(
+                    loDetal.getsCategrID(),
+                    mViewModel.GetCategory(loDetal.getsCategrID()).getsDescript(),
+                    Double.parseDouble(loDetal.getnRatingxx()),
+                    loDetal.getsRemarksx(),
+                    loDetal.getdEvaluate()
+
+            );
+            laCategories.add(loCategory);
+        }
+        return laCategories;
+
+    }
+
+    private void InitAdapter(){
+
+        //initialize categories
+        loAdapter = new Adapter_SSDDCategories(GetList(), new Adapter_SSDDCategories.OnItemClickListener() {
+            @Override
+            public void OnRate(Adapter_SSDDCategories.SSDD_Evaluation_Categories foDetail, double ffTotalRate) {
+
+                try {
+
+                    //do not allow if category is already evaluated before this day
+                    if (mViewModel.IsEvaluated(foDetail.lsEvaluated)){
+
+                        InitMessage(0, R.drawable.baseline_error_24, "You are not allowed to re evaluate categories before the day", "Okay", "", new onMessageButton() {
+                            @Override
+                            public void onPositive() {}
+
+                            @Override
+                            public void onNegative() {}
+                        });
+                        return;
+                    }
+
+                    //confirm rating, if result is zero
+                    if (ffTotalRate <= 0.0){
+
+                        InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "You are rating this category to zero. Continue?", "Yes", "No", new onMessageButton() {
+                            @Override
+                            public void onPositive() {
+                                RateEvaluation(foDetail.sCategryID, String.valueOf(ffTotalRate), foDetail.lsRemarks);
+                            }
+
+                            @Override
+                            public void onNegative() {}
+                        });
+                    }
+                    RateEvaluation(foDetail.sCategryID, String.valueOf(ffTotalRate), foDetail.lsRemarks);
+
+                    //initialize master details
+                    double ldbl_totalRating = 0.0;
+                    int ntotalEvaluated = 0;
+                    for (ESSDDetail loDetal : laDetails){
+
+                        if (loDetal.getdEvaluate() != null && !loDetal.getdEvaluate().isEmpty()){
+                            ldbl_totalRating += Double.parseDouble(loDetal.getnRatingxx());
+                            ntotalEvaluated++;
+                        }
+                    }
+
+                    //display total
+                    mtv_evaluation.setText(ntotalEvaluated + " out of " + laDetails.size());
+                    mtv_ratings.setText(String.valueOf(ldbl_totalRating));
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void OnCamera() {
+
+            }
+
+            @Override
+            public void OnDetails(String fsCategoryID) {
+
+                //proceed to category details
+                Intent loIntent = new Intent(Activity_SSDD_Category.this, Activity_SSDD_Category_Details.class);
+                loIntent.putExtra("transnox", getIntent().getStringExtra("transnox"));
+                loIntent.putExtra("categoryid", fsCategoryID);
+                startActivity(loIntent);
+
+            }
+        });
+        rcv_adapter.setAdapter(loAdapter);
+        rcv_adapter.setLayoutManager(new LinearLayoutManager(Activity_SSDD_Category.this, LinearLayoutManager.VERTICAL, false));
+
+        loAdapter.notifyDataSetChanged();
+
+    }
+
     private void InitActivity(){
 
         if (!getIntent().hasExtra("transnox")) {
@@ -93,6 +193,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 public void onNegative() {}
             });
         }else {
+
             InitObservers();
         }
 
@@ -125,7 +226,18 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     return;
                 }
                 loMaster= essddMaster;
-                mtv_dept.setText(mViewModel.GetDepartment(essddMaster.getsDeptIDxx()).getsDescript());
+
+                //set department name
+                mtv_dept.setText(mViewModel.GetDepartment(loMaster.getsDeptIDxx()).getsDescript());
+
+                //do not allow modifications, if evaluation is already posted
+                if (loMaster.getcTranStat().equals("3")){
+                    rcv_adapter.setEnabled(false);
+                    btn_submit.setEnabled(false);
+                    return;
+                }
+                rcv_adapter.setEnabled(true);
+                btn_submit.setEnabled(true);
             }
         });
 
@@ -140,6 +252,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                         @Override
                         public void onPositive() {
 
+                            //download evaluation details
                             mViewModel.DownloadEvaluationDetails(getIntent().getStringExtra("transnox"), new VMSSDEvaluation.OnDownloadCallback() {
                                 @Override
                                 public void OnLoad(String fsTitlexx, String fsMessage) {
@@ -174,80 +287,10 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     });
                     return;
                 }
-
-                //initialize list for adapter
-                List<Adapter_SSDDCategories.SSDD_Evaluation_Categories> laCategories = new ArrayList<>();
-                for (ESSDDetail loDetal : essdDetails){
-
-                    Adapter_SSDDCategories.SSDD_Evaluation_Categories loCategory = new Adapter_SSDDCategories.SSDD_Evaluation_Categories(
-                            loDetal.getsCategrID(),
-                            mViewModel.GetCategory(loDetal.getsCategrID()).getsDescript(),
-                            Double.parseDouble(loDetal.getnRatingxx()),
-                            loDetal.getsRemarksx(),
-                            loDetal.getdEvaluate()
-
-                    );
-                    laCategories.add(loCategory);
-                }
-
-
-                //initialize categories
-                loAdapter = new Adapter_SSDDCategories(laCategories, new Adapter_SSDDCategories.OnItemClickListener() {
-                    @Override
-                    public void OnRate(Adapter_SSDDCategories.SSDD_Evaluation_Categories foDetail, double ffTotalRate) {
-
-                        Log.d("RATE ME", String.valueOf(ffTotalRate));
-
-                        if (ffTotalRate <= 0.0){
-
-                            InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "You are rating this category to zero. Continue?", "Yes", "No", new onMessageButton() {
-                                @Override
-                                public void onPositive() {
-                                    RateEvaluation(foDetail.sCategryID, String.valueOf(ffTotalRate), foDetail.lsRemarks);
-                                }
-
-                                @Override
-                                public void onNegative() {}
-                            });
-                        }
-                        RateEvaluation(foDetail.sCategryID, String.valueOf(ffTotalRate), foDetail.lsRemarks);
-                    }
-
-                    @Override
-                    public void OnCamera() {
-
-                    }
-
-                    @Override
-                    public void OnDetails(String fsCategoryID) {
-
-                        Intent loIntent = new Intent(Activity_SSDD_Category.this, Activity_SSDD_Category_Details.class);
-                        loIntent.putExtra("transnox", getIntent().getStringExtra("transnox"));
-                        loIntent.putExtra("categoryid", fsCategoryID);
-                        startActivity(loIntent);
-
-                    }
-                });
-                rcv_adapter.setAdapter(loAdapter);
-                rcv_adapter.setLayoutManager(new LinearLayoutManager(Activity_SSDD_Category.this, LinearLayoutManager.VERTICAL, false));
-
-                loAdapter.notifyDataSetChanged();
-
-                //initialize master details
-                double ldbl_totalRating = 0.0;
-                int ntotalEvaluated = 0;
-                for (ESSDDetail loDetal : essdDetails){
-
-                    if (loDetal.getdEvaluate() != null && !loDetal.getdEvaluate().isEmpty()){
-                        ldbl_totalRating += Double.parseDouble(loDetal.getnRatingxx());
-                        ntotalEvaluated++;
-                    }
-                }
                 laDetails= essdDetails;
 
-                //display text details
-                mtv_evaluation.setText(ntotalEvaluated + " out of " + essdDetails.size());
-                mtv_ratings.setText(String.valueOf(ldbl_totalRating));
+                //initialize adapter
+                InitAdapter();
             }
         });
     }
@@ -263,28 +306,20 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
             InitMessage(1, R.drawable.baseline_error_24, "Master is empty", "Okay", "", new onMessageButton() {
                 @Override
-                public void onPositive() {
-
-                }
+                public void onPositive() {}
 
                 @Override
-                public void onNegative() {
-
-                }
+                public void onNegative() {}
             });
             return;
         }else if (laDetails == null || laDetails.size() < 1){
 
             InitMessage(1, R.drawable.baseline_error_24, "Details is empty", "Okay", "", new onMessageButton() {
                 @Override
-                public void onPositive() {
-
-                }
+                public void onPositive() {}
 
                 @Override
-                public void onNegative() {
-
-                }
+                public void onNegative() {}
             });
             return;
         }
@@ -292,17 +327,26 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         mViewModel.SubmitEvaluation(loMaster, laDetails, new VMSSDEvaluation.OnDownloadCallback() {
             @Override
             public void OnLoad(String fsTitlexx, String fsMessage) {
-
+                poDialog.initDialog(fsTitlexx, fsMessage, false);
+                poDialog.show();
             }
 
             @Override
             public void OnSuccess() {
-
+                poDialog.dismiss();
             }
 
             @Override
             public void OnFailed(String fsMessage) {
 
+                poDialog.dismiss();
+                InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                    @Override
+                    public void onPositive() {}
+
+                    @Override
+                    public void onNegative() {}
+                });
             }
         });
     }
