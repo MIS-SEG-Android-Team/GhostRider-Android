@@ -44,6 +44,17 @@ public class Adapter_SSDDHistory extends RecyclerView.Adapter<Adapter_SSDDHistor
     @Override
     public void onBindViewHolder(@NonNull VHistory holder, int position) {
 
+        holder.mtv_transnox.setText(laHistoryFiltered.get(position).getsTransNox());
+        holder.mtv_dtransact.setText(laHistoryFiltered.get(position).getdTransact());
+
+        String lsStatus = switch (laHistoryFiltered.get(position).getcTranStat()) {
+            case "0" -> "Open";
+            case "1" -> "Closed";
+            case "3" -> "Posted";
+            default -> "Unknown";
+        };
+        holder.mtv_status.setText(lsStatus);
+
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,7 +105,7 @@ public class Adapter_SSDDHistory extends RecyclerView.Adapter<Adapter_SSDDHistor
             }else {
                 List<ESSDDMaster> filterSearch = new ArrayList<>();
 
-                for (ESSDDMaster history: filterSearch){
+                for (ESSDDMaster history: laHistory){
 
                     if (history.getsTransNox().toLowerCase().contains(constraint.toString().toLowerCase())){
                         filterSearch.add(history);

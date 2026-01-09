@@ -33,8 +33,10 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
+import org.rmj.guanzongroup.evaluation.Activity.SSDD.Activity_SSDD_Category;
 import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDHistory;
 import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDepartments;
 import org.rmj.guanzongroup.evaluation.Callback.OnSSDDItemClick;
@@ -87,12 +89,13 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         lsDfrom = GetFirstQuarter();
         lsDto = GetDateToday();
 
-        lsTranstat = "*";
+        lsTranstat = "cTranStat IN ('0', '1', '3')";
 
+        //initalize callback
         callback = (OnSSDDItemClick) getActivity();
 
-        InitListener();
         InitFragment();
+        InitListener();
 
         return view;
     }
@@ -125,7 +128,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                     if (essdDepartments == null){
 
                         //if null, ask user to re download data
-                        InitMessage(2, R.drawable.baseline_error_24, "No departments found for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
+                        InitMessage(1, R.drawable.baseline_error_24, "No departments found for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
                             @Override
                             public void OnPositive() {
                                 ReDownloadData();
@@ -149,8 +152,26 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                     rcv_list.setAdapter(loAdapter);
                     rcv_list.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
+                    tie_search.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            loAdapter.GetFilter().filter(s);
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+
+                        }
+                    });
+
                 }
             });
+
         }else {
 
             //show filtering option
@@ -169,7 +190,8 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                     public void onChanged(List<ESSDDMaster> essddMasters) {
 
                         if (essddMasters == null){
-                            InitMessage(1, R.drawable.baseline_error_24, "No transactions found", "Okay", "", new OnMessageButton() {
+
+                            InitMessage(0, R.drawable.baseline_error_24, "No transactions found", "Okay", "", new OnMessageButton() {
                                 @Override
                                 public void OnPositive() {}
 
@@ -184,32 +206,11 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                             @Override
                             public void OnClick(ESSDDMaster loHistory) {
 
-                                //download details and proceed to evaluation category
-                                mViewModel.DownloadEvaluationDetails(loHistory.getsTransNox(), new VMSSDEvaluation.OnDownloadCallback() {
-                                    @Override
-                                    public void OnLoad(String fsTitlexx, String fsMessage) {
-                                        poDialog.initDialog(fsTitlexx, fsMessage, false);
-                                        poDialog.show();
-                                    }
-
-                                    @Override
-                                    public void OnSuccess() {
-                                        poDialog.dismiss();
-                                        callback.OnSelectEvaluation(loHistory);
-                                    }
-
-                                    @Override
-                                    public void OnFailed(String fsMessage) {
-                                        poDialog.dismiss();
-                                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
-                                            @Override
-                                            public void OnPositive() {}
-
-                                            @Override
-                                            public void OnNegative() {}
-                                        });
-                                    }
-                                });
+                                //Continue to evaluation details
+                                Intent loIntent = new Intent(requireActivity(), Activity_SSDD_Category.class);
+                                loIntent.putExtra("transnox", loHistory.getsTransNox());
+                                loIntent.putExtra("deptid", loBundle.getString("dept_id"));
+                                startActivity(loIntent);
                             }
                         });
                         loAdapter.notifyDataSetChanged();
@@ -217,11 +218,28 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                         rcv_list.setAdapter(loAdapter);
                         rcv_list.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
 
+                        tie_search.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                loAdapter.GetFilter().filter(s);
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+
+                            }
+                        });
 
                     }
                 });
                 return;
             }
+
             Toast.makeText(requireActivity(), "Invalid arguments. Department id not detected!", Toast.LENGTH_LONG).show();
         }
 
@@ -248,7 +266,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                 public void OnFailed(String fsMessage) {
 
                     poDialog.dismiss();
-                    InitMessage(1, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
+                    InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
                         @Override
                         public void OnPositive() {
 
@@ -335,7 +353,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                                     lsDto = GetDateFormat(selection.second);
 
                                     //ask user before downloading
-                                    InitMessage(2, R.drawable.ic_baseline_confirmation_pin_24, "Download transactions from " + lsDfrom + " to " + lsDto + "?",
+                                    InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Download transactions from " + lsDfrom + " to " + lsDto + "?",
                                             "Yes", "No", new OnMessageButton() {
                                                 @Override
                                                 public void OnPositive() {
@@ -351,16 +369,20 @@ public class Fragment_SSDD_Evaluation extends Fragment{
 
                             return true;
                         }else if (item.getItemId() == R.id.action_item_all){ //filter by status
-                            lsTranstat = "*";
+                            lsTranstat = "cTranStat IN ('0', '1', '3')";
+                            InitFragment();
                             return true;
                         }else if (item.getItemId() == R.id.action_item_open){ //filter by status
-                            lsTranstat = "0";
+                            lsTranstat = "cTranStat= '0'";
+                            InitFragment();
                             return true;
                         }else if (item.getItemId() == R.id.action_item_closed){ //filter by status
-                            lsTranstat = "1";
+                            lsTranstat = "cTranStat= '1'";
+                            InitFragment();
                             return true;
                         }else if (item.getItemId() == R.id.action_item_posted){ //filter by status
-                            lsTranstat = "3";
+                            lsTranstat = "cTranStat= '3'";
+                            InitFragment();
                             return true;
                         }
                         return false;
@@ -374,13 +396,13 @@ public class Fragment_SSDD_Evaluation extends Fragment{
             public void onClick(View v) {
 
 
-                InitMessage(2, R.drawable.ic_baseline_confirmation_pin_24, "Create a new evaluation?", "Yes", "No", new OnMessageButton() {
+                InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Create a new evaluation?", "Yes", "No", new OnMessageButton() {
                     @Override
                     public void OnPositive() {
 
                         if (mViewModel.GetCategoriesNonLive() == null){
 
-                            InitMessage(2, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
+                            InitMessage(1, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
                                 @Override
                                 public void OnPositive() {
                                     ReDownloadData();
@@ -390,6 +412,14 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                                 public void OnNegative() {}
                             });
                         }
+
+                        String lsTransNox = mViewModel.CreateEvaluation(loBundle.getString("dept_id"), mViewModel.GetCategoriesNonLive());
+
+                        Intent loIntent = new Intent(requireActivity(), Activity_SSDD_Category.class);
+                        loIntent.putExtra("transnox", lsTransNox);
+                        loIntent.putExtra("deptid", loBundle.getString("dept_id"));
+
+                        startActivity(loIntent);
                     }
 
                     @Override

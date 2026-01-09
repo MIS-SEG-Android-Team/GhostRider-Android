@@ -16,6 +16,9 @@ import org.rmj.guanzongroup.evaluation.Callback.OnSSDDItemClick;
 import org.rmj.guanzongroup.evaluation.Fragments.SSDD.Fragment_SSDD_Evaluation;
 import org.rmj.guanzongroup.evaluation.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Activity_SSDD_Evaluation extends AppCompatActivity implements OnSSDDItemClick {
 
     private ViewPager2 vpage_list;
@@ -28,23 +31,42 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity implements OnSSD
 
         vpage_list = findViewById(R.id.vpage_list);
 
-        InitFragment();
+        //initialize default fragment list
+        List<Fragment> laFragment= new ArrayList<>();
+        laFragment.add(new Fragment_SSDD_Evaluation());
+
+        //initialize adapter list
+        InitFragment(laFragment);
     }
 
-    private void InitFragment(){
-
-        Fragment_SSDD_Evaluation loFragment = new Fragment_SSDD_Evaluation();
+    private void InitFragment(List<Fragment> foFragment){
 
         //initialize adapter
         Fragment_SSDD_Adapter loAdapter = new Fragment_SSDD_Adapter(getSupportFragmentManager(), getLifecycle());
-        loAdapter.InitFragment(loFragment);
-        vpage_list.setAdapter(loAdapter);
+        loAdapter.InitFragment(foFragment);
 
+        vpage_list.setAdapter(loAdapter);
+        vpage_list.setCurrentItem(loAdapter.getItemCount());
     }
 
     @Override
     public void OnSelectDepartment(ESSDDepartments loDepartment) {
-        Log.d("GAGANA BA?", "GUMANA NGA");
+
+        //initliaze bundle params
+        Bundle loBundle = new Bundle();
+        loBundle.putString("dept_id", loDepartment.getsDeptIDxx());
+
+        List<Fragment> laFragment= new ArrayList<>();
+
+        //initalize fragment parameter
+        Fragment_SSDD_Evaluation loFragment = new Fragment_SSDD_Evaluation();
+        loFragment.setArguments(loBundle);
+
+        laFragment.add(new Fragment_SSDD_Evaluation());
+        laFragment.add(loFragment);
+
+        //initialize fragment
+        InitFragment(laFragment);
     }
 
     @Override
@@ -54,25 +76,25 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity implements OnSSD
 
     private static class Fragment_SSDD_Adapter extends FragmentStateAdapter {
 
-        private Fragment loFragment;
+        private List<Fragment> laFragment;
 
         public Fragment_SSDD_Adapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
             super(fragmentManager, lifecycle);
         }
 
-        public void InitFragment(Fragment loFragment){
-            this.loFragment = loFragment;
+        public void InitFragment(List<Fragment> foFragment){
+            this.laFragment = foFragment;
         }
 
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            return loFragment;
+            return laFragment.get(position);
         }
 
         @Override
         public int getItemCount() {
-            return 1;
+            return laFragment.size();
         }
     }
 

@@ -8,6 +8,8 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.sqlite.db.SimpleSQLiteQuery;
+import androidx.sqlite.db.SupportSQLiteQuery;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -74,6 +76,10 @@ public class SSDDEvaluation {
         this.poImagesDao = GGC_GCircleDB.getInstance(poApp).dssddImagesDao();
     }
 
+    public void Rate(String fsTransNox, String fsCatgrID, String fsRating, String fsRemarks, String fsDate){
+        poDetailDao.Rate(fsTransNox, fsCatgrID, fsRating, fsRemarks, fsDate);
+    }
+
     private String GenerateTransNox(){
 
         String lsTransNox = null;
@@ -106,6 +112,9 @@ public class SSDDEvaluation {
             ESSDDetail loDetail = new ESSDDetail();
             loDetail.setsTransNox(GenerateTransNox());
             loDetail.setsCategrID(loCategory.getsCategrID());
+            loDetail.setnRatingxx("0.0");
+            loDetail.setdEvaluate("");
+            loDetail.setsRemarksx("");
 
             poDetailDao.Save(loDetail);
         }
@@ -140,7 +149,11 @@ public class SSDDEvaluation {
     }
 
     public LiveData<List<ESSDDMaster>> GetMasterList(String dFrom, String dTo, String sDeptIDxx, String cTranStat){
-        return poMasterDao.GetMasterList(dFrom, dTo, sDeptIDxx, cTranStat);
+
+        SimpleSQLiteQuery lsQuery = new SimpleSQLiteQuery(
+                "SELECT * FROM SSDD_Master WHERE dTransact BETWEEN '" + dFrom + "' AND '" + dTo + "' AND " +
+                "sDeptIDxx = '" + sDeptIDxx + "' AND " + cTranStat);
+        return poMasterDao.GetMasterList(lsQuery);
     }
 
     public LiveData<ESSDDMaster> GetMaster(String fsTransNox, String fsDeptIDxx) {
@@ -331,7 +344,7 @@ public class SSDDEvaluation {
 
             return true;
         }catch (Exception e){
-            e.printStackTrace();
+            lsMessage = e.getMessage();
             return false;
         }
     }

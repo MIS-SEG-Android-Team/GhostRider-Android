@@ -1,8 +1,11 @@
 package org.rmj.guanzongroup.evaluation.Activity.SSDD;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -21,7 +24,11 @@ import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategories;
 import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class Activity_SSDD_Category extends AppCompatActivity {
@@ -60,9 +67,16 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
         rcv_adapter = findViewById(R.id.rcv_adapter);
 
+        InitActivity();
+        InitListener();
+
+    }
+
+    private void InitActivity(){
+
         if (!getIntent().hasExtra("transnox")) {
 
-            InitMessage(1, R.drawable.baseline_error_24, "No transaction number has been detected", "Okay", "", new onMessageButton() {
+            InitMessage(0, R.drawable.baseline_error_24, "No transaction number has been detected", "Okay", "", new onMessageButton() {
                 @Override
                 public void onPositive() { finish(); }
 
@@ -71,7 +85,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             });
         }else if(!getIntent().hasExtra("deptid")){
 
-            InitMessage(1, R.drawable.baseline_error_24, "No department id has been detected", "Okay", "", new onMessageButton() {
+            InitMessage(0, R.drawable.baseline_error_24, "No department id has been detected", "Okay", "", new onMessageButton() {
                 @Override
                 public void onPositive() { finish(); }
 
@@ -80,9 +94,13 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             });
         }else {
             InitObservers();
-
-            btn_submit.setOnClickListener(v -> SubmitEvaluation() );
         }
+
+    }
+
+    private void InitListener(){
+
+        btn_submit.setOnClickListener(v -> SubmitEvaluation() );
     }
 
     private void InitObservers(){
@@ -118,10 +136,37 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 if (essdDetails == null){
 
-                    InitMessage(1, R.drawable.baseline_error_24, "No details found for this transaction", "Okay", "", new onMessageButton() {
+                    InitMessage(1, R.drawable.baseline_error_24, "No details found for this transaction. Download details?", "Yes", "No", new onMessageButton() {
                         @Override
                         public void onPositive() {
-                            finish();
+
+                            mViewModel.DownloadEvaluationDetails(getIntent().getStringExtra("transnox"), new VMSSDEvaluation.OnDownloadCallback() {
+                                @Override
+                                public void OnLoad(String fsTitlexx, String fsMessage) {
+                                    poDialog.initDialog(fsTitlexx, fsMessage, false);
+                                    poDialog.show();
+                                }
+
+                                @Override
+                                public void OnSuccess() {
+                                    Toast.makeText(Activity_SSDD_Category.this, "Successfully downloaded details", Toast.LENGTH_SHORT).show();
+                                    poDialog.dismiss();
+                                }
+
+                                @Override
+                                public void OnFailed(String fsMessage) {
+
+                                    InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                                        @Override
+                                        public void onPositive() {
+                                            finish();
+                                        }
+
+                                        @Override
+                                        public void onNegative() {}
+                                    });
+                                }
+                            });
                         }
 
                         @Override
@@ -137,9 +182,10 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     Adapter_SSDDCategories.SSDD_Evaluation_Categories loCategory = new Adapter_SSDDCategories.SSDD_Evaluation_Categories(
                             loDetal.getsCategrID(),
                             mViewModel.GetCategory(loDetal.getsCategrID()).getsDescript(),
-                            Double.parseDouble(loDetal.getdEvaluate()),
+                            Double.parseDouble(loDetal.getnRatingxx()),
                             loDetal.getsRemarksx(),
                             loDetal.getdEvaluate()
+
                     );
                     laCategories.add(loCategory);
                 }
@@ -148,8 +194,23 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 //initialize categories
                 loAdapter = new Adapter_SSDDCategories(laCategories, new Adapter_SSDDCategories.OnItemClickListener() {
                     @Override
-                    public void OnRate(float ffTotalRate) {
+                    public void OnRate(Adapter_SSDDCategories.SSDD_Evaluation_Categories foDetail, double ffTotalRate) {
 
+                        Log.d("RATE ME", String.valueOf(ffTotalRate));
+
+                        if (ffTotalRate <= 0.0){
+
+                            InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "You are rating this category to zero. Continue?", "Yes", "No", new onMessageButton() {
+                                @Override
+                                public void onPositive() {
+                                    RateEvaluation(foDetail.sCategryID, String.valueOf(ffTotalRate), foDetail.lsRemarks);
+                                }
+
+                                @Override
+                                public void onNegative() {}
+                            });
+                        }
+                        RateEvaluation(foDetail.sCategryID, String.valueOf(ffTotalRate), foDetail.lsRemarks);
                     }
 
                     @Override
@@ -177,8 +238,8 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 int ntotalEvaluated = 0;
                 for (ESSDDetail loDetal : essdDetails){
 
-                    if (loDetal.getdEvaluate() != null){
-                        ldbl_totalRating += Double.parseDouble(loDetal.getdEvaluate());
+                    if (loDetal.getdEvaluate() != null && !loDetal.getdEvaluate().isEmpty()){
+                        ldbl_totalRating += Double.parseDouble(loDetal.getnRatingxx());
                         ntotalEvaluated++;
                     }
                 }
@@ -186,9 +247,14 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 //display text details
                 mtv_evaluation.setText(ntotalEvaluated + " out of " + essdDetails.size());
-                mtv_ratings.setText(String.format("%.1f", ldbl_totalRating / ntotalEvaluated));
+                mtv_ratings.setText(String.valueOf(ldbl_totalRating));
             }
         });
+    }
+
+    private void RateEvaluation(String fsCatgrID, String fsRating, String fsRemarks){
+
+        mViewModel.Rate(getIntent().getStringExtra("transnox"), fsCatgrID, String.valueOf(fsRating), fsRemarks, mViewModel.GetDateToday());
     }
 
     private void SubmitEvaluation(){

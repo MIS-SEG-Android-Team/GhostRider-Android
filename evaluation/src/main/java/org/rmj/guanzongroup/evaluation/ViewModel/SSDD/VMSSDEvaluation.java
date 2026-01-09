@@ -1,6 +1,7 @@
 package org.rmj.guanzongroup.evaluation.ViewModel.SSDD;
 
 import android.app.Application;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -16,6 +17,13 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class VMSSDEvaluation extends AndroidViewModel {
@@ -27,6 +35,36 @@ public class VMSSDEvaluation extends AndroidViewModel {
         super(application);
 
         this.loEvaluation = new SSDDEvaluation(application);
+    }
+
+    public String GetDateToday(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+        }
+    }
+
+    public Boolean IsEvaluated(String fsdEvaluated) throws ParseException {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            LocalDate loDtoday = LocalDate.now();
+
+            String lsdEvaluated = LocalDateTime.parse(fsdEvaluated, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            LocalDate loDate = LocalDate.parse(lsdEvaluated, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+            return loDtoday.isAfter(loDate);
+
+        }else {
+
+            Date loDtoday = Calendar.getInstance().getTime();
+
+            String lsdEvaluated = new SimpleDateFormat("yyyy-MM-dd").format("yyyy-MM-dd HH:mm:ss");
+            Date loDate = new SimpleDateFormat("yyyy-MM-dd").parse(lsdEvaluated);
+
+            return loDtoday.after(loDate);
+
+        }
     }
 
     public LiveData<List<ESSDDepartments>> GetDepartments(){
@@ -78,6 +116,10 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
     public String CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
         return loEvaluation.CreateEvaluation(fsDeptID, foCategories);
+    }
+
+    public void Rate(String fsTransNox, String fsCatgrID, String fsRating, String fsRemarks, String fsDate){
+        loEvaluation.Rate(fsTransNox, fsCatgrID, fsRating, fsRemarks, fsDate);
     }
 
     public void DownloadDepartments(OnDownloadCallback focallback){

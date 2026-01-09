@@ -16,7 +16,7 @@
             android:id="@+id/mtv_transnox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="MX0012500001"
+            android:text="N/A"
             android:textStyle="bold"
             app:layout_constraintWidth_percent="0.5"/>
 
@@ -35,19 +35,9 @@
             android:id="@+id/mtv_status"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Open"
+            android:text="Unknown"
             app:layout_constraintTop_toBottomOf="@+id/mtv_transnox"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="?attr/colorOnSurface"
-        android:layout_marginTop="5dp"
-        app:layout_constraintTop_toBottomOf="@+id/layout_details"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.02"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
