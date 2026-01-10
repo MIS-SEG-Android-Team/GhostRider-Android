@@ -66,7 +66,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity {
             });
         }else if(!getIntent().hasExtra("categoryid")){
 
-            InitMessage(1, R.drawable.baseline_error_24, "No category id has been detected", "Okay", "", new onMessageButton() {
+            InitMessage(0, R.drawable.baseline_error_24, "No category id has been detected", "Okay", "", new onMessageButton() {
                 @Override
                 public void onPositive() { finish(); }
 
@@ -91,7 +91,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity {
 
                 if (essdDetail == null){
 
-                    InitMessage(1, R.drawable.baseline_error_24, "No details found for this category", "Okay", "", new onMessageButton() {
+                    InitMessage(0, R.drawable.baseline_error_24, "No details found for this category", "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {
                             finish();
@@ -105,48 +105,58 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity {
 
                 mtv_category.setText(mViewModel.GetCategory(essdDetail.getsCategrID()).getsDescript());
                 mtv_transnox.setText(essdDetail.getsTransNox());
-                mtv_evaluated.setText(essdDetail.getdEvaluate());
-                mtv_remarks.setText(essdDetail.getsRemarksx());
                 mtv_rate.setText(essdDetail.getnRatingxx());
 
-                mViewModel.GetCategoryImages(essdDetail.getsTransNox(), essdDetail.getsCategrID()).observe(Activity_SSDD_Category_Details.this, new Observer<List<ESSDDImages>>() {
-                    @Override
-                    public void onChanged(List<ESSDDImages> essddImages) {
+                if (essdDetail.getdEvaluate() == null || essdDetail.getdEvaluate().isEmpty()){
+                    mtv_evaluated.setText("N/A");
+                }else {
+                    mtv_evaluated.setText(essdDetail.getdEvaluate());
+                }
 
-                        if (essddImages == null){
-                            mtv_noimage.setVisibility(View.VISIBLE);
-                            vpage_images.setVisibility(View.GONE);
-                            return;
-                        }
+                if (essdDetail.getsRemarksx() == null || essdDetail.getsRemarksx().isEmpty()){
+                    mtv_remarks.setText("N/A");
+                }else {
+                    mtv_remarks.setText(essdDetail.getsRemarksx());
+                }
 
-                        mtv_noimage.setVisibility(View.GONE);
-                        vpage_images.setVisibility(View.VISIBLE);
+            }
+        });
 
-                        Adapter_SSDDCategory_Images adapter = new Adapter_SSDDCategory_Images(essddImages, vpage_images);
-                        vpage_images.setAdapter(adapter);
+        mViewModel.GetCategoryImages(getIntent().getStringExtra("transnox"), getIntent().getStringExtra("categoryid")).observe(Activity_SSDD_Category_Details.this, new Observer<List<ESSDDImages>>() {
+            @Override
+            public void onChanged(List<ESSDDImages> essddImages) {
 
-                        adapter.notifyDataSetChanged();
+                if (essddImages == null){
+                    mtv_noimage.setVisibility(View.VISIBLE);
+                    vpage_images.setVisibility(View.GONE);
+                    return;
+                }
 
-                        /**
-                         * Set viewpager properties and design
-                         * Custom library for designing viewpager.
-                         * Add new designs , for future layout viewpager design
-                         * Guillier 03/28/2025
-                         **/
-                        ViewPagerProperty loViewPagerProperty = new ViewPagerProperty(vpage_images);
+                mtv_noimage.setVisibility(View.GONE);
+                vpage_images.setVisibility(View.VISIBLE);
 
-                        //todo get device density width
-                        int densWidth = (int) (vpage_images.getResources().getDisplayMetrics().xdpi);
+                Adapter_SSDDCategory_Images adapter = new Adapter_SSDDCategory_Images(essddImages, vpage_images);
+                vpage_images.setAdapter(adapter);
 
-                        //todo formula to retain padding (density width - ( 30% of density width ))
-                        loViewPagerProperty.initSliderPadding(
-                                new ViewPagerProperty.Padding_Property((int) (densWidth - (densWidth * 0.3)), (int) (densWidth - (densWidth * 0.3)),
-                                        0, 0, false, false, 3));
+                adapter.notifyDataSetChanged();
 
-                        loViewPagerProperty.initSliderPageTransformer();
+                /**
+                 * Set viewpager properties and design
+                 * Custom library for designing viewpager.
+                 * Add new designs , for future layout viewpager design
+                 * Guillier 03/28/2025
+                 **/
+                ViewPagerProperty loViewPagerProperty = new ViewPagerProperty(vpage_images);
 
-                    }
-                });
+                //todo get device density width
+                int densWidth = (int) (vpage_images.getResources().getDisplayMetrics().xdpi);
+
+                //todo formula to retain padding (density width - ( 30% of density width ))
+                loViewPagerProperty.initSliderPadding(
+                        new ViewPagerProperty.Padding_Property((int) (densWidth - (densWidth * 0.3)), (int) (densWidth - (densWidth * 0.3)),
+                                0, 0, false, false, 3));
+
+                loViewPagerProperty.initSliderPageTransformer();
 
             }
         });

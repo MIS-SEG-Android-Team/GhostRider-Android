@@ -220,9 +220,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
 
                         tie_search.addTextChangedListener(new TextWatcher() {
                             @Override
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                            }
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
                             @Override
                             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -230,9 +228,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                             }
 
                             @Override
-                            public void afterTextChanged(Editable s) {
-
-                            }
+                            public void afterTextChanged(Editable s) {}
                         });
 
                     }
