@@ -1,5 +1,6 @@
 package org.rmj.guanzongroup.evaluation.ViewModel.SSDD;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
 
@@ -37,6 +38,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         this.loEvaluation = new SSDDEvaluation(application);
     }
 
+    @SuppressLint("SimpleDateFormat")
     public String GetDateToday(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -45,6 +47,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     public Boolean IsEvaluated(String fsdEvaluated) throws ParseException {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -67,16 +70,20 @@ public class VMSSDEvaluation extends AndroidViewModel {
         }
     }
 
-    public LiveData<List<ESSDDepartments>> GetDepartments(){
-        return loEvaluation.GetDepartments();
-    }
-
     public List<ESSDDCategories> GetCategoriesNonLive(){
         return loEvaluation.GetCategoriesNonLive();
     }
 
     public ESSDDCategories GetCategory(String fsCategory){
         return loEvaluation.GetCategory(fsCategory);
+    }
+
+    public ESSDDepartments GetDepartment(String fsDeptIDxx){
+        return loEvaluation.GetDepartment(fsDeptIDxx);
+    }
+
+    public LiveData<List<ESSDDepartments>> GetDepartments(){
+        return loEvaluation.GetDepartments();
     }
 
     public LiveData<List<ESSDDMaster>> GetMasterList(String dFrom, String dTo, String sDeptIDxx, String cTranStat){
@@ -101,10 +108,6 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
     public LiveData<ESSDDImages> GetImage(String fsTransNox, String fsCategory){
         return loEvaluation.GetImage(fsTransNox, fsCategory);
-    }
-
-    public ESSDDepartments GetDepartment(String fsDeptIDxx){
-        return loEvaluation.GetDepartment(fsDeptIDxx);
     }
 
     public interface OnDownloadCallback{

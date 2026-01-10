@@ -1,6 +1,7 @@
 package org.rmj.guanzongroup.evaluation.Adapter.SSDD;
 
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,20 +13,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
-
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.guanzongroup.evaluation.R;
 import java.util.List;
 
 public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCategories.VHCategories> {
 
     private final OnItemClickListener foListener;
-    private final List<SSDD_Evaluation_Categories> laCategories;
+    private List<SSDD_Evaluation_Categories> laCategories;
 
     public Adapter_SSDDCategories(List<SSDD_Evaluation_Categories> laCategories, OnItemClickListener foListener) {
         this.laCategories = laCategories;
         this.foListener = foListener;
+    }
+
+    public void SetDataList(List<SSDD_Evaluation_Categories> laParams){
+        laCategories.clear();
+        laCategories.addAll(laParams);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -39,28 +43,57 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
 
         holder.mtv_category.setText(laCategories.get(position).sCategry);
 
-        holder.rb_rate.setRating((float) laCategories.get(position).ldbl_rating);
+        //get the total count of all categories
+        int nTotalCat = laCategories.size();
 
+        //get the total rating per category
+        double ldbl_totalPerCat = 100.0 / nTotalCat;
+
+        //get total rate per star. for one category
+        double ldbl_ratePerStar = ldbl_totalPerCat / 5.0;
+
+        //set default values
+        holder.rb_rate.setRating((float) (laCategories.get(position).ldbl_rating / ldbl_ratePerStar));
+
+        holder.tie_remarks.setText(laCategories.get(position).lsRemarks);
+
+        //initialize listener
         holder.rb_rate.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
 
                 if (fromUser){
 
-                    //get the total count of all categories
-                    int nTotalCat = laCategories.size(); //8
-
-                    //get the total rating per category
-                    double ldbl_totalPerCat = 100.0 / nTotalCat; //12.5
-
-                    //get total rate per star. for one category
-                    double ldbl_ratePerStar = ldbl_totalPerCat / 5.0; //2.5
-
                     //compute the final rate computation
                     double ldbl_finalRate = rating * ldbl_ratePerStar;
 
-                    foListener.OnRate(laCategories.get(position), ldbl_finalRate);
+                    foListener.OnRate(position, laCategories.get(position), ldbl_finalRate);
                 }
+            }
+        });
+
+        holder.tie_remarks.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.isEmpty() || !holder.tie_remarks.hasFocus()){
+                    holder.ib_check.setVisibility(View.GONE);
+                    return;
+                }
+                holder.ib_check.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        holder.ib_check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                foListener.OnRemarks(position, laCategories.get(position), holder.tie_remarks.getText().toString());
+                v.setVisibility(View.GONE);
             }
         });
 
@@ -85,7 +118,8 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
     }
 
     public interface OnItemClickListener{
-        void OnRate(SSDD_Evaluation_Categories foDetail, double ffTotalRate);
+        void OnRate(int fnPosition, SSDD_Evaluation_Categories foDetail, double ffTotalRate);
+        void OnRemarks(int fnPosition, SSDD_Evaluation_Categories foDetail, String fsRemarks);
         void OnCamera();
         void OnDetails(String fsCategoryID);
     }
@@ -94,6 +128,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
 
         private MaterialTextView mtv_category;
         private RatingBar rb_rate;
+        private ImageButton ib_check;
         private TextInputEditText tie_remarks;
         private ImageButton ib_camera, ib_info;
 
@@ -102,6 +137,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
             
             mtv_category = itemView.findViewById(R.id.mtv_category);
             rb_rate = itemView.findViewById(R.id.rb_rate);
+            ib_check = itemView.findViewById(R.id.ib_check);
             tie_remarks = itemView.findViewById(R.id.tie_remarks);
             ib_camera = itemView.findViewById(R.id.ib_camera);
             ib_info = itemView.findViewById(R.id.ib_info);

@@ -136,16 +136,16 @@ public class SSDDEvaluation {
         return lsMessage;
     }
 
-    public LiveData<List<ESSDDepartments>> GetDepartments(){
-        return poDeptDao.GetDepartmentList();
-    }
-
     public List<ESSDDCategories> GetCategoriesNonLive(){
         return poCatgDao.GetCategoriesNonLive();
     }
 
     public ESSDDCategories GetCategory(String fsCategory){
         return poCatgDao.GetCategory(fsCategory);
+    }
+
+    public LiveData<List<ESSDDepartments>> GetDepartments(){
+        return poDeptDao.GetDepartmentList();
     }
 
     public LiveData<List<ESSDDMaster>> GetMasterList(String dFrom, String dTo, String sDeptIDxx, String cTranStat){
