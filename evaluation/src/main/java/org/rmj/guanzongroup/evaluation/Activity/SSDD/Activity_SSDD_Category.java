@@ -194,6 +194,10 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             @Override
             public void onChanged(ESSDDMaster essddMaster) {
 
+                if (essddMaster == null){
+                    return;
+                }
+
                 loMaster= essddMaster;
 
                 //set department name
@@ -215,6 +219,10 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<ESSDDetail> essdDetails) {
+
+                if (essdDetails == null){
+                    return;
+                }
 
                 //initialize list, and update the list
                 laDetails= essdDetails;
@@ -388,6 +396,15 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             @Override
             public void OnSuccess() {
                 poDialog.dismiss();
+                InitMessage(0, R.drawable.baseline_message_24, "Evaluation submitted successfully", "Okay", "", new onMessageButton() {
+                    @Override
+                    public void onPositive() {
+                        InitObservers();
+                    }
+
+                    @Override
+                    public void onNegative() {}
+                });
             }
 
             @Override

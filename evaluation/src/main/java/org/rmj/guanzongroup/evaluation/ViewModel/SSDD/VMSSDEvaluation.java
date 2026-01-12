@@ -250,7 +250,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
-
+                foCallback.OnLoad("SSDD Evaluation", "Uploading evaluations. Please wait . . ");
             }
 
             @Override

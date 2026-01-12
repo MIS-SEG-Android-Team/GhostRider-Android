@@ -371,9 +371,9 @@ public class SSDDEvaluation {
 
                 laDetails.put(loParam);
             }
-            loParams.put("details", laDetails);
+            loParams.put("sPayloadxx", laDetails);
 
-            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDetails(), loParams.toString(), poHeaders.getHeaders());
+            String lsResponse = WebClient.sendRequest(poApi.getUrlSubmitEvaluation(), loParams.toString(), poHeaders.getHeaders());
             if (lsResponse == null){
                 lsMessage = "Server no response";
                 return false;

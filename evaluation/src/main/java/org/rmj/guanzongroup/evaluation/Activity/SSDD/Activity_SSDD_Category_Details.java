@@ -1,19 +1,28 @@
 package org.rmj.guanzongroup.evaluation.Activity.SSDD;
 
+import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.etc.MessageBox;
+import org.rmj.g3appdriver.etc.OnSwipeListener;
 import org.rmj.g3appdriver.etc.ViewPagerProperty;
+import org.rmj.g3appdriver.utils.GestureListener;
 import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategory_Images;
 import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
@@ -21,7 +30,7 @@ import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 import java.util.List;
 
 
-public class Activity_SSDD_Category_Details extends AppCompatActivity {
+public class Activity_SSDD_Category_Details extends AppCompatActivity implements OnSwipeListener {
 
     private VMSSDEvaluation mViewModel;
     private MessageBox poMessage;
@@ -29,12 +38,17 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity {
     private MaterialTextView mtv_category, mtv_transnox, mtv_evaluated, mtv_remarks, mtv_rate, mtv_noimage;
     private ViewPager2 vpage_images;
     private MaterialTextView mtv_company, mtv_version, mtv_dev;
+    private ShapeableImageView siv_preview;
+    private MaterialCardView mcv_details;
+
+    private GestureDetector gestureDetector;
 
     private interface onMessageButton{
         void onPositive();
         void onNegative();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +68,11 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity {
         mtv_company = findViewById(R.id.mtv_company);
         mtv_version = findViewById(R.id.mtv_version);
         mtv_dev = findViewById(R.id.mtv_dev);
+
+        siv_preview = findViewById(R.id.siv_preview);
+        mcv_details = findViewById(R.id.mcv_details);
+
+        gestureDetector = new GestureDetector(Activity_SSDD_Category_Details.this, new GestureListener(Activity_SSDD_Category_Details.this));
 
         if (!getIntent().hasExtra("transnox")) {
 
@@ -80,8 +99,35 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity {
             mtv_dev.setText(R.string.sLblCopyright);
 
             InitObservers();
+
+            siv_preview.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return gestureDetector.onTouchEvent(event);
+                }
+            });
         }
     }
+
+    @Override
+    public void OnSwipeUp() {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mcv_details, "Y", mcv_details.getBottom(), mcv_details.getTop());
+        animator.setDuration(500);
+        animator.start();
+    }
+
+    @Override
+    public void OnSwipeDown() {
+         ObjectAnimator animator = ObjectAnimator.ofFloat(mcv_details, "Y", mcv_details.getTop(), mcv_details.getBottom());
+        animator.setDuration(500);
+        animator.start();
+    }
+
+    @Override
+    public void OnSwipeRight() {}
+
+    @Override
+    public void OnSwipeLeft() {}
 
     private void InitObservers(){
 
@@ -184,4 +230,5 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity {
 
         poMessage.show();
     }
+
 }
