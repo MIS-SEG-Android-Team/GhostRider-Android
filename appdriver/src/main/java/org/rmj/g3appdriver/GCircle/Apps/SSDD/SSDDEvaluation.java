@@ -16,11 +16,13 @@ import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDImages;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDepartment;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDetail;
+import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
@@ -58,6 +60,7 @@ public class SSDDEvaluation {
     private final DSSDDMaster poMasterDao;
     private final DSSDDetail poDetailDao;
     private final DSSDDImages poImagesDao;
+    private final DErrorLogs poErrorDao;
 
     public SSDDEvaluation(Application poApp){
 
@@ -74,10 +77,31 @@ public class SSDDEvaluation {
         this.poMasterDao = GGC_GCircleDB.getInstance(poApp).ssdMasterDao();
         this.poDetailDao = GGC_GCircleDB.getInstance(poApp).ssdDetailDao();
         this.poImagesDao = GGC_GCircleDB.getInstance(poApp).dssddImagesDao();
+        this.poErrorDao = GGC_GCircleDB.getInstance(poApp).errorLogsDao();
+    }
+
+    public void SaveError(String fsSource, String fsMessage){
+
+        EErrorLogs logs = new EErrorLogs();
+        logs.setnErrorLogID(poErrorDao.GetErrorLogCount() + 1);
+        logs.setsMessagex(fsMessage);
+        logs.setdLogDate(GetCurrentDate());
+        logs.setsSourceTransNo(fsSource);
+        logs.setcRead("0");
+
+        poErrorDao.SaveErrorLogs(logs);
     }
 
     public void Rate(String fsTransNox, String fsCatgrID, String fsRating, String fsRemarks, String fsDate){
         poDetailDao.Rate(fsTransNox, fsCatgrID, fsRating, fsRemarks, fsDate);
+    }
+
+    public void SaveImage(ESSDDImages foImage){
+
+        //initialize transaction no and save
+        foImage.setsTransNox(GenerateImageTransNox());
+        foImage.setnEntryNox(String.valueOf(poImagesDao.GetCountPerCategory(foImage.sReferNox, foImage.getsCategrID())));
+        poImagesDao.Save(foImage);
     }
 
     private String GenerateTransNox(){
@@ -91,6 +115,22 @@ public class SSDDEvaluation {
             lsTransNox = "MX01" +
                     new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
                     poMasterDao.GetCount() + 1;
+        }
+
+        return lsTransNox;
+    }
+
+    private String GenerateImageTransNox(){
+
+        String lsTransNox = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            lsTransNox = "MX01" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
+                    poImagesDao.GetCount() + 1;
+        }else {
+            lsTransNox = "MX01" +
+                    new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
+                    poImagesDao.GetCount() + 1;
         }
 
         return lsTransNox;

@@ -65,6 +65,8 @@ public class Fragment_SSDD_Evaluation extends Fragment{
     private String lsDfrom, lsDto, lsTranstat;
     private OnSSDDItemClick callback;
 
+    private final String TAG = getClass().getSimpleName();
+
     public interface OnMessageButton {
         void OnPositive();
         void OnNegative();
@@ -85,17 +87,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         ib_filter = view.findViewById(R.id.ib_filter);
         fbtn_evaluate = view.findViewById(R.id.fbtn_evaluate);
 
-        //initiliaze default date range parameters
-        lsDfrom = GetFirstQuarter();
-        lsDto = GetDateToday();
-
-        lsTranstat = "cTranStat IN ('0', '1', '3')";
-
-        //initalize callback
-        callback = (OnSSDDItemClick) getActivity();
-
         InitFragment();
-        InitListener();
 
         return view;
     }
@@ -109,7 +101,28 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         }
     }
 
-    public void InitFragment(){
+    private void InitFragment(){
+
+        try {
+
+            //initiliaze default date range parameters
+            lsDfrom = GetFirstQuarter();
+            lsDto = GetDateToday();
+
+            lsTranstat = "cTranStat IN ('0', '1', '3')";
+
+            //initalize callback
+            callback = (OnSSDDItemClick) getActivity();
+
+            InitData();
+            InitListener();
+
+        }catch (Exception e){
+            mViewModel.SaveError(TAG, e.getMessage());
+        }
+    }
+
+    private void InitData(){
 
         if (loBundle == null){
 
@@ -183,6 +196,33 @@ public class Fragment_SSDD_Evaluation extends Fragment{
             //check selected department id if passed
             if (loBundle.containsKey("dept_id")){
 
+                //download history
+                mViewModel.DownloadEvaluation(loBundle.getString("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
+                    @Override
+                    public void OnLoad(String fsTitlexx, String fsMessage) {
+                        poDialog.initDialog(fsTitlexx, fsMessage, false);
+                        poDialog.show();
+                    }
+
+                    @Override
+                    public void OnSuccess() {
+                        poDialog.dismiss();
+                        Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG);
+                    }
+
+                    @Override
+                    public void OnFailed(String fsMessage) {
+                        poDialog.dismiss();
+                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
+                        });
+                    }
+                });
+
                 //load master list
                 mViewModel.GetMasterList(lsDfrom, lsDto, loBundle.getString("dept_id"), lsTranstat).observe(requireActivity(), new Observer<List<ESSDDMaster>>() {
                     @SuppressLint("NotifyDataSetChanged")
@@ -238,6 +278,116 @@ public class Fragment_SSDD_Evaluation extends Fragment{
 
             Toast.makeText(requireActivity(), "Invalid arguments. Department id not detected!", Toast.LENGTH_LONG).show();
         }
+
+    }
+
+    private void InitListener(){
+
+        ib_filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //initialize pop up object, menu object holder
+                PopupMenu loMenu = new PopupMenu(requireContext(), v);
+                loMenu.getMenuInflater().inflate(R.menu.menu_ssdd_filter, loMenu.getMenu());
+                loMenu.show();
+
+                //object listener
+                loMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        if (item.getItemId() == R.id.action_by_date){ //filter by date
+
+                            MaterialDatePicker.Builder<Pair<Long, Long>> loBuilder = MaterialDatePicker.Builder.dateRangePicker();
+                            loBuilder.setTitleText("Select Date Range");
+
+                            MaterialDatePicker<Pair<Long, Long>> loPicker = loBuilder.build();
+                            loPicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
+                                @Override
+                                public void onPositiveButtonClick(Pair<Long, Long> selection) {
+
+                                    //set date range parameters for downloading history
+                                    lsDfrom = GetDateFormat(selection.first);
+                                    lsDto = GetDateFormat(selection.second);
+
+                                    //ask user before downloading
+                                    InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Download transactions from " + lsDfrom + " to " + lsDto + "?",
+                                            "Yes", "No", new OnMessageButton() {
+                                                @Override
+                                                public void OnPositive() {
+                                                    ReDownloadData();
+                                                }
+
+                                                @Override
+                                                public void OnNegative() {}
+                                            });
+                                }
+                            });
+                            loPicker.show(getParentFragmentManager(), "DATE_RANGE_PICKER");
+
+                            return true;
+                        }else if (item.getItemId() == R.id.action_item_all){ //filter by status
+                            lsTranstat = "cTranStat IN ('0', '1', '3')";
+                            InitData();
+                            return true;
+                        }else if (item.getItemId() == R.id.action_item_open){ //filter by status
+                            lsTranstat = "cTranStat= '0'";
+                            InitData();
+                            return true;
+                        }else if (item.getItemId() == R.id.action_item_closed){ //filter by status
+                            lsTranstat = "cTranStat= '1'";
+                            InitData();
+                            return true;
+                        }else if (item.getItemId() == R.id.action_item_posted){ //filter by status
+                            lsTranstat = "cTranStat= '3'";
+                            InitData();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+            }
+        });
+
+        fbtn_evaluate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Create a new evaluation?", "Yes", "No", new OnMessageButton() {
+                    @Override
+                    public void OnPositive() {
+
+                        if (mViewModel.GetCategoriesNonLive() == null){
+
+                            InitMessage(1, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
+                                @Override
+                                public void OnPositive() {
+                                    ReDownloadData();
+                                }
+
+                                @Override
+                                public void OnNegative() {}
+                            });
+                        }
+
+                        String lsTransNox = mViewModel.CreateEvaluation(loBundle.getString("dept_id"), mViewModel.GetCategoriesNonLive());
+
+                        Intent loIntent = new Intent(requireActivity(), Activity_SSDD_Category.class);
+                        loIntent.putExtra("transnox", lsTransNox);
+                        loIntent.putExtra("deptid", loBundle.getString("dept_id"));
+
+                        startActivity(loIntent);
+                    }
+
+                    @Override
+                    public void OnNegative() {
+
+                    }
+                });
+            }
+        });
 
     }
 
@@ -316,116 +466,6 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         }else {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
         }
-    }
-
-    private void InitListener(){
-
-        ib_filter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //initialize pop up object, menu object holder
-                PopupMenu loMenu = new PopupMenu(requireContext(), v);
-                loMenu.getMenuInflater().inflate(R.menu.menu_ssdd_filter, loMenu.getMenu());
-                loMenu.show();
-
-                //object listener
-                loMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-
-                        if (item.getItemId() == R.id.action_by_date){ //filter by date
-
-                            MaterialDatePicker.Builder<Pair<Long, Long>> loBuilder = MaterialDatePicker.Builder.dateRangePicker();
-                            loBuilder.setTitleText("Select Date Range");
-
-                            MaterialDatePicker<Pair<Long, Long>> loPicker = loBuilder.build();
-                            loPicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
-                                @Override
-                                public void onPositiveButtonClick(Pair<Long, Long> selection) {
-
-                                    //set date range parameters for downloading history
-                                    lsDfrom = GetDateFormat(selection.first);
-                                    lsDto = GetDateFormat(selection.second);
-
-                                    //ask user before downloading
-                                    InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Download transactions from " + lsDfrom + " to " + lsDto + "?",
-                                            "Yes", "No", new OnMessageButton() {
-                                                @Override
-                                                public void OnPositive() {
-                                                    ReDownloadData();
-                                                }
-
-                                                @Override
-                                                public void OnNegative() {}
-                                            });
-                                }
-                            });
-                            loPicker.show(getParentFragmentManager(), "DATE_RANGE_PICKER");
-
-                            return true;
-                        }else if (item.getItemId() == R.id.action_item_all){ //filter by status
-                            lsTranstat = "cTranStat IN ('0', '1', '3')";
-                            InitFragment();
-                            return true;
-                        }else if (item.getItemId() == R.id.action_item_open){ //filter by status
-                            lsTranstat = "cTranStat= '0'";
-                            InitFragment();
-                            return true;
-                        }else if (item.getItemId() == R.id.action_item_closed){ //filter by status
-                            lsTranstat = "cTranStat= '1'";
-                            InitFragment();
-                            return true;
-                        }else if (item.getItemId() == R.id.action_item_posted){ //filter by status
-                            lsTranstat = "cTranStat= '3'";
-                            InitFragment();
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-            }
-        });
-
-        fbtn_evaluate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Create a new evaluation?", "Yes", "No", new OnMessageButton() {
-                    @Override
-                    public void OnPositive() {
-
-                        if (mViewModel.GetCategoriesNonLive() == null){
-
-                            InitMessage(1, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
-                                @Override
-                                public void OnPositive() {
-                                    ReDownloadData();
-                                }
-
-                                @Override
-                                public void OnNegative() {}
-                            });
-                        }
-
-                        String lsTransNox = mViewModel.CreateEvaluation(loBundle.getString("dept_id"), mViewModel.GetCategoriesNonLive());
-
-                        Intent loIntent = new Intent(requireActivity(), Activity_SSDD_Category.class);
-                        loIntent.putExtra("transnox", lsTransNox);
-                        loIntent.putExtra("deptid", loBundle.getString("dept_id"));
-
-                        startActivity(loIntent);
-                    }
-
-                    @Override
-                    public void OnNegative() {
-
-                    }
-                });
-            }
-        });
-
     }
 
     private String GetDateFormat(Long fsDate){

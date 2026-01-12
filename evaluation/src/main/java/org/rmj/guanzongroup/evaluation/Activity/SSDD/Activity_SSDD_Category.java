@@ -1,14 +1,24 @@
 package org.rmj.guanzongroup.evaluation.Activity.SSDD;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultCallerLauncher;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,10 +28,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
+import org.rmj.g3appdriver.etc.DialogDisclosure;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
+import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
 import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategories;
 import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
@@ -38,6 +52,8 @@ public class Activity_SSDD_Category extends AppCompatActivity {
     private VMSSDEvaluation mViewModel;
     private LoadDialog poDialog;
     private MessageBox poMessage;
+    private DialogDisclosure dialogDisclosure;
+    private ActivityResultLauncher<Intent> poCamera;
 
     private MaterialTextView mtv_dept, mtv_evaluation, mtv_ratings;
     private RecyclerView rcv_adapter;
@@ -47,6 +63,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
     private ESSDDMaster loMaster = new ESSDDMaster();
     private List<ESSDDetail> laDetails = new ArrayList<>();
 
+    private final String TAG = getClass().getSimpleName();
 
     private interface onMessageButton{
         void onPositive();
@@ -62,6 +79,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         mViewModel = new ViewModelProvider(this).get(VMSSDEvaluation.class);
         poDialog = new LoadDialog(this);
         poMessage = new MessageBox(this);
+        dialogDisclosure = new DialogDisclosure(this);
 
         mtv_dept = findViewById(R.id.mtv_dept);
         mtv_evaluation = findViewById(R.id.mtv_evaluation);
@@ -80,6 +98,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         for (ESSDDetail loDetal : laDetails){
 
             Adapter_SSDDCategories.SSDD_Evaluation_Categories loCategory = new Adapter_SSDDCategories.SSDD_Evaluation_Categories(
+                    loMaster.getcTranStat(),
                     loDetal.getsCategrID(),
                     mViewModel.GetCategory(loDetal.getsCategrID()).getsDescript(),
                     Double.parseDouble(loDetal.getnRatingxx()),
@@ -93,96 +112,144 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
     }
 
-    private void DownloadData(){
+    private void OpenPermission(){
 
-        //download evaluation details
-        mViewModel.DownloadEvaluationDetails(getIntent().getStringExtra("transnox"), new VMSSDEvaluation.OnDownloadCallback() {
+        //ask user to grant permission
+        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
             @Override
-            public void OnLoad(String fsTitlexx, String fsMessage) {
-                poDialog.initDialog(fsTitlexx, fsMessage, false);
-                poDialog.show();
+            public void onAccept() {
+
+                try {
+
+                    Intent loIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    loIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    loIntent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(loIntent);
+
+                }catch (ActivityNotFoundException e){
+
+                    Intent loIntent = new Intent(Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS);
+                    loIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(loIntent);
+
+                }catch (Exception e){
+                    mViewModel.SaveError(TAG, e.getMessage());
+                }
+
             }
 
             @Override
-            public void OnSuccess() {
-                Toast.makeText(Activity_SSDD_Category.this, "Successfully downloaded details", Toast.LENGTH_SHORT).show();
-                poDialog.dismiss();
-            }
-
-            @Override
-            public void OnFailed(String fsMessage) {
-
-                InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
-                    @Override
-                    public void onPositive() {
-                        finish();
-                    }
-
-                    @Override
-                    public void onNegative() {}
-                });
+            public void onDecline() {
+                Toast.makeText(Activity_SSDD_Category.this, "Please allow missing permissions to continue", Toast.LENGTH_LONG).show();
             }
         });
+        dialogDisclosure.setMessage("Guanzon Circle requires camera and storage permissions to take SSDD images when the app is in use.");
+        dialogDisclosure.show();
+    }
+
+    private void DownloadData(){
+
+        try {
+
+            //download evaluation details
+            mViewModel.DownloadEvaluationDetails(getIntent().getStringExtra("transnox"), new VMSSDEvaluation.OnDownloadCallback() {
+                @Override
+                public void OnLoad(String fsTitlexx, String fsMessage) {
+                    poDialog.initDialog(fsTitlexx, fsMessage, false);
+                    poDialog.show();
+                }
+
+                @Override
+                public void OnSuccess() {
+                    Toast.makeText(Activity_SSDD_Category.this, "Successfully downloaded details", Toast.LENGTH_SHORT).show();
+                    poDialog.dismiss();
+                }
+
+                @Override
+                public void OnFailed(String fsMessage) {
+
+                    InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                        @Override
+                        public void onPositive() {
+                            finish();
+                        }
+
+                        @Override
+                        public void onNegative() {}
+                    });
+                }
+            });
+
+        }catch (Exception e){
+            mViewModel.SaveError(TAG, e.getMessage());
+        }
 
     }
 
     private void InitActivity(){
 
-        if (!getIntent().hasExtra("transnox")) {
+        try {
 
-            InitMessage(0, R.drawable.baseline_error_24, "No transaction number has been detected", "Okay", "", new onMessageButton() {
-                @Override
-                public void onPositive() { finish(); }
+            if (!getIntent().hasExtra("transnox")) {
 
-                @Override
-                public void onNegative() {}
-            });
-        }else if(!getIntent().hasExtra("deptid")){
-
-            InitMessage(0, R.drawable.baseline_error_24, "No department id has been detected", "Okay", "", new onMessageButton() {
-                @Override
-                public void onPositive() { finish(); }
-
-                @Override
-                public void onNegative() {}
-            });
-        }else {
-
-            //initialize data
-            InitObservers();
-
-            //do not continue if master transaction is not set after data observation
-            if (loMaster == null){
-
-                InitMessage(0, R.drawable.baseline_error_24, "Could not find transaction", "Okay", "", new onMessageButton() {
+                InitMessage(0, R.drawable.baseline_error_24, "No transaction number has been detected", "Okay", "", new onMessageButton() {
                     @Override
-                    public void onPositive() {
-                        finish();
-                    }
+                    public void onPositive() { finish(); }
 
                     @Override
                     public void onNegative() {}
                 });
-                return;
-            }
+            }else if(!getIntent().hasExtra("deptid")){
 
-            //ask for user to download details, if not found
-            if (laDetails == null){
-
-                InitMessage(1, R.drawable.baseline_error_24, "No details found for this transaction. Download details?", "Yes", "No", new onMessageButton() {
+                InitMessage(0, R.drawable.baseline_error_24, "No department id has been detected", "Okay", "", new onMessageButton() {
                     @Override
-                    public void onPositive() {
-                        DownloadData();
-                    }
+                    public void onPositive() { finish(); }
 
                     @Override
                     public void onNegative() {}
                 });
+            }else {
+
+                //initialize data
+                InitObservers();
+
+                //do not continue if master transaction is not set after data observation
+                if (loMaster == null){
+
+                    InitMessage(0, R.drawable.baseline_error_24, "Could not find transaction", "Okay", "", new onMessageButton() {
+                        @Override
+                        public void onPositive() {
+                            finish();
+                        }
+
+                        @Override
+                        public void onNegative() {}
+                    });
+                    return;
+                }
+
+                //ask for user to download details, if not found
+                if (laDetails == null){
+
+                    InitMessage(1, R.drawable.baseline_error_24, "No details found for this transaction. Download details?", "Yes", "No", new onMessageButton() {
+                        @Override
+                        public void onPositive() {
+                            DownloadData();
+                        }
+
+                        @Override
+                        public void onNegative() {}
+                    });
+                }
             }
+
+            InitListener();
+            InitAdapter();
+            InitCameraLauncher();
+
+        }catch (Exception e){
+            mViewModel.SaveError(TAG, e.getMessage());
         }
-
-        InitListener();
-        InitAdapter();
 
     }
 
@@ -199,6 +266,12 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 }
 
                 loMaster= essddMaster;
+
+                if (essddMaster.getcTranStat().equals("3")){
+                    btn_submit.setEnabled(false);
+                }else {
+                    btn_submit.setEnabled(true);
+                }
 
                 //set department name
                 mtv_dept.setText(mViewModel.GetDepartment(loMaster.getsDeptIDxx()).getsDescript());
@@ -238,8 +311,6 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                         ntotalEvaluated++;
                     }
                 }
-
-                //update master
 
                 //display total
                 mtv_evaluation.setText(ntotalEvaluated + " out of " + laDetails.size());
@@ -301,7 +372,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     RateEvaluation(foDetail.sCategryID, String.valueOf(ffTotalRate), foDetail.lsRemarks);
 
                 }catch (Exception e){
-                    e.printStackTrace();
+                    mViewModel.SaveError(TAG, e.getMessage());
                 }
             }
 
@@ -332,12 +403,54 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     RateEvaluation(foDetail.sCategryID, String.valueOf(foDetail.ldbl_rating), fsRemarks);
 
                 }catch (Exception e){
-                    e.printStackTrace();
+                    mViewModel.SaveError(TAG, e.getMessage());
                 }
             }
 
             @Override
             public void OnCamera() {
+
+                //check permission
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                        checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                        checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+
+                    OpenPermission();
+                    return;
+                }
+
+                //initliaze camera
+                mViewModel.InitCamera(new OnInitializeCameraCallback() {
+                    @Override
+                    public void OnInit() {
+                        poDialog.initDialog("Camera Launch", "Initializing camera. Please wait . .", false);
+                        poDialog.show();
+                    }
+
+                    @Override
+                    public void OnSuccess(Intent intent, String[] args) {
+                        poDialog.dismiss();
+
+                        intent.putExtra("sFilePath", args[0]); //pass file path
+                        intent.putExtra("sFilename", args[1]); //pass file name
+
+                        //start camera intent
+                        poCamera.launch(intent);
+                    }
+
+                    @Override
+                    public void OnFailed(String message, Intent intent, String[] args) {
+                        poDialog.dismiss();
+
+                        InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new onMessageButton() {
+                            @Override
+                            public void onPositive() {}
+
+                            @Override
+                            public void onNegative() {}
+                        });
+                    }
+                });
 
             }
 
@@ -357,6 +470,40 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         rcv_adapter.setLayoutManager(new LinearLayoutManager(Activity_SSDD_Category.this, LinearLayoutManager.VERTICAL, false));
     }
 
+    private void InitCameraLauncher(){
+
+        poCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult o) {
+
+                if (o.getResultCode() == RESULT_OK){
+
+                    Intent camIntent = o.getData();
+
+                    if (!camIntent.hasExtra("sFilePath")){
+                        Toast.makeText(Activity_SSDD_Category.this, "File path not found!", Toast.LENGTH_SHORT);
+                        return;
+                    }else if (!camIntent.hasExtra("sFileName")){
+                        Toast.makeText(Activity_SSDD_Category.this, "File name not found!", Toast.LENGTH_SHORT);
+                        return;
+                    }
+                    String lsFilePath = camIntent.getStringExtra("sFilePath");
+                    String lsFileName = camIntent.getStringExtra("sFileName");
+
+                    //save image details
+                    ESSDDImages loImage = new ESSDDImages();
+                    loImage.setsReferNox(getIntent().getStringExtra("transnox"));
+                    loImage.setsImagePth(lsFilePath);
+                    loImage.setsImageNme(lsFileName);
+                    loImage.setsCategrID("");
+
+
+                    mViewModel.SaveImage(loImage);
+                }
+            }
+        });
+    }
+
     private void RateEvaluation(String fsCatgrID, String fsRating, String fsRemarks){
 
         mViewModel.Rate(getIntent().getStringExtra("transnox"), fsCatgrID, String.valueOf(fsRating), fsRemarks, mViewModel.GetDateToday());
@@ -364,62 +511,68 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
     private void SubmitEvaluation(){
 
-        if (loMaster == null){
+        try {
 
-            InitMessage(1, R.drawable.baseline_error_24, "Master is empty", "Okay", "", new onMessageButton() {
-                @Override
-                public void onPositive() {}
+            if (loMaster == null){
 
-                @Override
-                public void onNegative() {}
-            });
-            return;
-        }else if (laDetails == null || laDetails.size() < 1){
-
-            InitMessage(1, R.drawable.baseline_error_24, "Details is empty", "Okay", "", new onMessageButton() {
-                @Override
-                public void onPositive() {}
-
-                @Override
-                public void onNegative() {}
-            });
-            return;
-        }
-
-        mViewModel.SubmitEvaluation(loMaster, laDetails, new VMSSDEvaluation.OnDownloadCallback() {
-            @Override
-            public void OnLoad(String fsTitlexx, String fsMessage) {
-                poDialog.initDialog(fsTitlexx, fsMessage, false);
-                poDialog.show();
-            }
-
-            @Override
-            public void OnSuccess() {
-                poDialog.dismiss();
-                InitMessage(0, R.drawable.baseline_message_24, "Evaluation submitted successfully", "Okay", "", new onMessageButton() {
-                    @Override
-                    public void onPositive() {
-                        InitObservers();
-                    }
-
-                    @Override
-                    public void onNegative() {}
-                });
-            }
-
-            @Override
-            public void OnFailed(String fsMessage) {
-
-                poDialog.dismiss();
-                InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                InitMessage(1, R.drawable.baseline_error_24, "Master is empty", "Okay", "", new onMessageButton() {
                     @Override
                     public void onPositive() {}
 
                     @Override
                     public void onNegative() {}
                 });
+                return;
+            }else if (laDetails == null || laDetails.size() < 1){
+
+                InitMessage(1, R.drawable.baseline_error_24, "Details is empty", "Okay", "", new onMessageButton() {
+                    @Override
+                    public void onPositive() {}
+
+                    @Override
+                    public void onNegative() {}
+                });
+                return;
             }
-        });
+
+            mViewModel.SubmitEvaluation(loMaster, laDetails, new VMSSDEvaluation.OnDownloadCallback() {
+                @Override
+                public void OnLoad(String fsTitlexx, String fsMessage) {
+                    poDialog.initDialog(fsTitlexx, fsMessage, false);
+                    poDialog.show();
+                }
+
+                @Override
+                public void OnSuccess() {
+                    poDialog.dismiss();
+                    InitMessage(0, R.drawable.baseline_message_24, "Evaluation submitted successfully", "Okay", "", new onMessageButton() {
+                        @Override
+                        public void onPositive() {
+                            InitObservers();
+                        }
+
+                        @Override
+                        public void onNegative() {}
+                    });
+                }
+
+                @Override
+                public void OnFailed(String fsMessage) {
+
+                    poDialog.dismiss();
+                    InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                        @Override
+                        public void onPositive() {}
+
+                        @Override
+                        public void onNegative() {}
+                    });
+                }
+            });
+
+        }catch (Exception e){
+            mViewModel.SaveError(TAG, e.getMessage());
+        }
     }
 
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, onMessageButton callback){

@@ -2,19 +2,26 @@ package org.rmj.guanzongroup.evaluation.ViewModel.SSDD;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.Context;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Apps.ErrorList.ViewModel.VMErrorLogs;
 import org.rmj.g3appdriver.GCircle.Apps.SSDD.SSDDEvaluation;
+import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
+import org.rmj.g3appdriver.etc.AppConstants;
+import org.rmj.g3appdriver.etc.ImageFileCreator;
+import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
+import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
@@ -30,12 +37,19 @@ import java.util.List;
 public class VMSSDEvaluation extends AndroidViewModel {
 
     private String fsMessage;
-    private SSDDEvaluation loEvaluation;
+
+    private final Context loContext;
+    private final ConnectionUtil loConnect;
+    private final SSDDEvaluation loEvaluation;
+    private final EmployeeSession poSession;
 
     public VMSSDEvaluation(@NonNull Application application) {
         super(application);
 
+        this.loContext = application;
         this.loEvaluation = new SSDDEvaluation(application);
+        this.loConnect = new ConnectionUtil(application);
+        this.poSession = EmployeeSession.getInstance(application);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -110,15 +124,18 @@ public class VMSSDEvaluation extends AndroidViewModel {
         return loEvaluation.GetImage(fsTransNox, fsCategory);
     }
 
+    public String CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
+        return loEvaluation.CreateEvaluation(fsDeptID, foCategories);
+    }
+
     public interface OnDownloadCallback{
         void OnLoad(String fsTitlexx, String fsMessage);
         void OnSuccess();
         void OnFailed(String fsMessage);
     }
-
-
-    public String CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
-        return loEvaluation.CreateEvaluation(fsDeptID, foCategories);
+    
+    public void SaveError(String fsSource, String fsMessage){
+        loEvaluation.SaveError(fsSource, fsMessage);
     }
 
     public void Rate(String fsTransNox, String fsCatgrID, String fsRating, String fsRemarks, String fsDate){
@@ -135,6 +152,11 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
             @Override
             public Object DoInBackground(Object args) {
+
+                if (!loConnect.isDeviceConnected()){
+                    fsMessage = loConnect.getMessage();
+                    return false;
+                }
 
                 if (!loEvaluation.DownloadDepartments()){
                     fsMessage = loEvaluation.GetMessage();
@@ -166,6 +188,11 @@ public class VMSSDEvaluation extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
+                if (!loConnect.isDeviceConnected()){
+                    fsMessage = loConnect.getMessage();
+                    return false;
+                }
+
                 if (!loEvaluation.DownloadCategories()){
                     fsMessage = loEvaluation.GetMessage();
                     return false;
@@ -196,6 +223,11 @@ public class VMSSDEvaluation extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
+                if (!loConnect.isDeviceConnected()){
+                    fsMessage = loConnect.getMessage();
+                    return false;
+                }
+
                 //download previous transactions
                 if (!loEvaluation.DownloadMaster(fsDeptIDxx, fsDfrom, fsDto)){
                     fsMessage= loEvaluation.GetMessage();
@@ -225,13 +257,17 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
             @Override
             public Object DoInBackground(Object args) {
-                String lsPAram = (String) args;
-                if (loEvaluation.DownloadDetails(lsPAram)){
-                    return true;
-                }else {
-                    fsMessage = loEvaluation.GetMessage();
+
+                if (!loConnect.isDeviceConnected()){
+                    fsMessage = loConnect.getMessage();
                     return false;
                 }
+
+                String lsPAram = (String) args;
+                if (!loEvaluation.DownloadDetails(lsPAram)){
+                    return false;
+                }
+                return true;
             }
 
             @Override
@@ -255,7 +291,17 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
             @Override
             public Object DoInBackground(Object args) {
-                return loEvaluation.SubmitEvaluation(foMaster, faDetails);
+
+                if (!loConnect.isDeviceConnected()){
+                    fsMessage = loConnect.getMessage();
+                    return false;
+                }
+
+                if (!loEvaluation.SubmitEvaluation(foMaster, faDetails)){
+                    fsMessage = loConnect.getMessage();
+                    return false;
+                }
+                return true;
             }
 
             @Override
@@ -263,7 +309,48 @@ public class VMSSDEvaluation extends AndroidViewModel {
                 if ((Boolean) object){
                     foCallback.OnSuccess();
                 }else {
-                    foCallback.OnFailed(loEvaluation.GetMessage());
+                    foCallback.OnFailed(fsMessage);
+                }
+            }
+        });
+    }
+
+    public void SaveImage(ESSDDImages foImage){
+        loEvaluation.SaveImage(foImage);
+    }
+
+    public void InitCamera(OnInitializeCameraCallback foListener){
+
+        ImageFileCreator loImage = new ImageFileCreator(loContext, AppConstants.SUB_FOLDER_SSDD_EVALUATION, poSession.getUserID());
+
+        String[] lsResult = new String[4];
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                foListener.OnInit();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if(!loImage.IsFileCreated(true)){
+                    fsMessage = loImage.getMessage();
+                    return false;
+                }
+
+                lsResult[0]= loImage.getFilePath();
+                lsResult[1]= loImage.getFileName();
+
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if (!(Boolean) object){
+                    foListener.OnFailed(loImage.getMessage(), null, lsResult);
+                }else {
+                    foListener.OnSuccess(loImage.getCameraIntent(), lsResult);
                 }
             }
         });

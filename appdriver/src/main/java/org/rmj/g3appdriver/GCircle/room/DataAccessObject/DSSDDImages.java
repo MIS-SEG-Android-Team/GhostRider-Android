@@ -15,6 +15,12 @@ public interface DSSDDImages {
     @Upsert
     void Save(ESSDDImages foVal);
 
+    @Query("SELECT COUNT(*) FROM SSDD_Images")
+    int GetCount();
+
+    @Query("SELECT COUNT(*) FROM SSDD_Images WHERE sReferNox = :fsTransNox AND sCategrID = :fsCategrID")
+    int GetCountPerCategory(String fsTransNox, String fsCategrID);
+
     @Query("SELECT * FROM SSDD_Images WHERE sReferNox= :fsTransNox AND sCategrID= :fsCategory")
     LiveData<List<ESSDDImages>> GetCategoryImages(String fsTransNox, String fsCategory);
 

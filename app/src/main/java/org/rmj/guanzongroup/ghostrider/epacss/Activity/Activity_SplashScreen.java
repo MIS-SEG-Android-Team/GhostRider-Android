@@ -15,7 +15,6 @@ import static org.rmj.g3appdriver.utils.ServiceScheduler.FIFTEEN_MINUTE_PERIODIC
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -36,8 +35,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.etc.GMSUtility;
-import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.TransparentToolbar;
 import org.rmj.g3appdriver.utils.AppDirectoryCreator;
@@ -48,7 +45,7 @@ import org.rmj.guanzongroup.ghostrider.epacss.R;
 import org.rmj.guanzongroup.ghostrider.epacss.Service.DataDownloadService;
 import org.rmj.guanzongroup.ghostrider.epacss.Service.GMessagingService;
 import org.rmj.guanzongroup.ghostrider.epacss.ViewModel.VMSplashScreen;
-import org.rmj.guanzongroup.petmanager.Dialog.DialogDisclosure;
+import org.rmj.g3appdriver.etc.DialogDisclosure;
 
 import java.util.ArrayList;
 import java.util.List;

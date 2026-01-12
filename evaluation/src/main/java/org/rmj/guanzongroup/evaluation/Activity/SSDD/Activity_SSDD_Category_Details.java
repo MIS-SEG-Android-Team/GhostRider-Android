@@ -72,40 +72,51 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
         siv_preview = findViewById(R.id.siv_preview);
         mcv_details = findViewById(R.id.mcv_details);
 
-        gestureDetector = new GestureDetector(Activity_SSDD_Category_Details.this, new GestureListener(Activity_SSDD_Category_Details.this));
+        InitActivity();
+    }
 
-        if (!getIntent().hasExtra("transnox")) {
+    private void InitActivity(){
 
-            InitMessage(1, R.drawable.baseline_error_24, "No transaction number has been detected", "Okay", "", new onMessageButton() {
-                @Override
-                public void onPositive() { finish(); }
+        try {
 
-                @Override
-                public void onNegative() {}
-            });
-        }else if(!getIntent().hasExtra("categoryid")){
+            gestureDetector = new GestureDetector(Activity_SSDD_Category_Details.this, new GestureListener(Activity_SSDD_Category_Details.this));
 
-            InitMessage(0, R.drawable.baseline_error_24, "No category id has been detected", "Okay", "", new onMessageButton() {
-                @Override
-                public void onPositive() { finish(); }
+            if (!getIntent().hasExtra("transnox")) {
 
-                @Override
-                public void onNegative() {}
-            });
-        }else {
+                InitMessage(1, R.drawable.baseline_error_24, "No transaction number has been detected", "Okay", "", new onMessageButton() {
+                    @Override
+                    public void onPositive() { finish(); }
 
-            mtv_company.setText(R.string.sLblCompName);
-            mtv_version.setText(R.string.lblBuildVersion);
-            mtv_dev.setText(R.string.sLblCopyright);
+                    @Override
+                    public void onNegative() {}
+                });
+            }else if(!getIntent().hasExtra("categoryid")){
 
-            InitObservers();
+                InitMessage(0, R.drawable.baseline_error_24, "No category id has been detected", "Okay", "", new onMessageButton() {
+                    @Override
+                    public void onPositive() { finish(); }
 
-            siv_preview.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return gestureDetector.onTouchEvent(event);
-                }
-            });
+                    @Override
+                    public void onNegative() {}
+                });
+            }else {
+
+                mtv_company.setText(R.string.sLblCompName);
+                mtv_version.setText(R.string.lblBuildVersion);
+                mtv_dev.setText(R.string.sLblCopyright);
+
+                InitObservers();
+
+                siv_preview.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return gestureDetector.onTouchEvent(event);
+                    }
+                });
+            }
+
+        }catch (Exception e){
+            mViewModel.SaveError(getClass().getSimpleName(), e.getMessage());
         }
     }
 
@@ -118,7 +129,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
     @Override
     public void OnSwipeDown() {
-         ObjectAnimator animator = ObjectAnimator.ofFloat(mcv_details, "Y", mcv_details.getTop(), mcv_details.getBottom());
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mcv_details, "Y", mcv_details.getTop(), mcv_details.getBottom());
         animator.setDuration(500);
         animator.start();
     }

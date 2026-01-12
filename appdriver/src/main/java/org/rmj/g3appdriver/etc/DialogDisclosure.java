@@ -1,4 +1,4 @@
-package org.rmj.guanzongroup.petmanager.Dialog;
+package org.rmj.g3appdriver.etc;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -10,7 +10,8 @@ import android.view.View;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.rmj.guanzongroup.petmanager.R;
+import org.rmj.g3appdriver.R;
+
 
 public class DialogDisclosure {
 

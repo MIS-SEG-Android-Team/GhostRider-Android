@@ -19,7 +19,7 @@ import java.util.List;
 public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCategories.VHCategories> {
 
     private final OnItemClickListener foListener;
-    private List<SSDD_Evaluation_Categories> laCategories;
+    private final List<SSDD_Evaluation_Categories> laCategories;
 
     public Adapter_SSDDCategories(List<SSDD_Evaluation_Categories> laCategories, OnItemClickListener foListener) {
         this.laCategories = laCategories;
@@ -29,6 +29,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
     public void SetDataList(List<SSDD_Evaluation_Categories> laParams){
         laCategories.clear();
         laCategories.addAll(laParams);
+
         notifyDataSetChanged();
     }
 
@@ -110,6 +111,26 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
                 foListener.OnCamera();
             }
         });
+
+        //disable objects based on master status
+        switch (laCategories.get(position).lsTranStat){
+            case "0":
+            case "1":
+                holder.rb_rate.setEnabled(true);
+                holder.tie_remarks.setEnabled(true);
+                holder.ib_camera.setEnabled(true);
+                break;
+            case "3":
+                holder.rb_rate.setEnabled(false);
+                holder.tie_remarks.setEnabled(false);
+                holder.ib_camera.setEnabled(false);
+                break;
+            default:
+                holder.rb_rate.setEnabled(false);
+                holder.tie_remarks.setEnabled(false);
+                holder.ib_camera.setEnabled(false);
+                break;
+        }
     }
 
     @Override
@@ -126,11 +147,12 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
 
     public static class VHCategories extends RecyclerView.ViewHolder{
 
-        private MaterialTextView mtv_category;
-        private RatingBar rb_rate;
-        private ImageButton ib_check;
-        private TextInputEditText tie_remarks;
-        private ImageButton ib_camera, ib_info;
+        private final MaterialTextView mtv_category;
+        private final RatingBar rb_rate;
+        private final ImageButton ib_check;
+        private final TextInputEditText tie_remarks;
+        private final ImageButton ib_camera;
+        private final ImageButton ib_info;
 
         public VHCategories(@NonNull View itemView) {
             super(itemView);
@@ -145,13 +167,15 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
     }
 
     public static class SSDD_Evaluation_Categories{
+        public String lsTranStat;
         public String sCategryID;
         public String sCategry;
         public double ldbl_rating;
         public String lsRemarks;
         public String lsEvaluated;
 
-        public SSDD_Evaluation_Categories(String sCategryID, String sCategry, double ldbl_rating, String lsRemarks, String fsEvaluated){
+        public SSDD_Evaluation_Categories(String lsTranStat, String sCategryID, String sCategry, double ldbl_rating, String lsRemarks, String fsEvaluated){
+            this.lsTranStat = lsTranStat;
             this.sCategryID = sCategryID;
             this.sCategry = sCategry;
             this.ldbl_rating = ldbl_rating;
