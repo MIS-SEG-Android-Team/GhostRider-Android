@@ -116,8 +116,8 @@ public class GCircleApi extends WebApi {
     private static final String GET_SSDD_CATEGORIES = "gcircle/ssdd/download_ssdd_categories.php";
     private static final String SUBMIT_SSDD_EVALUATION = "gcircle/ssdd/submit_ssdd_evaluation.php";
     private static final String SUBMIT_SSDD_IMAGES = "gcircle/ssdd/submit_ssdd_images.php";
-    private static final String GET_SSDD_MASTER = "gcircle/ssdd/download_evaluation_master.php";
-    private static final String GET_SSDD_DETAILS = "gcircle/ssdd/download_evaluation_detail.php";
+    private static final String GET_SSDD_MASTER = "gcircle/ssdd/download_evaluations_master.php";
+    private static final String GET_SSDD_DETAILS = "gcircle/ssdd/download_evaluations_detail.php";
     private static final String GET_SSDD_IMAGE_CATEGORY = "gcircle/ssdd/download_category_image.php";
 
     private static final String URL_SUBMIT_INQUIRY = "gcircle/ganado/submit_inquiry.php";

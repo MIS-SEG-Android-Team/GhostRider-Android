@@ -52,6 +52,10 @@ public class VMSSDEvaluation extends AndroidViewModel {
         this.poSession = EmployeeSession.getInstance(application);
     }
 
+    public int CountDetails(String fsTransNox){
+        return loEvaluation.CountDetails(fsTransNox);
+    }
+
     @SuppressLint("SimpleDateFormat")
     public String GetDateToday(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -131,6 +135,12 @@ public class VMSSDEvaluation extends AndroidViewModel {
     public interface OnDownloadCallback{
         void OnLoad(String fsTitlexx, String fsMessage);
         void OnSuccess();
+        void OnFailed(String fsMessage);
+    }
+
+    public interface OnSubmitCallback{
+        void OnLoad(String fsTitlexx, String fsMessage);
+        void OnSuccess(String fsTransNox);
         void OnFailed(String fsMessage);
     }
     
@@ -265,6 +275,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
                 String lsPAram = (String) args;
                 if (!loEvaluation.DownloadDetails(lsPAram)){
+                    fsMessage = loEvaluation.GetMessage();
                     return false;
                 }
                 return true;
@@ -281,7 +292,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         });
     }
 
-    public void SubmitEvaluation(ESSDDMaster foMaster, List<ESSDDetail> faDetails, OnDownloadCallback foCallback){
+    public void SubmitEvaluation(ESSDDMaster foMaster, List<ESSDDetail> faDetails, OnSubmitCallback foCallback){
 
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
@@ -298,16 +309,18 @@ public class VMSSDEvaluation extends AndroidViewModel {
                 }
 
                 if (!loEvaluation.SubmitEvaluation(foMaster, faDetails)){
-                    fsMessage = loConnect.getMessage();
+                    fsMessage = loEvaluation.GetMessage();
                     return false;
                 }
+                //new transaction number
+                fsMessage = loEvaluation.GetMessage();
                 return true;
             }
 
             @Override
             public void OnPostExecute(Object object) {
                 if ((Boolean) object){
-                    foCallback.OnSuccess();
+                    foCallback.OnSuccess(fsMessage);
                 }else {
                     foCallback.OnFailed(fsMessage);
                 }

@@ -104,6 +104,10 @@ public class SSDDEvaluation {
         poImagesDao.Save(foImage);
     }
 
+    public int CountDetails(String fsTransNox){
+        return poDetailDao.CountDetails(fsTransNox);
+    }
+
     private String GenerateTransNox(){
 
         String lsTransNox = null;
@@ -184,6 +188,10 @@ public class SSDDEvaluation {
         return poCatgDao.GetCategory(fsCategory);
     }
 
+    public ESSDDepartments GetDepartment(String fsDeptIDxx){
+        return poDeptDao.GetDepartment(fsDeptIDxx);
+    }
+
     public LiveData<List<ESSDDepartments>> GetDepartments(){
         return poDeptDao.GetDepartmentList();
     }
@@ -206,10 +214,6 @@ public class SSDDEvaluation {
 
     public LiveData<ESSDDetail> GetCategoryDetail(String fsTransNox, String fsCategory){
         return poDetailDao.GetCategoryDetail(fsTransNox, fsCategory);
-    }
-
-    public ESSDDepartments GetDepartment(String fsDeptIDxx){
-        return poDeptDao.GetDepartment(fsDeptIDxx);
     }
 
     public LiveData<List<ESSDDImages>> GetCategoryImages(String fsTransNox, String fsCategory){
@@ -303,17 +307,16 @@ public class SSDDEvaluation {
         try {
 
             JSONObject loParams = new JSONObject();
-            loParams.put("sUserIDxx", poEmployee.getUserID());
+            loParams.put("sUserIDxx", poEmployee.getUserNonLiveData().getUserIDxx());
             loParams.put("sDeptIDxx", fsDeptIDxx);
             loParams.put("dFrom", fsDfrom);
             loParams.put("dTo", fsDto);
 
-            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDMaster(), new JSONObject().toString(), poHeaders.getHeaders());
+            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDMaster(), loParams.toString(), poHeaders.getHeaders());
             if (lsResponse == null){
                 lsMessage = "Server no response";
                 return false;
             }
-            Log.d("SSD Evaluation", lsResponse);
 
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
@@ -352,7 +355,7 @@ public class SSDDEvaluation {
             JSONObject loParams = new JSONObject();
             loParams.put("sTransNox", fsTransnox);
 
-            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDetails(), new JSONObject().toString(), poHeaders.getHeaders());
+            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDetails(),loParams.toString(), poHeaders.getHeaders());
             if (lsResponse == null){
                 lsMessage = "Server no response";
                 return false;
@@ -373,7 +376,7 @@ public class SSDDEvaluation {
                 JSONObject loResult = laDetail.getJSONObject(i);
 
                 ESSDDetail loDetail = new ESSDDetail();
-                loDetail.setsTransNox(loResult.getString("fsTransnox"));
+                loDetail.setsTransNox(fsTransnox);
                 loDetail.setsCategrID(loResult.getString("sCategrID"));
                 loDetail.setnRatingxx(loResult.getString("nRatingxx"));
                 loDetail.setsRemarksx(loResult.getString("sRemarksx"));
@@ -431,6 +434,9 @@ public class SSDDEvaluation {
             String lsTransNox = loResponse.getString("sTransNox");
             poDetailDao.Submit(lsTransNox, foMaster.getsTransNox());
             poMasterDao.Submit(lsTransNox, foMaster.getsTransNox());
+
+            //use variable fsmessage to hold the new transaction number
+            lsMessage = lsTransNox;
 
             return true;
         }catch (Exception e){

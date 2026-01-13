@@ -207,7 +207,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                     @Override
                     public void OnSuccess() {
                         poDialog.dismiss();
-                        Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG);
+                        Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG).show();
                     }
 
                     @Override

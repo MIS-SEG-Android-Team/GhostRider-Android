@@ -21,6 +21,9 @@ public interface DSSDDetail {
     @Query("UPDATE SSDD_Detail SET nRatingxx= :fsRating, sRemarksx= :fsRemarks, dEvaluate= :fsDate WHERE sTransNox= :fsTransNox AND sCategrID= :fsCatgrID")
     void Rate(String fsTransNox, String fsCatgrID, String fsRating, String fsRemarks, String fsDate);
 
+    @Query("SELECT COUNT(*) FROM SSDD_Detail WHERE sTransNox= :fsTransNox")
+    int CountDetails(String fsTransNox);
+
     @Query("SELECT * FROM SSDD_Detail WHERE sTransNox= :fsTransNox")
     LiveData<List<ESSDDetail>> GetDetails(String fsTransNox);
 

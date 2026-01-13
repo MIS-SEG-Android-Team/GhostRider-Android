@@ -20,6 +20,7 @@ import androidx.activity.result.ActivityResultCallerLauncher;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -49,6 +50,8 @@ import java.util.List;
 
 public class Activity_SSDD_Category extends AppCompatActivity {
 
+    private final String TAG = getClass().getSimpleName();
+
     private VMSSDEvaluation mViewModel;
     private LoadDialog poDialog;
     private MessageBox poMessage;
@@ -63,7 +66,6 @@ public class Activity_SSDD_Category extends AppCompatActivity {
     private ESSDDMaster loMaster = new ESSDDMaster();
     private List<ESSDDetail> laDetails = new ArrayList<>();
 
-    private final String TAG = getClass().getSimpleName();
 
     private interface onMessageButton{
         void onPositive();
@@ -136,11 +138,14 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     mViewModel.SaveError(TAG, e.getMessage());
                 }
 
+                dialogDisclosure.dismiss();
+
             }
 
             @Override
             public void onDecline() {
                 Toast.makeText(Activity_SSDD_Category.this, "Please allow missing permissions to continue", Toast.LENGTH_LONG).show();
+                dialogDisclosure.dismiss();
             }
         });
         dialogDisclosure.setMessage("Guanzon Circle requires camera and storage permissions to take SSDD images when the app is in use.");
@@ -215,8 +220,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 //do not continue if master transaction is not set after data observation
                 if (loMaster == null){
-
-                    InitMessage(0, R.drawable.baseline_error_24, "Could not find transaction", "Okay", "", new onMessageButton() {
+                    InitMessage(0, R.drawable.baseline_error_24, "Master transaction is not initialized", "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {
                             finish();
@@ -228,23 +232,36 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     return;
                 }
 
-                //ask for user to download details, if not found
-                if (laDetails == null){
+                //initialize adapter
+                InitAdapter();
 
-                    InitMessage(1, R.drawable.baseline_error_24, "No details found for this transaction. Download details?", "Yes", "No", new onMessageButton() {
-                        @Override
-                        public void onPositive() {
-                            DownloadData();
-                        }
+                //re download details, if list is not initialized and empty
+                if (laDetails == null || laDetails.size() < 1){
 
-                        @Override
-                        public void onNegative() {}
-                    });
+                    //count details
+                    if (mViewModel.CountDetails(getIntent().getStringExtra("transnox")) < 1){
+
+                        //ask user to download details, if not found
+                        InitMessage(1, R.drawable.baseline_error_24, "No details found for this transaction. Download details?", "Yes", "No", new onMessageButton() {
+                            @Override
+                            public void onPositive() {
+                                DownloadData();
+                            }
+
+                            @Override
+                            public void onNegative() {
+                                finish();
+                            }
+                        });
+
+                    }
+
                 }
             }
 
+
+            //initialize other methods
             InitListener();
-            InitAdapter();
             InitCameraLauncher();
 
         }catch (Exception e){
@@ -256,16 +273,29 @@ public class Activity_SSDD_Category extends AppCompatActivity {
     private void InitObservers(){
 
         //initliaze master
-        mViewModel.GetMaster(getIntent().getStringExtra("transnox"), getIntent().getStringExtra("deptid")).observe(
-                Activity_SSDD_Category.this, new Observer<ESSDDMaster>() {
+        mViewModel.GetMaster(getIntent().getStringExtra("transnox"), getIntent().getStringExtra("deptid")).observe(Activity_SSDD_Category.this, new Observer<ESSDDMaster>() {
             @Override
             public void onChanged(ESSDDMaster essddMaster) {
 
+                //reset to null, signal that observation has been triggered after default value has been set
+                loMaster = null;
+
                 if (essddMaster == null){
+
+                    InitMessage(0, R.drawable.baseline_error_24, "Could not find transaction", "Okay", "", new onMessageButton() {
+                        @Override
+                        public void onPositive() {
+                            finish();
+                        }
+
+                        @Override
+                        public void onNegative() {}
+                    });
+
                     return;
                 }
 
-                loMaster= essddMaster;
+                loMaster = essddMaster;
 
                 if (essddMaster.getcTranStat().equals("3")){
                     btn_submit.setEnabled(false);
@@ -293,12 +323,20 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             @Override
             public void onChanged(List<ESSDDetail> essdDetails) {
 
+                //reset to null, signal that observation has been triggered after default value has been set
+                laDetails = null;
+
                 if (essdDetails == null){
                     return;
                 }
 
                 //initialize list, and update the list
                 laDetails= essdDetails;
+
+                //check if adapter is initialized
+                if (loAdapter == null){
+                    return;
+                }
                 loAdapter.SetDataList(GetList());
 
                 //initialize master details
@@ -413,7 +451,8 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 //check permission
                 if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
                         checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                        checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED){
 
                     OpenPermission();
                     return;
@@ -496,6 +535,10 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     loImage.setsImagePth(lsFilePath);
                     loImage.setsImageNme(lsFileName);
                     loImage.setsCategrID("");
+                    loImage.setcImgeStat("");
+                    loImage.setdImgeDate("");
+                    loImage.setsMD5Hashx("");
+                    loImage.setsScanndID("");
 
 
                     mViewModel.SaveImage(loImage);
@@ -535,7 +578,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 return;
             }
 
-            mViewModel.SubmitEvaluation(loMaster, laDetails, new VMSSDEvaluation.OnDownloadCallback() {
+            mViewModel.SubmitEvaluation(loMaster, laDetails, new VMSSDEvaluation.OnSubmitCallback() {
                 @Override
                 public void OnLoad(String fsTitlexx, String fsMessage) {
                     poDialog.initDialog(fsTitlexx, fsMessage, false);
@@ -543,12 +586,12 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 }
 
                 @Override
-                public void OnSuccess() {
+                public void OnSuccess(String fsTransNox) {
                     poDialog.dismiss();
                     InitMessage(0, R.drawable.baseline_message_24, "Evaluation submitted successfully", "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {
-                            InitObservers();
+                            finish();
                         }
 
                         @Override
