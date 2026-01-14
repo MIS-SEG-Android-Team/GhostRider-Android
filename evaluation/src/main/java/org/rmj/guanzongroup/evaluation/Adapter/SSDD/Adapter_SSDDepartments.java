@@ -27,6 +27,13 @@ public class Adapter_SSDDepartments extends RecyclerView.Adapter<Adapter_SSDDepa
         this.foListener = foListener;
     }
 
+    public void SetDataList(List<ESSDDepartments> laParams) {
+        laDepartments.clear();
+        laDepartments.addAll(laParams);
+
+        notifyDataSetChanged();
+    }
+
     public SSDDFilter GetFilter(){
         return loFilter;
     }

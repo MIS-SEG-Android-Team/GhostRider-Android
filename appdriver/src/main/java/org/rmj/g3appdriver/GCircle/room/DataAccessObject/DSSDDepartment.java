@@ -15,6 +15,9 @@ public interface DSSDDepartment {
     @Upsert
     void Save(ESSDDepartments eeDepartment);
 
+    @Query("SELECT COUNT(*) FROM SSDD_Department")
+    int GetCount();
+
     @Query("SELECT * FROM SSDD_Department WHERE sDeptIDxx= :fsDeptIDxx")
     ESSDDepartments GetDepartment(String fsDeptIDxx);
 

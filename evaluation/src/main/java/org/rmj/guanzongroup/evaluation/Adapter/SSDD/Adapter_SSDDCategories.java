@@ -1,5 +1,6 @@
 package org.rmj.guanzongroup.evaluation.Adapter.SSDD;
 
+import android.annotation.SuppressLint;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
         this.foListener = foListener;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void SetDataList(List<SSDD_Evaluation_Categories> laParams){
         laCategories.clear();
         laCategories.addAll(laParams);

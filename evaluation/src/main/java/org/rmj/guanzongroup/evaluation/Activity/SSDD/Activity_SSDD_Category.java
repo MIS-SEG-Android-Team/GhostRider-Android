@@ -281,17 +281,6 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 loMaster = null;
 
                 if (essddMaster == null){
-
-                    InitMessage(0, R.drawable.baseline_error_24, "Could not find transaction", "Okay", "", new onMessageButton() {
-                        @Override
-                        public void onPositive() {
-                            finish();
-                        }
-
-                        @Override
-                        public void onNegative() {}
-                    });
-
                     return;
                 }
 
@@ -337,7 +326,6 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 if (loAdapter == null){
                     return;
                 }
-                loAdapter.SetDataList(GetList());
 
                 //initialize master details
                 double ldbl_totalRating = 0.0;
@@ -349,6 +337,9 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                         ntotalEvaluated++;
                     }
                 }
+
+                //update adapter item list
+                loAdapter.SetDataList(GetList());
 
                 //display total
                 mtv_evaluation.setText(ntotalEvaluated + " out of " + laDetails.size());
@@ -449,10 +440,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             public void OnCamera() {
 
                 //check permission
-                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                        checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED){
+                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
 
                     OpenPermission();
                     return;
@@ -591,6 +579,19 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     InitMessage(0, R.drawable.baseline_message_24, "Evaluation submitted successfully", "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {
+
+                            int ntotalEvaluated = 0;
+                            for (ESSDDetail loDetail: laDetails) {
+
+                                if (loDetail.getdEvaluate() != null && !loDetail.getdEvaluate().trim().isEmpty()){
+                                    ntotalEvaluated++;
+                                }
+                            }
+
+                            //if all are evaluated and status is not posted '3', close evaluation status '1'
+                            if (ntotalEvaluated == laDetails.size() && !loMaster.getcTranStat().equals("3")){
+                                mViewModel.UpdateMasterStatus("1", loMaster.getsTransNox());
+                            }
                             finish();
                         }
 

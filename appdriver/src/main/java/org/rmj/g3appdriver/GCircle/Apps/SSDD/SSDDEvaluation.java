@@ -9,7 +9,6 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.sqlite.db.SimpleSQLiteQuery;
-import androidx.sqlite.db.SupportSQLiteQuery;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -104,8 +103,20 @@ public class SSDDEvaluation {
         poImagesDao.Save(foImage);
     }
 
+    public void UpdateMasterStatus(String fsTranStat, String fsTransNox){
+        poMasterDao.UpdateMasterStatus(fsTranStat, fsTransNox);
+    }
+
     public int CountDetails(String fsTransNox){
         return poDetailDao.CountDetails(fsTransNox);
+    }
+
+    public int CountDepartments(){
+        return poDeptDao.GetCount();
+    }
+
+    public int CountMasterByDepartment(String fsTransNox){
+        return poMasterDao.GetCountByDepartment(fsTransNox);
     }
 
     private String GenerateTransNox(){
@@ -149,7 +160,7 @@ public class SSDDEvaluation {
         }
     }
 
-    public String CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
+    public ESSDDMaster CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
 
         for (ESSDDCategories loCategory : foCategories){
 
@@ -170,10 +181,11 @@ public class SSDDEvaluation {
         loMaster.setdTransact(GetCurrentDate());
         loMaster.setsDeptIDxx(fsDeptID);
         loMaster.setcTranStat("0");
+        loMaster.setcSendStat("0");
 
         poMasterDao.Save(loMaster);
 
-        return lsTransNox;
+        return loMaster;
     }
 
     public String GetMessage(){
@@ -302,7 +314,7 @@ public class SSDDEvaluation {
         }
     }
 
-    public Boolean DownloadMaster(String fsDeptIDxx, String fsDfrom, String fsDto){
+    public Boolean DownloadMasterList(String fsDeptIDxx, String fsDfrom, String fsDto){
 
         try {
 
@@ -336,6 +348,7 @@ public class SSDDEvaluation {
                 loMaster.setsTransNox(loResult.getString("sTransNox"));
                 loMaster.setdTransact(loResult.getString("dTransact"));
                 loMaster.setcTranStat(loResult.getString("cTranStat"));
+                loMaster.setcSendStat("1");
                 loMaster.setsDeptIDxx(loResult.getString("sDeptIDxx"));
 
                 poMasterDao.Save(loMaster);

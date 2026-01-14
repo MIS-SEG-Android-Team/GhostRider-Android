@@ -10,9 +10,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
-import org.rmj.g3appdriver.GCircle.Apps.ErrorList.ViewModel.VMErrorLogs;
 import org.rmj.g3appdriver.GCircle.Apps.SSDD.SSDDEvaluation;
-import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
@@ -54,6 +52,14 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
     public int CountDetails(String fsTransNox){
         return loEvaluation.CountDetails(fsTransNox);
+    }
+
+    public int CountDepartment(){
+        return loEvaluation.CountDepartments();
+    }
+
+    public int CountMaster(String fsDeptIDxx){
+        return loEvaluation.CountMasterByDepartment(fsDeptIDxx);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -128,7 +134,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         return loEvaluation.GetImage(fsTransNox, fsCategory);
     }
 
-    public String CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
+    public ESSDDMaster CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
         return loEvaluation.CreateEvaluation(fsDeptID, foCategories);
     }
 
@@ -239,7 +245,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
                 }
 
                 //download previous transactions
-                if (!loEvaluation.DownloadMaster(fsDeptIDxx, fsDfrom, fsDto)){
+                if (!loEvaluation.DownloadMasterList(fsDeptIDxx, fsDfrom, fsDto)){
                     fsMessage= loEvaluation.GetMessage();
                     return false;
                 }
@@ -330,6 +336,10 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
     public void SaveImage(ESSDDImages foImage){
         loEvaluation.SaveImage(foImage);
+    }
+
+    public void UpdateMasterStatus(String fsTranStat, String fsTransNox){
+        loEvaluation.UpdateMasterStatus(fsTranStat, fsTransNox);
     }
 
     public void InitCamera(OnInitializeCameraCallback foListener){

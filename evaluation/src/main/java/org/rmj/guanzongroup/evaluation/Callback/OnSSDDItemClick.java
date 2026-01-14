@@ -5,5 +5,5 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 
 public interface OnSSDDItemClick {
     void OnSelectDepartment(ESSDDepartments loDepartment);
-    void OnSelectEvaluation(ESSDDMaster loMaster);
+    void OnSelectEvaluation(String lsDept, ESSDDMaster loMaster);
 }

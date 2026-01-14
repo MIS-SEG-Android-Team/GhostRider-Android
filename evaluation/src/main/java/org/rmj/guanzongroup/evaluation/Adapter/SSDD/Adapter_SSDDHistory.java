@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.guanzongroup.evaluation.R;
 
 import java.util.ArrayList;
@@ -30,6 +31,13 @@ public class Adapter_SSDDHistory extends RecyclerView.Adapter<Adapter_SSDDHistor
         this.laHistory = laHistory;
         this.laHistoryFiltered = laHistory;
         this.foListener = foListener;
+    }
+
+    public void SetDataList(List<ESSDDMaster> laParams) {
+        laHistory.clear();
+        laHistory.addAll(laParams);
+
+        notifyDataSetChanged();
     }
 
     public SSDDFilter GetFilter(){

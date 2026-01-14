@@ -46,6 +46,7 @@ import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -64,6 +65,9 @@ public class Fragment_SSDD_Evaluation extends Fragment{
 
     private String lsDfrom, lsDto, lsTranstat;
     private OnSSDDItemClick callback;
+
+    private List<ESSDDepartments> laDepartments = new ArrayList<>();
+    private List<ESSDDMaster> laMasterlist = new ArrayList<>();
 
     private final String TAG = getClass().getSimpleName();
 
@@ -87,8 +91,6 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         ib_filter = view.findViewById(R.id.ib_filter);
         fbtn_evaluate = view.findViewById(R.id.fbtn_evaluate);
 
-        InitFragment();
-
         return view;
     }
 
@@ -99,6 +101,13 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         if (args != null){
             loBundle = args;
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        InitFragment();
     }
 
     private void InitFragment(){
@@ -138,20 +147,14 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                 @Override
                 public void onChanged(List<ESSDDepartments> essdDepartments) {
 
+                    //reset to null, signal that observation has been triggered after default value has been set
+                    laDepartments = null;
+
                     if (essdDepartments == null){
-
-                        //if null, ask user to re download data
-                        InitMessage(1, R.drawable.baseline_error_24, "No departments found for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
-                            @Override
-                            public void OnPositive() {
-                                ReDownloadData();
-                            }
-
-                            @Override
-                            public void OnNegative() {}
-                        });
                         return;
                     }
+
+                    laDepartments = essdDepartments;
 
                     //initialize adapter for department list
                     Adapter_SSDDepartments loAdapter = new Adapter_SSDDepartments(essdDepartments, new Adapter_SSDDepartments.OnItemClickListener() {
@@ -185,6 +188,26 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                 }
             });
 
+            //ask user to re download data, if no departments found
+            if (laDepartments == null || laDepartments.size() < 1){
+
+                if (mViewModel.CountDepartment() < 1){
+
+                    //if null, ask user to re download data
+                    InitMessage(1, R.drawable.baseline_error_24, "No departments found for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
+                        @Override
+                        public void OnPositive() {
+                            ReDownloadData();
+                        }
+
+                        @Override
+                        public void OnNegative() {}
+                    });
+
+                }
+
+            }
+
         }else {
 
             //show filtering option
@@ -196,61 +219,28 @@ public class Fragment_SSDD_Evaluation extends Fragment{
             //check selected department id if passed
             if (loBundle.containsKey("dept_id")){
 
-                //download history
-                mViewModel.DownloadEvaluation(loBundle.getString("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
-                    @Override
-                    public void OnLoad(String fsTitlexx, String fsMessage) {
-                        poDialog.initDialog(fsTitlexx, fsMessage, false);
-                        poDialog.show();
-                    }
-
-                    @Override
-                    public void OnSuccess() {
-                        poDialog.dismiss();
-                        Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void OnFailed(String fsMessage) {
-                        poDialog.dismiss();
-                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
-                            @Override
-                            public void OnPositive() {}
-
-                            @Override
-                            public void OnNegative() {}
-                        });
-                    }
-                });
 
                 //load master list
-                mViewModel.GetMasterList(lsDfrom, lsDto, loBundle.getString("dept_id"), lsTranstat).observe(requireActivity(), new Observer<List<ESSDDMaster>>() {
+                mViewModel.GetMasterList(lsDfrom, lsDto, loBundle.getString("dept_id"), lsTranstat).observe(getViewLifecycleOwner(), new Observer<List<ESSDDMaster>>() {
                     @SuppressLint("NotifyDataSetChanged")
                     @Override
                     public void onChanged(List<ESSDDMaster> essddMasters) {
 
+                        //reset to null, signal that observation has been triggered after default value has been set
+                        laMasterlist = null;
+
                         if (essddMasters == null){
-
-                            InitMessage(0, R.drawable.baseline_error_24, "No transactions found", "Okay", "", new OnMessageButton() {
-                                @Override
-                                public void OnPositive() {}
-
-                                @Override
-                                public void OnNegative() {}
-                            });
                             return;
                         }
+                        laMasterlist = essddMasters;
 
                         //initialize list adapter for history
                         Adapter_SSDDHistory loAdapter = new Adapter_SSDDHistory(essddMasters, new Adapter_SSDDHistory.OnItemClickListener() {
                             @Override
                             public void OnClick(ESSDDMaster loHistory) {
 
-                                //Continue to evaluation details
-                                Intent loIntent = new Intent(requireActivity(), Activity_SSDD_Category.class);
-                                loIntent.putExtra("transnox", loHistory.getsTransNox());
-                                loIntent.putExtra("deptid", loBundle.getString("dept_id"));
-                                startActivity(loIntent);
+                                //get the selected evaluation
+                                callback.OnSelectEvaluation(loBundle.getString("dept_id"), loHistory);
                             }
                         });
                         loAdapter.notifyDataSetChanged();
@@ -273,6 +263,41 @@ public class Fragment_SSDD_Evaluation extends Fragment{
 
                     }
                 });
+
+                //ask user to re download data, if no history found
+                if (laMasterlist == null || laMasterlist.size() < 1){
+
+                    if (mViewModel.CountMaster(loBundle.getString("dept_id")) < 1){
+
+                        //download history
+                        mViewModel.DownloadEvaluation(loBundle.getString("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
+                            @Override
+                            public void OnLoad(String fsTitlexx, String fsMessage) {
+                                poDialog.initDialog(fsTitlexx, fsMessage, false);
+                                poDialog.show();
+                            }
+
+                            @Override
+                            public void OnSuccess() {
+                                poDialog.dismiss();
+                                Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void OnFailed(String fsMessage) {
+                                poDialog.dismiss();
+                                InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
+                                    @Override
+                                    public void OnPositive() {}
+
+                                    @Override
+                                    public void OnNegative() {}
+                                });
+                            }
+                        });
+
+                    }
+                }
                 return;
             }
 
@@ -359,7 +384,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                     @Override
                     public void OnPositive() {
 
-                        if (mViewModel.GetCategoriesNonLive() == null){
+                        if (mViewModel.GetCategoriesNonLive() == null || mViewModel.GetCategoriesNonLive().size() < 1){
 
                             InitMessage(1, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
                                 @Override
@@ -370,15 +395,12 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                                 @Override
                                 public void OnNegative() {}
                             });
+                            return;
                         }
 
-                        String lsTransNox = mViewModel.CreateEvaluation(loBundle.getString("dept_id"), mViewModel.GetCategoriesNonLive());
-
-                        Intent loIntent = new Intent(requireActivity(), Activity_SSDD_Category.class);
-                        loIntent.putExtra("transnox", lsTransNox);
-                        loIntent.putExtra("deptid", loBundle.getString("dept_id"));
-
-                        startActivity(loIntent);
+                        //return the generated evaluation master
+                        ESSDDMaster loMaster = mViewModel.CreateEvaluation(loBundle.getString("dept_id"), mViewModel.GetCategoriesNonLive());
+                        callback.OnSelectEvaluation(loMaster.getsDeptIDxx(), loMaster);
                     }
 
                     @Override

@@ -1,7 +1,9 @@
 package org.rmj.guanzongroup.evaluation.Activity.SSDD;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -87,8 +89,13 @@ public class Activity_SSDD_Evaluation extends AppCompatActivity implements OnSSD
     }
 
     @Override
-    public void OnSelectEvaluation(ESSDDMaster loMaster) {
-        Log.d("GAGANA BA?", "GUMANA NGA");
+    public void OnSelectEvaluation(String lsDept, ESSDDMaster loMaster) {
+
+        //Continue to evaluation details
+        Intent loIntent = new Intent(this, Activity_SSDD_Category.class);
+        loIntent.putExtra("transnox", loMaster.getsTransNox());
+        loIntent.putExtra("deptid", lsDept);
+        startActivity(loIntent);
     }
 
     private static class Fragment_SSDD_Adapter extends FragmentStateAdapter {

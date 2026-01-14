@@ -13,14 +13,17 @@ public class ESSDDMaster {
     @ColumnInfo(name = "sTransNox")
     public String sTransNox;
 
+    @ColumnInfo(name = "sDeptIDxx")
+    public String sDeptIDxx;
+
     @ColumnInfo(name = "dTransact")
     public String dTransact;
 
     @ColumnInfo(name = "cTranStat")
     public String cTranStat;
 
-    @ColumnInfo(name = "sDeptIDxx")
-    public String sDeptIDxx;
+    @ColumnInfo(name = "cSendStat")
+    public String cSendStat;
 
     @NonNull
     public String getsTransNox() {
@@ -53,5 +56,13 @@ public class ESSDDMaster {
 
     public void setsDeptIDxx(String sDeptIDxx) {
         this.sDeptIDxx = sDeptIDxx;
+    }
+
+    public String getcSendStat() {
+        return cSendStat;
+    }
+
+    public void setcSendStat(String cSendStat) {
+        this.cSendStat = cSendStat;
     }
 }
