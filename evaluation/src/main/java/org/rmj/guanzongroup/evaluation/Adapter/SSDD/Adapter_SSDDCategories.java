@@ -110,9 +110,18 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
         holder.ib_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                foListener.OnCamera();
+                foListener.OnCamera(laCategories.get(position));
             }
         });
+
+        //if transaction status is null, auto disable items
+        if (laCategories.get(position).lsTranStat == null){
+            holder.rb_rate.setEnabled(false);
+            holder.tie_remarks.setEnabled(false);
+            holder.ib_camera.setEnabled(false);
+
+            return;
+        }
 
         //disable objects based on master status
         switch (laCategories.get(position).lsTranStat){
@@ -143,7 +152,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
     public interface OnItemClickListener{
         void OnRate(int fnPosition, SSDD_Evaluation_Categories foDetail, double ffTotalRate);
         void OnRemarks(int fnPosition, SSDD_Evaluation_Categories foDetail, String fsRemarks);
-        void OnCamera();
+        void OnCamera(SSDD_Evaluation_Categories foDetail);
         void OnDetails(String fsCategoryID);
     }
 

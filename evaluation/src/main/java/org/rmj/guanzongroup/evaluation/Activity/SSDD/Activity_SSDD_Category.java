@@ -34,6 +34,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.etc.DialogDisclosure;
+import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
@@ -41,6 +42,7 @@ import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategories;
 import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -66,6 +68,9 @@ public class Activity_SSDD_Category extends AppCompatActivity {
     private ESSDDMaster loMaster = new ESSDDMaster();
     private List<ESSDDetail> laDetails = new ArrayList<>();
 
+    private FileUtility loFile;
+    private ESSDDImages loImage;
+    private Adapter_SSDDCategories.SSDD_Evaluation_Categories foCamDetail;
 
     private interface onMessageButton{
         void onPositive();
@@ -82,6 +87,8 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         poDialog = new LoadDialog(this);
         poMessage = new MessageBox(this);
         dialogDisclosure = new DialogDisclosure(this);
+        loFile = new FileUtility(Activity_SSDD_Category.this);
+        loImage = new ESSDDImages();
 
         mtv_dept = findViewById(R.id.mtv_dept);
         mtv_evaluation = findViewById(R.id.mtv_evaluation);
@@ -364,7 +371,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 try {
 
-                    //validate evaluation date, if already evaluated, else proceed to rate
+                    //validate evaluation date if already evaluated, else proceed to rate
                     if (foDetail.lsEvaluated != null && !foDetail.lsEvaluated.isEmpty()){
 
                         //do not allow if category is already evaluated before this day
@@ -410,7 +417,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 try {
 
-                    //validate evaluation date, if already evaluated, else proceed to rate
+                    //validate evaluation date if already evaluated, else proceed to rate
                     if (foDetail.lsEvaluated != null && !foDetail.lsEvaluated.isEmpty()){
 
                         //do not allow if category is already evaluated before this day
@@ -437,47 +444,76 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             }
 
             @Override
-            public void OnCamera() {
+            public void OnCamera(Adapter_SSDDCategories.SSDD_Evaluation_Categories foDetail) {
 
-                //check permission
-                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                try {
 
-                    OpenPermission();
-                    return;
+                    //validate evaluation date if already evaluated, else proceed to camera
+                    if (foDetail.lsEvaluated != null && !foDetail.lsEvaluated.isEmpty()){
+
+                        //do not allow if category is already evaluated before this day
+                        if (mViewModel.IsEvaluated(foDetail.lsEvaluated)){
+
+                            InitMessage(0, R.drawable.baseline_error_24, "You are not allowed to re evaluate categories before the day", "Okay", "", new onMessageButton() {
+                                @Override
+                                public void onPositive() {
+                                    loAdapter.SetDataList(GetList());
+                                }
+
+                                @Override
+                                public void onNegative() {}
+                            });
+                            return;
+                        }
+
+                    }
+
+                    //check permission
+                    if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                        OpenPermission();
+                        return;
+                    }
+
+                    //initliaze camera
+                    mViewModel.InitCamera(getIntent().getStringExtra("transnox"), foDetail, new OnInitializeCameraCallback() {
+                        @Override
+                        public void OnInit() {
+                            poDialog.initDialog("Camera Launch", "Initializing camera. Please wait . .", false);
+                            poDialog.show();
+                        }
+
+                        @Override
+                        public void OnSuccess(Intent intent, String[] args) {
+                            poDialog.dismiss();
+
+                            loImage.setsReferNox(getIntent().getStringExtra("transnox"));
+                            loImage.setsCategrID(foDetail.sCategryID);
+                            loImage.setsImagePth(args[0]); //pass file path
+                            loImage.setsImageNme(args[1]); //pass file name
+
+                            foCamDetail = foDetail;
+
+                            //start camera intent
+                            poCamera.launch(intent);
+                        }
+
+                        @Override
+                        public void OnFailed(String message, Intent intent, String[] args) {
+                            poDialog.dismiss();
+
+                            InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new onMessageButton() {
+                                @Override
+                                public void onPositive() {}
+
+                                @Override
+                                public void onNegative() {}
+                            });
+                        }
+                    });
+
+                }catch (Exception e){
+                    mViewModel.SaveError(TAG, e.getMessage());
                 }
-
-                //initliaze camera
-                mViewModel.InitCamera(new OnInitializeCameraCallback() {
-                    @Override
-                    public void OnInit() {
-                        poDialog.initDialog("Camera Launch", "Initializing camera. Please wait . .", false);
-                        poDialog.show();
-                    }
-
-                    @Override
-                    public void OnSuccess(Intent intent, String[] args) {
-                        poDialog.dismiss();
-
-                        intent.putExtra("sFilePath", args[0]); //pass file path
-                        intent.putExtra("sFilename", args[1]); //pass file name
-
-                        //start camera intent
-                        poCamera.launch(intent);
-                    }
-
-                    @Override
-                    public void OnFailed(String message, Intent intent, String[] args) {
-                        poDialog.dismiss();
-
-                        InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new onMessageButton() {
-                            @Override
-                            public void onPositive() {}
-
-                            @Override
-                            public void onNegative() {}
-                        });
-                    }
-                });
 
             }
 
@@ -505,31 +541,23 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 if (o.getResultCode() == RESULT_OK){
 
-                    Intent camIntent = o.getData();
+                    loFile = new FileUtility(Activity_SSDD_Category.this);
 
-                    if (!camIntent.hasExtra("sFilePath")){
-                        Toast.makeText(Activity_SSDD_Category.this, "File path not found!", Toast.LENGTH_SHORT);
-                        return;
-                    }else if (!camIntent.hasExtra("sFileName")){
-                        Toast.makeText(Activity_SSDD_Category.this, "File name not found!", Toast.LENGTH_SHORT);
-                        return;
-                    }
-                    String lsFilePath = camIntent.getStringExtra("sFilePath");
-                    String lsFileName = camIntent.getStringExtra("sFileName");
-
-                    //save image details
-                    ESSDDImages loImage = new ESSDDImages();
-                    loImage.setsReferNox(getIntent().getStringExtra("transnox"));
-                    loImage.setsImagePth(lsFilePath);
-                    loImage.setsImageNme(lsFileName);
-                    loImage.setsCategrID("");
-                    loImage.setcImgeStat("");
-                    loImage.setdImgeDate("");
+                    //initialize other image properties
+                    loImage.setdImgeDate(loFile.GetFileDate(new File(loImage.getsImagePth()))); //get creation date after successful capture
+                    loImage.setcImgeStat("0");
                     loImage.setsMD5Hashx("");
                     loImage.setsScanndID("");
 
-
+                    //save image
                     mViewModel.SaveImage(loImage);
+
+                    //if selected detail from camera is not null, update evaluation
+                    if (foCamDetail != null){
+                        RateEvaluation(loImage.getsCategrID(), String.valueOf(foCamDetail.ldbl_rating), foCamDetail.lsRemarks);
+                    }
+
+                    Toast.makeText(Activity_SSDD_Category.this, "Image saved succesfully", Toast.LENGTH_SHORT).show();
                 }
             }
         });

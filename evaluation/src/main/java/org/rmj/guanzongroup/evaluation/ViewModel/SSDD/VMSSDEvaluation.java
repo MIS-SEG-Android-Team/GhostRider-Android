@@ -17,12 +17,15 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.etc.AppConstants;
+import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.ImageFileCreator;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
+import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategories;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -128,10 +131,6 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
     public LiveData<List<ESSDDImages>> GetCategoryImages(String fsTransNox, String fsCategory){
         return loEvaluation.GetCategoryImages(fsTransNox, fsCategory);
-    }
-
-    public LiveData<ESSDDImages> GetImage(String fsTransNox, String fsCategory){
-        return loEvaluation.GetImage(fsTransNox, fsCategory);
     }
 
     public ESSDDMaster CreateEvaluation(String fsDeptID, List<ESSDDCategories> foCategories){
@@ -342,9 +341,9 @@ public class VMSSDEvaluation extends AndroidViewModel {
         loEvaluation.UpdateMasterStatus(fsTranStat, fsTransNox);
     }
 
-    public void InitCamera(OnInitializeCameraCallback foListener){
+    public void InitCamera(String fsRefernox, Adapter_SSDDCategories.SSDD_Evaluation_Categories foCategories, OnInitializeCameraCallback foListener){
 
-        ImageFileCreator loImage = new ImageFileCreator(loContext, AppConstants.SUB_FOLDER_SSDD_EVALUATION, poSession.getUserID());
+        ImageFileCreator loImage = new ImageFileCreator(loContext, AppConstants.SUB_FOLDER_SSDD_EVALUATION + "/" + foCategories.sCategryID, poSession.getUserID());
 
         String[] lsResult = new String[4];
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
@@ -356,13 +355,21 @@ public class VMSSDEvaluation extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
-                if(!loImage.IsFileCreated(true)){
+                //do not allow more than 2 images per category
+                if (loEvaluation.CountImagePerCategory(fsRefernox, foCategories.sCategryID) >= 2){
+                    fsMessage = "Only 2 images per category is allowed for evaluation";
+                    return false;
+                }
+
+                //create image file
+                if(!loImage.IsFileCreated(false)){
                     fsMessage = loImage.getMessage();
                     return false;
                 }
 
-                lsResult[0]= loImage.getFilePath();
-                lsResult[1]= loImage.getFileName();
+                //return image result
+                lsResult[0]= loImage.getFilePath(); //image path
+                lsResult[1]= loImage.getFileName(); //image filename
 
                 return true;
             }
@@ -371,7 +378,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
             public void OnPostExecute(Object object) {
 
                 if (!(Boolean) object){
-                    foListener.OnFailed(loImage.getMessage(), null, lsResult);
+                    foListener.OnFailed(fsMessage, null, lsResult);
                 }else {
                     foListener.OnSuccess(loImage.getCameraIntent(), lsResult);
                 }

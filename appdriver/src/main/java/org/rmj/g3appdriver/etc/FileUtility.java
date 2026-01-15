@@ -17,6 +17,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class FileUtility {
 
@@ -53,6 +55,11 @@ public class FileUtility {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public String GetFileDate(File foFile){
+        SimpleDateFormat loFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return loFormat.format(foFile.lastModified());
     }
 
     public File GetFileFromUri(Uri uri) {

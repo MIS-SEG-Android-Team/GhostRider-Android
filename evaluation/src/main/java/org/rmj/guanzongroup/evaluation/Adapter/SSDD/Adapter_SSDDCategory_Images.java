@@ -20,10 +20,16 @@ public class Adapter_SSDDCategory_Images extends RecyclerView.Adapter<Adapter_SS
 
     private List<ESSDDImages> laImages;
     private ViewPager2 loViewPager;
+    private OnImageClickListener foCallback;
 
-    public Adapter_SSDDCategory_Images(List<ESSDDImages> laImages, ViewPager2 loViewPager){
+    public interface OnImageClickListener{
+        void OnImageClick(ESSDDImages loImage);
+    }
+
+    public Adapter_SSDDCategory_Images(List<ESSDDImages> laImages, ViewPager2 loViewPager, OnImageClickListener foCallback){
         this.laImages = laImages;
         this.loViewPager = loViewPager;
+        this.foCallback = foCallback;
     }
 
     @NonNull
@@ -37,7 +43,7 @@ public class Adapter_SSDDCategory_Images extends RecyclerView.Adapter<Adapter_SS
     public void onBindViewHolder(@NonNull VHSSDDCategory_Images holder, int position) {
 
         Glide.with(holder.itemView)
-                .load(laImages.get(position))
+                .load(laImages.get(position).getsImagePth())
                 .fitCenter()
                 .into(holder.img_ssdd);
 
@@ -52,7 +58,16 @@ public class Adapter_SSDDCategory_Images extends RecyclerView.Adapter<Adapter_SS
         holder.img_ssdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                foCallback.OnImageClick(laImages.get(position));
+            }
+        });
 
+        loViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+
+                foCallback.OnImageClick(laImages.get(loViewPager.getCurrentItem()));
             }
         });
 
@@ -63,7 +78,7 @@ public class Adapter_SSDDCategory_Images extends RecyclerView.Adapter<Adapter_SS
         return laImages.size();
     }
 
-    public class VHSSDDCategory_Images extends RecyclerView.ViewHolder {
+    public static class VHSSDDCategory_Images extends RecyclerView.ViewHolder {
 
         private ImageButton img_ssdd;
 

@@ -239,6 +239,21 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                             @Override
                             public void OnClick(ESSDDMaster loHistory) {
 
+                                //ask user to download categories if not found, before proceeding to evaluation
+                                if (mViewModel.GetCategoriesNonLive() == null || mViewModel.GetCategoriesNonLive().size() < 1){
+
+                                    InitMessage(1, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
+                                        @Override
+                                        public void OnPositive() {
+                                            ReDownloadData();
+                                        }
+
+                                        @Override
+                                        public void OnNegative() {}
+                                    });
+                                    return;
+                                }
+
                                 //get the selected evaluation
                                 callback.OnSelectEvaluation(loBundle.getString("dept_id"), loHistory);
                             }

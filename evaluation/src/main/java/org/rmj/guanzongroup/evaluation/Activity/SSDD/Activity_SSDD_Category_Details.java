@@ -2,23 +2,31 @@ package org.rmj.guanzongroup.evaluation.Activity.SSDD;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual;
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_PDFViewer;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
+import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnSwipeListener;
 import org.rmj.g3appdriver.etc.ViewPagerProperty;
@@ -27,6 +35,7 @@ import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategory_Images;
 import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -37,9 +46,12 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
     private MaterialTextView mtv_category, mtv_transnox, mtv_evaluated, mtv_remarks, mtv_rate, mtv_noimage;
     private ViewPager2 vpage_images;
-    private MaterialTextView mtv_company, mtv_version, mtv_dev;
+    private MaterialTextView mtv_company, mtv_version, mtv_dev, mtv_imgnme, mtv_imgdate, mtv_filename, mtv_filedate;
     private ShapeableImageView siv_preview;
     private MaterialCardView mcv_details;
+    private ImageButton btn_upload, btn_memo;
+
+    private ConstraintLayout layout_imginfo;
 
     private GestureDetector gestureDetector;
 
@@ -70,7 +82,15 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
         mtv_dev = findViewById(R.id.mtv_dev);
 
         siv_preview = findViewById(R.id.siv_preview);
+        mtv_imgnme = findViewById(R.id.mtv_imgnme);
+        mtv_imgdate = findViewById(R.id.mtv_imgdate);
+        mtv_filename = findViewById(R.id.mtv_filename);
+        mtv_filedate = findViewById(R.id.mtv_filedate);
+        btn_upload = findViewById(R.id.btn_upload);
+        btn_memo = findViewById(R.id.btn_memo);
+
         mcv_details = findViewById(R.id.mcv_details);
+        layout_imginfo = findViewById(R.id.layout_imginfo);
 
         InitActivity();
     }
@@ -176,6 +196,24 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                     mtv_remarks.setText(essdDetail.getsRemarksx());
                 }
 
+                btn_memo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        ESSDDCategories loCategory = mViewModel.GetCategory(essdDetail.getsCategrID());
+
+                        if (loCategory == null){
+                            Toast.makeText(Activity_SSDD_Category_Details.this, "Category information not found", Toast.LENGTH_LONG);
+                            return;
+                        }
+
+                        Intent loIntent = new Intent(Activity_SSDD_Category_Details.this, Activity_PDFViewer.class);
+                        loIntent.putExtra("pdf_url", loCategory.getsMemoLink());
+                        loIntent.putExtra("pdf_index", loCategory.getnPageNumber());
+                        startActivity(loIntent);
+                        overridePendingTransition(org.rmj.g3appdriver.R.anim.anim_intent_slide_in_right, org.rmj.g3appdriver.R.anim.anim_intent_slide_out_left);
+                    }
+                });
             }
         });
 
@@ -183,18 +221,33 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
             @Override
             public void onChanged(List<ESSDDImages> essddImages) {
 
-                if (essddImages == null){
+                if (essddImages == null || essddImages.size() < 1){
                     mtv_noimage.setVisibility(View.VISIBLE);
                     vpage_images.setVisibility(View.GONE);
+                    layout_imginfo.setVisibility(View.GONE);
                     return;
                 }
 
                 mtv_noimage.setVisibility(View.GONE);
                 vpage_images.setVisibility(View.VISIBLE);
+                layout_imginfo.setVisibility(View.VISIBLE);
 
-                Adapter_SSDDCategory_Images adapter = new Adapter_SSDDCategory_Images(essddImages, vpage_images);
+                Adapter_SSDDCategory_Images adapter = new Adapter_SSDDCategory_Images(essddImages, vpage_images, new Adapter_SSDDCategory_Images.OnImageClickListener() {
+                    @Override
+                    public void OnImageClick(ESSDDImages loImage) {
+
+                        Glide.with(siv_preview.getRootView())
+                                .load(loImage.getsImagePth())
+                                .fitCenter()
+                                .into(siv_preview);
+
+                        mtv_imgnme.setText(loImage.getsImageNme());
+                        mtv_imgdate.setText(loImage.getdImgeDate());
+                        mtv_filename.setText(loImage.getsImageNme());
+                        mtv_filedate.setText(loImage.getdImgeDate());
+                    }
+                });
                 vpage_images.setAdapter(adapter);
-
                 adapter.notifyDataSetChanged();
 
                 /**
@@ -210,10 +263,20 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
                 //todo formula to retain padding (density width - ( 30% of density width ))
                 loViewPagerProperty.initSliderPadding(
-                        new ViewPagerProperty.Padding_Property((int) (densWidth - (densWidth * 0.3)), (int) (densWidth - (densWidth * 0.3)),
+                        new ViewPagerProperty.Padding_Property((int) (densWidth - (densWidth * 0.4)), (int) (densWidth - (densWidth * 0.4)),
                                 0, 0, false, false, 3));
 
                 loViewPagerProperty.initSliderPageTransformer();
+
+            }
+        });
+    }
+
+    private void InitListener(){
+
+        btn_upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
             }
         });
