@@ -16,19 +16,20 @@ import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DImageInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDCategories;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDImages;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDepartment;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
+import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
+import org.rmj.g3appdriver.GCircle.room.Repositories.RImageInfo;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.dev.Api.WebFileServer;
@@ -53,12 +54,13 @@ public class SSDDEvaluation {
 
     private final FileUtility poFile;
     private final AppTokenManager poToken;
+    private final RImageInfo poImage;
 
     private final DSSDDepartment poDeptDao;
     private final DSSDDCategories poCatgDao;
     private final DSSDDMaster poMasterDao;
     private final DSSDDetail poDetailDao;
-    private final DSSDDImages poImagesDao;
+    private final DImageInfo poImageDao;
     private final DErrorLogs poErrorDao;
 
     public SSDDEvaluation(Application poApp){
@@ -70,12 +72,13 @@ public class SSDDEvaluation {
 
         this.poFile = new FileUtility(poApp);
         this.poToken = new AppTokenManager(poApp);
+        this.poImage = new RImageInfo(poApp);
 
         this.poDeptDao = GGC_GCircleDB.getInstance(poApp).ssdDepartmentDao();
         this.poCatgDao = GGC_GCircleDB.getInstance(poApp).ssdCategoriesDao();
         this.poMasterDao = GGC_GCircleDB.getInstance(poApp).ssdMasterDao();
         this.poDetailDao = GGC_GCircleDB.getInstance(poApp).ssdDetailDao();
-        this.poImagesDao = GGC_GCircleDB.getInstance(poApp).dssddImagesDao();
+        this.poImageDao = GGC_GCircleDB.getInstance(poApp).ImageInfoDao();
         this.poErrorDao = GGC_GCircleDB.getInstance(poApp).errorLogsDao();
     }
 
@@ -95,12 +98,8 @@ public class SSDDEvaluation {
         poDetailDao.Rate(fsTransNox, fsCatgrID, fsRating, fsRemarks, fsDate);
     }
 
-    public void SaveImage(ESSDDImages foImage){
-
-        //initialize transaction no and save
-        foImage.setsTransNox(GenerateImageTransNox());
-        foImage.setnEntryNox(String.valueOf(poImagesDao.GetCountPerCategory(foImage.sReferNox, foImage.getsCategrID())));
-        poImagesDao.Save(foImage);
+    public void SaveSSDDImage(String fsTransNox, String fsFileName, String fsFilePath, String fsLongitude, String fsLatitude, String fsCategrID){
+        poImage.SaveSSDDImage(fsTransNox, fsFileName, fsFilePath, fsLongitude, fsLatitude, fsCategrID);
     }
 
     public void UpdateMasterStatus(String fsTranStat, String fsTransNox){
@@ -120,7 +119,7 @@ public class SSDDEvaluation {
     }
 
     public int CountImagePerCategory(String fsRefernox, String fsCategrID){
-        return poImagesDao.GetCountPerCategory(fsRefernox, fsCategrID);
+        return poImageDao.CountImagePerCategory(fsRefernox, fsCategrID);
     }
 
     private String GenerateTransNox(){
@@ -134,22 +133,6 @@ public class SSDDEvaluation {
             lsTransNox = "MX01" +
                     new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
                     poMasterDao.GetCount() + 1;
-        }
-
-        return lsTransNox;
-    }
-
-    private String GenerateImageTransNox(){
-
-        String lsTransNox = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            lsTransNox = "MX01" +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
-                    poImagesDao.GetCount() + 1;
-        }else {
-            lsTransNox = "MX01" +
-                    new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
-                    poImagesDao.GetCount() + 1;
         }
 
         return lsTransNox;
@@ -232,8 +215,8 @@ public class SSDDEvaluation {
         return poDetailDao.GetCategoryDetail(fsTransNox, fsCategory);
     }
 
-    public LiveData<List<ESSDDImages>> GetCategoryImages(String fsTransNox, String fsCategory){
-        return poImagesDao.GetCategoryImages(fsTransNox, fsCategory);
+    public LiveData<List<EImageInfo>> GetCategoryImages(String fsTransNox, String fsCategory){
+        return poImageDao.GetSSDDImagesPerCategory(fsTransNox, fsCategory);
     }
 
     public Boolean DownloadDepartments(){
@@ -405,11 +388,13 @@ public class SSDDEvaluation {
         }
     }
 
-    public Boolean SubmitEvaluation(ESSDDMaster foMaster, List<ESSDDetail> faDetails){
+    public Object[] SubmitEvaluation(ESSDDMaster foMaster, List<ESSDDetail> faDetails){
 
+        Object[] result= new Object[2];
         try {
 
             JSONObject loParams = new JSONObject();
+            loParams.put("sTransNox", foMaster.getsTransNox());
             loParams.put("dTransact", foMaster.getdTransact());
             loParams.put("sDeptIDxx", foMaster.getsDeptIDxx());
             loParams.put("cTranStat", foMaster.getcTranStat());
@@ -432,7 +417,9 @@ public class SSDDEvaluation {
             String lsResponse = WebClient.sendRequest(poApi.getUrlSubmitEvaluation(), loParams.toString(), poHeaders.getHeaders());
             if (lsResponse == null){
                 lsMessage = "Server no response";
-                return false;
+                result[0] = false;
+                result[1] = lsMessage;
+                return result;
             }
 
             JSONObject loResponse = new JSONObject(lsResponse);
@@ -441,95 +428,37 @@ public class SSDDEvaluation {
             if(lsResult.equalsIgnoreCase("error")){
                 JSONObject loError = loResponse.getJSONObject("error");
                 lsMessage = getErrorMessage(loError);;
-                return false;
+                result[0] = false;
+                result[1] = lsMessage;
+                return result;
             }
 
             String lsTransNox = loResponse.getString("sTransNox");
             poDetailDao.Submit(lsTransNox, foMaster.getsTransNox());
             poMasterDao.Submit(lsTransNox, foMaster.getsTransNox());
 
+            //update image reference no
+            if (poImageDao.GetCountPerTransaction(foMaster.getsTransNox()) > 0){
+                poImageDao.UpdateTransNox(lsTransNox, foMaster.getsTransNox());
+            }
+
             //use variable fsmessage to hold the new transaction number
             lsMessage = lsTransNox;
 
-            return true;
+            result[0] = true;
+            result[1] = lsTransNox;
+            return result;
         }catch (Exception e){
             lsMessage = e.getMessage();
-            return false;
+            result[0] = true;
+            result[1] = lsMessage;
+            return result;
         }
     }
 
-    public Boolean SubmitImages(List<ESSDDImages> foImages){
+    public Boolean SubmitImage(EImageInfo foImages){
 
         try {
-
-            String lsClient = poToken.GetClientToken();
-            if(lsClient == null){
-                lsMessage= "No generated client token to upload image";
-                return false;
-            }
-
-            //check image path, if existing
-            for (ESSDDImages loImage : foImages){
-
-                //convert image path into uri and get file
-                Uri loUri = Uri.parse(loImage.getsImagePth());
-                File loFile = poFile.GetFileFromUri(loUri);
-
-                //check if image file is exisiting
-                if (!loFile.exists()){
-                    Log.d("SSDD Image", "File not found for " + loImage.getsImageNme() + ".\nTransaction number: " + loImage.getsTransNox());
-                }
-
-                //check file extension if image type
-                if (poFile.GetMimeType(loUri).equals("image/jpeg") || poFile.GetMimeType(loUri).equals("image/png")){
-                    Log.d("SSDD Image", "File is not valid as image type for " + loImage.getsImageNme() + ".\nTransaction number: " + loImage.getsTransNox());
-                }
-
-//                String lsClient = poToken.GetClientToken();
-//                if(lsClient == null){
-//                    Log.d("SSDD Image", "No generated client token to upload image for " + loImage.getsImageNme() + ".\nTransaction number: " + loImage.getsTransNox());
-//                }
-
-                //save to database
-                JSONObject loParam = new JSONObject();
-                loParam.put("sReferNox", loImage.getsReferNox());
-                loParam.put("sCategrID", loImage.getsCategrID());
-                loParam.put("nEntryNox", loImage.getnEntryNox());
-                loParam.put("sScanndID", loImage.getsScanndID());
-                loParam.put("sImageNme", loImage.getsImageNme());
-                loParam.put("sMD5Hashx", loImage.getsMD5Hashx());
-                loParam.put("sImagePth", loImage.getsImagePth());
-                loParam.put("dImgeDate", loImage.getdImgeDate());
-
-                String lsResponse = WebClient.sendRequest(poApi.getUrlSubmitSSDDImage(), loParam.toString(), poHeaders.getHeaders());
-                if (lsResponse == null){
-                    lsMessage = "Server no response";
-                    return false;
-                }
-
-                JSONObject loResponse = new JSONObject(lsResponse);
-                String lsResult = loResponse.getString("result");
-
-                if(lsResult.equalsIgnoreCase("error")){
-                    JSONObject loError = loResponse.getJSONObject("error");
-                    lsMessage = getErrorMessage(loError);;
-                    return false;
-                }
-
-                Thread.sleep(1000);
-
-                //upload image
-                WebFileServer.UploadFile(
-                        loImage.getsImagePth() + loImage.getsImageNme(),
-                        poToken.GetAccessToken(lsClient),
-                        poFile.GetMimeType(loUri),
-                        "",
-                        loImage.getsImageNme(),
-                        poSession.getUserID(),
-                        "SSDD",
-                        "",
-                        "");
-            }
 
             return true;
         }catch (Exception e){

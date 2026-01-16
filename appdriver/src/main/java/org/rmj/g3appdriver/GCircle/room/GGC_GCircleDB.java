@@ -16,7 +16,6 @@ import android.database.Cursor;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -94,7 +93,6 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRelation;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DRemittanceAccounts;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDCategories;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDImages;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDepartment;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSSDDetail;
@@ -176,7 +174,6 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ERemittanceAccounts;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
@@ -265,8 +262,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         ESSDDepartments.class,
         ESSDDCategories.class,
         ESSDDMaster.class,
-        ESSDDetail.class,
-        ESSDDImages.class}, version = 46, exportSchema = false)
+        ESSDDetail.class}, version = 46, exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -352,7 +348,6 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DSSDDCategories ssdCategoriesDao();
     public abstract DSSDDMaster ssdMasterDao();
     public abstract DSSDDetail ssdDetailDao();
-    public abstract DSSDDImages dssddImagesDao();
 
 
     public static synchronized GGC_GCircleDB getInstance(Context context){

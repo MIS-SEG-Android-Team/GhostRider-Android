@@ -27,6 +27,7 @@ import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeOB;
 import org.rmj.g3appdriver.GCircle.Apps.CashCount.CashCount;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditOnlineApplication;
+import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
 import org.rmj.g3appdriver.GCircle.room.Repositories.DeviceLocationRecords;
 import org.rmj.g3appdriver.lib.Notifications.Obj.Payslip;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
@@ -62,23 +63,23 @@ public class DataSyncService extends BroadcastReceiver {
                         return false;
                     }
 
-//                    SelfieLog loSelfie = new SelfieLog(instance);
-//                    if(loSelfie.UploadSelfieLogs()){
-//                        message = "Selfie log/s uploaded successfully";
-//                        TaskExecutor.ShowProgress(() -> GNotifBuilder.createNotification(instance, GNotifBuilder.BROADCAST_RECEIVER, message, GNotifBuilder.SYNC_PROGRESS).show());
-//                    } else {
-//                        message = loSelfie.getMessage();
-//                        Log.e(TAG, message);
-//                    }
-//                    Thread.sleep(1000);
+                    SelfieLog loSelfie = new SelfieLog(instance);
+                    if(loSelfie.UploadSelfieLogs()){
+                        message = "Selfie log/s uploaded successfully";
+                        TaskExecutor.ShowProgress(() -> GNotifBuilder.createNotification(instance, GNotifBuilder.BROADCAST_RECEIVER, message, GNotifBuilder.SYNC_PROGRESS).show());
+                    } else {
+                        message = loSelfie.getMessage();
+                        Log.e(TAG, message);
+                    }
+                    Thread.sleep(1000);
 
-//                    if(loSelfie.UploadImages()){
-//                        message = "Selfie log image/s uploaded successfully";
-//                        TaskExecutor.ShowProgress(() -> GNotifBuilder.createNotification(instance, GNotifBuilder.BROADCAST_RECEIVER, message, GNotifBuilder.SYNC_PROGRESS).show());
-//                    } else {
-//                        message = loSelfie.getMessage();
-//                        Log.e(TAG, message);
-//                    }
+                    if(loSelfie.UploadImages()){
+                        message = "Selfie log image/s uploaded successfully";
+                        TaskExecutor.ShowProgress(() -> GNotifBuilder.createNotification(instance, GNotifBuilder.BROADCAST_RECEIVER, message, GNotifBuilder.SYNC_PROGRESS).show());
+                    } else {
+                        message = loSelfie.getMessage();
+                        Log.e(TAG, message);
+                    }
                     Thread.sleep(1000);
 
                     EmployeeLeave loLeave = new EmployeeLeave(instance);

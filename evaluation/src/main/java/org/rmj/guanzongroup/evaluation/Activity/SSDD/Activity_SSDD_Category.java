@@ -6,21 +6,18 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultCallerLauncher;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
+import androidx.exifinterface.media.ExifInterface;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,12 +26,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
+import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.etc.DialogDisclosure;
-import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
@@ -43,12 +38,9 @@ import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class Activity_SSDD_Category extends AppCompatActivity {
 
@@ -68,9 +60,10 @@ public class Activity_SSDD_Category extends AppCompatActivity {
     private ESSDDMaster loMaster = new ESSDDMaster();
     private List<ESSDDetail> laDetails = new ArrayList<>();
 
-    private FileUtility loFile;
-    private ESSDDImages loImage;
+    private EImageInfo loImage;
     private Adapter_SSDDCategories.SSDD_Evaluation_Categories foCamDetail;
+
+    private String lsTransNox;
 
     private interface onMessageButton{
         void onPositive();
@@ -87,8 +80,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         poDialog = new LoadDialog(this);
         poMessage = new MessageBox(this);
         dialogDisclosure = new DialogDisclosure(this);
-        loFile = new FileUtility(Activity_SSDD_Category.this);
-        loImage = new ESSDDImages();
+        loImage = new EImageInfo();
 
         mtv_dept = findViewById(R.id.mtv_dept);
         mtv_evaluation = findViewById(R.id.mtv_evaluation);
@@ -98,6 +90,13 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         rcv_adapter = findViewById(R.id.rcv_adapter);
 
         InitActivity();
+    }
+
+    private String GetTransNox(){
+        if (lsTransNox == null){
+            return getIntent().getStringExtra("transnox");
+        }
+        return lsTransNox;
     }
 
     private List<Adapter_SSDDCategories.SSDD_Evaluation_Categories> GetList(){
@@ -164,7 +163,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         try {
 
             //download evaluation details
-            mViewModel.DownloadEvaluationDetails(getIntent().getStringExtra("transnox"), new VMSSDEvaluation.OnDownloadCallback() {
+            mViewModel.DownloadEvaluationDetails(GetTransNox(), new VMSSDEvaluation.OnDownloadCallback() {
                 @Override
                 public void OnLoad(String fsTitlexx, String fsMessage) {
                     poDialog.initDialog(fsTitlexx, fsMessage, false);
@@ -222,7 +221,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 });
             }else {
 
-                //initialize data
+                //initialize observer
                 InitObservers();
 
                 //do not continue if master transaction is not set after data observation
@@ -246,7 +245,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 if (laDetails == null || laDetails.size() < 1){
 
                     //count details
-                    if (mViewModel.CountDetails(getIntent().getStringExtra("transnox")) < 1){
+                    if (mViewModel.CountDetails(GetTransNox()) < 1){
 
                         //ask user to download details, if not found
                         InitMessage(1, R.drawable.baseline_error_24, "No details found for this transaction. Download details?", "Yes", "No", new onMessageButton() {
@@ -280,7 +279,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
     private void InitObservers(){
 
         //initliaze master
-        mViewModel.GetMaster(getIntent().getStringExtra("transnox"), getIntent().getStringExtra("deptid")).observe(Activity_SSDD_Category.this, new Observer<ESSDDMaster>() {
+        mViewModel.GetMaster(GetTransNox(), getIntent().getStringExtra("deptid")).observe(Activity_SSDD_Category.this, new Observer<ESSDDMaster>() {
             @Override
             public void onChanged(ESSDDMaster essddMaster) {
 
@@ -293,7 +292,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 loMaster = essddMaster;
 
-                if (essddMaster.getcTranStat().equals("3")){
+                if (loMaster.getcTranStat().equals("3")){
                     btn_submit.setEnabled(false);
                 }else {
                     btn_submit.setEnabled(true);
@@ -301,20 +300,11 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 //set department name
                 mtv_dept.setText(mViewModel.GetDepartment(loMaster.getsDeptIDxx()).getsDescript());
-
-                //do not allow modifications, if evaluation is already posted
-                if (loMaster.getcTranStat().equals("3")){
-                    rcv_adapter.setEnabled(false);
-                    btn_submit.setEnabled(false);
-                    return;
-                }
-                rcv_adapter.setEnabled(true);
-                btn_submit.setEnabled(true);
             }
         });
 
         //initialize detail
-        mViewModel.GetDetail(getIntent().getStringExtra("transnox")).observe(Activity_SSDD_Category.this, new Observer<List<ESSDDetail>>() {
+        mViewModel.GetDetail(GetTransNox()).observe(Activity_SSDD_Category.this, new Observer<List<ESSDDetail>>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onChanged(List<ESSDDetail> essdDetails) {
@@ -329,11 +319,6 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 //initialize list, and update the list
                 laDetails= essdDetails;
 
-                //check if adapter is initialized
-                if (loAdapter == null){
-                    return;
-                }
-
                 //initialize master details
                 double ldbl_totalRating = 0.0;
                 int ntotalEvaluated = 0;
@@ -345,8 +330,18 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     }
                 }
 
+                //check if adapter is initialized
+                if (loAdapter == null){
+                    return;
+                }
+
                 //update adapter item list
                 loAdapter.SetDataList(GetList());
+
+                //if all are evaluated and status is not posted '3', close evaluation status '1'
+                if (ntotalEvaluated == laDetails.size()){
+                    mViewModel.UpdateMasterStatus("1", GetTransNox());
+                }
 
                 //display total
                 mtv_evaluation.setText(ntotalEvaluated + " out of " + laDetails.size());
@@ -469,13 +464,16 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     }
 
                     //check permission
-                    if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                            checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
                         OpenPermission();
                         return;
                     }
 
                     //initliaze camera
-                    mViewModel.InitCamera(getIntent().getStringExtra("transnox"), foDetail, new OnInitializeCameraCallback() {
+                    mViewModel.InitCamera(GetTransNox(), foDetail, new OnInitializeCameraCallback() {
                         @Override
                         public void OnInit() {
                             poDialog.initDialog("Camera Launch", "Initializing camera. Please wait . .", false);
@@ -486,10 +484,12 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                         public void OnSuccess(Intent intent, String[] args) {
                             poDialog.dismiss();
 
-                            loImage.setsReferNox(getIntent().getStringExtra("transnox"));
-                            loImage.setsCategrID(foDetail.sCategryID);
-                            loImage.setsImagePth(args[0]); //pass file path
-                            loImage.setsImageNme(args[1]); //pass file name
+                            loImage.setSourceNo(GetTransNox());
+                            loImage.setFileLoct(args[0]); //pass file path
+                            loImage.setImageNme(args[1]); //pass file name
+                            loImage.setFileCode(args[2]); //pass category id
+                            loImage.setLongitud(args[3]); //pass longitude
+                            loImage.setLatitude(args[4]); //pass latitude
 
                             foCamDetail = foDetail;
 
@@ -503,7 +503,21 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                             InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new onMessageButton() {
                                 @Override
-                                public void onPositive() {}
+                                public void onPositive() {
+
+                                    loImage.setSourceNo(GetTransNox());
+                                    loImage.setFileLoct(args[0]); //pass file name
+                                    loImage.setImageNme(args[1]); //pass file name
+                                    loImage.setFileCode(args[2]); //pass category id
+                                    loImage.setLongitud(args[3]); //pass longitude
+                                    loImage.setLatitude(args[4]); //pass latitude
+
+                                    foCamDetail = foDetail;
+
+                                    //start camera intent
+                                    poCamera.launch(intent);
+
+                                }
 
                                 @Override
                                 public void onNegative() {}
@@ -522,7 +536,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 //proceed to category details
                 Intent loIntent = new Intent(Activity_SSDD_Category.this, Activity_SSDD_Category_Details.class);
-                loIntent.putExtra("transnox", getIntent().getStringExtra("transnox"));
+                loIntent.putExtra("transnox", GetTransNox());
                 loIntent.putExtra("categoryid", fsCategoryID);
                 startActivity(loIntent);
 
@@ -539,33 +553,95 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             @Override
             public void onActivityResult(ActivityResult o) {
 
-                if (o.getResultCode() == RESULT_OK){
+                try {
 
-                    loFile = new FileUtility(Activity_SSDD_Category.this);
+                    if (o.getResultCode() == RESULT_OK){
 
-                    //initialize other image properties
-                    loImage.setdImgeDate(loFile.GetFileDate(new File(loImage.getsImagePth()))); //get creation date after successful capture
-                    loImage.setcImgeStat("0");
-                    loImage.setsMD5Hashx("");
-                    loImage.setsScanndID("");
+                        //TODO: 1. GET COORDINATES OF CAPTURED IMAGE'S PROPERTIES,
+                        // NOTE: TO GET THIS PROPERLY. ENABLE MANUALLY THE TAG LOCATION SETTINGS ON CAMERA WITHIN THE APP
+                        @SuppressLint({"NewApi", "LocalSuppress"}) ExifInterface exifInterface =
+                                new ExifInterface(
+                                        Objects.requireNonNull(getContentResolver().openInputStream(
+                                                MediaStore.setRequireOriginal(Uri.fromFile(new File(loImage.getFileLoct())))
+                                        ))
+                                );
 
-                    //save image
-                    mViewModel.SaveImage(loImage);
+                        //TODO: 2. SET IMAGE COORDINATES, IF NOT EMPTY
+                        if (exifInterface.getLatLong() != null){
 
-                    //if selected detail from camera is not null, update evaluation
-                    if (foCamDetail != null){
-                        RateEvaluation(loImage.getsCategrID(), String.valueOf(foCamDetail.ldbl_rating), foCamDetail.lsRemarks);
+                            Log.d(TAG, "Image Longitude is " + String.valueOf(Objects.requireNonNull(exifInterface.getLatLong())[1])
+                                    + " and Image Latitude is " + String.valueOf(exifInterface.getLatLong()[0]));
+
+                            loImage.setLatitude(String.valueOf(exifInterface.getLatLong()[0]));
+                            loImage.setLongitud(String.valueOf(exifInterface.getLatLong()[1]));
+                        }
+
+                        //TODO: 3. VALIDATE SAVED COORDINATES
+                        if (loImage.getLongitud() == null || loImage.getLatitude() == null){
+                            InitMessage(0, R.drawable.baseline_error_24, "Unable to get location coordinates. Please inform your superior for this matter.", "Okay", "", new onMessageButton() {
+                                @Override
+                                public void onPositive() {
+
+                                }
+
+                                @Override
+                                public void onNegative() {
+
+                                }
+                            });
+                            return;
+                        }
+
+                        if (loImage.getLongitud().isEmpty() || loImage.getLatitude().isEmpty()){
+                            InitMessage(0, R.drawable.baseline_error_24, "Location coordinates is empty. Please inform your superior for this matter.", "Okay", "", new onMessageButton() {
+                                @Override
+                                public void onPositive() {
+
+                                }
+
+                                @Override
+                                public void onNegative() {
+
+                                }
+                            });
+                            return;
+                        }
+
+                        if (loImage.getLongitud().equalsIgnoreCase("0.00000000000") || loImage.getLatitude().equalsIgnoreCase("0.00000000000")) {
+                            InitMessage(0, R.drawable.baseline_error_24, "Location coordinates is invalid. Please inform your superior for this matter.", "Okay", "", new onMessageButton() {
+                                @Override
+                                public void onPositive() {
+
+                                }
+
+                                @Override
+                                public void onNegative() {
+
+                                }
+                            });
+                            return;
+                        }
+
+                        //save image
+                        mViewModel.SaveImage(loImage.getSourceNo(), loImage.getImageNme(), loImage.getFileLoct(), loImage.getLongitud(), loImage.getLatitude(), loImage.getFileCode());
+
+                        //if selected detail from camera is not null, update evaluation
+                        if (foCamDetail != null){
+                            RateEvaluation(foCamDetail.sCategryID, String.valueOf(foCamDetail.ldbl_rating), foCamDetail.lsRemarks);
+                        }
+
+                        Toast.makeText(Activity_SSDD_Category.this, "Image saved succesfully", Toast.LENGTH_SHORT).show();
                     }
 
-                    Toast.makeText(Activity_SSDD_Category.this, "Image saved succesfully", Toast.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    mViewModel.SaveError("SSSDD Evaluation", e.getMessage());
                 }
             }
         });
     }
 
     private void RateEvaluation(String fsCatgrID, String fsRating, String fsRemarks){
-
-        mViewModel.Rate(getIntent().getStringExtra("transnox"), fsCatgrID, String.valueOf(fsRating), fsRemarks, mViewModel.GetDateToday());
+        mViewModel.Rate(loMaster.getsTransNox(), fsCatgrID, String.valueOf(fsRating), fsRemarks, mViewModel.GetDateToday());
     }
 
     private void SubmitEvaluation(){
@@ -607,20 +683,8 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     InitMessage(0, R.drawable.baseline_message_24, "Evaluation submitted successfully", "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {
-
-                            int ntotalEvaluated = 0;
-                            for (ESSDDetail loDetail: laDetails) {
-
-                                if (loDetail.getdEvaluate() != null && !loDetail.getdEvaluate().trim().isEmpty()){
-                                    ntotalEvaluated++;
-                                }
-                            }
-
-                            //if all are evaluated and status is not posted '3', close evaluation status '1'
-                            if (ntotalEvaluated == laDetails.size() && !loMaster.getcTranStat().equals("3")){
-                                mViewModel.UpdateMasterStatus("1", loMaster.getsTransNox());
-                            }
-                            finish();
+                            lsTransNox = fsTransNox;
+                            InitObservers();
                         }
 
                         @Override

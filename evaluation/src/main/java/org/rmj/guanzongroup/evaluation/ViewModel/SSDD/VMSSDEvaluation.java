@@ -3,6 +3,7 @@ package org.rmj.guanzongroup.evaluation.ViewModel.SSDD;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -11,21 +12,22 @@ import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Apps.SSDD.SSDDEvaluation;
+import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.ImageFileCreator;
 import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
+import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
+import org.rmj.g3appdriver.lib.Location.LocationRetriever;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategories;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -129,7 +131,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         return loEvaluation.GetCategoryDetail(fsTransNox, fsCategory);
     }
 
-    public LiveData<List<ESSDDImages>> GetCategoryImages(String fsTransNox, String fsCategory){
+    public LiveData<List<EImageInfo>> GetCategoryImages(String fsTransNox, String fsCategory){
         return loEvaluation.GetCategoryImages(fsTransNox, fsCategory);
     }
 
@@ -145,7 +147,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
     public interface OnSubmitCallback{
         void OnLoad(String fsTitlexx, String fsMessage);
-        void OnSuccess(String fsTransNox);
+        void OnSuccess(String fsTransnox);
         void OnFailed(String fsMessage);
     }
     
@@ -308,33 +310,37 @@ public class VMSSDEvaluation extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
+                Object[] result = new Object[2];
+
                 if (!loConnect.isDeviceConnected()){
-                    fsMessage = loConnect.getMessage();
-                    return false;
+                    result[0] = false;
+                    result[1] = loConnect.getMessage();
+                    return result;
                 }
 
-                if (!loEvaluation.SubmitEvaluation(foMaster, faDetails)){
-                    fsMessage = loEvaluation.GetMessage();
-                    return false;
-                }
-                //new transaction number
-                fsMessage = loEvaluation.GetMessage();
-                return true;
+                Object[] laRresult = loEvaluation.SubmitEvaluation(foMaster, faDetails);
+
+                result[0] = laRresult[0];
+                result[1] = laRresult[1];
+
+                return result;
             }
 
             @Override
             public void OnPostExecute(Object object) {
-                if ((Boolean) object){
-                    foCallback.OnSuccess(fsMessage);
+                Object[] laResult = (Object[]) object;
+
+                if (!(Boolean) laResult[0]){
+                    foCallback.OnFailed((String) laResult[1]);
                 }else {
-                    foCallback.OnFailed(fsMessage);
+                    foCallback.OnSuccess((String) laResult[1]);
                 }
             }
         });
     }
 
-    public void SaveImage(ESSDDImages foImage){
-        loEvaluation.SaveImage(foImage);
+    public void SaveImage(String fsTransNox, String fsFileName, String fsFilePath, String fsLongitude, String fsLatitude, String fsCategrID){
+        loEvaluation.SaveSSDDImage(fsTransNox, fsFileName, fsFilePath, fsLongitude, fsLatitude, fsCategrID);
     }
 
     public void UpdateMasterStatus(String fsTranStat, String fsTransNox){
@@ -343,9 +349,9 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
     public void InitCamera(String fsRefernox, Adapter_SSDDCategories.SSDD_Evaluation_Categories foCategories, OnInitializeCameraCallback foListener){
 
-        ImageFileCreator loImage = new ImageFileCreator(loContext, AppConstants.SUB_FOLDER_SSDD_EVALUATION + "/" + foCategories.sCategryID, poSession.getUserID());
+        ImageFileCreator loImage = new ImageFileCreator(loContext, AppConstants.SUB_FOLDER_SSDD_EVALUATION  + "/" + fsRefernox +"/" + foCategories.sCategryID, poSession.getUserID() );
 
-        String[] lsResult = new String[4];
+        String[] lsResult = new String[5];
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -370,6 +376,40 @@ public class VMSSDEvaluation extends AndroidViewModel {
                 //return image result
                 lsResult[0]= loImage.getFilePath(); //image path
                 lsResult[1]= loImage.getFileName(); //image filename
+                lsResult[2]= foCategories.sCategryID; //image filename
+
+                String lsCompx = android.os.Build.MANUFACTURER.toLowerCase();
+                LocationRetriever.iLocationRetriever location;
+
+                if (!lsCompx.equalsIgnoreCase("huawei")) {
+                    location = new GmsLocationRetriever();
+                } else {
+                    location = new HmsLocationRetriever();
+                }
+
+                location.GetLocation(loContext, new LocationRetriever.OnRetrieveLocationListener() {
+                    @Override
+                    public void OnRetrieve(String latitude, String longitude) {
+                        lsResult[3] = latitude;
+                        lsResult[4] = longitude;
+
+                        Intent loIntent = loImage.getCameraIntent();
+                        loIntent.putExtra("result", true);
+
+                        foListener.OnSuccess(loIntent, lsResult);
+                    }
+
+                    @Override
+                    public void OnFailed(String message, String latitude, String longitude) {
+                        lsResult[3] = latitude;
+                        lsResult[4] = longitude;
+
+                        Intent loIntent = loImage.getCameraIntent();
+                        loIntent.putExtra("result", false);
+
+                        foListener.OnFailed(message, loIntent, lsResult);
+                    }
+                });
 
                 return true;
             }
@@ -377,11 +417,6 @@ public class VMSSDEvaluation extends AndroidViewModel {
             @Override
             public void OnPostExecute(Object object) {
 
-                if (!(Boolean) object){
-                    foListener.OnFailed(fsMessage, null, lsResult);
-                }else {
-                    foListener.OnSuccess(loImage.getCameraIntent(), lsResult);
-                }
             }
         });
     }

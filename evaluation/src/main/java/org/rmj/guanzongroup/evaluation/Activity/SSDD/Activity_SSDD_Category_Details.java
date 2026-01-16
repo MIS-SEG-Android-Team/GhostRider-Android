@@ -21,12 +21,10 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual;
 import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_PDFViewer;
+import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
-import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnSwipeListener;
 import org.rmj.g3appdriver.etc.ViewPagerProperty;
@@ -35,7 +33,6 @@ import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategory_Images;
 import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 
-import java.io.File;
 import java.util.List;
 
 
@@ -217,9 +214,9 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
             }
         });
 
-        mViewModel.GetCategoryImages(getIntent().getStringExtra("transnox"), getIntent().getStringExtra("categoryid")).observe(Activity_SSDD_Category_Details.this, new Observer<List<ESSDDImages>>() {
+        mViewModel.GetCategoryImages(getIntent().getStringExtra("transnox"), getIntent().getStringExtra("categoryid")).observe(Activity_SSDD_Category_Details.this, new Observer<List<EImageInfo>>() {
             @Override
-            public void onChanged(List<ESSDDImages> essddImages) {
+            public void onChanged(List<EImageInfo> essddImages) {
 
                 if (essddImages == null || essddImages.size() < 1){
                     mtv_noimage.setVisibility(View.VISIBLE);
@@ -234,17 +231,17 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
                 Adapter_SSDDCategory_Images adapter = new Adapter_SSDDCategory_Images(essddImages, vpage_images, new Adapter_SSDDCategory_Images.OnImageClickListener() {
                     @Override
-                    public void OnImageClick(ESSDDImages loImage) {
+                    public void OnImageClick(EImageInfo loImage) {
 
                         Glide.with(siv_preview.getRootView())
-                                .load(loImage.getsImagePth())
+                                .load(loImage.getFileLoct())
                                 .fitCenter()
                                 .into(siv_preview);
 
-                        mtv_imgnme.setText(loImage.getsImageNme());
-                        mtv_imgdate.setText(loImage.getdImgeDate());
-                        mtv_filename.setText(loImage.getsImageNme());
-                        mtv_filedate.setText(loImage.getdImgeDate());
+                        mtv_imgnme.setText(loImage.getImageNme());
+                        mtv_imgdate.setText(loImage.getCaptured());
+                        mtv_filename.setText(loImage.getImageNme());
+                        mtv_filedate.setText(loImage.getCaptured());
                     }
                 });
                 vpage_images.setAdapter(adapter);

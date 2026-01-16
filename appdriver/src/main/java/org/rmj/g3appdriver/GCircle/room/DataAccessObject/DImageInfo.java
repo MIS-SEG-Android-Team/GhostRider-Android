@@ -31,8 +31,22 @@ public interface DImageInfo {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(EImageInfo imageInfo);
 
+    @Query("UPDATE Image_Information SET sSourceNo = :fsSource WHERE sSourceNo = :fsOldTransNox")
+    void UpdateTransNox(String fsSource, String fsOldTransNox);
+
     @Query("SELECT COUNT (*) FROM Image_Information")
     int GetRowsCountForID();
+
+    @Query("SELECT COUNT(*) FROM Image_Information " +
+            "WHERE sSourceNo = :fsSource " +
+            "AND sFileCode = :fsCategrID " +
+            "AND sSourceCD = 'SSDD'")
+    int CountImagePerCategory(String fsSource, String fsCategrID);
+
+    @Query("SELECT COUNT(*) FROM Image_Information " +
+            "WHERE sSourceNo = :fsSource " +
+            "AND sSourceCD = 'SSDD'")
+    int GetCountPerTransaction(String fsSource);
 
     @Query("SELECT * FROM Image_Information WHERE sTransNox =:TransNox")
     EImageInfo GetImageInfo(String TransNox);
@@ -63,6 +77,12 @@ public interface DImageInfo {
     LiveData<List<EImageInfo>> getUnsentDCPImageInfoList();
 
     @Query("SELECT * FROM Image_Information " +
+            "WHERE sSourceNo = :fsSource " +
+            "AND sFileCode = :fsCategrID " +
+            "AND sSourceCD = 'SSDD'")
+    LiveData<List<EImageInfo>> GetSSDDImagesPerCategory(String fsSource, String fsCategrID);
+
+    @Query("SELECT * FROM Image_Information " +
             "WHERE sDtlSrcNo = :sDtlSrcNo AND " +
             "sImageNme = :sImageNme")
     LiveData<EImageInfo> getImageLocation(String sDtlSrcNo, String sImageNme);
@@ -81,4 +101,5 @@ public interface DImageInfo {
 
     @Query("SELECT * FROM Image_Information WHERE sSourceNo =:TransNox AND sDtlSrcNo=:AccntNo")
     EImageInfo getDCPImageInfoForPosting(String TransNox, String AccntNo);
+
 }

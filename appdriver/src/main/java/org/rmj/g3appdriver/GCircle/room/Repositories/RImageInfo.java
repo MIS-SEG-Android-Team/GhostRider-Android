@@ -65,10 +65,6 @@ public class RImageInfo {
         return poDao.getImageLocation(sDtlSrcNo, sImageNme);
     }
 
-    public String GetImageFileLocation(String TransNox){
-        return poDao.GetImageFileLocation(TransNox);
-    }
-
     public List<EImageInfo> getUnsentSelfieLogImageList(){
         return poDao.getUnsentLoginImageInfo();
     }
@@ -309,6 +305,46 @@ public class RImageInfo {
             message = getLocalMessage(e);
             return null;
         }
+    }
+
+    /**
+     *
+     * @param args SSDD transaction number
+     * @param args1 image file name
+     * @param args2 image file location
+     * @param args3 current device location (Longitude)
+     * @param args4 current device location (Latitude)
+     * @param args5 category id / file code
+     * @return returns transaction no. if operation succeed, else null if operation fails. Call getMessage() to get error message.
+     */
+    public String SaveSSDDImage(String args, String args1, String args2, String args3, String args4, String args5){
+
+        try{
+            EImageInfo loImage = new EImageInfo();
+            String lsTransNo = CreateUniqueID();
+
+            loImage.setTransNox(lsTransNo);
+            loImage.setFileCode(args5);
+            loImage.setDtlSrcNo(poSession.getUserID());
+            loImage.setSourceCD("SSDD");
+            loImage.setMD5Hashx(WebFileServer.createMD5Hash(args1));
+            loImage.setCaptured(AppConstants.DATE_MODIFIED());
+            loImage.setSourceNo(args);
+            loImage.setImageNme(args1);
+            loImage.setFileLoct(args2);
+            loImage.setLongitud(args3);
+            loImage.setLatitude(args4);
+
+            poDao.SaveImageInfo(loImage);
+            Log.d(TAG, "SSDD Image has been saved.");
+
+            return lsTransNo;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return null;
+        }
+
     }
 
     /**

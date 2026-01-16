@@ -444,15 +444,6 @@ public class VMSelfieLog extends AndroidViewModel {
         });
     }
 
-    public void InitFaceMesh(Activity foActvity){
-        try{
-
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
     public void SaveError(String source, String message){
         poSys.SaveError(source, message);
     }

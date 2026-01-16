@@ -11,22 +11,22 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDImages;
+import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.guanzongroup.evaluation.R;
 
 import java.util.List;
 
 public class Adapter_SSDDCategory_Images extends RecyclerView.Adapter<Adapter_SSDDCategory_Images.VHSSDDCategory_Images>{
 
-    private List<ESSDDImages> laImages;
+    private List<EImageInfo> laImages;
     private ViewPager2 loViewPager;
     private OnImageClickListener foCallback;
 
     public interface OnImageClickListener{
-        void OnImageClick(ESSDDImages loImage);
+        void OnImageClick(EImageInfo loImage);
     }
 
-    public Adapter_SSDDCategory_Images(List<ESSDDImages> laImages, ViewPager2 loViewPager, OnImageClickListener foCallback){
+    public Adapter_SSDDCategory_Images(List<EImageInfo> laImages, ViewPager2 loViewPager, OnImageClickListener foCallback){
         this.laImages = laImages;
         this.loViewPager = loViewPager;
         this.foCallback = foCallback;
@@ -43,7 +43,7 @@ public class Adapter_SSDDCategory_Images extends RecyclerView.Adapter<Adapter_SS
     public void onBindViewHolder(@NonNull VHSSDDCategory_Images holder, int position) {
 
         Glide.with(holder.itemView)
-                .load(laImages.get(position).getsImagePth())
+                .load(laImages.get(position).getFileLoct())
                 .fitCenter()
                 .into(holder.img_ssdd);
 

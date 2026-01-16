@@ -45,20 +45,8 @@ public interface DSelfieLog {
     @Query("UPDATE Employee_Log_Selfie SET sImageIDx =:ImageID WHERE sTransNox =:TransNox")
     void updateSelfieLogImageID(String TransNox, String ImageID);
 
-    @Query("UPDATE Employee_Log_Selfie " +
-            "SET cSendStat = '1', " +
-            "sImageIDx =:NewImgID " +
-            "WHERE sImageIDx =:OldImgID")
-    void UpdateUploadedSelfieImageToLog(String OldImgID, String NewImgID);
-
     @Query("SELECT * FROM Employee_Log_Selfie WHERE cSendStat <> '1'")
     List<ESelfieLog> GetSelfieLogsForUpload();
-
-    @Query("SELECT * FROM Employee_Log_Selfie " +
-            "WHERE sEmployID = (SELECT sEmployID FROM User_Info_Master) " +
-            "AND dTransact =:fsVal " +
-            "ORDER BY dLogTimex DESC")
-    LiveData<List<ESelfieLog>> getAllEmployeeTimeLog(String fsVal);
 
     @Query("SELECT COUNT(*) FROM Employee_Log_Selfie WHERE sBranchCd=:BranchCd AND dTransact=:Transact")
     int checkBranchCodeIfExist(String BranchCd, String Transact);
