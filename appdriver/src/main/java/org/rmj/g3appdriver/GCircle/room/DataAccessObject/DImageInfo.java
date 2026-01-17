@@ -31,8 +31,11 @@ public interface DImageInfo {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(EImageInfo imageInfo);
 
-    @Query("UPDATE Image_Information SET sSourceNo = :fsSource WHERE sSourceNo = :fsOldTransNox")
+    @Query("UPDATE Image_Information SET sTransNox = :fsSource WHERE sTransNox = :fsOldTransNox")
     void UpdateTransNox(String fsSource, String fsOldTransNox);
+
+    @Query("UPDATE Image_Information SET sSourceNo = :fsSource WHERE sSourceNo = :fsOldTransNox")
+    void UpdateSourceNo(String fsSource, String fsOldTransNox);
 
     @Query("SELECT COUNT (*) FROM Image_Information")
     int GetRowsCountForID();
@@ -48,9 +51,6 @@ public interface DImageInfo {
             "AND sSourceCD = 'SSDD'")
     int GetCountPerTransaction(String fsSource);
 
-    @Query("SELECT * FROM Image_Information WHERE sTransNox =:TransNox")
-    EImageInfo GetImageInfo(String TransNox);
-
     /**
      *
      * @param TransNox pass the new transaction no which will be return by API after uploading image...
@@ -63,6 +63,14 @@ public interface DImageInfo {
             "dSendDate =:DateModifield " +
             "WHERE sTransNox =:oldTransNox")
     void updateImageInfo(String TransNox, String DateModifield, String oldTransNox);
+
+    @Query("SELECT * FROM Image_Information WHERE sTransNox =:TransNox")
+    EImageInfo GetImageInfo(String TransNox);
+
+    @Query("SELECT * FROM Image_Information " +
+            "WHERE sSourceCD = 'SSDD' " +
+            "AND cSendStat <> '1'")
+    List<EImageInfo> GetSSDDImagesForUpload();
 
     /**
      *
@@ -83,12 +91,15 @@ public interface DImageInfo {
     LiveData<List<EImageInfo>> GetSSDDImagesPerCategory(String fsSource, String fsCategrID);
 
     @Query("SELECT * FROM Image_Information " +
+            "WHERE sSourceCD = 'SSDD' " +
+            "AND cSendStat <> '1' " +
+            "AND sSourceNo = :fsSourceNo")
+    LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo);
+
+    @Query("SELECT * FROM Image_Information " +
             "WHERE sDtlSrcNo = :sDtlSrcNo AND " +
             "sImageNme = :sImageNme")
     LiveData<EImageInfo> getImageLocation(String sDtlSrcNo, String sImageNme);
-
-    @Query("SELECT sFileLoct FROM Image_Information WHERE sTransNox =:TrasNox")
-    String GetImageFileLocation(String TrasNox);
 
     @Query("SELECT * FROM Image_Information WHERE sFileCode = '0021' AND cSendStat <> '1'")
     List<EImageInfo> getUnsentLoginImageInfo();

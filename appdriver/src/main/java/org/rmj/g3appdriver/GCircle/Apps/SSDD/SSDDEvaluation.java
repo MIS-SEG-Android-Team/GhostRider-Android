@@ -3,7 +3,6 @@ package org.rmj.g3appdriver.GCircle.Apps.SSDD;
 import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 
 import android.app.Application;
-import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
@@ -12,6 +11,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.rmj.apprdiver.util.WebFile;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
@@ -32,10 +32,8 @@ import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RImageInfo;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
-import org.rmj.g3appdriver.dev.Api.WebFileServer;
 import org.rmj.g3appdriver.etc.FileUtility;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -183,14 +181,6 @@ public class SSDDEvaluation {
         return poCatgDao.GetCategoriesNonLive();
     }
 
-    public ESSDDCategories GetCategory(String fsCategory){
-        return poCatgDao.GetCategory(fsCategory);
-    }
-
-    public ESSDDepartments GetDepartment(String fsDeptIDxx){
-        return poDeptDao.GetDepartment(fsDeptIDxx);
-    }
-
     public LiveData<List<ESSDDepartments>> GetDepartments(){
         return poDeptDao.GetDepartmentList();
     }
@@ -217,6 +207,18 @@ public class SSDDEvaluation {
 
     public LiveData<List<EImageInfo>> GetCategoryImages(String fsTransNox, String fsCategory){
         return poImageDao.GetSSDDImagesPerCategory(fsTransNox, fsCategory);
+    }
+
+    public LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo){
+        return poImageDao.GetTransactionImagesForUpload(fsSourceNo);
+    }
+
+    public ESSDDCategories GetCategory(String fsCategory){
+        return poCatgDao.GetCategory(fsCategory);
+    }
+
+    public ESSDDepartments GetDepartment(String fsDeptIDxx){
+        return poDeptDao.GetDepartment(fsDeptIDxx);
     }
 
     public Boolean DownloadDepartments(){
@@ -388,6 +390,109 @@ public class SSDDEvaluation {
         }
     }
 
+    public Boolean DownloadImageCategory(String fsTransNox, String fsCategrID){
+
+        try {
+
+            JSONObject loParams = new JSONObject();
+            loParams.put("sTransNox", fsTransNox);
+            loParams.put("sCategrID", fsCategrID);
+
+            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDImageCategory(),loParams.toString(), poHeaders.getHeaders());
+            if (lsResponse == null){
+                lsMessage = "Server no response";
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                lsMessage = getErrorMessage(loError);;
+                return false;
+            }
+
+            JSONArray laDetail = loResponse.getJSONArray("detail");
+            for (int i = 0; i < laDetail.length(); i++) {
+
+                JSONObject loResult = laDetail.getJSONObject(i);
+
+                EImageInfo loDetail = new EImageInfo();
+                loDetail.setTransNox(loResult.getString("sTransNox"));
+                loDetail.setFileCode(fsCategrID);
+                loDetail.setImageNme(loResult.getString("sImageNme"));
+                loDetail.setFileLoct(loResult.getString("sImagePth"));
+                loDetail.setSourceNo(fsTransNox);
+                loDetail.setSourceCD("SSDD");
+                loDetail.setSendStat("1");
+                loDetail.setCaptured(loResult.getString("dImgeDate"));
+                loDetail.setMD5Hashx(loResult.getString("sMD5Hashx"));
+                loDetail.setDtlSrcNo(poSession.getUserID());
+                loDetail.setSendDate(loResult.getString("dTimeStmp"));
+                loDetail.setLongitud("0.0");
+                loDetail.setLatitude("0.0");
+
+                poImageDao.SaveImageInfo(loDetail);
+            }
+
+            return true;
+        }catch (Exception e){
+            lsMessage = e.getMessage();
+            return false;
+        }
+    }
+
+    public Boolean SubmitSSDDImagesForUpload(){
+
+        try {
+
+            if (poImageDao.GetSSDDImagesForUpload() == null || poImageDao.GetSSDDImagesForUpload().size() < 1){
+                return false;
+            }
+
+            boolean isSuccess = true;
+
+            List<EImageInfo> laImages =  poImageDao.GetSSDDImagesForUpload();
+            for (EImageInfo loImage : laImages){
+
+                String lsOldTransnox = loImage.getTransNox();
+
+                //if uploading successful,
+                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                if (lsImageID != null && !lsImageID.isEmpty()){
+
+                    JSONObject loParams = new JSONObject();
+                    loParams.put("sTransNox", lsOldTransnox);
+                    loParams.put("sSourceNo", lsOldTransnox);
+
+                    String lsResponse = WebClient.sendRequest(poApi.getUrlUpdateSSDDTransaction(), loParams.toString(), poHeaders.getHeaders());
+                    if (lsResponse == null){
+                        lsMessage = "Server no response";
+                        isSuccess = false;
+                        break;
+                    }
+
+                    JSONObject loResponse = new JSONObject(lsResponse);
+                    String lsResult = loResponse.getString("result");
+
+                    if(lsResult.equalsIgnoreCase("error")){
+                        JSONObject loError = loResponse.getJSONObject("error");
+                        lsMessage = getErrorMessage(loError);;
+                        isSuccess = false;
+                        break;
+                    }
+                    Thread.sleep(1000);
+                }
+            }
+            return isSuccess;
+
+        }catch (Exception e){
+            lsMessage = e.getMessage();
+            return false;
+        }
+    }
+
     public Object[] SubmitEvaluation(ESSDDMaster foMaster, List<ESSDDetail> faDetails){
 
         Object[] result= new Object[2];
@@ -439,31 +544,78 @@ public class SSDDEvaluation {
 
             //update image reference no
             if (poImageDao.GetCountPerTransaction(foMaster.getsTransNox()) > 0){
-                poImageDao.UpdateTransNox(lsTransNox, foMaster.getsTransNox());
+                poImageDao.UpdateSourceNo(lsTransNox, foMaster.getsTransNox());
             }
-
-            //use variable fsmessage to hold the new transaction number
-            lsMessage = lsTransNox;
 
             result[0] = true;
             result[1] = lsTransNox;
             return result;
         }catch (Exception e){
             lsMessage = e.getMessage();
-            result[0] = true;
+            result[0] = false;
             result[1] = lsMessage;
             return result;
         }
     }
 
-    public Boolean SubmitImage(EImageInfo foImages){
+    public Object[] SubmitImage(EImageInfo foImages){
 
+        Object[] result= new Object[2];
         try {
 
-            return true;
+            JSONObject loParams = new JSONObject();
+
+            //if uploading successful, set transaction number as parameter for uploading image
+            String lsImageID = poImage.UploadImage(foImages.getTransNox());
+            if (lsImageID != null && !lsImageID.isEmpty()){
+                loParams.put("sTransNox", lsImageID);
+                Log.d("SSDDEvaluation", lsImageID);
+            }
+
+            //initialize other parameters
+            loParams.put("sReferNox", foImages.getSourceNo());
+            loParams.put("sCategrID", foImages.getFileCode());
+            loParams.put("sScanndID", "");
+            loParams.put("sImageNme", foImages.getImageNme());
+            loParams.put("sMD5Hashx", foImages.getMD5Hashx());
+            loParams.put("sImagePth", foImages.getFileLoct());
+            loParams.put("dImgeDate", foImages.getCaptured());
+            loParams.put("dImgeDate", foImages.getCaptured());
+
+            //upload image details
+            String lsResponse = WebClient.sendRequest(poApi.getUrlSubmitSSDDImage(), loParams.toString(), poHeaders.getHeaders());
+            if (lsResponse == null){
+                lsMessage = "Server no response";
+
+                result[0] = false;
+                result[1] = lsMessage;
+                return result;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                lsMessage = getErrorMessage(loError);;
+
+                result[0] = false;
+                result[1] = lsMessage;
+                return result;
+            }
+
+            String lsTransNox = loResponse.getString("sTransNox");
+            poImageDao.UpdateTransNox(lsTransNox, foImages.getTransNox());
+
+            result[0] = true;
+            result[1] = lsTransNox;
+            return result;
         }catch (Exception e){
             lsMessage = e.getMessage();
-            return false;
+
+            result[0] = false;
+            result[1] = lsMessage;
+            return result;
         }
     }
 }

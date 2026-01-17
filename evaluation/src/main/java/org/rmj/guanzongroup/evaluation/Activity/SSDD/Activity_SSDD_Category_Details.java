@@ -25,6 +25,7 @@ import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_PDFViewer;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
+import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.etc.OnSwipeListener;
 import org.rmj.g3appdriver.etc.ViewPagerProperty;
@@ -40,10 +41,11 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
     private VMSSDEvaluation mViewModel;
     private MessageBox poMessage;
+    private LoadDialog poDialog;
 
     private MaterialTextView mtv_category, mtv_transnox, mtv_evaluated, mtv_remarks, mtv_rate, mtv_noimage;
     private ViewPager2 vpage_images;
-    private MaterialTextView mtv_company, mtv_version, mtv_dev, mtv_imgnme, mtv_imgdate, mtv_filename, mtv_filedate;
+    private MaterialTextView mtv_company, mtv_version, mtv_dev,  mtv_filename, mtv_filedate;
     private ShapeableImageView siv_preview;
     private MaterialCardView mcv_details;
     private ImageButton btn_upload, btn_memo;
@@ -66,6 +68,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
         mViewModel = new ViewModelProvider(this).get(VMSSDEvaluation.class);
         poMessage = new MessageBox(this);
+        poDialog = new LoadDialog(this);
 
         mtv_category = findViewById(R.id.mtv_category);
         mtv_transnox = findViewById(R.id.mtv_transnox);
@@ -79,8 +82,6 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
         mtv_dev = findViewById(R.id.mtv_dev);
 
         siv_preview = findViewById(R.id.siv_preview);
-        mtv_imgnme = findViewById(R.id.mtv_imgnme);
-        mtv_imgdate = findViewById(R.id.mtv_imgdate);
         mtv_filename = findViewById(R.id.mtv_filename);
         mtv_filedate = findViewById(R.id.mtv_filedate);
         btn_upload = findViewById(R.id.btn_upload);
@@ -118,11 +119,27 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                 });
             }else {
 
+                //download images
+                mViewModel.DownloadImageCategory(getIntent().getStringExtra("transnox"), getIntent().getStringExtra("categoryid"), new VMSSDEvaluation.OnDownloadCallback() {
+                    @Override
+                    public void OnLoad(String fsTitlexx, String fsMessage) {}
+
+                    @Override
+                    public void OnSuccess() {
+                        Toast.makeText(Activity_SSDD_Category_Details.this, "Images imported successfully", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void OnFailed(String fsMessage) {
+                        Toast.makeText(Activity_SSDD_Category_Details.this, fsMessage, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                InitObservers();
+
                 mtv_company.setText(R.string.sLblCompName);
                 mtv_version.setText(R.string.lblBuildVersion);
                 mtv_dev.setText(R.string.sLblCopyright);
-
-                InitObservers();
 
                 siv_preview.setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -238,10 +255,54 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                                 .fitCenter()
                                 .into(siv_preview);
 
-                        mtv_imgnme.setText(loImage.getImageNme());
-                        mtv_imgdate.setText(loImage.getCaptured());
                         mtv_filename.setText(loImage.getImageNme());
                         mtv_filedate.setText(loImage.getCaptured());
+
+                        //allow uploading
+                        if (!loImage.getSendStat().equals("1")){
+                            btn_upload.setImageResource(R.drawable.baseline_cloud_upload_24);
+                            btn_upload.setEnabled(true);
+
+                            //set button method to upload
+                            btn_upload.setOnClickListener(v ->
+
+                                mViewModel.SubmitImage(loImage, new VMSSDEvaluation.OnSubmitCallback() {
+                                    @Override
+                                    public void OnLoad(String fsTitlexx, String fsMessage) {
+                                        poDialog.initDialog(fsTitlexx, fsMessage, false);
+                                        poDialog.show();
+                                    }
+
+                                    @Override
+                                    public void OnSuccess(String fsTransnox) {
+                                        poDialog.dismiss();
+                                    }
+
+                                    @Override
+                                    public void OnFailed(String fsMessage) {
+                                        poDialog.dismiss();
+                                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                                            @Override
+                                            public void onPositive() {}
+
+                                            @Override
+                                            public void onNegative() {}
+                                        });
+                                    }
+                                }));
+
+                        }else {
+
+                            //allow downloading, if file is not found
+                            if (!mViewModel.IsFileExist(loImage.getFileLoct())){
+                                btn_upload.setImageResource(R.drawable.ic_baseline_file_download_24);
+                                btn_upload.setEnabled(false);
+                                return;
+                            }
+                            //display icon for successful upload
+                            btn_upload.setImageResource(R.drawable.baseline_check_circle_24);
+                            btn_upload.setEnabled(false);
+                        }
                     }
                 });
                 vpage_images.setAdapter(adapter);
@@ -264,16 +325,6 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                                 0, 0, false, false, 3));
 
                 loViewPagerProperty.initSliderPageTransformer();
-
-            }
-        });
-    }
-
-    private void InitListener(){
-
-        btn_upload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
             }
         });

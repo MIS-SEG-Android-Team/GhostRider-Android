@@ -27,6 +27,7 @@ import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeOB;
 import org.rmj.g3appdriver.GCircle.Apps.CashCount.CashCount;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditOnlineApplication;
+import org.rmj.g3appdriver.GCircle.Apps.SSDD.SSDDEvaluation;
 import org.rmj.g3appdriver.GCircle.Apps.SelfieLog.SelfieLog;
 import org.rmj.g3appdriver.GCircle.room.Repositories.DeviceLocationRecords;
 import org.rmj.g3appdriver.lib.Notifications.Obj.Payslip;
@@ -78,6 +79,16 @@ public class DataSyncService extends BroadcastReceiver {
                         TaskExecutor.ShowProgress(() -> GNotifBuilder.createNotification(instance, GNotifBuilder.BROADCAST_RECEIVER, message, GNotifBuilder.SYNC_PROGRESS).show());
                     } else {
                         message = loSelfie.getMessage();
+                        Log.e(TAG, message);
+                    }
+                    Thread.sleep(1000);
+
+                    SSDDEvaluation loSSDD = new SSDDEvaluation(instance);
+                    if (loSSDD.SubmitSSDDImagesForUpload()){
+                        message = "SSDD evaluation image/s uploaded successfully";
+                        TaskExecutor.ShowProgress(() -> GNotifBuilder.createNotification(instance, GNotifBuilder.BROADCAST_RECEIVER, message, GNotifBuilder.SYNC_PROGRESS).show());
+                    } else {
+                        message = loSSDD.GetMessage();
                         Log.e(TAG, message);
                     }
                     Thread.sleep(1000);

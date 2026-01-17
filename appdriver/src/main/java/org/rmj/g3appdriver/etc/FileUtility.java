@@ -28,6 +28,15 @@ public class FileUtility {
         this.context = context;
     }
 
+    public Boolean IsFileExist(String fsPath){
+        return new File(fsPath).exists();
+    }
+
+    public String GetFileDate(File foFile){
+        SimpleDateFormat loFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return loFormat.format(foFile.lastModified());
+    }
+
     public String GetDisplayName(Uri uri){
 
         try {
@@ -55,11 +64,6 @@ public class FileUtility {
             e.printStackTrace();
             return "";
         }
-    }
-
-    public String GetFileDate(File foFile){
-        SimpleDateFormat loFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return loFormat.format(foFile.lastModified());
     }
 
     public File GetFileFromUri(Uri uri) {

@@ -327,7 +327,7 @@ public class RImageInfo {
             loImage.setFileCode(args5);
             loImage.setDtlSrcNo(poSession.getUserID());
             loImage.setSourceCD("SSDD");
-            loImage.setMD5Hashx(WebFileServer.createMD5Hash(args1));
+            loImage.setMD5Hashx(WebFileServer.createMD5Hash(args2));
             loImage.setCaptured(AppConstants.DATE_MODIFIED());
             loImage.setSourceNo(args);
             loImage.setImageNme(args1);

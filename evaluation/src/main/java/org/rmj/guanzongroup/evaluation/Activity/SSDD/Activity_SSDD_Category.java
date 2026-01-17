@@ -349,6 +349,46 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
             }
         });
+
+        //get pending images for upload, send to database
+        mViewModel.GetTransactionImagesForUpload(GetTransNox()).observe(Activity_SSDD_Category.this, new Observer<List<EImageInfo>>() {
+            @Override
+            public void onChanged(List<EImageInfo> eImageInfos) {
+
+                try {
+
+                    //do not proceed, if empty
+                    if (eImageInfos == null || eImageInfos.size() < 1){
+                        return;
+                    }
+
+                    //upload images
+                    for (EImageInfo loImage : eImageInfos){
+
+                        mViewModel.SubmitImage(loImage, new VMSSDEvaluation.OnSubmitCallback() {
+                            @Override
+                            public void OnLoad(String fsTitlexx, String fsMessage) {
+                                Toast.makeText(Activity_SSDD_Category.this, "Uploading image. Please wait . .", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void OnSuccess(String fsTransnox) {
+                                Toast.makeText(Activity_SSDD_Category.this, "Uploading successful", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void OnFailed(String fsMessage) {
+                                Toast.makeText(Activity_SSDD_Category.this, fsMessage, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        Thread.sleep(1000);
+                    }
+
+                }catch (Exception e){
+                    mViewModel.SaveError("SSDD Evaluation", e.getMessage());
+                }
+            }
+        });
     }
 
     private void InitListener(){
