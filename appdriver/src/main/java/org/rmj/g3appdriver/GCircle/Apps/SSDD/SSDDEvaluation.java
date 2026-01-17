@@ -443,11 +443,54 @@ public class SSDDEvaluation {
         }
     }
 
+    public Boolean DownloadImageFile(EImageInfo foImage){
+
+        try {
+
+            String lsClient = poToken.GetClientToken();
+
+            if(lsClient == null){
+                lsMessage = "No generated client token to upload image.";
+                return false;
+            }
+
+            String lsAccess = poToken.GetAccessToken(lsClient);
+
+            if(lsAccess == null){
+                lsMessage = "No generated access token to upload image.";
+                return false;
+            }
+
+            org.json.simple.JSONObject loDownload = WebFile.DownloadFile(lsAccess, foImage.getFileLoct(), foImage.getDtlSrcNo(), foImage.getImageNme(), foImage.getSourceCD(), foImage.getTransNox(), "");
+            if (loDownload == null){
+                lsMessage = "No response from Web Server";
+                return false;
+            }
+            if (loDownload.get("result").equals("success")){
+
+                JSONObject loResult = (JSONObject) loDownload.get("payload");
+                if (WebFile.Base64ToFile(loResult.getString("data"), loResult.getString("hash"), foImage.getFileLoct(), "" )){
+                    lsMessage = "File downloaded successfully";
+                    return true;
+                }
+                lsMessage = "Failed to download file";
+                return false;
+            }
+            lsMessage = ((org.json.simple.JSONObject) loDownload.get("error")).get("message").toString();
+            return false;
+
+        }catch (Exception e){
+            lsMessage = e.getMessage();
+            return false;
+        }
+    }
+
     public Boolean SubmitSSDDImagesForUpload(){
 
         try {
 
             if (poImageDao.GetSSDDImagesForUpload() == null || poImageDao.GetSSDDImagesForUpload().size() < 1){
+                lsMessage = "No SSDD image to upload";
                 return false;
             }
 
@@ -461,6 +504,8 @@ public class SSDDEvaluation {
                 //if uploading successful,
                 String lsImageID = poImage.UploadImage(loImage.getTransNox());
                 if (lsImageID != null && !lsImageID.isEmpty()){
+
+                    Thread.sleep(1000);
 
                     JSONObject loParams = new JSONObject();
                     loParams.put("sTransNox", lsOldTransnox);

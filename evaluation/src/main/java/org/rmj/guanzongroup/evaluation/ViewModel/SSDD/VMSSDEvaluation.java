@@ -344,6 +344,42 @@ public class VMSSDEvaluation extends AndroidViewModel {
         });
     }
 
+    public void DownloadImageFile(EImageInfo foImage, OnDownloadCallback callback){
+
+        TaskExecutor.Execute(foImage, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnLoad("Downloading Image Files", "Downloading image files. Please wait . .");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!loConnect.isDeviceConnected()){
+                    fsMessage = loConnect.getMessage();
+                    return false;
+                }
+
+                EImageInfo loImage = (EImageInfo) args;
+                if (loEvaluation.DownloadImageFile(loImage)){
+                    return true;
+                }
+                fsMessage = loEvaluation.GetMessage();
+                return false;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if ((Boolean) object){
+                    callback.OnSuccess();
+                }else {
+                    callback.OnFailed(fsMessage);
+                }
+            }
+        });
+    }
+
     public void SubmitEvaluation(ESSDDMaster foMaster, List<ESSDDetail> faDetails, OnSubmitCallback foCallback){
 
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {

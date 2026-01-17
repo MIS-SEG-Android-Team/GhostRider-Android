@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -101,7 +102,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
             if (!getIntent().hasExtra("transnox")) {
 
-                InitMessage(1, R.drawable.baseline_error_24, "No transaction number has been detected", "Okay", "", new onMessageButton() {
+                InitMessage(0, R.drawable.baseline_error_24, "No transaction number has been detected", "Okay", "", new onMessageButton() {
                     @Override
                     public void onPositive() { finish(); }
 
@@ -294,9 +295,37 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                         }else {
 
                             //allow downloading, if file is not found
-                            if (!mViewModel.IsFileExist(loImage.getFileLoct())){
+                            if (mViewModel.IsFileExist(loImage.getFileLoct())){
                                 btn_upload.setImageResource(R.drawable.ic_baseline_file_download_24);
-                                btn_upload.setEnabled(false);
+                                btn_upload.setEnabled(true);
+
+                                btn_upload.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                        mViewModel.DownloadImageFile(loImage, new VMSSDEvaluation.OnDownloadCallback() {
+                                            @Override
+                                            public void OnLoad(String fsTitlexx, String fsMessage) {
+                                                poDialog.initDialog(fsTitlexx, fsMessage, false);
+                                                poDialog.show();
+                                            }
+
+                                            @Override
+                                            public void OnSuccess() {
+                                                poDialog.dismiss();
+                                                Toast.makeText(Activity_SSDD_Category_Details.this, "Image downloaded successfully", Toast.LENGTH_LONG).show();
+                                            }
+
+                                            @Override
+                                            public void OnFailed(String fsMessage) {
+                                                poDialog.dismiss();
+                                                Log.d("SSDD EVALUATION", fsMessage);
+                                                Toast.makeText(Activity_SSDD_Category_Details.this, fsMessage, Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+                                });
+
                                 return;
                             }
                             //display icon for successful upload
