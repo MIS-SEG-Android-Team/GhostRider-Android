@@ -13,6 +13,7 @@
 <resources>
     <dimen name="dots_height">15dp</dimen>
     <dimen name="dots_margin_bottom">28dp</dimen>
+    <dimen name="dots_margin_top">28dp</dimen>
 
     <dimen name="header_background_image">300dp</dimen>
 </resources>

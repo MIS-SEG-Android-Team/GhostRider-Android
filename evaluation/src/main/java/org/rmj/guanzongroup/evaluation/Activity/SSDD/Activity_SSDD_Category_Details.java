@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -150,6 +151,8 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                         return gestureDetector.onTouchEvent(event);
                     }
                 });
+
+                mcv_details.startAnimation(AnimationUtils.loadAnimation(Activity_SSDD_Category_Details.this, R.anim.anim_slide_up));
             }
 
         }catch (Exception e){

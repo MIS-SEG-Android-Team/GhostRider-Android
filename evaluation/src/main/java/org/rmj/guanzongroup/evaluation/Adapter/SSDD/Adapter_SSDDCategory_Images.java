@@ -45,6 +45,7 @@ public class Adapter_SSDDCategory_Images extends RecyclerView.Adapter<Adapter_SS
         Glide.with(holder.itemView)
                 .load(laImages.get(position).getFileLoct())
                 .fitCenter()
+                .error(R.drawable.img_imageview_place_holder)
                 .into(holder.img_ssdd);
 
         if (loViewPager.getCurrentItem() == position){
