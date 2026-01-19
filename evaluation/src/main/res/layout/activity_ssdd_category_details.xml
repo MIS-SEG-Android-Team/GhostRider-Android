@@ -31,7 +31,6 @@
         android:id="@+id/mcv_details"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="-20dp"
         android:visibility="visible"
         app:cardCornerRadius="20dp"
         app:cardElevation="10dp"
@@ -300,7 +299,6 @@
                         android:alpha="0.6"/>
 
                 </LinearLayout>
-
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

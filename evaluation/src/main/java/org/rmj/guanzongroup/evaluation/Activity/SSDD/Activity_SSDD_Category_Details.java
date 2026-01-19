@@ -300,6 +300,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
                             //allow downloading, if file is not found
                             if (!mViewModel.IsFileExist(loImage.getFileLoct())){
+
                                 btn_upload.setImageResource(R.drawable.ic_baseline_file_download_24);
                                 btn_upload.setEnabled(true);
 
