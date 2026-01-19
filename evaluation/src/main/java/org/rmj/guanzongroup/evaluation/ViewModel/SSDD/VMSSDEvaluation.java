@@ -161,6 +161,13 @@ public class VMSSDEvaluation extends AndroidViewModel {
         void OnSuccess(String fsTransnox);
         void OnFailed(String fsMessage);
     }
+
+    public interface OnInitializeCameraListner {
+        void OnInit();
+        void OnSuccess(Intent intent, String[] args);
+        void OnFailed(String message, Intent intent, String[] args);
+        void OnError(String fsMessage);
+    }
     
     public void SaveError(String fsSource, String fsMessage){
         loEvaluation.SaveError(fsSource, fsMessage);
@@ -469,7 +476,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         loEvaluation.UpdateMasterStatus(fsTranStat, fsTransNox);
     }
 
-    public void InitCamera(String fsRefernox, Adapter_SSDDCategories.SSDD_Evaluation_Categories foCategories, OnInitializeCameraCallback foListener){
+    public void InitCamera(String fsRefernox, Adapter_SSDDCategories.SSDD_Evaluation_Categories foCategories, OnInitializeCameraListner foListener){
 
         ImageFileCreator loImage = new ImageFileCreator(loContext, AppConstants.SUB_FOLDER_SSDD_EVALUATION  + "/" + fsRefernox +"/" + foCategories.sCategryID, poSession.getUserID() );
 
@@ -539,6 +546,9 @@ public class VMSSDEvaluation extends AndroidViewModel {
             @Override
             public void OnPostExecute(Object object) {
 
+                if (!(Boolean) object){
+                    foListener.OnError(fsMessage);
+                }
             }
         });
     }

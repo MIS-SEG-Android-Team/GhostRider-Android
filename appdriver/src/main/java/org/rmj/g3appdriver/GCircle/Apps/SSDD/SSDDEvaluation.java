@@ -32,6 +32,7 @@ import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RImageInfo;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
+import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.FileUtility;
 
 import java.text.SimpleDateFormat;
@@ -50,7 +51,6 @@ public class SSDDEvaluation {
     private final GCircleApi poApi;
     private final HttpHeaders poHeaders;
 
-    private final FileUtility poFile;
     private final AppTokenManager poToken;
     private final RImageInfo poImage;
 
@@ -68,7 +68,6 @@ public class SSDDEvaluation {
         this.poApi = new GCircleApi(poApp);
         this.poHeaders = HttpHeaders.getInstance(poApp);
 
-        this.poFile = new FileUtility(poApp);
         this.poToken = new AppTokenManager(poApp);
         this.poImage = new RImageInfo(poApp);
 
@@ -125,11 +124,11 @@ public class SSDDEvaluation {
         String lsTransNox = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             lsTransNox = "MX01" +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) +
                     poMasterDao.GetCount() + 1;
         }else {
             lsTransNox = "MX01" +
-                    new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
+                    new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
                     poMasterDao.GetCount() + 1;
         }
 
@@ -461,15 +460,15 @@ public class SSDDEvaluation {
                 return false;
             }
 
-            org.json.simple.JSONObject loDownload = WebFile.DownloadFile(lsAccess, foImage.getFileLoct(), foImage.getDtlSrcNo(), foImage.getImageNme(), foImage.getSourceCD(), foImage.getTransNox(), "");
+            org.json.simple.JSONObject loDownload = WebFile.DownloadFile(lsAccess, foImage.getFileCode(), foImage.getDtlSrcNo(), foImage.getImageNme(), foImage.getSourceCD(), foImage.getTransNox(), "");
             if (loDownload == null){
                 lsMessage = "No response from Web Server";
                 return false;
             }
             if (loDownload.get("result").equals("success")){
 
-                JSONObject loResult = (JSONObject) loDownload.get("payload");
-                if (WebFile.Base64ToFile(loResult.getString("data"), loResult.getString("hash"), foImage.getFileLoct(), "" )){
+                org.json.simple.JSONObject loResult = (org.json.simple.JSONObject) loDownload.get("payload");
+                if (WebFile.Base64ToFile(loResult.get("data").toString(), loResult.get("hash").toString(), foImage.getFileLoct().substring(0, foImage.getFileLoct().lastIndexOf("/") + 1), foImage.getImageNme() )){
                     lsMessage = "File downloaded successfully";
                     return true;
                 }
@@ -508,7 +507,7 @@ public class SSDDEvaluation {
                     Thread.sleep(1000);
 
                     JSONObject loParams = new JSONObject();
-                    loParams.put("sTransNox", lsOldTransnox);
+                    loParams.put("sTransNox", lsImageID);
                     loParams.put("sSourceNo", lsOldTransnox);
 
                     String lsResponse = WebClient.sendRequest(poApi.getUrlUpdateSSDDTransaction(), loParams.toString(), poHeaders.getHeaders());
@@ -517,6 +516,7 @@ public class SSDDEvaluation {
                         isSuccess = false;
                         break;
                     }
+                    Log.d("SSDDEvaluation", lsResponse);
 
                     JSONObject loResponse = new JSONObject(lsResponse);
                     String lsResult = loResponse.getString("result");
@@ -527,6 +527,20 @@ public class SSDDEvaluation {
                         isSuccess = false;
                         break;
                     }
+                    if (loResponse.getString("sTransNox") == null || loResponse.getString("sTransNox").isEmpty()){
+                        isSuccess = false;
+                        break;
+                    }
+
+                    //update send status, after update of transaction number
+                    loImage.setSendStat("1");
+                    loImage.setSendDate(AppConstants.DATE_MODIFIED());
+
+                    poImageDao.update(loImage);
+
+                    //update transaction number
+                    poImageDao.UpdateTransNox(lsImageID, lsOldTransnox);
+
                     Thread.sleep(1000);
                 }
             }
@@ -584,8 +598,12 @@ public class SSDDEvaluation {
             }
 
             String lsTransNox = loResponse.getString("sTransNox");
-            poDetailDao.Submit(lsTransNox, foMaster.getsTransNox());
+
+            //update master transaction no
             poMasterDao.Submit(lsTransNox, foMaster.getsTransNox());
+
+            //update detail transaction no
+            poDetailDao.Submit(lsTransNox, foMaster.getsTransNox());
 
             //update image reference no
             if (poImageDao.GetCountPerTransaction(foMaster.getsTransNox()) > 0){

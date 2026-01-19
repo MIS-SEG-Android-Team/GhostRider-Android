@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
@@ -94,6 +95,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
         InitActivity();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void InitActivity(){
 
         try {
@@ -247,6 +249,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                 vpage_images.setVisibility(View.VISIBLE);
                 layout_imginfo.setVisibility(View.VISIBLE);
 
+                //set adapter
                 Adapter_SSDDCategory_Images adapter = new Adapter_SSDDCategory_Images(essddImages, vpage_images, new Adapter_SSDDCategory_Images.OnImageClickListener() {
                     @Override
                     public void OnImageClick(EImageInfo loImage) {
@@ -254,6 +257,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                         Glide.with(siv_preview.getRootView())
                                 .load(loImage.getFileLoct())
                                 .fitCenter()
+                                .error(R.drawable.img_imageview_place_holder)
                                 .into(siv_preview);
 
                         mtv_filename.setText(loImage.getImageNme());
@@ -295,7 +299,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                         }else {
 
                             //allow downloading, if file is not found
-                            if (mViewModel.IsFileExist(loImage.getFileLoct())){
+                            if (!mViewModel.IsFileExist(loImage.getFileLoct())){
                                 btn_upload.setImageResource(R.drawable.ic_baseline_file_download_24);
                                 btn_upload.setEnabled(true);
 
@@ -314,6 +318,10 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                                             public void OnSuccess() {
                                                 poDialog.dismiss();
                                                 Toast.makeText(Activity_SSDD_Category_Details.this, "Image downloaded successfully", Toast.LENGTH_LONG).show();
+
+                                                //set button as downloaded
+                                                btn_upload.setImageResource(R.drawable.baseline_check_circle_24);
+                                                btn_upload.setEnabled(false);
                                             }
 
                                             @Override
@@ -334,8 +342,8 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                         }
                     }
                 });
-                vpage_images.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
+                vpage_images.setAdapter(adapter);
 
                 /**
                  * Set viewpager properties and design

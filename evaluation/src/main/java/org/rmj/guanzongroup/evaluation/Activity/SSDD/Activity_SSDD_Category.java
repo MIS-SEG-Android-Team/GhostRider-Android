@@ -513,7 +513,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                     }
 
                     //initliaze camera
-                    mViewModel.InitCamera(GetTransNox(), foDetail, new OnInitializeCameraCallback() {
+                    mViewModel.InitCamera(GetTransNox(), foDetail, new VMSSDEvaluation.OnInitializeCameraListner() {
                         @Override
                         public void OnInit() {
                             poDialog.initDialog("Camera Launch", "Initializing camera. Please wait . .", false);
@@ -541,7 +541,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                         public void OnFailed(String message, Intent intent, String[] args) {
                             poDialog.dismiss();
 
-                            InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new onMessageButton() {
+                            InitMessage(0, R.drawable.baseline_error_24, message + ". Continue?", "Yes", "No", new onMessageButton() {
                                 @Override
                                 public void onPositive() {
 
@@ -563,6 +563,21 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                                 public void onNegative() {}
                             });
                         }
+
+                        @Override
+                        public void OnError(String fsMessage) {
+                            poDialog.dismiss();
+
+                            InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
+                                @Override
+                                public void onPositive() {}
+
+                                @Override
+                                public void onNegative() {}
+                            });
+
+                        }
+
                     });
 
                 }catch (Exception e){
