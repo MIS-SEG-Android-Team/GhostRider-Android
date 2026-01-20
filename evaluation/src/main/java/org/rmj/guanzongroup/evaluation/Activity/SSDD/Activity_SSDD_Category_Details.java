@@ -141,6 +141,8 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
 
                 InitObservers();
 
+
+
                 mtv_company.setText(R.string.sLblCompName);
                 mtv_version.setText(R.string.lblBuildVersion);
                 mtv_dev.setText(R.string.sLblCopyright);
