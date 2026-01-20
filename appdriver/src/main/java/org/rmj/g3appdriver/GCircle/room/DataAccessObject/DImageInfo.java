@@ -31,11 +31,25 @@ public interface DImageInfo {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(EImageInfo imageInfo);
 
+    @Query("UPDATE Image_Information SET sTransNox = :fsSource WHERE sTransNox = :fsOldTransNox")
+    void UpdateTransNox(String fsSource, String fsOldTransNox);
+
+    @Query("UPDATE Image_Information SET sSourceNo = :fsSource WHERE sSourceNo = :fsOldTransNox")
+    void UpdateSourceNo(String fsSource, String fsOldTransNox);
+
     @Query("SELECT COUNT (*) FROM Image_Information")
     int GetRowsCountForID();
 
-    @Query("SELECT * FROM Image_Information WHERE sTransNox =:TransNox")
-    EImageInfo GetImageInfo(String TransNox);
+    @Query("SELECT COUNT(*) FROM Image_Information " +
+            "WHERE sSourceNo = :fsSource " +
+            "AND sFileCode = :fsCategrID " +
+            "AND sSourceCD = 'SSDD'")
+    int CountImagePerCategory(String fsSource, String fsCategrID);
+
+    @Query("SELECT COUNT(*) FROM Image_Information " +
+            "WHERE sSourceNo = :fsSource " +
+            "AND sSourceCD = 'SSDD'")
+    int GetCountPerTransaction(String fsSource);
 
     /**
      *
@@ -50,6 +64,14 @@ public interface DImageInfo {
             "WHERE sTransNox =:oldTransNox")
     void updateImageInfo(String TransNox, String DateModifield, String oldTransNox);
 
+    @Query("SELECT * FROM Image_Information WHERE sTransNox =:TransNox")
+    EImageInfo GetImageInfo(String TransNox);
+
+    @Query("SELECT * FROM Image_Information " +
+            "WHERE sSourceCD = 'SSDD' " +
+            "AND cSendStat <> '1'")
+    List<EImageInfo> GetSSDDImagesForUpload();
+
     /**
      *
      * @return returns a LiveData List of all unsent DCP image info...
@@ -63,12 +85,21 @@ public interface DImageInfo {
     LiveData<List<EImageInfo>> getUnsentDCPImageInfoList();
 
     @Query("SELECT * FROM Image_Information " +
+            "WHERE sSourceNo = :fsSource " +
+            "AND sFileCode = :fsCategrID " +
+            "AND sSourceCD = 'SSDD'")
+    LiveData<List<EImageInfo>> GetSSDDImagesPerCategory(String fsSource, String fsCategrID);
+
+    @Query("SELECT * FROM Image_Information " +
+            "WHERE sSourceCD = 'SSDD' " +
+            "AND cSendStat <> '1' " +
+            "AND sSourceNo = :fsSourceNo")
+    LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo);
+
+    @Query("SELECT * FROM Image_Information " +
             "WHERE sDtlSrcNo = :sDtlSrcNo AND " +
             "sImageNme = :sImageNme")
     LiveData<EImageInfo> getImageLocation(String sDtlSrcNo, String sImageNme);
-
-    @Query("SELECT sFileLoct FROM Image_Information WHERE sTransNox =:TrasNox")
-    String GetImageFileLocation(String TrasNox);
 
     @Query("SELECT * FROM Image_Information WHERE sFileCode = '0021' AND cSendStat <> '1'")
     List<EImageInfo> getUnsentLoginImageInfo();
@@ -81,4 +112,5 @@ public interface DImageInfo {
 
     @Query("SELECT * FROM Image_Information WHERE sSourceNo =:TransNox AND sDtlSrcNo=:AccntNo")
     EImageInfo getDCPImageInfoForPosting(String TransNox, String AccntNo);
+
 }

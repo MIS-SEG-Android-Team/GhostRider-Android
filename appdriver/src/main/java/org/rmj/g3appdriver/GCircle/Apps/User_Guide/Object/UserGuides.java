@@ -5,7 +5,9 @@ import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 import static org.rmj.g3appdriver.lib.Firebase.CrashReportingUtil.reportException;
 
 import android.app.Application;
-import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -25,25 +27,24 @@ import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
-import org.rmj.g3appdriver.dev.Api.WebFileServer;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
+import org.rmj.g3appdriver.etc.FileUtility;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class UserGuides {
     private final AppConfigPreference poConfig;
     private final EmployeeSession poSession;
-    private final AppTokenManager poToken;
     private final DGuides dGuides;
-    private DCompanyPolicy dCompanyPolicy;
-    private DArticle dArticle;
+    private final DCompanyPolicy dCompanyPolicy;
+    private final DArticle dArticle;
     private final GCircleApi poApi;
     private final HttpHeaders poHeaders;
+    private final FileUtility poFile;
     private String message;
 
     public UserGuides(Application context){
@@ -54,7 +55,7 @@ public class UserGuides {
         this.poApi = new GCircleApi(context);
         this.poHeaders = HttpHeaders.getInstance(context);
         this.poSession = EmployeeSession.getInstance(context);
-        this.poToken = new AppTokenManager(context);
+        this.poFile = new FileUtility(context);
     }
 
     private String CreateUniqueID() {
@@ -274,64 +275,36 @@ public class UserGuides {
 
         try {
 
-            String lsClient = poToken.GetClientToken();
+            JSONObject loParams = new JSONObject();
+            loParams.put("filename", filename);
 
-            if(lsClient == null){
-                message = "No generated client token to upload image.";
-                return false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                String lsBytes = Base64.encodeToString(poFile.ReadFileToBytes(new File(fileloc)), Base64.NO_WRAP);
+                loParams.put("uploadedfile", lsBytes);
             }
 
-            String lsAccess = poToken.GetAccessToken(lsClient);
 
-            if(lsAccess == null){
-                message = "No generated access token to upload image.";
-                return false;
-            }
+            String lsUpload = WebClient.sendRequest(poApi.getUrlUploadGuides(), loParams.toString(), poHeaders.getHeaders());
 
-            org.json.simple.JSONObject loUpload = WebFileServer.UploadFile(
-                    fileloc,
-                    lsAccess,
-                    "0031",
-                    poSession.getUserID(),
-                    filename,
-                    poSession.getBranchCode(),
-                    CreateUniqueID(),
-                    "",
-                    "");
+            Log.d("FILE UPLOAD", lsUpload);
 
-            if (loUpload == null) {
+            if (lsUpload == null) {
                 message = SERVER_NO_RESPONSE;
                 reportException(poSession.getUserID(), message);
                 return false;
             }
 
-            Log.d("FILE UPLOAD", loUpload.toString());
-
-            JSONObject loResult = new JSONObject(loUpload.toJSONString());
-            if(loResult.has("result")){
-                String lsImgResult = (String) loUpload.get("result");
-                if (lsImgResult.equalsIgnoreCase("error")) {
-                    JSONObject loError = loResult.getJSONObject("error");
-                    message = getErrorMessage(loError);
-                    reportException(poSession.getUserID(), message);
-                    return false;
-                }
-            } else {
-                String lsImgResult = (String) loUpload.get("rhsult");
-                if (lsImgResult.equalsIgnoreCase("error")) {
-                    JSONObject loError = loResult.getJSONObject("error");
-                    message = getErrorMessage(loError);
-                    reportException(poSession.getUserID(), message);
-                    return false;
-                }
+            JSONObject loResult = new JSONObject(lsUpload);
+            if (loResult.getString("result").equalsIgnoreCase("error")){
+                message = getErrorMessage(loResult.getJSONObject("error"));
+                return false;
             }
 
             EGuides loGuide = new EGuides();
-
-            loGuide.setsTransNox(loUpload.get("sTransNox").toString());
-            loGuide.setType("0031");
-            loGuide.setsTitlexx(filename);
-            loGuide.setsURlxx(loUpload.get("url").toString());
+            loGuide.setsTransNox(loResult.get("transNox").toString());
+            loGuide.setType(loResult.get("type").toString());
+            loGuide.setsTitlexx(loResult.get("title").toString());
+            loGuide.setsURlxx(loResult.get("link").toString());
 
             dGuides.InsertGuides(loGuide);
 
@@ -348,16 +321,16 @@ public class UserGuides {
         return dGuides.GetGuides();
     }
     public String GetURLByTrans(String fsTransNox){ return dGuides.GetURLByTrans(fsTransNox);}
-    public LiveData<List<EPolicyContents>> getPolicyContents(String sParentIDxx){
+    public LiveData<List<EPolicyContents>> GetPolicyContents(String sParentIDxx){
         return dCompanyPolicy.getPolicyContents(sParentIDxx);
     }
-    public LiveData<List<EPolicyMenus>> getPolicyMenus(){
+    public LiveData<List<EPolicyMenus>> GetPolicyMenus(){
         return dCompanyPolicy.getPolicyMenus();
     }
-    public LiveData<List<EArticleHead>> getArticleMenu(){
+    public LiveData<List<EArticleHead>> GetArticleMenu(){
         return dArticle.getArticleMenus();
     }
-    public LiveData<List<EArticleDetails>> getArticleDetails(String sCodexx){
+    public LiveData<List<EArticleDetails>> GetArticleDetails(String sCodexx){
         return dArticle.getArticleDetails(sCodexx);
     }
 }

@@ -49,7 +49,7 @@ public class Activity_PDFViewer extends AppCompatActivity {
             poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
                 @Override
                 public void OnButtonClick(View view, AlertDialog dialog) {
-
+                    dialog.dismiss();
                 }
             });
 
@@ -68,11 +68,16 @@ public class Activity_PDFViewer extends AppCompatActivity {
             public void OnSuccess(InputStream inputStream) {
                 poDialog.dismiss();
 
+                int pdf_index = 1;
+                if (getIntent().hasExtra("pdf_index")){
+                    pdf_index = Integer.parseInt(getIntent().getStringExtra("pdf_index"));
+                }
+
                 pdv_viewer.fromStream(inputStream)
                         .enableSwipe(true)
                         .enableDoubletap(true)
                         .swipeHorizontal(false)
-                        .defaultPage(0)
+                        .defaultPage(pdf_index)
                         .load();
             }
 

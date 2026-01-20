@@ -167,15 +167,15 @@ public class VMGuide extends AndroidViewModel {
         return poGuides.GetGuides();
     }
     public LiveData<List<EPolicyContents>> GetPolicyContents(String sParentIDxx){
-        return poGuides.getPolicyContents(sParentIDxx);
+        return poGuides.GetPolicyContents(sParentIDxx);
     }
     public LiveData<List<EPolicyMenus>> GetPolicyMenus(){
-        return poGuides.getPolicyMenus();
+        return poGuides.GetPolicyMenus();
     }
     public LiveData<List<EArticleHead>> GetArticles(){
-        return poGuides.getArticleMenu();
+        return poGuides.GetArticleMenu();
     }
     public LiveData<List<EArticleDetails>> GetArticleDetails(String sArticleIDxx){
-        return poGuides.getArticleDetails(sArticleIDxx);
+        return poGuides.GetArticleDetails(sArticleIDxx);
     }
 }

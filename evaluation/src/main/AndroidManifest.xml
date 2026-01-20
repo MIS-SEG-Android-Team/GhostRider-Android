@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name=".Activity.SSDD.Activity_SSDD_Category_Details"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.SSDD.Activity_SSDD_Category"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.SSDD.Activity_SSDD_Evaluation"
+            android:exported="false"/>
+        <activity
+            android:name=".Activity.PacitaReward.Activity_BranchRecord_Details"
+            android:exported="false"
+            android:screenOrientation="userPortrait"
+            android:theme="@style/GhostRiderMaterialTheme" />
+        <activity
+            android:name=".Activity.PacitaReward.Activity_BranchRecords"
+            android:exported="false"
+            android:screenOrientation="userPortrait"
+            android:theme="@style/GhostRiderMaterialTheme" />
+        <activity
+            android:name=".Dialog.Dialog_SelectAction"
+            android:exported="false"
+            android:screenOrientation="userPortrait"
+            android:theme="@style/GhostRiderMaterialTheme" />
+        <activity
+            android:name=".Activity.PacitaReward.Activity_BranchList"
+            android:exported="false"
+            android:screenOrientation="userPortrait"
+            android:theme="@style/GhostRiderMaterialTheme" />
+        <activity
+            android:name=".Activity.PacitaReward.Activity_Branch_Rate"
+            android:exported="true"
+            android:screenOrientation="userPortrait"
+            android:theme="@style/GhostRiderMaterialTheme" />
+    </application>
+
+</manifest>

@@ -303,58 +303,58 @@ public class VMClientInfo extends AndroidViewModel {
                         if (!fileLoc.exists()) {
                             fileLoc.mkdirs();
                         }
-//                        JSONObject loDownload = WebFileServer.DownloadFile(lsAccess,
-//                                poFileInfo.sFileCode,
-//                                "",
-//                                imageName,
-//                                "COAD",
-//                                psSourceNo,
-//                                "");
+                        JSONObject loDownload = WebFileServer.DownloadFile(lsAccess,
+                                poFileInfo.sFileCode,
+                                "",
+                                imageName,
+                                "COAD",
+                                psSourceNo,
+                                "");
 
-//                        String lsResponse = (String) loDownload.get("result");
-//                        if (Objects.requireNonNull(lsResponse).equalsIgnoreCase("success")) {
-//                            //convert to image and save to proper file location
-//                            JSONParser loParser = new JSONParser();
-//                            loDownload = (JSONObject) loParser.parse(loDownload.get("payload").toString());
-//                            String location = fileLoc.getAbsolutePath() + "/";
-//                            if (WebFile.Base64ToFile((String) loDownload.get("data"),
-//                                    (String) loDownload.get("hash"),
-//                                    location,
-//                                    (String) loDownload.get("filename"))){
-//                                //insert entry to image info
-//                                EImageInfo loImage = new EImageInfo();
-//                                loImage.setTransNox((String) loDownload.get("transnox"));
-//                                loImage.setSourceCD("COAD");
-//                                loImage.setSourceNo(poFileInfo.sTransNox);
-//                                loImage.setDtlSrcNo(poFileInfo.sTransNox);
-//                                loImage.setFileCode(poFileInfo.sFileCode);
-//                                loImage.setMD5Hashx((String) loDownload.get("hash"));
-//                                loImage.setFileLoct(fileLoc.getAbsolutePath() +"/" + imageName);
-//                                loImage.setImageNme((String) loDownload.get("filename"));
-//                                loImage.setLatitude("0.0");
-//                                loImage.setLongitud("0.0");
-//                                loImage.setSendDate(new AppConstants().DATE_MODIFIED);
-//                                loImage.setSendStat("1");
-//                                //loImage....
-//                                ScannerConstants.PhotoPath = loImage.getFileLoct();
-////                                poImage.insertImageInfo(loImage);
-////                                saveImageInfo(loImage);
-//                                //end - insert entry to image info
-//                                saveDocumentInfoFromCamera(poFileInfo.sTransNox, poFileInfo.sFileCode);
-//                                //todo:
-//                                //insert/update entry to credit_online_application_documents
-//                                //end - convert to image and save to proper file location
-//                                loDownload = (org.json.simple.JSONObject) loParser.parse("{\"result\":\"success\",\"convert\":\"true\",\"message\":\""+ ScannerConstants.FileDesc + " has been downloaded successfully." + "\"}");
-//                                lsResult = String.valueOf(loDownload);
-//                            } else{
-//                                Log.e(TAG, "Unable to convert file.");
-//                                loDownload = (org.json.simple.JSONObject) loParser.parse("{\"result\":\"success\",\"convert\":\"false\",\"message\":\"Unable to convert file.\"}");
-//                                lsResult = String.valueOf(loDownload);
-//
-//                            }
-//                        }else{
-//                            lsResult = String.valueOf(loDownload);
-//                        }
+                        String lsResponse = (String) loDownload.get("result");
+                        if (Objects.requireNonNull(lsResponse).equalsIgnoreCase("success")) {
+                            //convert to image and save to proper file location
+                            JSONParser loParser = new JSONParser();
+                            loDownload = (JSONObject) loParser.parse(loDownload.get("payload").toString());
+                            String location = fileLoc.getAbsolutePath() + "/";
+                            if (WebFile.Base64ToFile((String) loDownload.get("data"),
+                                    (String) loDownload.get("hash"),
+                                    location,
+                                    (String) loDownload.get("filename"))){
+                                //insert entry to image info
+                                EImageInfo loImage = new EImageInfo();
+                                loImage.setTransNox((String) loDownload.get("transnox"));
+                                loImage.setSourceCD("COAD");
+                                loImage.setSourceNo(poFileInfo.sTransNox);
+                                loImage.setDtlSrcNo(poFileInfo.sTransNox);
+                                loImage.setFileCode(poFileInfo.sFileCode);
+                                loImage.setMD5Hashx((String) loDownload.get("hash"));
+                                loImage.setFileLoct(fileLoc.getAbsolutePath() +"/" + imageName);
+                                loImage.setImageNme((String) loDownload.get("filename"));
+                                loImage.setLatitude("0.0");
+                                loImage.setLongitud("0.0");
+                                loImage.setSendDate(new AppConstants().DATE_MODIFIED);
+                                loImage.setSendStat("1");
+                                //loImage....
+                                ScannerConstants.PhotoPath = loImage.getFileLoct();
+//                                poImage.insertImageInfo(loImage);
+//                                saveImageInfo(loImage);
+                                //end - insert entry to image info
+                                saveDocumentInfoFromCamera(poFileInfo.sTransNox, poFileInfo.sFileCode);
+                                //todo:
+                                //insert/update entry to credit_online_application_documents
+                                //end - convert to image and save to proper file location
+                                loDownload = (org.json.simple.JSONObject) loParser.parse("{\"result\":\"success\",\"convert\":\"true\",\"message\":\""+ ScannerConstants.FileDesc + " has been downloaded successfully." + "\"}");
+                                lsResult = String.valueOf(loDownload);
+                            } else{
+                                Log.e(TAG, "Unable to convert file.");
+                                loDownload = (org.json.simple.JSONObject) loParser.parse("{\"result\":\"success\",\"convert\":\"false\",\"message\":\"Unable to convert file.\"}");
+                                lsResult = String.valueOf(loDownload);
+
+                            }
+                        }else{
+                            lsResult = String.valueOf(loDownload);
+                        }
 
                         Thread.sleep(1000);
                     }

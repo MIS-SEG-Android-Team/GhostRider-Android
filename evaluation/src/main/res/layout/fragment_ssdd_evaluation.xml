@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_search"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Search Item"
+        android:layout_marginTop="10dp"
+        app:boxBackgroundColor="?attr/colorSurface"
+        app:layout_constraintStart_toStartOf="@+id/rcv_list"
+        app:layout_constraintEnd_toStartOf="@+id/ib_filter">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tie_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageButton
+        android:id="@+id/ib_filter"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:alpha="0.7"
+        android:background="@color/zxing_transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/baseline_filter_list_24"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/til_search"
+        app:layout_constraintEnd_toEndOf="@+id/rcv_list"
+        app:layout_constraintTop_toTopOf="@+id/til_search"
+        app:layout_constraintWidth_percent="0.1"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.526"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_search"
+        app:layout_constraintVertical_bias="0.157" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fbtn_evaluate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:src="@drawable/baseline_edit_note_24"
+        app:layout_constraintTop_toTopOf="@+id/rcv_list"
+        app:layout_constraintBottom_toBottomOf="@+id/rcv_list"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

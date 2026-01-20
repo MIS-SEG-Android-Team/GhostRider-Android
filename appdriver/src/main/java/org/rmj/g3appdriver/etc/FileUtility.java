@@ -1,5 +1,10 @@
 package org.rmj.g3appdriver.etc;
 
+/**
+ * Written By ggutoman
+ * Created Date 11/25/2025
+ * **/
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,6 +17,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class FileUtility {
 
@@ -19,6 +26,15 @@ public class FileUtility {
 
     public FileUtility(Context context){
         this.context = context;
+    }
+
+    public Boolean IsFileExist(String fsPath){
+        return new File(fsPath).exists();
+    }
+
+    public String GetFileDate(File foFile){
+        SimpleDateFormat loFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return loFormat.format(foFile.lastModified());
     }
 
     public String GetDisplayName(Uri uri){

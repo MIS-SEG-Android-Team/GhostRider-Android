@@ -6,7 +6,6 @@
         android:id="@+id/action_add_guideline"
         android:orderInCategory="100"
         android:title="New File"
-        android:visible="false"
         app:showAsAction="never" />
 
     <item

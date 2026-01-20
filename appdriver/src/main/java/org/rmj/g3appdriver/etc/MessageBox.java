@@ -18,6 +18,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
@@ -31,6 +33,7 @@ import java.util.Objects;
 
 public class  MessageBox {
     private AlertDialog poDialogx;
+    private ScrollView message_view;
     private MaterialButton btnPositive;
     private MaterialButton btnNegative;
     private MaterialTextView lblTitle;
@@ -54,6 +57,7 @@ public class  MessageBox {
         poDialogx = poBuilder.create();
         poDialogx.setCancelable(false);
 
+        message_view = view.findViewById(R.id.message_view);
         msg_icon = view.findViewById(R.id.msg_icon);
         lblTitle = view.findViewById(R.id.lbl_dialogTitle);
         lblMsgxx = view.findViewById(R.id.lbl_dialogMessage);

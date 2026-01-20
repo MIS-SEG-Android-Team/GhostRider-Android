@@ -138,12 +138,4 @@ public class Activity_LocalData extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showResultMessage(String message){
-        poMessage.initDialog();
-        poMessage.setIcon(R.drawable.baseline_message_24);
-        poMessage.setTitle("Manage Local Data");
-        poMessage.setMessage(message);
-        poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-        poMessage.show();
-    }
 }

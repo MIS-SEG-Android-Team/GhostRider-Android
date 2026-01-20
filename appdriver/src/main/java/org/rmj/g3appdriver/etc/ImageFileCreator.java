@@ -92,10 +92,6 @@ public class ImageFileCreator {
         String lsResult = imgName + "_" + generateTimestamp() + ".png";
         return lsResult;
     }
-    public String generateImageScanFileName() {
-        String lsResult = TransNox + "_" + EntryNox + "_" + FileCode + ".png";
-        return lsResult;
-    }
 
     public File generateMainStorageDir() {
         String root = String.valueOf(poContext.getExternalFilesDir(null));

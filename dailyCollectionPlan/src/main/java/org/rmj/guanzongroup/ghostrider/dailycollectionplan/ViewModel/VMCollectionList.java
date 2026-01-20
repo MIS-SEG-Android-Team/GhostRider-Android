@@ -12,6 +12,7 @@
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel;
 
 import android.app.Application;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
+import java.net.URI;
 import java.util.List;
 
 public class VMCollectionList extends AndroidViewModel {
@@ -78,6 +80,42 @@ public class VMCollectionList extends AndroidViewModel {
 
     public boolean IsTesting(){
         return poConfig.getTestStatus();
+    }
+
+    public void ImportFromFile(Uri fsURI, OnActionCallback foCallback){
+
+        TaskExecutor.Execute(fsURI, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                foCallback.OnLoad();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+                if (args == null){
+                    message = "Invalid file path";
+                    return false;
+                }
+
+                Uri params = (Uri) args;
+
+                if (!poSys.ImportFromFile(params)){
+                    message = poSys.getMessage();
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                Boolean isSuccess = (Boolean) object;
+                if(isSuccess){
+                    foCallback.OnSuccess();
+                }else {
+                    foCallback.OnFailed("Daily Collection Plan", message);
+                }
+            }
+        });
     }
 
     public void DownloadDCP(ImportParams foVal, OnActionCallback callback){

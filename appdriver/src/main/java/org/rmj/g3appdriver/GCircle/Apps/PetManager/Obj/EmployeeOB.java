@@ -62,6 +62,8 @@ public class EmployeeOB extends PetMngr {
                     new JSONObject().toString(),
                     poHeaders.getHeaders());
 
+            Log.d(TAG, obResponse);
+
             if (obResponse == null) {
                 message = SERVER_NO_RESPONSE;
                 return false;

@@ -21,6 +21,8 @@ import org.rmj.g3appdriver.GCircle.ImportData.Obj.ImportBrand;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.ImportBrandModel;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.ImportCategory;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.ImportCountry;
+import org.rmj.g3appdriver.GCircle.ImportData.Obj.ImportSSDCategories;
+import org.rmj.g3appdriver.GCircle.ImportData.Obj.ImportSSDDepartments;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_MCCashPrice;
 import org.rmj.g3appdriver.GCircle.ImportData.Obj.Import_McColors;
 import org.rmj.g3appdriver.GCircle.ImportData.model.ImportDataCallback;
@@ -81,7 +83,9 @@ public class DataDownloadService extends JobService {
                 new Import_SysConfig(getApplication()),
                 new Import_SCARequest(getApplication()),
                 new Import_AreaPerformance(getApplication()),
-                new Import_BranchPerformance(getApplication())};
+                new Import_BranchPerformance(getApplication()),
+                new ImportSSDDepartments(getApplication()),
+                new ImportSSDCategories(getApplication())};
         new Thread(() -> {
             for (ImportInstance importInstance : importInstances) {
                 importInstance.ImportData(new ImportDataCallback() {

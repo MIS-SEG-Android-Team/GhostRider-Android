@@ -59,14 +59,17 @@
                 android:id="@+id/message_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:fillViewport="true"
                 app:layout_constraintStart_toEndOf="@+id/msg_icon"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lbl_dialogTitle">
+                app:layout_constraintTop_toBottomOf="@+id/lbl_dialogTitle"
+                app:layout_constraintHeight_max="300dp">
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/lbl_dialogMessage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:scrollbars="vertical"
                     android:text="Message"
                     android:paddingVertical="5dp"
                     android:fontFamily="@font/roboto"

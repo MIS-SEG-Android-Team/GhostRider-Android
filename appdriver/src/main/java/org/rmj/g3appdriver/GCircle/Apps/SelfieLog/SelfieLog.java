@@ -201,6 +201,121 @@ public class SelfieLog {
         }
     }
 
+    public boolean UploadSelfieLogs(){
+        try{
+
+            //get list of selfie log for upload
+            List<ESelfieLog> laDetail = poDao.GetSelfieLogsForUpload();
+
+            if(laDetail == null || laDetail.size() < 1){
+                message = "No selfie logs to upload";
+                Log.e(TAG, message);
+                return false;
+            }
+
+            //send selfie logs to database and upload images
+            boolean isSuccess = false;
+            for (ESelfieLog loSelfie : laDetail){
+
+                String lsImageID = loSelfie.getImageIDx();
+
+                lsImageID = poImage.UploadImage(lsImageID);
+                if(lsImageID == null){
+                    message = poImage.getMessage();
+                    lsImageID = loSelfie.getImageIDx();
+                }
+                poDao.updateSelfieLogImageID(loSelfie.getTransNox(), lsImageID);
+
+                Thread.sleep(1000);
+
+                JSONObject params = new JSONObject();
+                params.put("sEmployID", loSelfie.getEmployID());
+                params.put("dLogTimex", loSelfie.getLogTimex());
+                params.put("nLatitude", loSelfie.getLatitude());
+                params.put("nLongitud", loSelfie.getLongitud());
+                params.put("sBranchCd", loSelfie.getBranchCd());
+                params.put("sRemarksx", loSelfie.getRemarksx());
+
+                String lsResponse = WebClient.sendRequest(
+                        poApi.getUrlPostSelfielog(),
+                        params.toString(),
+                        poHeaders.getHeaders());
+
+                if(lsResponse == null){
+                    message = "Server no response";
+                    isSuccess = false;
+                    break;
+                }
+
+                JSONObject loResponse = new JSONObject(lsResponse);
+                String lsResult = loResponse.getString("result");
+
+                if(lsResult.equalsIgnoreCase("error")){
+                    JSONObject loError = loResponse.getJSONObject("error");
+                    message = getErrorMessage(loError);
+                    reportException(poSession.getUserID(), message);
+
+                    isSuccess = false;
+                    break;
+                }
+
+                poDao.updateEmployeeLogStat(
+                        loResponse.getString("sTransNox"),
+                        loSelfie.getTransNox(),
+                        lsImageID,
+                        AppConstants.DATE_MODIFIED());
+
+                isSuccess = true;
+            }
+            return isSuccess;
+
+        } catch (Exception e){
+            message = e.getLocalizedMessage();
+            reportException(poSession.getUserID(), message);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean UploadImages(){
+        try{
+
+            //get list of selfie log for upload
+            List<EImageInfo> laDetail = poDao.GetSelfieImagesForUpload();
+
+            if(laDetail == null || laDetail.size() < 1){
+                message = "No selfie images to upload";
+                Log.e(TAG, message);
+                return false;
+            }
+
+            //send selfie logs to database and upload images
+            boolean isSuccess = false;
+            for (EImageInfo loImage : laDetail){
+
+                String lsImageID = loImage.getTransNox();
+
+                lsImageID = poImage.UploadImage(lsImageID);
+                if(lsImageID == null){
+                    message = poImage.getMessage();
+                    isSuccess = false;
+                    break;
+                }
+                poDao.updateSelfieLogImageID(loImage.getSourceNo(), lsImageID);
+                isSuccess = true;
+
+                Thread.sleep(1000);
+            }
+            return isSuccess;
+
+        } catch (Exception e){
+            message = e.getLocalizedMessage();
+            reportException(poSession.getUserID(), message);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean UploadSelfieLog(String fsVal){
         try{
             ESelfieLog loDetail = poDao.GetSelfieLog(fsVal);

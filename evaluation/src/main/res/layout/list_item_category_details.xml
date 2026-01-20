@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:strokeColor="?attr/colorControlNormal"
+        app:strokeWidth="1dp"
+        app:cardBackgroundColor="@color/zxing_transparent"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp">
+
+        <ImageButton
+            android:id="@+id/img_ssdd"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/kay"
+            android:background="@color/zxing_transparent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"/>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

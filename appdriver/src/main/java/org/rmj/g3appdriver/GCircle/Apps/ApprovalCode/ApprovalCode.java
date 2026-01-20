@@ -25,8 +25,13 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.apprdiver.util.MiscUtil;
+import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASApprovalCode;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASRequests;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
+import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
+import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
@@ -47,13 +52,14 @@ public class ApprovalCode {
     private static final String TAG = ApprovalCode.class.getSimpleName();
 
     private final DApprovalCode poDao;
-
+    private final DCASApprovalCode poCASDao;
+    private final DCASRequests poCASReqDao;
     private final DSCARqstEmp poDaoRstEmp;
 
-    public final Application instance;
 
+    public final EmployeeMaster poMaster;
+    private final Application instance;
     private final GCircleApi poApi;
-
     private final HttpHeaders poHeaders;
 
     private String message;
@@ -61,7 +67,10 @@ public class ApprovalCode {
     public ApprovalCode(Application instance) {
         this.instance = instance;
         this.poDao = GGC_GCircleDB.getInstance(instance).ApprovalDao();
+        this.poCASDao = GGC_GCircleDB.getInstance(instance).casapprovalDao();
+        this.poCASReqDao = GGC_GCircleDB.getInstance(instance).casrequestsDao();
         this.poDaoRstEmp = GGC_GCircleDB.getInstance(instance).scaRqstEmpDao();
+        this.poMaster = new EmployeeMaster(instance);
         this.poApi = new GCircleApi(instance);
         this.poHeaders = HttpHeaders.getInstance(instance);
     }
@@ -261,6 +270,174 @@ public class ApprovalCode {
         }
     }
 
+    public boolean ImportCASTransactions(){
+        try{
+            JSONObject params = new JSONObject();
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlCasTransactions(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+
+            JSONArray laDetail = loResponse.getJSONArray("detail");
+            for (int i = 0; i < laDetail.length(); i++) {
+
+                JSONObject loResult = laDetail.getJSONObject(i);
+
+                ECASApprovalCode loCASCode = new ECASApprovalCode();
+                loCASCode.setsSourceCD(loResult.getString("sSourceCD"));
+                loCASCode.setsDescript(loResult.getString("sDescript"));
+
+                poCASDao.SaveCASApprovalCode(loCASCode);
+            }
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
+    public boolean ImportCASRequests(String fsEmployID, String fsSrcCd){
+        try{
+            JSONObject params = new JSONObject();
+            params.put("sEmployID", fsEmployID);
+            params.put("sSourceCD", fsSrcCd);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlCasRequests(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+
+            JSONArray laDetail = loResponse.getJSONArray("detail");
+            for (int i = 0; i < laDetail.length(); i++) {
+
+                JSONObject loResult = laDetail.getJSONObject(i);
+
+                ECASRequests loRequests = new ECASRequests();
+                loRequests.setsTransNox(loResult.getString("sTransNox"));
+                loRequests.setdTransact(loResult.getString("dTransact"));
+                loRequests.setsSourceCD(loResult.getString("sSourceCD"));
+                loRequests.setsSourceNo(loResult.getString("sSourceNo"));
+                loRequests.setsAuthType(loResult.getString("sAuthType"));
+                loRequests.setsDescript(loResult.getString("sDescript"));
+                loRequests.setsCompnyNm(loResult.getString("sCompnyNm"));
+                loRequests.setsRemarksx(loResult.getString("sRemarksx"));
+                loRequests.setcTranStat(loResult.getString("cTranStat"));
+                loRequests.setdApproved(loResult.getString("dApproved"));
+                loRequests.setsAppSrcNo(loResult.getString("sAppSrcNo"));
+
+                poCASReqDao.SaveCASRequest(loRequests);
+            }
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
+    public boolean VerifyUserMatrix(String fsAuthType, String fsEmployID){
+        try{
+            JSONObject params = new JSONObject();
+            params.put("sEmployID", fsEmployID);
+            params.put("sAuthType", fsAuthType);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlCasMatrix(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+            message = "User verified successfully";
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
+    public boolean UpdateCASRequest(String fsTransNox, String fsEmployID, String fscTranStat){
+        try{
+            JSONObject params = new JSONObject();
+            params.put("sEmployID", fsEmployID);
+            params.put("sTransNox", fsTransNox);
+            params.put("cTranStat", fscTranStat);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlCasApproval(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            System.out.println(lsResponse);
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+
+            poCASReqDao.UpdateRequest(loResponse.getString("sTransNox"), loResponse.getString("cTranStat"), loResponse.getString("dApproved"), loResponse.getString("sEmployID"));
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
     public LiveData<List<ESCA_Request>> getAuthorizedFeatures(String fsVal){
 
         EEmployeeInfo loUser = poDao.GetUserInfo();
@@ -330,10 +507,25 @@ public class ApprovalCode {
         return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
     }
 
+    public LiveData<List<ECASApprovalCode>> GetCASApprovalCodes(){
+        return poCASDao.getCASApprovalCodes();
+    }
+    public LiveData<List<ECASRequests>> GetCASRequests(String fsSource, String dFrom, String dTo){
+        return poCASReqDao.GetRequests(fsSource, dFrom, dTo);
+    }
+    public LiveData<List<ECASRequests>> GetCASHistory(String fsSource, String dFrom, String dTo){
+        return poCASReqDao.GetHistory(fsSource, dFrom, dTo);
+    }
+    public LiveData<ECASRequests> GetRequestDetail(String sTransNox){
+        return poCASReqDao.GetRequestDetail(sTransNox);
+    }
+
+    public String GetDescription(String code){
+        return poCASDao.getDescription(code);
+    }
     public String getLatestStamp(){
         return poDaoRstEmp.GetLatestStamp();
     }
-
     public enum eSCA{
         MANUAL_LOG,
         SYSTEM_CODE,

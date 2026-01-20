@@ -37,6 +37,8 @@ import org.rmj.guanzongroup.ghostrider.samsungknox.Activity_Knox;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_BranchApplications;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_CreditApplications;
 import org.rmj.guanzongroup.onlinecreditapplication.Activities.Activity_IntroductoryQuestion;
+import org.rmj.guanzongroup.evaluation.Activity.PacitaReward.Activity_BranchList;
+import org.rmj.guanzongroup.evaluation.Activity.SSDD.Activity_SSDD_Evaluation;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Application;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_EmployeeLoanEntry;
 import org.rmj.guanzongroup.petmanager.Activity.Activity_Employee_Applications;
@@ -158,6 +160,16 @@ public class ChildObject {
                 loIntent.putExtra("sysCode", "2");
                 break;
 
+            case "by transaction":
+                loIntent = new Intent(context, Activity_ApprovalSelection.class);
+                loIntent.putExtra("sysCode", "3");
+                break;
+
+            case "by history":
+                loIntent = new Intent(context, Activity_ApprovalSelection.class);
+                loIntent.putExtra("sysCode", "4");
+                break;
+
             case "random stock inventory":
                 loIntent = new Intent(context, Activity_Inventory.class);
                 break;
@@ -175,6 +187,12 @@ public class ChildObject {
                 break;
             case "itinerary entry":
                 loIntent = new Intent(context, Activity_ItineraryEntry.class);
+                break;
+            case "pacita evaluation":
+                loIntent = new Intent(context, Activity_BranchList.class);
+                break;
+            case "ssdd evaluation":
+                loIntent = new Intent(context, Activity_SSDD_Evaluation.class);
                 break;
             case "employee loan":
                 loIntent = new Intent(context, Activity_EmployeeLoanEntry.class);
