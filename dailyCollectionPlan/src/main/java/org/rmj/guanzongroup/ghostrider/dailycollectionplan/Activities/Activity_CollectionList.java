@@ -347,6 +347,7 @@ public class Activity_CollectionList extends AppCompatActivity {
 
     @SuppressLint("NewApi")
     private void DownloadDCP(ImportParams foVal){
+
         mViewModel.DownloadDCP(foVal, new VMCollectionList.OnActionCallback() {
             @Override
             public void OnLoad() {
@@ -371,6 +372,7 @@ public class Activity_CollectionList extends AppCompatActivity {
                 ShowMessage(message, 2, new OnMessageButton() {
                     @Override
                     public void OnPositive() {
+
                         if (code.equals("40026")){ //Record not found
 
                             ShowMessage("Open user guide to fix dcp downloading issue. Continue?", 3, new OnMessageButton() {

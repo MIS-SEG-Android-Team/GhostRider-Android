@@ -119,6 +119,7 @@ public class VMCollectionList extends AndroidViewModel {
     }
 
     public void DownloadDCP(ImportParams foVal, OnActionCallback callback){
+
         TaskExecutor.Execute(foVal, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {

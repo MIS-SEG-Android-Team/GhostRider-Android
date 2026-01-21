@@ -61,6 +61,9 @@ public interface DLRDcp {
     @Query("SELECT * FROM LR_DCP_Collection_Detail WHERE sTransNox =:TransNox AND cSendStat <> '1'")
     List<EDCPCollectionDetail> GetCollectionDetailForPosting(String TransNox);
 
+    @Query("SELECT * FROM LR_DCP_Collection_Master WHERE cSendStat = '1' AND cTranStat = '2' AND (dSendDate IS NOT NULL AND dSendDate <> '')")
+    List<EDCPCollectionMaster> GetPostedCollectionMaster();
+
     @Query("SELECT * FROM Image_Information WHERE sSourceNo =:TransNox AND sDtlSrcNo=:AccntNo")
     EImageInfo GetDcpImageForPosting(String TransNox, String AccntNo);
 
@@ -113,4 +116,13 @@ public interface DLRDcp {
 
     @Query("DELETE FROM LR_DCP_Remittance")
     void ClearDCPRemittance();
+
+    @Query("DELETE FROM LR_DCP_Collection_Master WHERE sTransNox = :fsTransnox")
+    void ClearPostedMasterTransaction(String fsTransnox);
+
+    @Query("DELETE FROM LR_DCP_Collection_Detail WHERE sTransNox = :fsTransnox")
+    void ClearPostedDetailTransaction(String fsTransnox);
+
+    @Query("DELETE FROM LR_DCP_Remittance WHERE sTransNox = :fsTransnox")
+    void ClearPostedRemittanceTransaction(String fsTransnox);
 }

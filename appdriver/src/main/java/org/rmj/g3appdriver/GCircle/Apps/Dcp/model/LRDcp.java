@@ -461,6 +461,23 @@ public class LRDcp {
                 return false;
             }
 
+            //get posted collections from previous transactions
+            if (poDao.GetPostedCollectionMaster() != null){
+
+                if (poDao.GetPostedCollectionMaster().size() > 0){
+
+                    //if there are posted collections, clear then
+                    List<EDCPCollectionMaster> laCollectionMaster = poDao.GetPostedCollectionMaster();
+
+                    for (EDCPCollectionMaster loPosted: laCollectionMaster){
+                        poDao.ClearPostedRemittanceTransaction(loPosted.getTransNox());
+                        poDao.ClearPostedDetailTransaction(loPosted.getTransNox());
+                        poDao.ClearPostedMasterTransaction(loPosted.getTransNox());
+                    }
+
+                }
+            }
+
             EDCPCollectionMaster dcpMaster = new EDCPCollectionMaster();
             dcpMaster.setTransNox(joMaster.getString("sTransNox"));
             dcpMaster.setTransact(joMaster.getString("dTransact"));
@@ -505,6 +522,7 @@ public class LRDcp {
                 dcpDetail.setABalance(joDetail.getString("nABalance"));
                 dcpDetail.setDelayAvg(joDetail.getDouble("nDelayAvg"));
                 dcpDetail.setMonAmort(joDetail.getDouble("nMonAmort"));
+
                 poDao.SaveDcpDetail(dcpDetail);
                 Log.d(TAG, "DCP account no. " +dcpDetail.getAcctNmbr() + " has been saved.");
             }
@@ -512,6 +530,7 @@ public class LRDcp {
             return true;
         } catch (Exception e){
             e.printStackTrace();
+            lscode = "EX3C";
             message = getLocalMessage(e);
             return false;
         }
