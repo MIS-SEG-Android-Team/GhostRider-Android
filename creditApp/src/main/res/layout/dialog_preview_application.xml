@@ -12,7 +12,6 @@
 
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -29,14 +28,15 @@
         android:orientation="vertical">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/dialogTitle"
+            style="@style/HeaderLabelBlack"
+            android:id="@+id/lbl_applicantName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Application Info"
-            android:textSize="20sp"
+            android:text="N/A"
             android:textAlignment="center"
+            android:textSize="18sp"
+            android:textColor="?attr/colorPrimary"
             android:fontFamily="@font/roboto_bold"
-            android:layout_marginTop="15dp"
             android:gravity="center_horizontal" />
 
         <com.google.android.material.divider.MaterialDivider
@@ -48,160 +48,176 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:padding="10dp">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/lbl_applicantName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
-                android:text="Doe, John"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textview1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:fontFamily="@font/roboto_regular"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/roboto_bold"
                 android:text="Transaction No:"
+                app:layout_constraintWidth_percent="0.35"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lbl_applicantName" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/lbl_TransNox"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
-                android:text="MX0112345678910"
-                android:layout_marginTop="5dp"
+                android:fontFamily="@font/roboto_italic"
+                android:text="N/A"
+                android:paddingStart="15dp"
+                app:layout_constraintStart_toEndOf="@+id/textview1"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lbl_applicantName" />
+                app:layout_constraintTop_toTopOf="@+id/textview1"
+                app:layout_constraintBottom_toBottomOf="@+id/textview1"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textview2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/roboto_regular"
+                android:fontFamily="@font/roboto_bold"
                 android:text="Date Applied:"
-                app:layout_constraintStart_toStartOf="parent"
+                android:gravity="end"
+                app:layout_constraintStart_toStartOf="@+id/textview1"
+                app:layout_constraintEnd_toEndOf="@+id/textview1"
                 app:layout_constraintTop_toBottomOf="@+id/textview1" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/lbl_dateCreated"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_regular"
-                android:text="January 1, 2023"
-                android:layout_marginTop="5dp"
+                android:fontFamily="@font/roboto_italic"
+                android:text="N/A"
+                android:paddingStart="15dp"
+                app:layout_constraintStart_toEndOf="@+id/textview2"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lbl_TransNox" />
+                app:layout_constraintTop_toTopOf="@+id/textview2"
+                app:layout_constraintBottom_toBottomOf="@+id/textview2"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textview3"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/roboto_regular"
+                android:fontFamily="@font/roboto_bold"
                 android:text="GOCas No:"
-                app:layout_constraintStart_toStartOf="parent"
+                android:gravity="end"
+                app:layout_constraintStart_toStartOf="@+id/textview1"
+                app:layout_constraintEnd_toEndOf="@+id/textview1"
                 app:layout_constraintTop_toBottomOf="@+id/textview2" />
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/lbl_gocasNox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_italic"
+                android:text="N/A"
+                android:paddingStart="15dp"
+                app:layout_constraintTop_toTopOf="@+id/textview3"
+                app:layout_constraintBottom_toBottomOf="@+id/textview3"
+                app:layout_constraintStart_toEndOf="@+id/textview3"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textview4"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/roboto_regular"
+                android:fontFamily="@font/roboto_bold"
                 android:text="Date Sent:"
-                app:layout_constraintStart_toStartOf="parent"
+                android:gravity="end"
+                app:layout_constraintStart_toStartOf="@+id/textview1"
+                app:layout_constraintEnd_toEndOf="@+id/textview1"
                 app:layout_constraintTop_toBottomOf="@+id/textview3" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/lbl_gocasNox"
-                android:layout_width="wrap_content"
+                android:id="@+id/lbl_dateSent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
-                android:text="MX0112345678910"
-                android:layout_marginTop="5dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lbl_dateCreated" />
+                android:fontFamily="@font/roboto_italic"
+                android:text="N/A"
+                android:paddingStart="15dp"
+                app:layout_constraintTop_toTopOf="@+id/textview4"
+                app:layout_constraintBottom_toBottomOf="@+id/textview4"
+                app:layout_constraintStart_toEndOf="@+id/textview4"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textview5"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/roboto_regular"
+                android:fontFamily="@font/roboto_bold"
                 android:text="Status"
-                app:layout_constraintStart_toStartOf="parent"
+                android:gravity="end"
+                app:layout_constraintStart_toStartOf="@+id/textview1"
+                app:layout_constraintEnd_toEndOf="@+id/textview1"
                 app:layout_constraintTop_toBottomOf="@+id/textview4" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/lbl_dateSent"
-                android:layout_width="wrap_content"
+                android:id="@+id/lbl_applStatus"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_regular"
-                android:text="January 1, 2023"
-                android:layout_marginTop="5dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lbl_gocasNox" />
+                android:fontFamily="@font/roboto_italic"
+                android:text="N/A"
+                android:paddingStart="15dp"
+                app:layout_constraintTop_toTopOf="@+id/textview5"
+                app:layout_constraintBottom_toBottomOf="@+id/textview5"
+                app:layout_constraintStart_toEndOf="@+id/textview5"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textview6"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/roboto_regular"
+                android:fontFamily="@font/roboto_bold"
                 android:text="Date Approved:"
-                app:layout_constraintStart_toStartOf="parent"
+                android:gravity="end"
+                app:layout_constraintStart_toStartOf="@+id/textview1"
+                app:layout_constraintEnd_toEndOf="@+id/textview1"
                 app:layout_constraintTop_toBottomOf="@+id/textview5" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/lbl_applStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
-                android:text="Approve With CI"
-                android:layout_marginTop="5dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lbl_dateSent" />
-
-            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/lbl_dateApproved"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_regular"
-                android:text="January 1, 2023"
-                android:layout_marginTop="5dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lbl_applStatus" />
+                android:fontFamily="@font/roboto_italic"
+                android:text="N/A"
+                android:paddingStart="15dp"
+                app:layout_constraintTop_toTopOf="@+id/textview6"
+                app:layout_constraintBottom_toBottomOf="@+id/textview6"
+                app:layout_constraintStart_toEndOf="@+id/textview6"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_docScan"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Scan Documents"
-                android:layout_marginTop="10dp"
-                style="@style/MaterialButtonAccent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/roboto"
+                android:padding="10dp"
+                app:layout_constraintWidth_percent="0.45"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textview6" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_close"
-                android:layout_width="wrap_content"
+                android:id="@+id/btn_docSend"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Close"
-                style="@style/MaterialButtonAccent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btn_docScan" />
+                android:text="Send Application"
+                android:fontFamily="@font/roboto"
+                android:padding="10dp"
+                android:enabled="false"
+                app:layout_constraintWidth_percent="0.45"
+                app:layout_constraintTop_toTopOf="@+id/btn_docScan"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_docScan"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

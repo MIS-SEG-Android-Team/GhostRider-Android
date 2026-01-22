@@ -3,63 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/GhostRiderMaterialTheme"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="5dp"
+    android:paddingTop="15dp"
     android:paddingHorizontal="10dp">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/lbl_applicantName"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_medium"
-        android:text="Doe, John"
+        android:fontFamily="@font/roboto_medium_italic"
+        android:text="N/A"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/lbl_dateCreated"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_regular"
-        android:text="Date Applied: January 1, 2023"
-        android:layout_marginTop="5dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lbl_applicantName" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/lbl_dateSent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_regular"
-        android:text="Date Applied: January 1, 2023"
-        android:layout_marginTop="5dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lbl_dateCreated" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/lbl_dateApproved"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_regular"
-        android:text="Date Applied: January 1, 2023"
-        android:layout_marginTop="5dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lbl_dateSent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_submit"
-        style="@style/OutlinedButton.IconOnly"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        app:icon="@drawable/ic_baseline_file_upload_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.85"/>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/lbl_status"
@@ -67,16 +25,88 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:fontFamily="@font/roboto_medium"
-        android:text="Sent"
-        android:textColor="@color/check_green"
-        app:layout_constraintEnd_toStartOf="@+id/btn_submit"
-        app:layout_constraintTop_toBottomOf="@+id/lbl_dateSent" />
+        android:text="Pending"
+        android:textColor="?attr/colorOnSurface"
+        android:alpha="0.5"
+        app:layout_constraintTop_toTopOf="@+id/lbl_applicantName"
+        app:layout_constraintBottom_toBottomOf="@+id/lbl_applicantName"
+        app:layout_constraintStart_toEndOf="@+id/lbl_applicantName"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
+        android:id="@+id/dvd_header"
+        android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginVertical="5dp"
         android:background="@color/guanzon_digital_orange"
-        app:layout_constraintTop_toBottomOf="@id/lbl_status" />
+        app:layout_constraintTop_toBottomOf="@id/lbl_status"
+        app:layout_constraintStart_toStartOf="@+id/lbl_applicantName"
+        app:layout_constraintEnd_toEndOf="@+id/lbl_status"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_lbl1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Created:"
+        android:layout_marginTop="5dp"
+        app:layout_constraintWidth_percent="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dvd_header" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/lbl_dateCreated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_italic"
+        android:text="N/A"
+        app:layout_constraintStart_toEndOf="@+id/mtv_lbl1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mtv_lbl1"
+        app:layout_constraintBottom_toBottomOf="@+id/mtv_lbl1"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_lbl2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Sent:"
+        android:layout_marginTop="5dp"
+        app:layout_constraintWidth_percent="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lbl_dateCreated" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/lbl_dateSent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_italic"
+        android:text="N/A"
+        app:layout_constraintStart_toEndOf="@+id/mtv_lbl2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mtv_lbl2"
+        app:layout_constraintBottom_toBottomOf="@+id/mtv_lbl2"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_lbl3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Approved:"
+        android:layout_marginTop="5dp"
+        app:layout_constraintWidth_percent="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mtv_lbl2" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/lbl_dateApproved"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_italic"
+        android:text="N/A"
+        app:layout_constraintStart_toEndOf="@+id/mtv_lbl3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mtv_lbl3"
+        app:layout_constraintBottom_toBottomOf="@+id/mtv_lbl3"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -25,6 +25,7 @@ public class DialogPreviewApplication {
 
     public interface OnDialogActionClickListener{
         void DocumentScan(DCreditApplication.ApplicationLog creditApp);
+        void SendApplication(DCreditApplication.ApplicationLog creditApp);
     }
 
     public DialogPreviewApplication(Context context) {
@@ -32,12 +33,14 @@ public class DialogPreviewApplication {
     }
 
     public void initDialog(DCreditApplication.ApplicationLog args, OnDialogActionClickListener listener){
+
         AlertDialog.Builder poBuilder = new AlertDialog.Builder(mContext);
+
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_preview_application, null);
-        poBuilder.setCancelable(false)
+        poBuilder.setCancelable(true)
                 .setView(view);
         poDialogx = poBuilder.create();
-        poDialogx.setCancelable(false);
+        poDialogx.setCancelable(true);
 
         MaterialTextView lblTransNo = view.findViewById(R.id.lbl_TransNox),
                 lblApplName = view.findViewById(R.id.lbl_applicantName),
@@ -48,24 +51,36 @@ public class DialogPreviewApplication {
                 lblDateAppr = view.findViewById(R.id.lbl_dateApproved);
 
         MaterialButton btnScan = view.findViewById(R.id.btn_docScan),
-                btnClose = view.findViewById(R.id.btn_close);
+                btn_docSend = view.findViewById(R.id.btn_docSend);
 
         lblTransNo.setText(args.sTransNox);
         lblApplName.setText(args.sClientNm);
+
+        //initialize GOCAS number
         if(args.sGOCASNox.equalsIgnoreCase("null")){
-            lblGOCasNo.setText("");
+            lblGOCasNo.setText("N/A");
         } else {
             lblGOCasNo.setText(args.sGOCASNox);
         }
+
         lblDateAppl.setText(FormatUIText.getParseDateTime(args.dCreatedx));
         lblDateSent.setText(FormatUIText.getParseDateTime(args.dReceived));
+
+        //initialize status
         if(args.cTranStat.isEmpty() ||
             args.cTranStat.equalsIgnoreCase("0")){
             lblStatus.setText("Waiting for approval");
         } else if(args.cWithCIxx.equalsIgnoreCase("1")){
             lblStatus.setText("For C.I");
         } else {
-            lblStatus.setText("");
+            lblStatus.setText("N/A");
+        }
+
+        //initialize send button
+        if (args.cSendStat == null || args.cSendStat.isEmpty() || args.cSendStat.equalsIgnoreCase("0")){
+            btn_docSend.setEnabled(true);
+        } else {
+            btn_docSend.setEnabled(false);
         }
 
         lblDateAppr.setText(FormatUIText.getParseDateTime(args.dVerified));
@@ -75,7 +90,13 @@ public class DialogPreviewApplication {
             listener.DocumentScan(args);
         });
 
-        btnClose.setOnClickListener(v -> poDialogx.dismiss());
+        btn_docSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                poDialogx.dismiss();
+                listener.SendApplication(args);
+            }
+        });
     }
 
     public void show(){

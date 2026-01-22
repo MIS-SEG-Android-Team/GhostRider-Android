@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/CardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="10dp"
+    app:cardCornerRadius="10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/HeaderLabelBlack"
+            android:id="@+id/mtv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="MC Contract Finalization"
+            android:gravity="center"
+            android:textColor="?attr/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/dvd_header"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@+id/mtv_title"/>
+
+        <LinearLayout
+            android:id="@+id/layout_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/dvd_header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Branch"
+                android:enabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    style="@style/TextInputStyle.Edittext"
+                    android:id="@+id/tie_branch"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Transaction Number"
+                android:enabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    style="@style/TextInputStyle.Edittext"
+                    android:id="@+id/tie_transaction"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Client ID"
+                android:enabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    style="@style/TextInputStyle.Edittext"
+                    android:id="@+id/tie_client"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Account Number"
+                android:enabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    style="@style/TextInputStyle.Edittext"
+                    android:id="@+id/tie_account"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/CustomDropDownTilStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Serial ID"
+                android:paddingTop="10dp">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    style="@style/CustomDropDownTilStyle"
+                    android:id="@+id/auto_serial"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Downpayment"
+                android:padding="5dp"
+                app:boxBackgroundColor="?attr/colorSurface">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tie_downpay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="numberDecimal"
+                    android:background="@color/zxing_transparent"
+                    android:text="0.00"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/CustomDropDownTilStyle"
+            android:id="@+id/layout_terms"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Terms"
+            app:layout_constraintTop_toBottomOf="@+id/layout_1"
+            app:layout_constraintStart_toStartOf="@+id/layout_1"
+            app:layout_constraintWidth_percent="0.35">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                style="@style/TextInputStyle.Edittext"
+                android:id="@+id/auto_term"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="0"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/TextInputStyle"
+            android:id="@+id/layout_monthly"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:hint="Monthly Amort"
+            app:layout_constraintTop_toTopOf="@+id/layout_terms"
+            app:layout_constraintBottom_toBottomOf="@+id/layout_terms"
+            app:layout_constraintStart_toEndOf="@+id/layout_terms"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:enabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                style="@style/TextInputStyle.Edittext"
+                android:id="@+id/tie_branch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="0.0"
+                android:gravity="end" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/TextInputTextAreaStyle"
+            android:id="@+id/layout_remarks"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:hint="Remarks"
+            app:layout_constraintTop_toBottomOf="@+id/layout_terms"
+            app:layout_constraintStart_toStartOf="@+id/layout_terms"
+            app:layout_constraintEnd_toEndOf="@+id/layout_monthly">
+
+            <com.google.android.material.textfield.TextInputEditText
+                style="@style/TextInputStyle.Edittext"
+                android:id="@+id/tie_branch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:maxLines="2"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="SUBMIT"
+            android:layout_marginTop="10dp"
+            android:enabled="false"
+            app:layout_constraintTop_toBottomOf="@+id/layout_remarks"
+            app:layout_constraintStart_toStartOf="@+id/layout_remarks"
+            app:layout_constraintEnd_toEndOf="@+id/layout_remarks"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

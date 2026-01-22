@@ -124,6 +124,7 @@ public class CreditOnlineApplication {
                 message = SERVER_NO_RESPONSE;
                 return false;
             }
+            Log.d(TAG, lsResponse);
 
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");

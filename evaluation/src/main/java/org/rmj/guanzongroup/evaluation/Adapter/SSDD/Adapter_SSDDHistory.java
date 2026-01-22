@@ -20,7 +20,7 @@ import java.util.List;
 
 public class Adapter_SSDDHistory extends RecyclerView.Adapter<Adapter_SSDDHistory.VHistory> {
 
-    private SSDDFilter loFilter;
+    private final SSDDFilter loFilter;
     private List<ESSDDMaster> laHistoryFiltered;
 
     private final OnItemClickListener foListener;
@@ -31,13 +31,6 @@ public class Adapter_SSDDHistory extends RecyclerView.Adapter<Adapter_SSDDHistor
         this.laHistory = laHistory;
         this.laHistoryFiltered = laHistory;
         this.foListener = foListener;
-    }
-
-    public void SetDataList(List<ESSDDMaster> laParams) {
-        laHistory.clear();
-        laHistory.addAll(laParams);
-
-        notifyDataSetChanged();
     }
 
     public SSDDFilter GetFilter(){

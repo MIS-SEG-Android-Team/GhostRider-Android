@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -23,6 +25,7 @@ import org.rmj.guanzongroup.onlinecreditapplication.Adapter.CreditApplicationsAd
 import org.rmj.guanzongroup.onlinecreditapplication.R;
 import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMCreditApplications;
 import org.rmj.guanzongroup.onlinecreditapplication.dialog.DialogPreviewApplication;
+import org.rmj.guanzongroup.onlinecreditapplication.dialog.Dialog_MContract;
 
 import java.util.Objects;
 
@@ -38,14 +41,55 @@ public class Activity_CreditApplications extends AppCompatActivity {
     private LoadDialog poDialogx;
     private MessageBox poMessage;
 
+    public interface OnMessageButton {
+        void OnPositive();
+        void OnNegative();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mViewModel = new ViewModelProvider(Activity_CreditApplications.this).get(VMCreditApplications.class);
         poDialogx = new LoadDialog(Activity_CreditApplications.this);
         poMessage = new MessageBox(Activity_CreditApplications.this);
+
         setContentView(R.layout.activity_credit_applications);
+
         initWidgets();
+        initData();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
+        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initWidgets(){
+
+        toolbar = findViewById(R.id.toolbar_applicationHistory);
+
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        txtSearch = findViewById(R.id.txt_Search);
+        recyclerView = findViewById(R.id.rectangles_applicationHistory);
+        noRecord = findViewById(R.id.layout_application_history_noRecord);
+    }
+
+    private void initData(){
+
         mViewModel.ImportApplications(new VMCreditApplications.OnImportApplicationsListener() {
             @Override
             public void OnImport() {
@@ -79,61 +123,116 @@ public class Activity_CreditApplications extends AppCompatActivity {
         });
 
         mViewModel.GetApplicationList().observe(Activity_CreditApplications.this, eCreditApplications -> {
+
             try{
+
+                //show record not found
+                if (eCreditApplications == null || eCreditApplications.size() < 1){
+                    noRecord.setVisibility(LinearLayout.VISIBLE);
+                    recyclerView.setVisibility(LinearLayout.GONE);
+                    return;
+                }
+                recyclerView.setVisibility(LinearLayout.VISIBLE);
+                noRecord.setVisibility(LinearLayout.GONE);
+
+                //show previww, if not approved (GOCAS Number is empty)
+                CreditApplicationsAdapter loAdapter = new CreditApplicationsAdapter(eCreditApplications, new CreditApplicationsAdapter.OnItemActionClickListener() {
+                    @Override
+                    public void OnPreview(DCreditApplication.ApplicationLog creditapp) {
+
+                        if (creditapp.sGOCASNox == null || creditapp.sGOCASNox.trim().isEmpty() || creditapp.sGOCASNox.equalsIgnoreCase("null")){
+
+                            //show details on preview
+                            DialogPreviewApplication loDialog = new DialogPreviewApplication(Activity_CreditApplications.this);
+                            loDialog.initDialog(creditapp, new DialogPreviewApplication.OnDialogActionClickListener() {
+                                @Override
+                                public void DocumentScan(DCreditApplication.ApplicationLog creditApp) {
+                                    Toast.makeText(Activity_CreditApplications.this, "Under development.", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void SendApplication(DCreditApplication.ApplicationLog creditApp) {
+                                    String lsTransNo = creditapp.sTransNox;
+                                    resendApp(lsTransNo);
+                                }
+                            });
+                            loDialog.show();
+
+                            return;
+                        }
+
+                        //ask user for next action, MC AR Contract Emtry or Preview Only
+                        InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Confirm next action", "AR Contract", "Preview Only", new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {
+
+                                //show details on preview
+                                Dialog_MContract loDialog = new Dialog_MContract(Activity_CreditApplications.this);
+                                loDialog.initDialog(new Dialog_MContract.OnDialogActionClickListener() {
+                                    @Override
+                                    public void SendApplication() {
+                                        
+                                    }
+                                });
+                                loDialog.show();
+
+                            }
+
+                            @Override
+                            public void OnNegative() {
+
+                                //show details on preview
+                                DialogPreviewApplication loDialog = new DialogPreviewApplication(Activity_CreditApplications.this);
+                                loDialog.initDialog(creditapp, new DialogPreviewApplication.OnDialogActionClickListener() {
+                                    @Override
+                                    public void DocumentScan(DCreditApplication.ApplicationLog creditApp) {
+                                        Toast.makeText(Activity_CreditApplications.this, "Under development.", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void SendApplication(DCreditApplication.ApplicationLog creditApp) {
+                                        String lsTransNo = creditapp.sTransNox;
+                                        resendApp(lsTransNo);
+                                    }
+                                });
+                                loDialog.show();
+                            }
+                        });
+
+                    }
+                });
+
+                //initialize adapter
                 LinearLayoutManager loLayout = new LinearLayoutManager(Activity_CreditApplications.this);
                 loLayout.setOrientation(RecyclerView.VERTICAL);
+
                 recyclerView.setLayoutManager(loLayout);
-                recyclerView.setAdapter(new CreditApplicationsAdapter(eCreditApplications, new CreditApplicationsAdapter.OnItemActionClickListener() {
+                recyclerView.setAdapter(loAdapter);
+
+                txtSearch.addTextChangedListener(new TextWatcher() {
                     @Override
-                    public void Resend(DCreditApplication.ApplicationLog creditapp) {
-                        String lsTransNo = creditapp.sTransNox;
-                        resendApp(lsTransNo);
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                        loAdapter.GetFilter().filter(s.toString());
                     }
 
                     @Override
-                    public void OnPreview(DCreditApplication.ApplicationLog creditapp) {
-                        DialogPreviewApplication loDialog = new DialogPreviewApplication(Activity_CreditApplications.this);
-                        loDialog.initDialog(creditapp, new DialogPreviewApplication.OnDialogActionClickListener() {
-                            @Override
-                            public void DocumentScan(DCreditApplication.ApplicationLog creditApp) {
-                                Toast.makeText(Activity_CreditApplications.this, "Under development.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        loDialog.show();
-                    }
-                }));
+                    public void afterTextChanged(Editable s) {}
+                });
+
             } catch (Exception e){
                 e.printStackTrace();
 
             }
         });
-    }
 
-    private void initWidgets(){
-        toolbar = findViewById(R.id.toolbar_applicationHistory);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        txtSearch = findViewById(R.id.txt_Search);
-        recyclerView = findViewById(R.id.rectangles_applicationHistory);
-        noRecord = findViewById(R.id.layout_application_history_noRecord);
-    }
-
-    @Override
-    public void onBackPressed() {
-        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
-        finish();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void resendApp(String args){
+
         mViewModel.ResendApplication(args, new VMCreditApplications.OnResendApplicationListener() {
             @Override
             public void OnResend() {
@@ -144,24 +243,51 @@ public class Activity_CreditApplications extends AppCompatActivity {
             @Override
             public void OnSuccess() {
                 poDialogx.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_message_24);
-                poMessage.setTitle("Credit Online Application");
-                poMessage.setMessage("Applicant sent!");
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                poMessage.show();
+
+                InitMessage(0, R.drawable.baseline_message_24, "Application has been sent", "Okay", "", new OnMessageButton() {
+                    @Override
+                    public void OnPositive() {}
+
+                    @Override
+                    public void OnNegative() {}
+                });
             }
 
             @Override
             public void OnFailed(String message) {
                 poDialogx.dismiss();
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_error_24);
-                poMessage.setTitle("Credit Online Application");
-                poMessage.setMessage(message);
-                poMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                poMessage.show();
+
+                InitMessage(0, R.drawable.baseline_message_24, message, "Okay", "", new OnMessageButton() {
+                    @Override
+                    public void OnPositive() {}
+
+                    @Override
+                    public void OnNegative() {}
+                });
             }
         });
+    }
+
+    private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnMessageButton callback){
+
+        poMessage.initDialog();
+        poMessage.setTitle("Credit Application");
+        poMessage.setIcon(statusIcon);
+        poMessage.setMessage(message);
+
+        poMessage.setPositiveButton(posText, (view, dialog) -> {
+            dialog.dismiss();
+            callback.OnPositive();
+        });
+
+        if (messageType == 1){
+            poMessage.setNegativeButton(negText, (view, dialog) -> {
+                dialog.dismiss();
+                callback.OnNegative();
+
+            });
+        }
+
+        poMessage.show();
     }
 }
