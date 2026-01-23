@@ -91,6 +91,10 @@ public class Branch {
         return poDao.getBranchInfo(BranchCD);
     }
 
+    public EBranchInfo getBranchInfoNonLive(String BranchCD){
+        return poDao.GetBranchInfo(BranchCD);
+    }
+
     public boolean ImportBranches(){
         try{
             JSONObject params = new JSONObject();

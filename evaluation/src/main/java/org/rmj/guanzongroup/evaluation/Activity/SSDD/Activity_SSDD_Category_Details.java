@@ -333,7 +333,6 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                                             @Override
                                             public void OnFailed(String fsMessage) {
                                                 poDialog.dismiss();
-                                                Log.d("SSDD EVALUATION", fsMessage);
                                                 Toast.makeText(Activity_SSDD_Category_Details.this, fsMessage, Toast.LENGTH_LONG).show();
                                             }
                                         });

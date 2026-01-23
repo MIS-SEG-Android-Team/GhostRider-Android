@@ -58,6 +58,7 @@ import org.rmj.gocas.pricelist.PriceFactory;
 import org.rmj.gocas.pricelist.Pricelist;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -99,8 +100,212 @@ public class CreditOnlineApplication {
         return message;
     }
 
+    private String CreateUniqueIDForApplicant(){
+        String lsUniqIDx = "";
+        try{
+            String lsBranchCd = "MX01";
+            String lsCrrYear = new SimpleDateFormat("yy", Locale.getDefault()).format(new Date());
+            StringBuilder loBuilder = new StringBuilder(lsBranchCd);
+            loBuilder.append(lsCrrYear);
+
+            int lnLocalID = poDao.GetRowsCountForUniqueID() + 1;
+            String lsPadNumx = String.format("%05d", lnLocalID);
+            loBuilder.append(lsPadNumx);
+            lsUniqIDx = loBuilder.toString();
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
+        }
+        Log.d(TAG, lsUniqIDx);
+        return lsUniqIDx;
+    }
+
+    public String CreateApplication(LoanInfo foVal){
+        try{
+            if(!foVal.isDataValid()){
+                message = foVal.getMessage();
+                return null;
+            }
+
+            String lsTransNo = CreateUniqueIDForApplicant();
+
+            if(lsTransNo.isEmpty()){
+                message = "Failed to generate unique id please restart the app and try again.";
+                return null;
+            }
+
+            GOCASApplication loGocas = new GOCASApplication();
+            loGocas.PurchaseInfo().setAppliedFor(String.valueOf(foVal.getAppTypex()));
+            loGocas.PurchaseInfo().setTargetPurchase(foVal.getTargetDte());
+            loGocas.PurchaseInfo().setCustomerType(String.valueOf(foVal.getCustTypex()));
+            loGocas.PurchaseInfo().setPreferedBranch(foVal.getBranchCde());
+            loGocas.PurchaseInfo().setBrandName(foVal.getBrandIDxx());
+            loGocas.PurchaseInfo().setModelID(foVal.getModelIDxx());
+            loGocas.PurchaseInfo().setDownPayment(foVal.getDownPaymt());
+            loGocas.PurchaseInfo().setAccountTerm(foVal.getAccTermxx());
+            loGocas.PurchaseInfo().setDateApplied(AppConstants.DATE_MODIFIED());
+            loGocas.PurchaseInfo().setMonthlyAmortization(foVal.getMonthlyAm());
+            loGocas.PurchaseInfo().setRemarks(foVal.getsRemarks());
+
+            lsTransNo = CreateUniqueIDForApplicant();
+
+            ECreditApplicantInfo loApp = new ECreditApplicantInfo();
+            loApp.setTransNox(lsTransNo);
+            loApp.setPurchase(loGocas.PurchaseInfo().toJSONString());
+            loApp.setBranchCd(foVal.getBranchCde());
+            loApp.setAppliedx(loGocas.PurchaseInfo().getAppliedFor());
+            loApp.setDownPaym(loGocas.PurchaseInfo().getDownPayment());
+            loApp.setCreatedx(AppConstants.DATE_MODIFIED());
+            loApp.setTransact(AppConstants.CURRENT_DATE());
+            loApp.setTranStat("0");
+            loApp.setRemarksx(loGocas.PurchaseInfo().getRemarks());
+
+            poDao.Save(loApp);
+
+            Log.d(TAG, "New credit online application has been created.");
+            return lsTransNo;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return null;
+        }
+    }
+
     public LiveData<DEmployeeInfo.EmployeeBranch> GetUserInfo(){
         return poUser.GetEmployeeBranch();
+    }
+
+    public LiveData<List<ELoanTerm>> GetLoanTerms(){
+        return poDao.GetLoanTerms();
+    }
+
+    public LiveData<List<DCreditApplication.ApplicationLog>> GetCreditApplications(){
+        return poDao.getApplicationHistory();
+    }
+
+    public LiveData<List<EBranchLoanApplication>> GetBranchApplications(){
+        return poDao.GetBranchApplications();
+    }
+
+    public LiveData<List<EBranchInfo>> getAllBranchInfo(){
+        return poBranch.getAllMcBranchInfo();
+    }
+
+    public LiveData<List<EMcBrand>> getAllMcBrand(){
+        return poBrand.getAllBrandInfo();
+    }
+
+    public LiveData<List<EMcModel>> getAllBrandModelInfo(String args){
+        return poModel.getMcModelFromBrand(args);
+    }
+
+    public LiveData<DMcModel.McAmortInfo> GetMonthlyPayment(String ModelID, int Term){
+        return poModel.GetMonthlyPayment(ModelID, Term);
+    }
+
+    public LiveData<DMcModel.McDPInfo> GetInstallmentPlanDetail(String ModelID){
+        return poModel.getDownpayment(ModelID);
+    }
+
+    public CreditApp getInstance(CreditAppInstance app){
+        switch (app){
+            case Client_Info:
+                return new PersonalInfo(instance);
+            case Residence_Info:
+                return new ResidenceInfo(instance);
+            case Employed_Info:
+                return new EmploymentInfo(instance);
+            case Self_Employed_Info:
+                return new BusinessInfo(instance);
+            case Financier_Info:
+                return new FinancierInfo(instance);
+            case Pension_Info:
+                return new PensionInfo(instance);
+            case Spouse_Info:
+                return new SpouseInfo(instance);
+            case Spouse_Residence_Info:
+                return new SpouseResidenceInfo(instance);
+            case Spouse_Employment_Info:
+                return new SpouseEmploymentInfo(instance);
+            case Spouse_Self_Employed_Info:
+                return new SpouseBusinessInfo(instance);
+            case Spouse_Pension_Info:
+                return new SpousePensionInfo(instance);
+            case Disbursement_Info:
+                return new DisbursementInfo(instance);
+            case Dependent_Info:
+                return new DependentsInfo(instance);
+            case Properties_Info:
+                return new PropertiesInfo(instance);
+            case Other_Info:
+                return new OtherInfo(instance);
+            case CoMaker_Info:
+                return new CoMakerInfo(instance);
+            case CoMaker_Residence_Info:
+                return new CoMakerResidenceInfo(instance);
+            case Application_Info:
+                return new ApplicationInfo(instance);
+            case Means_Info:
+                return new MeansSelectionInfo(instance);
+            case ReviewLoanInfo:
+                return new ReviewLoanInfo(instance);
+            default:
+                return null;
+        }
+    }
+
+    public ECreditApplication GetApplication(String fsTransNox){
+        return poDao.GetCreditOnlineApplication(fsTransNox);
+    }
+
+    public EBranchInfo getBranchInfoNonLive(String fsBranchCd){
+        return poBranch.getBranchInfoNonLive(fsBranchCd);
+    }
+
+    public List<MCSerial> DownloadSerials(String fsSearch){
+
+        try {
+            JSONObject params = new JSONObject();
+            params.put("sSerial", fsSearch);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlImportMcSerials(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if (lsResponse == null) {
+                message = SERVER_NO_RESPONSE;
+                return null;
+            }
+            Log.d(TAG, lsResponse);
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+            if (lsResult.equalsIgnoreCase("error")) {
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return null;
+            }
+
+            List<MCSerial> laSerials = new ArrayList<>();
+            JSONArray laJson = loResponse.getJSONArray("detail");
+            for (int x = 0; x < laJson.length(); x++) {
+
+                JSONObject loResult = laJson.getJSONObject(x);
+
+                MCSerial loSerial = new MCSerial(
+                        loResult.getString("sSerialID"),
+                        loResult.getString("sEngineNo"),
+                        loResult.getString("sFrameNox")
+                );
+                laSerials.add(loSerial);
+            }
+            return laSerials;
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public boolean DownloadApplications(){
@@ -261,14 +466,6 @@ public class CreditOnlineApplication {
         }
     }
 
-    public LiveData<List<ELoanTerm>> GetLoanTerms(){
-        return poDao.GetLoanTerms();
-    }
-
-    public LiveData<List<DCreditApplication.ApplicationLog>> GetCreditApplications(){
-        return poDao.getApplicationHistory();
-    }
-
     public boolean DownloadBranchApplications(){
         try{
             JSONObject params = new JSONObject();
@@ -344,61 +541,6 @@ public class CreditOnlineApplication {
             e.printStackTrace();
             message = getLocalMessage(e);
             return false;
-        }
-    }
-
-    public LiveData<List<EBranchLoanApplication>> GetBranchApplications(){
-        return poDao.GetBranchApplications();
-    }
-
-    public String CreateApplication(LoanInfo foVal){
-        try{
-            if(!foVal.isDataValid()){
-                message = foVal.getMessage();
-                return null;
-            }
-
-            String lsTransNo = CreateUniqueIDForApplicant();
-
-            if(lsTransNo.isEmpty()){
-                message = "Failed to generate unique id please restart the app and try again.";
-                return null;
-            }
-
-            GOCASApplication loGocas = new GOCASApplication();
-            loGocas.PurchaseInfo().setAppliedFor(String.valueOf(foVal.getAppTypex()));
-            loGocas.PurchaseInfo().setTargetPurchase(foVal.getTargetDte());
-            loGocas.PurchaseInfo().setCustomerType(String.valueOf(foVal.getCustTypex()));
-            loGocas.PurchaseInfo().setPreferedBranch(foVal.getBranchCde());
-            loGocas.PurchaseInfo().setBrandName(foVal.getBrandIDxx());
-            loGocas.PurchaseInfo().setModelID(foVal.getModelIDxx());
-            loGocas.PurchaseInfo().setDownPayment(foVal.getDownPaymt());
-            loGocas.PurchaseInfo().setAccountTerm(foVal.getAccTermxx());
-            loGocas.PurchaseInfo().setDateApplied(AppConstants.DATE_MODIFIED());
-            loGocas.PurchaseInfo().setMonthlyAmortization(foVal.getMonthlyAm());
-            loGocas.PurchaseInfo().setRemarks(foVal.getsRemarks());
-
-            lsTransNo = CreateUniqueIDForApplicant();
-
-            ECreditApplicantInfo loApp = new ECreditApplicantInfo();
-            loApp.setTransNox(lsTransNo);
-            loApp.setPurchase(loGocas.PurchaseInfo().toJSONString());
-            loApp.setBranchCd(foVal.getBranchCde());
-            loApp.setAppliedx(loGocas.PurchaseInfo().getAppliedFor());
-            loApp.setDownPaym(loGocas.PurchaseInfo().getDownPayment());
-            loApp.setCreatedx(AppConstants.DATE_MODIFIED());
-            loApp.setTransact(AppConstants.CURRENT_DATE());
-            loApp.setTranStat("0");
-            loApp.setRemarksx(loGocas.PurchaseInfo().getRemarks());
-
-            poDao.Save(loApp);
-
-            Log.d(TAG, "New credit online application has been created.");
-            return lsTransNo;
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return null;
         }
     }
 
@@ -499,26 +641,6 @@ public class CreditOnlineApplication {
         }
     }
 
-    public LiveData<List<EBranchInfo>> getAllBranchInfo(){
-        return poBranch.getAllMcBranchInfo();
-    }
-
-    public LiveData<List<EMcBrand>> getAllMcBrand(){
-        return poBrand.getAllBrandInfo();
-    }
-
-    public LiveData<List<EMcModel>> getAllBrandModelInfo(String args){
-        return poModel.getMcModelFromBrand(args);
-    }
-
-    public LiveData<DMcModel.McAmortInfo> GetMonthlyPayment(String ModelID, int Term){
-        return poModel.GetMonthlyPayment(ModelID, Term);
-    }
-
-    public LiveData<DMcModel.McDPInfo> GetInstallmentPlanDetail(String ModelID){
-        return poModel.getDownpayment(ModelID);
-    }
-
     public boolean InitializeMcInstallmentTerms(DMcModel.McDPInfo args){
         try{
 
@@ -586,70 +708,16 @@ public class CreditOnlineApplication {
         }
     }
 
-    public CreditApp getInstance(CreditAppInstance app){
-        switch (app){
-            case Client_Info:
-                return new PersonalInfo(instance);
-            case Residence_Info:
-                return new ResidenceInfo(instance);
-            case Employed_Info:
-                return new EmploymentInfo(instance);
-            case Self_Employed_Info:
-                return new BusinessInfo(instance);
-            case Financier_Info:
-                return new FinancierInfo(instance);
-            case Pension_Info:
-                return new PensionInfo(instance);
-            case Spouse_Info:
-                return new SpouseInfo(instance);
-            case Spouse_Residence_Info:
-                return new SpouseResidenceInfo(instance);
-            case Spouse_Employment_Info:
-                return new SpouseEmploymentInfo(instance);
-            case Spouse_Self_Employed_Info:
-                return new SpouseBusinessInfo(instance);
-            case Spouse_Pension_Info:
-                return new SpousePensionInfo(instance);
-            case Disbursement_Info:
-                return new DisbursementInfo(instance);
-            case Dependent_Info:
-                return new DependentsInfo(instance);
-            case Properties_Info:
-                return new PropertiesInfo(instance);
-            case Other_Info:
-                return new OtherInfo(instance);
-            case CoMaker_Info:
-                return new CoMakerInfo(instance);
-            case CoMaker_Residence_Info:
-                return new CoMakerResidenceInfo(instance);
-            case Application_Info:
-                return new ApplicationInfo(instance);
-            case Means_Info:
-                return new MeansSelectionInfo(instance);
-            case ReviewLoanInfo:
-                return new ReviewLoanInfo(instance);
-            default:
-                return null;
-        }
-    }
+    public static class MCSerial{
 
-    private String CreateUniqueIDForApplicant(){
-        String lsUniqIDx = "";
-        try{
-            String lsBranchCd = "MX01";
-            String lsCrrYear = new SimpleDateFormat("yy", Locale.getDefault()).format(new Date());
-            StringBuilder loBuilder = new StringBuilder(lsBranchCd);
-            loBuilder.append(lsCrrYear);
+        public String lsSerialID;
+        public String lsEngine;
+        public String lsFrame;
 
-            int lnLocalID = poDao.GetRowsCountForUniqueID() + 1;
-            String lsPadNumx = String.format("%05d", lnLocalID);
-            loBuilder.append(lsPadNumx);
-            lsUniqIDx = loBuilder.toString();
-        } catch (Exception e){
-            e.printStackTrace();
-            Log.e(TAG, e.getMessage());
+        public MCSerial(String lsSerialID, String lsEngine, String lsFrame){
+            this.lsSerialID = lsSerialID;
+            this.lsEngine = lsEngine;
+            this.lsFrame = lsFrame;
         }
-        Log.d(TAG, lsUniqIDx);
-        return lsUniqIDx;
     }
 }

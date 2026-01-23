@@ -3,6 +3,15 @@
 
     <application>
         <activity
+            android:name=".Activities.Activity_MC_Contract"
+            android:exported="false"
+            android:label="MC AR Contract"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".Activities.Activity_CreditApplications"
             android:exported="false"
             android:label="Credit Online Application"

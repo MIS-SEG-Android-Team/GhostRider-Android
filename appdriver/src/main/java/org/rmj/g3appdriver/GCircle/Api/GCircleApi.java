@@ -36,6 +36,7 @@ public class GCircleApi extends WebApi {
     private static final String URL_IMPORT_RAFFLE_BASIS = "promo/param/download_raffle_entry_basis_all.php";
     private static final String URL_REQUEST_ONLINE_APPLICATIONS = "integsys/gocas/gocas_request_status.php";
     private static final String URL_IMPORT_ONLINE_APPLICATIONS = "integsys/gocas/gocas_request_application.php";
+    private static final String URL_IMPORT_MC_SERIALS = "integsys/param/get_mc_serial.php";
 
     private static final String URL_SUBMIT_CASHCOUNT = "integsys/cashcount/submit_cash_count.php";
     private static final String URL_QUICK_SEARCH = "integsys/paramqry/cash_count_rqst_officer.php";
@@ -367,6 +368,15 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + URL_IMPORT_ONLINE_APPLICATIONS);
         return LIVE + URL_IMPORT_ONLINE_APPLICATIONS;
+    }
+
+    public String getUrlImportMcSerials() {
+        if(isUnitTest()){
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_IMPORT_MC_SERIALS);
+            return LOCAL + URL_IMPORT_MC_SERIALS;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_IMPORT_MC_SERIALS);
+        return LIVE + URL_IMPORT_MC_SERIALS;
     }
 
     public String getUrlSubmitCashcount() {

@@ -59,6 +59,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
     private Adapter_SSDDCategories loAdapter;
     private ESSDDMaster loMaster = new ESSDDMaster();
     private List<ESSDDetail> laDetails = new ArrayList<>();
+    private List<EImageInfo> laImages = new ArrayList<>();
 
     private EImageInfo loImage;
     private Adapter_SSDDCategories.SSDD_Evaluation_Categories foCamDetail;
@@ -355,38 +356,12 @@ public class Activity_SSDD_Category extends AppCompatActivity {
             @Override
             public void onChanged(List<EImageInfo> eImageInfos) {
 
-                try {
-
-                    //do not proceed, if empty
-                    if (eImageInfos == null || eImageInfos.size() < 1){
-                        return;
-                    }
-
-                    //upload images
-                    for (EImageInfo loImage : eImageInfos){
-
-                        mViewModel.SubmitImage(loImage, new VMSSDEvaluation.OnSubmitCallback() {
-                            @Override
-                            public void OnLoad(String fsTitlexx, String fsMessage) {
-                                Toast.makeText(Activity_SSDD_Category.this, "Uploading image. Please wait . .", Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void OnSuccess(String fsTransnox) {
-                                Toast.makeText(Activity_SSDD_Category.this, "Uploading successful", Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void OnFailed(String fsMessage) {
-                                Toast.makeText(Activity_SSDD_Category.this, fsMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        Thread.sleep(1000);
-                    }
-
-                }catch (Exception e){
-                    mViewModel.SaveError("SSDD Evaluation", e.getMessage());
+                //do not proceed, if empty
+                if (eImageInfos == null || eImageInfos.size() < 1){
+                    return;
                 }
+
+                laImages = eImageInfos;
             }
         });
     }
@@ -735,11 +710,53 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 @Override
                 public void OnSuccess(String fsTransNox) {
                     poDialog.dismiss();
+
                     InitMessage(0, R.drawable.baseline_message_24, "Evaluation submitted successfully", "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {
-                            lsTransNox = fsTransNox;
-                            InitObservers();
+
+                            try {
+
+                                lsTransNox = fsTransNox;
+
+                                InitObservers();
+
+                                //if images is empty, do not proceed to image uploading
+                                if (laImages == null || laImages.size() < 1){
+                                    return;
+                                }
+
+                                //upload images, and disable view to avoid interrupted transactions
+                                rcv_adapter.setEnabled(false);
+                                btn_submit.setEnabled(false);
+
+                                for (EImageInfo loImage : laImages){
+
+                                    //upload images
+                                    mViewModel.SubmitImage(loImage, new VMSSDEvaluation.OnSubmitCallback() {
+                                        @Override
+                                        public void OnLoad(String fsTitlexx, String fsMessage) {
+                                            Toast.makeText(Activity_SSDD_Category.this, "Uploading image. Please wait . .", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void OnSuccess(String fsTransnox) {
+                                            Toast.makeText(Activity_SSDD_Category.this, "Uploading successful", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void OnFailed(String fsMessage) {
+                                            Toast.makeText(Activity_SSDD_Category.this, fsMessage, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    Thread.sleep(1000);
+                                }
+                                rcv_adapter.setEnabled(true);
+                                btn_submit.setEnabled(true);
+
+                            }catch (Exception e){
+                                mViewModel.SaveError("SSDD Evaluation", e.getMessage());
+                            }
                         }
 
                         @Override

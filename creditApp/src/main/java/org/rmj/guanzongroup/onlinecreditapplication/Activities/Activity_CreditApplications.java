@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,13 +20,13 @@ import com.google.android.material.textfield.TextInputEditText;
 
 
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCreditApplication;
+import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplication;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.onlinecreditapplication.Adapter.CreditApplicationsAdapter;
 import org.rmj.guanzongroup.onlinecreditapplication.R;
 import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMCreditApplications;
 import org.rmj.guanzongroup.onlinecreditapplication.dialog.DialogPreviewApplication;
-import org.rmj.guanzongroup.onlinecreditapplication.dialog.Dialog_MContract;
 
 import java.util.Objects;
 
@@ -50,11 +51,11 @@ public class Activity_CreditApplications extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_credit_applications);
+
         mViewModel = new ViewModelProvider(Activity_CreditApplications.this).get(VMCreditApplications.class);
         poDialogx = new LoadDialog(Activity_CreditApplications.this);
         poMessage = new MessageBox(Activity_CreditApplications.this);
-
-        setContentView(R.layout.activity_credit_applications);
 
         initWidgets();
         initData();
@@ -166,15 +167,16 @@ public class Activity_CreditApplications extends AppCompatActivity {
                             @Override
                             public void OnPositive() {
 
-                                //show details on preview
-                                Dialog_MContract loDialog = new Dialog_MContract(Activity_CreditApplications.this);
-                                loDialog.initDialog(new Dialog_MContract.OnDialogActionClickListener() {
-                                    @Override
-                                    public void SendApplication() {
-                                        
-                                    }
-                                });
-                                loDialog.show();
+                                //get credit application
+                                if (mViewModel.GetApplication(creditapp.sTransNox) == null){
+                                    Toast.makeText(Activity_CreditApplications.this, "Could not find application", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                //proceed to mc contract
+                                Intent loIntent = new Intent(Activity_CreditApplications.this, Activity_MC_Contract.class);
+                                loIntent.putExtra("sTransNox", creditapp.sTransNox);
+                                startActivity(loIntent);
 
                             }
 
