@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_serial"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="N/A"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="10dp"
+        android:textSize="14sp"
+        android:fontFamily="@font/roboto_bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_label1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Engine:"
+        android:textSize="12sp"
+        android:fontFamily="@font/roboto_medium"
+        android:paddingHorizontal="10dp"
+        android:paddingBottom="5dp"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintStart_toStartOf="@+id/mtv_serial"
+        app:layout_constraintTop_toBottomOf="@+id/mtv_serial"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_engine"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="N/A"
+        android:textSize="11sp"
+        android:fontFamily="@font/roboto_regular"
+        android:paddingHorizontal="10dp"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintStart_toStartOf="@+id/mtv_serial"
+        app:layout_constraintTop_toBottomOf="@+id/mtv_label1"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_label2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Frame:"
+        android:textSize="12sp"
+        android:fontFamily="@font/roboto_medium"
+        android:paddingHorizontal="10dp"
+        android:paddingBottom="5dp"
+        android:gravity="end"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintStart_toEndOf="@+id/mtv_engine"
+        app:layout_constraintTop_toBottomOf="@+id/mtv_serial"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/mtv_frame"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="N/A"
+        android:textSize="11sp"
+        android:fontFamily="@font/roboto_regular"
+        android:paddingHorizontal="10dp"
+        android:gravity="end"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintStart_toEndOf="@+id/mtv_engine"
+        app:layout_constraintTop_toBottomOf="@+id/mtv_label2"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

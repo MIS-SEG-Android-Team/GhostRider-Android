@@ -64,7 +64,19 @@ public class VMCreditApplications extends AndroidViewModel {
         return poApp.GetApplication(fsTransNox);
     }
 
-    public void GetSerials(String fsVal, OnSearchLSerial foListener){
+    public String CreateIDForContract(){
+        return poApp.CreateContractID();
+    }
+
+    public String CreateIDForClient(){
+        return poApp.CreateIDForClient();
+    }
+
+    public String CreateIDForAccountNumber(){
+        return poApp.CreateIDForAccountNumber();
+    }
+
+    public void GetSerials(String fsVal, boolean fByCode, OnSearchLSerial foListener){
 
         TaskExecutor.Execute(fsVal, new OnDoBackgroundTaskListener() {
             @Override
@@ -80,7 +92,7 @@ public class VMCreditApplications extends AndroidViewModel {
                     return laResult;
                 }
 
-                List<CreditOnlineApplication.MCSerial> laSerials = poApp.DownloadSerials(fsVal);
+                List<CreditOnlineApplication.MCSerial> laSerials = poApp.DownloadSerials(fsVal, fByCode);
                 if (laSerials == null){
                     message = poApp.getMessage();
 

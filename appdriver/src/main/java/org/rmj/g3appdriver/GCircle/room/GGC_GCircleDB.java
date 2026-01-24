@@ -16,6 +16,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -67,6 +68,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DItinerary;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLoanTypes;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLocatorSysLog;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMC_Contract;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcBrand;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcCategory;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcModel;
@@ -148,6 +150,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EItinerary;
 import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTerm;
 import org.rmj.g3appdriver.GCircle.room.Entities.ELoanTypes;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCColor;
+import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCModelCashPrice;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMcBrand;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMcCategory;
@@ -262,7 +265,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         ESSDDepartments.class,
         ESSDDCategories.class,
         ESSDDMaster.class,
-        ESSDDetail.class}, version = 46, exportSchema = false)
+        ESSDDetail.class,
+        EMCContractInfo.class}, version = 46,exportSchema = true)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -348,6 +352,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DSSDDCategories ssdCategoriesDao();
     public abstract DSSDDMaster ssdMasterDao();
     public abstract DSSDDetail ssdDetailDao();
+    public abstract DMC_Contract mcontractDao();
 
 
     public static synchronized GGC_GCircleDB getInstance(Context context){
@@ -486,6 +491,13 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Images` (" +
                     "sTransNox TEXT NOT NULL, sReferNox TEXT, sCategrID TEXT, nEntryNox TEXT, " +
                     "sScanndID TEXT, sImageNme TEXT, sMD5Hashx TEXT, sImagePth TEXT, dImgeDate TEXT, cImgeStat TEXT, PRIMARY KEY(sTransNox))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `MC_Contract_Info` (" +
+                    "sTransNox TEXT NOT NULL, sBranchCd TEXT, dTransact TEXT, sClientID TEXT, " +
+                    "sReferNox TEXT, sAcctNmbr TEXT, sSerialID TEXT, nAcctTerm INTEGER, nDownPaym DOUBLE, nMonAmort DOUBLE, " +
+                    "nRebatesx DOUBLE, nPenaltyx DOUBLE, dFirstPay TEXT, sRemarksx TEXT, cTranStat TEXT, sSendStat TEXT, " +
+                    "PRIMARY KEY(sTransNox))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");

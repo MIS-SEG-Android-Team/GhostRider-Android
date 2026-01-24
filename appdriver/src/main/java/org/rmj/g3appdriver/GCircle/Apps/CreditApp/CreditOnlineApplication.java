@@ -5,6 +5,7 @@ import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
 import android.app.Application;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -25,6 +26,7 @@ import org.rmj.g3appdriver.GCircle.Apps.CreditApp.Obj.ReviewLoanInfo;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.Obj.SpousePensionInfo;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.model.LoanInfo;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMC_Contract;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCreditApplication;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
@@ -58,7 +60,10 @@ import org.rmj.gocas.pricelist.PriceFactory;
 import org.rmj.gocas.pricelist.Pricelist;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +74,7 @@ public class CreditOnlineApplication {
     private final Application instance;
 
     private final DCreditApplication poDao;
+    private final DMC_Contract poMContract;
 
     private final EmployeeMaster poUser;
 
@@ -86,6 +92,7 @@ public class CreditOnlineApplication {
     public CreditOnlineApplication(Application instance) {
         this.instance = instance;
         this.poDao = GGC_GCircleDB.getInstance(instance).CreditApplicationDao();
+        this.poMContract = GGC_GCircleDB.getInstance(instance).mcontractDao();
         this.poUser = new EmployeeMaster(instance);
         this.poSession = EmployeeSession.getInstance(instance);
         this.poApi = new GCircleApi(instance);
@@ -94,10 +101,6 @@ public class CreditOnlineApplication {
         this.poBrand = new RMcBrand(instance);
         this.poModel = new RMcModel(instance);
         this.poPrice = PriceFactory.make(PriceFactory.ProductType.MOTORCYCLE);
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     private String CreateUniqueIDForApplicant(){
@@ -118,6 +121,58 @@ public class CreditOnlineApplication {
         }
         Log.d(TAG, lsUniqIDx);
         return lsUniqIDx;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String CreateContractID(){
+
+        String lsTransNox = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            lsTransNox = "MX01" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) +
+                    poMContract.CountRecord() + 1;
+        }else {
+            lsTransNox = "MX01" +
+                    new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
+                    poMContract.CountRecord() + 1;
+        }
+
+        return lsTransNox;
+    }
+
+    public String CreateIDForClient(){
+
+        String lsTransNox = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            lsTransNox = "CL" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) +
+                    poMContract.CountRecord() + 1;
+        }else {
+            lsTransNox = "CL" +
+                    new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
+                    poMContract.CountRecord() + 1;
+        }
+
+        return lsTransNox;
+    }
+
+    public String CreateIDForAccountNumber(){
+
+        String lsTransNox = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            lsTransNox = "AN" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) +
+                    poMContract.CountRecord() + 1;
+        }else {
+            lsTransNox = "AN" +
+                    new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Calendar.getInstance().getTime()) +
+                    poMContract.CountRecord() + 1;
+        }
+
+        return lsTransNox;
     }
 
     public String CreateApplication(LoanInfo foVal){
@@ -262,11 +317,12 @@ public class CreditOnlineApplication {
         return poBranch.getBranchInfoNonLive(fsBranchCd);
     }
 
-    public List<MCSerial> DownloadSerials(String fsSearch){
+    public List<MCSerial> DownloadSerials(String fsSearch, boolean fbyModel){
 
         try {
             JSONObject params = new JSONObject();
             params.put("sSerial", fsSearch);
+            params.put("byModel", fbyModel);
 
             String lsResponse = WebClient.sendRequest(
                     poApi.getUrlImportMcSerials(),

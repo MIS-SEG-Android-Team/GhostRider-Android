@@ -25,6 +25,8 @@ import androidx.fragment.app.Fragment;
 
 import org.rmj.g3appdriver.R;
 
+import java.util.HashMap;
+
 
 public class CreditAppConstants {
 
@@ -68,6 +70,16 @@ public class CreditAppConstants {
             "18 Months",
             "12 Months/1 Year",
             "6 Months"
+    };
+
+    public static HashMap<String, String> TERMS_BY_CODE = new HashMap<>(){
+        {
+            put("36 Months/3 Years", "36");
+            put("24 Months/2 Years", "24");
+            put("18 Months", "18");
+            put("12 Months/1 Year", "12");
+            put("6 Months", "6");
+        }
     };
 
     public static String[] MOBILE_NO_TYPE = {"Prepaid", "Postpaid"};

@@ -22,6 +22,16 @@ android {
         targetSdk 36
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    sourceSets {
+        debug.assets.srcDirs += files("$projectDir/schemas".toString())
     }
 
     buildTypes {
