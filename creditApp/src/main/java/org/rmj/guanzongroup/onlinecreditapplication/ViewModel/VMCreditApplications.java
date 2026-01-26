@@ -37,11 +37,6 @@ public class VMCreditApplications extends AndroidViewModel {
         void OnFailed(String message);
     }
 
-    public interface OnSearchLSerial{
-        void OnSuccess(List<CreditOnlineApplication.MCSerial> laSerials);
-        void OnFailed(String message);
-    }
-
     public VMCreditApplications(@NonNull Application application) {
         super(application);
         this.poApp = new CreditOnlineApplication(application);
@@ -56,70 +51,8 @@ public class VMCreditApplications extends AndroidViewModel {
         return poApp.GetCreditApplications();
     }
 
-    public EBranchInfo getBranchInfo(String fsBranchCd){
-        return poApp.getBranchInfoNonLive(fsBranchCd);
-    }
-
     public ECreditApplication GetApplication(String fsTransNox){
         return poApp.GetApplication(fsTransNox);
-    }
-
-    public String CreateIDForContract(){
-        return poApp.CreateContractID();
-    }
-
-    public String CreateIDForClient(){
-        return poApp.CreateIDForClient();
-    }
-
-    public String CreateIDForAccountNumber(){
-        return poApp.CreateIDForAccountNumber();
-    }
-
-    public void GetSerials(String fsVal, boolean fByCode, OnSearchLSerial foListener){
-
-        TaskExecutor.Execute(fsVal, new OnDoBackgroundTaskListener() {
-            @Override
-            public Object DoInBackground(Object args) {
-
-                Object[] laResult = new Object[2];
-
-                if (!poConn.isDeviceConnected()){
-                    message = poConn.getMessage();
-
-                    laResult[0] = false;
-                    laResult[1] = null;
-                    return laResult;
-                }
-
-                List<CreditOnlineApplication.MCSerial> laSerials = poApp.DownloadSerials(fsVal, fByCode);
-                if (laSerials == null){
-                    message = poApp.getMessage();
-
-                    laResult[0] = false;
-                    laResult[1] = null;
-                    return laResult;
-                }
-                laResult[0] = true;
-                laResult[1] = laSerials;
-                return laResult;
-            }
-
-            @Override
-            public void OnPostExecute(Object object) {
-                Object[] loResult = (Object[]) object;
-
-                if (!(Boolean) loResult[0]){
-                    foListener.OnFailed(message);
-                } else {
-                    if (loResult[1] == null){
-                        foListener.OnFailed("Invalid result found!");
-                        return;
-                    }
-                    foListener.OnSuccess((List<CreditOnlineApplication.MCSerial>) loResult[1]);
-                }
-            }
-        });
     }
 
     public void ImportApplications(OnImportApplicationsListener listener){

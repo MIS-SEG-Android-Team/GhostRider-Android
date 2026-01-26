@@ -352,7 +352,9 @@ public class CreditOnlineApplication {
                 MCSerial loSerial = new MCSerial(
                         loResult.getString("sSerialID"),
                         loResult.getString("sEngineNo"),
-                        loResult.getString("sFrameNox")
+                        loResult.getString("sFrameNox"),
+                        loResult.getString("sModelIDx"),
+                        loResult.getString("sDesc")
                 );
                 laSerials.add(loSerial);
             }
@@ -769,11 +771,15 @@ public class CreditOnlineApplication {
         public String lsSerialID;
         public String lsEngine;
         public String lsFrame;
+        public String lsModelIDx;
+        public String lsDescr;
 
-        public MCSerial(String lsSerialID, String lsEngine, String lsFrame){
+        public MCSerial(String lsSerialID, String lsEngine, String lsFrame, String lsModelIDx, String lsDescr){
             this.lsSerialID = lsSerialID;
             this.lsEngine = lsEngine;
             this.lsFrame = lsFrame;
+            this.lsModelIDx = lsModelIDx;
+            this.lsDescr = lsDescr;
         }
     }
 }

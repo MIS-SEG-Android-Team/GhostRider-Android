@@ -44,7 +44,7 @@ public class MCAdapter extends ArrayAdapter<CreditOnlineApplication.MCSerial> {
         MaterialTextView mtv_engine = view.findViewById(R.id.mtv_engine);
         MaterialTextView mtv_frame = view.findViewById(R.id.mtv_frame);
 
-        mtv_serial.setText(objectsFiltered.get(position).lsSerialID);
+        mtv_serial.setText(objectsFiltered.get(position).lsDescr);
         mtv_engine.setText(objectsFiltered.get(position).lsEngine);
         mtv_frame.setText(objectsFiltered.get(position).lsFrame);
 

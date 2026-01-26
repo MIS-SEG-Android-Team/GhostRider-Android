@@ -3,16 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtv_serial"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="N/A"
-        android:paddingHorizontal="10dp"
-        android:paddingTop="10dp"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:fontFamily="@font/roboto_bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -24,10 +23,9 @@
         android:text="Engine:"
         android:textSize="12sp"
         android:fontFamily="@font/roboto_medium"
-        android:paddingHorizontal="10dp"
         android:paddingBottom="5dp"
         app:layout_constraintWidth_percent="0.5"
-        app:layout_constraintStart_toStartOf="@+id/mtv_serial"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtv_serial"/>
 
     <com.google.android.material.textview.MaterialTextView
@@ -37,9 +35,8 @@
         android:text="N/A"
         android:textSize="11sp"
         android:fontFamily="@font/roboto_regular"
-        android:paddingHorizontal="10dp"
         app:layout_constraintWidth_percent="0.5"
-        app:layout_constraintStart_toStartOf="@+id/mtv_serial"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mtv_label1"/>
 
     <com.google.android.material.textview.MaterialTextView
@@ -49,12 +46,12 @@
         android:text="Frame:"
         android:textSize="12sp"
         android:fontFamily="@font/roboto_medium"
-        android:paddingHorizontal="10dp"
         android:paddingBottom="5dp"
         android:gravity="end"
         app:layout_constraintWidth_percent="0.5"
         app:layout_constraintStart_toEndOf="@+id/mtv_engine"
-        app:layout_constraintTop_toBottomOf="@+id/mtv_serial"/>
+        app:layout_constraintTop_toTopOf="@+id/mtv_label1"
+        app:layout_constraintBottom_toBottomOf="@+id/mtv_label1"/>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mtv_frame"
@@ -63,11 +60,9 @@
         android:text="N/A"
         android:textSize="11sp"
         android:fontFamily="@font/roboto_regular"
-        android:paddingHorizontal="10dp"
         android:gravity="end"
         app:layout_constraintWidth_percent="0.5"
         app:layout_constraintStart_toEndOf="@+id/mtv_engine"
-        app:layout_constraintTop_toBottomOf="@+id/mtv_label2"/>
-
+        app:layout_constraintTop_toTopOf="@+id/mtv_engine"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
