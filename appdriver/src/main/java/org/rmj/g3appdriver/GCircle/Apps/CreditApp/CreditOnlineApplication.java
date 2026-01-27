@@ -27,6 +27,7 @@ import org.rmj.g3appdriver.GCircle.Apps.CreditApp.Obj.SpousePensionInfo;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.model.LoanInfo;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMC_Contract;
+import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCreditApplication;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DEmployeeInfo;
@@ -690,6 +691,57 @@ public class CreditOnlineApplication {
                 Log.d(TAG, "Credit online application uploaded successfully.");
                 Thread.sleep(1000);
             }
+
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
+    public boolean UploadMContract(EMCContractInfo foVal){
+
+        try {
+
+            //save first to local
+            poMContract.Save(foVal);
+
+            //initialize parameter
+            JSONObject params = new JSONObject();
+            params.put("sBranchCd", foVal.getsBranchCd());
+            params.put("dTransact", foVal.getsBranchCd());
+            params.put("sClientID", foVal.getsBranchCd());
+            params.put("sReferNox", foVal.getsBranchCd());
+            params.put("sAcctNmbr", foVal.getsBranchCd());
+            params.put("sSerialID", foVal.getsBranchCd());
+            params.put("nDownPaym", foVal.getsBranchCd());
+            params.put("nAcctTerm", foVal.getsBranchCd());
+            params.put("nMonAmort", foVal.getsBranchCd());
+            params.put("sRemarksx", foVal.getsBranchCd());
+            params.put("cTranStat", foVal.getsBranchCd());
+
+            //upload to database
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlSubmitMContract(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return false;
+            }
+
+            String lsTransNox = loResponse.getString("sTransNox");
+            poMContract.UpdateTransNox(lsTransNox, foVal.getsTransNox());
 
             return true;
         } catch (Exception e){

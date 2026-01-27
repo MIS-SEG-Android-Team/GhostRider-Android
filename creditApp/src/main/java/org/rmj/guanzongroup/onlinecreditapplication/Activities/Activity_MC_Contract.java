@@ -24,6 +24,7 @@ import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditOnlineApplication;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcModel;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplication;
+import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
 import org.rmj.g3appdriver.etc.FormatUIText;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
@@ -125,14 +126,16 @@ public class Activity_MC_Contract extends AppCompatActivity {
             tie_client.setText(mViewModel.CreateIDForClient());
             tie_account.setText(mViewModel.CreateIDForAccountNumber());
 
+            //initialize terms
             String[] laTerms = new String[loTerms.size()];
             int lnCnt = 0;
+
             for (Map.Entry<String, String> loEntry: loTerms.entrySet()){
                 laTerms[lnCnt] = loEntry.getKey();
 
                 if (loDetail.getInt("nAcctTerm") == Integer.parseInt(loEntry.getValue())){
-                    auto_term.setText(loEntry.getKey(), false);
-                    mViewModel.GetModel().setAccTermxx(loDetail.getInt("nAcctTerm"));
+                    mViewModel.GetModel().setAccTermxx(lnCnt);
+                    auto_term.setText(String.valueOf(loEntry.getKey()));
                 }
                 lnCnt += 1;
             }
@@ -256,39 +259,99 @@ public class Activity_MC_Contract extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        auto_serial.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        tie_downpay.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onFocusChange(View v, boolean hasFocus) {
 
-                CreditOnlineApplication.MCSerial loSerial = (CreditOnlineApplication.MCSerial) parent.getItemAtPosition(position);
+                if (!hasFocus){
+
+                    if (tie_downpay.getText() == null || tie_downpay.getText().toString().trim().isEmpty()){
+                        InitMessage(0, R.drawable.baseline_error_24, "Please enter downpayment", "Okay", "", new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
+                        });
+                        return;
+                    }
+
+                    //initialize downpayment
+                    double lnDownPaym = FormatUIText.getParseDouble(tie_downpay.getText().toString());
+                    mViewModel.GetModel().setDownPaymt(lnDownPaym);
+
+                    //trigger coputation by downpayment
+                    InitializePayment(false);
+
+                }
+            }
+        });
+
+        auto_serial.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                CreditOnlineApplication.MCSerial loSerial = (CreditOnlineApplication.MCSerial) parent.getItemAtPosition(0);
                 mViewModel.SetModelIDxx(loSerial.lsModelIDx);
             }
+        });
 
+        auto_term.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                //initialize monthly and display computed amount
+                mViewModel.GetModel().setAccTermxx(position);
+                InitializePayment(true);
             }
         });
 
-        tie_downpay.addTextChangedListener(new TextWatcher() {
+        btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onClick(View v) {
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                EMCContractInfo loContract = new EMCContractInfo();
+                loContract.setsTransNox("");
 
-            @Override
-            public void afterTextChanged(Editable s) {
+                //mViewModel.SubmitMContract();
+            }
+        });
+    }
 
-                if (s == null || s.isEmpty()){
-                    return;
+    private void InitializePayment(Boolean fByTerms){
+
+        //set computed minimum downpayment
+        double ldbl_down = mViewModel.GetMinimumDownpayment();
+
+        //set defualt minimum down, if downpayment is lesser than requried amount
+        if (mViewModel.GetModel().getDownPaymt() < ldbl_down){
+
+            InitMessage(0, R.drawable.baseline_error_24, "Downpayment does not meet the required amount", "Okay", "", new OnMessageButton() {
+                @Override
+                public void OnPositive() {
+                    mViewModel.GetModel().setDownPaymt(ldbl_down);
+                    tie_downpay.setText(String.valueOf(ldbl_down));
                 }
 
-                double lnDownPaym = FormatUIText.getParseDouble(s.toString());
-                mViewModel.GetModel().setDownPaymt(lnDownPaym);
+                @Override
+                public void OnNegative() {}
+            });
 
-            }
-        });
+            return;
+        }
+
+        //compute monthly, triggered by terms or downpayment
+        double ldbl_monthly = mViewModel.GetMonthlyPayment(mViewModel.GetModel().getAccTermxx());
+        if (!fByTerms){
+            ldbl_monthly = mViewModel.GetMonthlyPayment(mViewModel.GetModel().getDownPaymt());
+        }
+        mViewModel.GetModel().setMonthlyAm(ldbl_monthly);
+        tie_monthly.setText(String.valueOf(ldbl_monthly));
+
+        Log.d("this is model", mViewModel.GetModel().getModelIDxx());
+        Log.d("this is dp", String.valueOf(mViewModel.GetModel().getDownPaymt()));
+        Log.d("this is terms", String.valueOf(mViewModel.GetModel().getAccTermxx()));
+        Log.d("this is monthly", String.valueOf(ldbl_monthly));
     }
 
     private void InitObservers(){
@@ -304,8 +367,6 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
                 //set model id to model
                 mViewModel.GetModel().setModelIDxx(s);
-
-                Log.d("This is the model", String.valueOf(mViewModel.GetModel().getModelIDxx()));
 
                 //get installment details
                 mViewModel.GetInstallmentPlanDetail(mViewModel.GetModel().getModelIDxx()).observe(Activity_MC_Contract.this, new Observer<DMcModel.McDPInfo>() {
@@ -331,20 +392,8 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                     //initialize model for monthly amortization
                                     mViewModel.SetModelAmortization(mcAmortInfo);
 
-                                    //set computed minimum downpayment
-                                    double ldbl_down = mViewModel.GetMinimumDownpayment();
-
-                                    mViewModel.GetModel().setDownPaymt(ldbl_down);
-                                    tie_downpay.setText(String.valueOf(ldbl_down));
-
-                                    //set monthly amortization
-                                    double ldbl_monthly = mViewModel.GetMonthlyPayment(mViewModel.GetModel().getAccTermxx());
-
-                                    Log.d("This is the downpayment", String.valueOf(ldbl_down));
-                                    Log.d("This is the monthly", String.valueOf(ldbl_monthly));
-
-                                    mViewModel.GetModel().setMonthlyAm(ldbl_monthly);
-                                    tie_monthly.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(ldbl_monthly)));
+                                    //initialize payment
+                                    InitializePayment(true);
                                 }
                             });
                         }

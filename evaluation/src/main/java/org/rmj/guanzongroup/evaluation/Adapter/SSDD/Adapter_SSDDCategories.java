@@ -81,7 +81,7 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.isEmpty() || !holder.tie_remarks.hasFocus()){
+                if (s.toString().isEmpty() || !holder.tie_remarks.hasFocus()){
                     holder.ib_check.setVisibility(View.GONE);
                     return;
                 }

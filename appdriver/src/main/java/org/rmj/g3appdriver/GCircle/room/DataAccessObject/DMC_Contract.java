@@ -15,6 +15,9 @@ public interface DMC_Contract {
     @Query("SELECT COUNT(*) FROM MC_Contract_Info")
     int CountRecord();
 
+    @Query("UPDATE MC_Contract_Info SET sTransNox = :fsTransNox WHERE sReferNox = :fsReferNox")
+    void UpdateTransNox(String fsTransNox, String fsReferNox);
+
     @Query("SELECT * FROM MC_Contract_Info WHERE sReferNox = :fsTransNox")
     EMCContractInfo GetContractInfo(String fsTransNox);
 

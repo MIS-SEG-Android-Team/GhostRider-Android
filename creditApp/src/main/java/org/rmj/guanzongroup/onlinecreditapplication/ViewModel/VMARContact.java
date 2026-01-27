@@ -12,8 +12,10 @@ import org.rmj.g3appdriver.GCircle.Apps.CreditApp.model.LoanInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcModel;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplication;
+import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
+import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 
 import java.util.List;
@@ -35,6 +37,12 @@ public class VMARContact extends AndroidViewModel {
 
     public interface OnSearchLSerial{
         void OnSuccess(List<CreditOnlineApplication.MCSerial> laSerials);
+        void OnFailed(String message);
+    }
+
+    public interface OnSubmit{
+        void OnLoad(String fsTitlexx, String fsMessage);
+        void OnSuccess();
         void OnFailed(String message);
     }
 
@@ -94,6 +102,10 @@ public class VMARContact extends AndroidViewModel {
         return poApp.GetMonthlyAmortization(poAmort.getValue(), args1);
     }
 
+    public double GetMonthlyPayment(double args1) {
+        return poApp.GetMonthlyAmortization(poAmort.getValue(), args1);
+    }
+
     public void SetModelAmortization(DMcModel.McAmortInfo args) {
         this.poAmort.setValue(args);
     }
@@ -139,6 +151,35 @@ public class VMARContact extends AndroidViewModel {
                         return;
                     }
                     foListener.OnSuccess((List<CreditOnlineApplication.MCSerial>) loResult[1]);
+                }
+            }
+        });
+    }
+
+    public void SubmitMContract(EMCContractInfo foVal, OnSubmit foListener){
+
+        TaskExecutor.Execute(foVal, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                foListener.OnLoad("MC Contract", "Submitting MC Contract...");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+                EMCContractInfo loVal = (EMCContractInfo) args;
+                if (!poApp.UploadMContract(loVal)){
+                    message = poApp.getMessage();
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                if ((Boolean) object){
+                    foListener.OnSuccess();
+                } else {
+                    foListener.OnFailed(message);
                 }
             }
         });
