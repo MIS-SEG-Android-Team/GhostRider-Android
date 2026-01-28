@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -30,15 +31,19 @@ import com.google.android.material.textview.MaterialTextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGanadoOnline;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.FormatUIText;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.OnSaveInfoListener;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditAppConstants;
+import org.rmj.g3appdriver.lib.Ganado.pojo.InstallmentInfo;
 import org.rmj.guanzongroup.onlinecreditapplication.R;
+import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMARContact;
 import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMIntroductoryQuestion;
 
 import java.text.SimpleDateFormat;
@@ -47,9 +52,13 @@ import java.util.Calendar;
 import java.util.Objects;
 
 public class Activity_IntroductoryQuestion extends AppCompatActivity {
+
     public static final String TAG = Activity_IntroductoryQuestion.class.getSimpleName();
     private VMIntroductoryQuestion mViewModel;
     private MessageBox poMessage;
+
+    private DGanadoOnline.CashPrice loCashPrice;
+    private InstallmentInfo loInstallment;
 
     private MaterialTextView lblBranchNm, lblBrandAdd;
     private MaterialAutoCompleteTextView txtBranchNm, txtBrandNm, txtModelNm;
@@ -63,6 +72,11 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
         return new Activity_IntroductoryQuestion();
     }
 
+    public interface OnMessageButton {
+        void OnPositive();
+        void OnNegative();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +87,59 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
         poMessage = new MessageBox(Activity_IntroductoryQuestion.this);
 
         initWidgets();
+        initObservers();
+        initData();
+        initListener();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        getViewModelStore().clear();
+        super.onDestroy();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
+    }
+
+    private void initWidgets(){
+
+        MaterialToolbar toolbar = findViewById(R.id.toolbar_introduction);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        lblBranchNm = findViewById(R.id.lbl_headerBranch);
+        lblBrandAdd = findViewById(R.id.lbl_headerAddress);
+        txtBranchNm = findViewById(R.id.txt_branchName);
+        txtBrandNm = findViewById(R.id.txt_brandName);
+        txtModelNm = findViewById(R.id.txt_modelName);
+        txtDownPymnt = findViewById(R.id.txt_downpayment);
+        txtAmort = findViewById(R.id.txt_monthlyAmort);
+        txtDTarget = findViewById(R.id.txt_dateTarget);
+        spnApplType = findViewById(R.id.spn_applicationType);
+        spnCustType = findViewById(R.id.spn_customerType);
+        spnAcctTerm = findViewById(R.id.spn_installmentTerm);
+        txt_remarks = findViewById(R.id.txt_remarks);
+
+        btnCreate = findViewById(R.id.btn_createCreditApp);
+    }
+
+    private void initObservers(){
 
         mViewModel.GetUserInfo().observe(Activity_IntroductoryQuestion.this, eBranchInfo -> {
             try {
@@ -83,43 +150,6 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
             } catch (Exception e){
                 e.printStackTrace();
             }
-        });
-
-        spnApplType.setText(CreditAppConstants.APPLICATION_TYPE[0]);
-        spnCustType.setText(CreditAppConstants.CUSTOMER_TYPE[0]);
-        spnAcctTerm.setText(CreditAppConstants.INSTALLMENT_TERM[0]);
-        spnApplType.setAdapter(CreditAppConstants.getAdapter(Activity_IntroductoryQuestion.this, CreditAppConstants.APPLICATION_TYPE));
-
-        mViewModel.getModel().setAppTypex("1");
-
-        spnCustType.setAdapter(CreditAppConstants.getAdapter(Activity_IntroductoryQuestion.this, CreditAppConstants.CUSTOMER_TYPE));
-        mViewModel.getModel().setCustTypex("1");
-
-        spnAcctTerm.setAdapter(CreditAppConstants.getAdapter(Activity_IntroductoryQuestion.this, CreditAppConstants.INSTALLMENT_TERM));
-
-        //Default value has been set here instead inside of the model in order
-        // to calculate monthly amortization upon selection of model.
-        mViewModel.getModel().setAccTermxx(0);
-
-        txtDTarget.setText(new AppConstants().CURRENT_DATE_WORD);
-
-        txtDTarget.setOnClickListener(v -> {
-
-            final Calendar newCalendar = Calendar.getInstance();
-
-            @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
-            final DatePickerDialog  StartTime = new DatePickerDialog(Activity_IntroductoryQuestion.this, (view131, year, monthOfYear, dayOfMonth) -> {
-                Calendar newDate = Calendar.getInstance();
-                newDate.set(year, monthOfYear, dayOfMonth);
-                String lsDate = dateFormatter.format(newDate.getTime());
-
-                txtDTarget.setText(lsDate);
-                mViewModel.getModel().setTargetDte(lsDate);
-
-            }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
-
-            StartTime.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
-            StartTime.show();
         });
 
         mViewModel.GetAllBranchInfo().observe(Activity_IntroductoryQuestion.this, loList -> {
@@ -171,6 +201,7 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
 
         mViewModel.GetBrandID().observe(Activity_IntroductoryQuestion.this, brandID -> {
             try {
+
                 mViewModel.GetAllBrandModelInfo(brandID).observe(Activity_IntroductoryQuestion.this, loList -> {
                     ArrayList<String> strings = new ArrayList<>();
                     for(int x = 0; x < loList.size(); x++){
@@ -181,9 +212,10 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
                     txtModelNm.setAdapter(adapter);
 
                     txtModelNm.setOnItemClickListener((adapterView, view, i, l) -> {
+
                         for(int x = 0; x < loList.size(); x++){
+
                             if(txtModelNm.getText().toString().equalsIgnoreCase(loList.get(x).getModelNme() +" "+ loList.get(x).getModelCde())){
-                                mViewModel.getModel().setModelIDxx(loList.get(x).getModelIDx());
                                 mViewModel.setModelID(loList.get(x).getModelIDx());
                                 break;
                             }
@@ -197,88 +229,203 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
         });
 
         mViewModel.GetModelID().observe(Activity_IntroductoryQuestion.this, modelID -> {
+
             try{
 
-                String lsModel = mViewModel.getModel().getModelIDxx();
-                int lnTermxx = mViewModel.getModel().getAccTermxx();
+                //set model id to model
+                mViewModel.getModel().setModelIDxx(modelID);
+                mViewModel.GetProductModel().setModelIDx(modelID);
 
-                mViewModel.GetInstallmentPlanDetail(modelID).observe(Activity_IntroductoryQuestion.this, mcDPInfo -> {
-                    try{
+                //get cash price of model
+                mViewModel.GetCashPrice(mViewModel.GetProductModel().getModelIDx()).observe(Activity_IntroductoryQuestion.this, new Observer<DGanadoOnline.CashPrice>() {
+                    @Override
+                    public void onChanged(DGanadoOnline.CashPrice cashPrice) {
 
-                        //todo: parse data retrieved
-                        if(mViewModel.InitializeTermAndDownpayment(mcDPInfo)) {
-
-                            //todo: get amortization detail
-                            mViewModel.GetAmortizationDetail(lsModel, lnTermxx).observe(Activity_IntroductoryQuestion.this, mcAmortInfo -> {
-
-                                mViewModel.setModelAmortization(mcAmortInfo);
-
-                                //todo: get minimum downpayment
-                                ldblMinDown = mViewModel.GetMinimumDownpayment();
-
-                                mViewModel.getModel().setDownPaymt(ldblMinDown);
-                                txtDownPymnt.setText(String.valueOf(ldblMinDown));
-
-                                double lnAmort = mViewModel.GetMonthlyPayment(mViewModel.getModel().getAccTermxx());
-
-                                mViewModel.getModel().setMonthlyAm(lnAmort);
-                                txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(lnAmort)));
-
-                            });
+                        if (cashPrice == null){
+                            return;
                         }
-                    } catch (Exception e){
-                        e.printStackTrace();
+                        loCashPrice = cashPrice;
                     }
                 });
+
+                //get installment details of model
+                mViewModel.GetMinimumDownpayment(mViewModel.GetProductModel().getModelIDx(), new VMARContact.OnRetrieveInstallmentInfo() {
+                    @Override
+                    public void OnRetrieve(InstallmentInfo loResult) {
+
+                        if (loResult == null){
+                            Toast.makeText(Activity_IntroductoryQuestion.this, "Installment info not found!", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        loInstallment = loResult;
+                    }
+
+                    @Override
+                    public void OnFailed(String message) {
+                        Toast.makeText(Activity_IntroductoryQuestion.this, message, Toast.LENGTH_LONG).show();
+                    }
+                });
+                InitializePayment();
+
+//                String lsModel = mViewModel.getModel().getModelIDxx();
+//                int lnTermxx = mViewModel.getModel().getAccTermxx();
+//
+//                mViewModel.GetInstallmentPlanDetail(modelID).observe(Activity_IntroductoryQuestion.this, mcDPInfo -> {
+//                    try{
+//
+//                        //todo: parse data retrieved
+//                        if(mViewModel.InitializeTermAndDownpayment(mcDPInfo)) {
+//
+//                            //todo: get amortization detail
+//                            mViewModel.GetAmortizationDetail(lsModel, lnTermxx).observe(Activity_IntroductoryQuestion.this, mcAmortInfo -> {
+//
+//                                mViewModel.setModelAmortization(mcAmortInfo);
+//
+//                                //todo: get minimum downpayment
+//                                ldblMinDown = mViewModel.GetMinimumDownpayment();
+//
+//                                mViewModel.getModel().setDownPaymt(ldblMinDown);
+//                                txtDownPymnt.setText(String.valueOf(ldblMinDown));
+//
+//                                double lnAmort = mViewModel.GetMonthlyPayment(mViewModel.getModel().getAccTermxx());
+//
+//                                mViewModel.getModel().setMonthlyAm(lnAmort);
+//                                txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(lnAmort)));
+//
+//                            });
+//                        }
+//                    } catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                });
 
             } catch (Exception e){
                 e.printStackTrace();
             }
+        });
+    }
+
+    private void initData(){
+
+        //display default values
+        spnApplType.setText(CreditAppConstants.APPLICATION_TYPE[0]);
+        spnCustType.setText(CreditAppConstants.CUSTOMER_TYPE[0]);
+        spnAcctTerm.setText(CreditAppConstants.INSTALLMENT_TERM[0]);
+
+        //initialize application type adapter
+        spnApplType.setAdapter(CreditAppConstants.getAdapter(Activity_IntroductoryQuestion.this, CreditAppConstants.APPLICATION_TYPE));
+        mViewModel.getModel().setAppTypex("1");
+        mViewModel.GetProductModel().setPaymForm("1");
+
+        //initialize customer type adapter
+        spnCustType.setAdapter(CreditAppConstants.getAdapter(Activity_IntroductoryQuestion.this, CreditAppConstants.CUSTOMER_TYPE));
+        mViewModel.getModel().setCustTypex("1");
+
+        //initialize target date
+        txtDTarget.setText(new AppConstants().CURRENT_DATE_WORD);
+
+        //initialize installment term adapter
+        spnAcctTerm.setAdapter(CreditAppConstants.getAdapter(Activity_IntroductoryQuestion.this, CreditAppConstants.INSTALLMENT_TERM));
+
+        //Default value has been set here instead inside of the model in order
+        // to calculate monthly amortization upon selection of model.
+        mViewModel.getModel().setAccTermxx(0);
+        mViewModel.GetProductModel().setTermIDxx(String.valueOf(mViewModel.getModel().getAccTermxx()));
+
+        //initialie default dp and monthly
+        mViewModel.getModel().setDownPaymt(Double.parseDouble("0.00"));
+        mViewModel.GetProductModel().setDownPaym("0.00");
+        mViewModel.GetProductModel().setMonthAmr("0.00");
+    }
+
+    private void initListener(){
+
+        txtDTarget.setOnClickListener(v -> {
+
+            final Calendar newCalendar = Calendar.getInstance();
+
+            @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
+            final DatePickerDialog  StartTime = new DatePickerDialog(Activity_IntroductoryQuestion.this, (view131, year, monthOfYear, dayOfMonth) -> {
+                Calendar newDate = Calendar.getInstance();
+                newDate.set(year, monthOfYear, dayOfMonth);
+                String lsDate = dateFormatter.format(newDate.getTime());
+
+                txtDTarget.setText(lsDate);
+                mViewModel.getModel().setTargetDte(lsDate);
+
+            }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+
+            StartTime.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            StartTime.show();
         });
 
         spnApplType.setOnItemClickListener(new OnItemClickListener(spnApplType));
         spnCustType.setOnItemClickListener(new OnItemClickListener(spnCustType));
         spnAcctTerm.setOnItemClickListener(new OnItemClickListener(spnAcctTerm));
 
-        txtDownPymnt.addTextChangedListener(new FormatUIText.CurrencyFormat(txtDownPymnt));
-
-        txtDownPymnt.addTextChangedListener(new TextWatcher() {
+        txtDownPymnt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {            }
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                try{
-                    if (!Objects.requireNonNull(txtDownPymnt.getText()).toString().trim().isEmpty()) {
+            public void onFocusChange(View v, boolean hasFocus) {
 
-                        txtDownPymnt.removeTextChangedListener(this);
+                if (!hasFocus){
 
-                        String lsInput = txtDownPymnt.getText().toString().trim();
+                    if (txtDownPymnt.getText() == null || txtDownPymnt.getText().toString().trim().isEmpty()){
 
-                        Double lnInput = FormatUIText.getParseDouble(lsInput);
+                        InitMessage(0, R.drawable.baseline_error_24, "Please enter downpayment", "Okay", "", new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {}
 
-                        mViewModel.getModel().setDownPaymt(lnInput);
-
-                        double lnVal = mViewModel.getModel().getDownPaymt();
-
-                        double lnMonthly = mViewModel.GetMonthlyPayment(lnVal);
-
-                        mViewModel.getModel().setMonthlyAm(lnMonthly);
-
-                        txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(lnMonthly)));
-
-                        txtDownPymnt.addTextChangedListener(this);
+                            @Override
+                            public void OnNegative() {}
+                        });
+                        return;
                     }
-                } catch (Exception e){
-                    e.printStackTrace();
 
-                    txtDownPymnt.addTextChangedListener(this);
+                    mViewModel.getModel().setDownPaymt(Double.parseDouble(txtDownPymnt.getText().toString()));
+                    mViewModel.GetProductModel().setDownPaym(txtDownPymnt.getText().toString());
+
+                    InitializePayment();
                 }
             }
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
         });
+
+        //txtDownPymnt.addTextChangedListener(new FormatUIText.CurrencyFormat(txtDownPymnt));
+//        txtDownPymnt.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {            }
+//            @Override
+//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//
+//                try{
+//                    if (!Objects.requireNonNull(txtDownPymnt.getText()).toString().trim().isEmpty()) {
+//
+//                        txtDownPymnt.removeTextChangedListener(this);
+//
+//                        String lsInput = txtDownPymnt.getText().toString().trim();
+//
+//                        Double lnInput = FormatUIText.getParseDouble(lsInput);
+//
+//                        mViewModel.getModel().setDownPaymt(lnInput);
+//
+//                        double lnVal = mViewModel.getModel().getDownPaymt();
+//
+//                        double lnMonthly = mViewModel.GetMonthlyPayment(lnVal);
+//
+//                        mViewModel.getModel().setMonthlyAm(lnMonthly);
+//
+//                        txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(lnMonthly)));
+//
+//                        txtDownPymnt.addTextChangedListener(this);
+//                    }
+//                } catch (Exception e){
+//                    e.printStackTrace();
+//
+//                    txtDownPymnt.addTextChangedListener(this);
+//                }
+//            }
+//            @Override
+//            public void afterTextChanged(Editable editable) {}
+//        });
 
         btnCreate.setOnClickListener(view -> {
 
@@ -315,53 +462,116 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
                 });
             }
         });
+
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
-    }
+    private void InitializePayment(){
 
-    private void initWidgets(){
-
-        MaterialToolbar toolbar = findViewById(R.id.toolbar_introduction);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
-        lblBranchNm = findViewById(R.id.lbl_headerBranch);
-        lblBrandAdd = findViewById(R.id.lbl_headerAddress);
-        txtBranchNm = findViewById(R.id.txt_branchName);
-        txtBrandNm = findViewById(R.id.txt_brandName);
-        txtModelNm = findViewById(R.id.txt_modelName);
-        txtDownPymnt = findViewById(R.id.txt_downpayment);
-        txtAmort = findViewById(R.id.txt_monthlyAmort);
-        txtDTarget = findViewById(R.id.txt_dateTarget);
-        spnApplType = findViewById(R.id.spn_applicationType);
-        spnCustType = findViewById(R.id.spn_customerType);
-        spnAcctTerm = findViewById(R.id.spn_installmentTerm);
-        txt_remarks = findViewById(R.id.txt_remarks);
-
-        btnCreate = findViewById(R.id.btn_createCreditApp);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            finish();
+        //check mc model, before initializing computation
+        if (mViewModel.GetProductModel().getModelIDx() == null || mViewModel.GetProductModel().getModelIDx().isEmpty()){
+            Toast.makeText(Activity_IntroductoryQuestion.this, "Please select MC model", Toast.LENGTH_SHORT).show();
+            return;
         }
-        return super.onOptionsItemSelected(item);
+
+        //validate mc payment info
+        if (loInstallment == null){
+            Toast.makeText(Activity_IntroductoryQuestion.this, "Could not find installment info", Toast.LENGTH_SHORT);
+            return;
+        }
+
+        if (loCashPrice == null){
+            Toast.makeText(Activity_IntroductoryQuestion.this, "Could not find cash info", Toast.LENGTH_SHORT);
+            return;
+        }
+
+        //initialize default value, if downpayment is empty
+        if (mViewModel.GetProductModel().getDownPaym() == null || Double.parseDouble(mViewModel.GetProductModel().getDownPaym()) == 0.00){
+            mViewModel.GetProductModel().setDownPaym(String.valueOf(loInstallment.getMinimumDownpayment()));
+        }else if (mViewModel.getModel().getDownPaymt() == 0.00){
+            mViewModel.getModel().setDownPaymt(loInstallment.getMinimumDownpayment());
+        }
+        txtDownPymnt.setText(String.valueOf(mViewModel.GetProductModel().getDownPaym()));
+
+        //set defualt minimum down, if downpayment is lesser than requried amount
+        if (Double.parseDouble(mViewModel.GetProductModel().getDownPaym()) < loInstallment.getMinimumDownpayment()){
+
+            InitMessage(0, R.drawable.baseline_error_24, "Downpayment does not meet the required amount", "Okay", "", new OnMessageButton() {
+                @Override
+                public void OnPositive() {
+                    mViewModel.GetProductModel().setDownPaym(String.valueOf(loInstallment.getMinimumDownpayment()));
+                    txtDownPymnt.setText(String.valueOf(loInstallment.getMinimumDownpayment()));
+                }
+
+                @Override
+                public void OnNegative() {}
+            });
+
+            return;
+        } else if (Double.parseDouble(mViewModel.GetProductModel().getDownPaym()) >= loCashPrice.CashPrce){
+
+            InitMessage(0, R.drawable.baseline_error_24, "Downpayment cannot exceed or be equal to the cash price", "Okay", "", new OnMessageButton() {
+                @Override
+                public void OnPositive() {
+                    mViewModel.GetProductModel().setDownPaym(String.valueOf(loInstallment.getMinimumDownpayment()));
+                    txtDownPymnt.setText(String.valueOf(loInstallment.getMinimumDownpayment()));
+                }
+
+                @Override
+                public void OnNegative() {}
+            });
+            return;
+        }
+
+        //compute monthly, triggered by terms or downpayment
+        double ldbl_monthly = mViewModel.GetMonthlyAmortization(Integer.parseInt(mViewModel.GetProductModel().getTermIDxx()));
+
+        mViewModel.getModel().setMonthlyAm(ldbl_monthly);
+        mViewModel.GetProductModel().setMonthAmr(String.valueOf(ldbl_monthly));
+
+        txtAmort.setText(String.valueOf(ldbl_monthly));
+
+        mViewModel.CalculateNewDownpayment(mViewModel.GetProductModel().getModelIDx(), Integer.parseInt(mViewModel.GetProductModel().getTermIDxx()),
+                Double.parseDouble(mViewModel.GetProductModel().getDownPaym()), new VMARContact.OnCalculateNewDownpayment() {
+                    @Override
+                    public void OnCalculate(double lnResult) {
+                        mViewModel.getModel().setMonthlyAm(lnResult);
+                        mViewModel.GetProductModel().setMonthAmr(String.valueOf(lnResult));
+
+                        txtAmort.setText(String.valueOf(lnResult));
+                    }
+
+                    @Override
+                    public void OnFailed(String message) {
+                        if (message == null || message.isEmpty()){
+                            Toast.makeText(Activity_IntroductoryQuestion.this, "Failted to calculate downpayment", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        Toast.makeText(Activity_IntroductoryQuestion.this, message, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-    }
+    private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnMessageButton callback){
 
-    @Override
-    protected void onDestroy() {
-        getViewModelStore().clear();
-        super.onDestroy();
+        poMessage.initDialog();
+        poMessage.setTitle("Credit Application");
+        poMessage.setIcon(statusIcon);
+        poMessage.setMessage(message);
+
+        poMessage.setPositiveButton(posText, (view, dialog) -> {
+            dialog.dismiss();
+            callback.OnPositive();
+        });
+
+        if (messageType == 1){
+            poMessage.setNegativeButton(negText, (view, dialog) -> {
+                dialog.dismiss();
+                callback.OnNegative();
+
+            });
+        }
+
+        poMessage.show();
     }
 
     private class OnItemClickListener implements AdapterView.OnItemClickListener {
@@ -377,13 +587,17 @@ public class Activity_IntroductoryQuestion extends AppCompatActivity {
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             if(loView == spnApplType){
                 mViewModel.getModel().setAppTypex(String.valueOf(i));
+                mViewModel.GetProductModel().setPaymForm(String.valueOf(i));
             } else if(loView == spnCustType){
                 mViewModel.getModel().setCustTypex(String.valueOf(i));
             } else if(loView == spnAcctTerm){
                 mViewModel.getModel().setAccTermxx(i);
-                double lnMonthly = mViewModel.GetMonthlyPayment(mViewModel.getModel().getAccTermxx());
+                mViewModel.GetProductModel().setTermIDxx(String.valueOf(mViewModel.getModel().getAccTermxx()));
 
-                txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(lnMonthly)));
+                InitializePayment();
+
+//                double lnMonthly = mViewModel.GetMonthlyPayment(mViewModel.getModel().getAccTermxx());
+//                txtAmort.setText(FormatUIText.getCurrencyUIFormat(String.valueOf(lnMonthly)));
             }
         }
     }

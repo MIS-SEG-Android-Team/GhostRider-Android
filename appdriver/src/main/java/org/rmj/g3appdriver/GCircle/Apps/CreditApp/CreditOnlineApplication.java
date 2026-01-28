@@ -4,6 +4,7 @@ import static org.rmj.g3appdriver.dev.Api.ApiResult.SERVER_NO_RESPONSE;
 import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
 import android.util.Log;
@@ -26,7 +27,9 @@ import org.rmj.g3appdriver.GCircle.Apps.CreditApp.Obj.ReviewLoanInfo;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.Obj.SpousePensionInfo;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.model.LoanInfo;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMC_Contract;
+import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCreditApplication;
@@ -76,6 +79,7 @@ public class CreditOnlineApplication {
 
     private final DCreditApplication poDao;
     private final DMC_Contract poMContract;
+    private final DErrorLogs poError;
 
     private final EmployeeMaster poUser;
 
@@ -94,6 +98,7 @@ public class CreditOnlineApplication {
         this.instance = instance;
         this.poDao = GGC_GCircleDB.getInstance(instance).CreditApplicationDao();
         this.poMContract = GGC_GCircleDB.getInstance(instance).mcontractDao();
+        this.poError = GGC_GCircleDB.getInstance(instance).errorLogsDao();
         this.poUser = new EmployeeMaster(instance);
         this.poSession = EmployeeSession.getInstance(instance);
         this.poApi = new GCircleApi(instance);
@@ -102,6 +107,15 @@ public class CreditOnlineApplication {
         this.poBrand = new RMcBrand(instance);
         this.poModel = new RMcModel(instance);
         this.poPrice = PriceFactory.make(PriceFactory.ProductType.MOTORCYCLE);
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private String GetDateToday(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+        }
     }
 
     private String CreateUniqueIDForApplicant(){
@@ -255,12 +269,57 @@ public class CreditOnlineApplication {
         return poModel.getMcModelFromBrand(args);
     }
 
-    public LiveData<DMcModel.McAmortInfo> GetMonthlyPayment(String ModelID, int Term){
-        return poModel.GetMonthlyPayment(ModelID, Term);
+    public List<MCSerial> DownloadSerials(String fsSearch, boolean fbyModel){
+
+        try {
+            JSONObject params = new JSONObject();
+            params.put("sSerial", fsSearch);
+            params.put("byModel", fbyModel);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlImportMcSerials(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if (lsResponse == null) {
+                message = SERVER_NO_RESPONSE;
+                return null;
+            }
+            Log.d(TAG, lsResponse);
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+            if (lsResult.equalsIgnoreCase("error")) {
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return null;
+            }
+
+            List<MCSerial> laSerials = new ArrayList<>();
+            JSONArray laJson = loResponse.getJSONArray("detail");
+            for (int x = 0; x < laJson.length(); x++) {
+
+                JSONObject loResult = laJson.getJSONObject(x);
+
+                MCSerial loSerial = new MCSerial(
+                        loResult.getString("sSerialID"),
+                        loResult.getString("sEngineNo"),
+                        loResult.getString("sFrameNox"),
+                        loResult.getString("sModelIDx"),
+                        loResult.getString("sDesc")
+                );
+                laSerials.add(loSerial);
+            }
+            return laSerials;
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public LiveData<DMcModel.McDPInfo> GetInstallmentPlanDetail(String ModelID){
-        return poModel.getDownpayment(ModelID);
+    public EMCContractInfo GetCreditContract(String fsTransNox){
+        return poMContract.GetCreditContract(fsTransNox);
     }
 
     public CreditApp getInstance(CreditAppInstance app){
@@ -318,53 +377,16 @@ public class CreditOnlineApplication {
         return poBranch.getBranchInfoNonLive(fsBranchCd);
     }
 
-    public List<MCSerial> DownloadSerials(String fsSearch, boolean fbyModel){
+    public void SaveError(String source, String message){
 
-        try {
-            JSONObject params = new JSONObject();
-            params.put("sSerial", fsSearch);
-            params.put("byModel", fbyModel);
+        EErrorLogs logs = new EErrorLogs();
+        logs.setnErrorLogID(poError.GetErrorLogCount() + 1);
+        logs.setsMessagex(message);
+        logs.setdLogDate(GetDateToday());
+        logs.setsSourceTransNo(source);
+        logs.setcRead("0");
 
-            String lsResponse = WebClient.sendRequest(
-                    poApi.getUrlImportMcSerials(),
-                    params.toString(),
-                    poHeaders.getHeaders());
-
-            if (lsResponse == null) {
-                message = SERVER_NO_RESPONSE;
-                return null;
-            }
-            Log.d(TAG, lsResponse);
-
-            JSONObject loResponse = new JSONObject(lsResponse);
-            String lsResult = loResponse.getString("result");
-            if (lsResult.equalsIgnoreCase("error")) {
-                JSONObject loError = loResponse.getJSONObject("error");
-                message = getErrorMessage(loError);
-                return null;
-            }
-
-            List<MCSerial> laSerials = new ArrayList<>();
-            JSONArray laJson = loResponse.getJSONArray("detail");
-            for (int x = 0; x < laJson.length(); x++) {
-
-                JSONObject loResult = laJson.getJSONObject(x);
-
-                MCSerial loSerial = new MCSerial(
-                        loResult.getString("sSerialID"),
-                        loResult.getString("sEngineNo"),
-                        loResult.getString("sFrameNox"),
-                        loResult.getString("sModelIDx"),
-                        loResult.getString("sDesc")
-                );
-                laSerials.add(loSerial);
-            }
-            return laSerials;
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
+        poError.SaveErrorLogs(logs);
     }
 
     public boolean DownloadApplications(){
@@ -704,22 +726,27 @@ public class CreditOnlineApplication {
 
         try {
 
-            //save first to local
+            //initialize date transact (considered new record) if not exist
+            if (poMContract.GetMContractInfo(foVal.getsTransNox()) == null){
+                foVal.setdTransact(GetDateToday());
+            }
+
+            //save or update first to local
             poMContract.Save(foVal);
 
             //initialize parameter
             JSONObject params = new JSONObject();
             params.put("sBranchCd", foVal.getsBranchCd());
-            params.put("dTransact", foVal.getsBranchCd());
-            params.put("sClientID", foVal.getsBranchCd());
-            params.put("sReferNox", foVal.getsBranchCd());
-            params.put("sAcctNmbr", foVal.getsBranchCd());
-            params.put("sSerialID", foVal.getsBranchCd());
-            params.put("nDownPaym", foVal.getsBranchCd());
-            params.put("nAcctTerm", foVal.getsBranchCd());
-            params.put("nMonAmort", foVal.getsBranchCd());
-            params.put("sRemarksx", foVal.getsBranchCd());
-            params.put("cTranStat", foVal.getsBranchCd());
+            params.put("dTransact", GetDateToday());
+            params.put("sClientID", foVal.getsClientID());
+            params.put("sReferNox", foVal.getsReferNox());
+            params.put("sAcctNmbr", foVal.getsAcctNmbr());
+            params.put("sSerialID", foVal.getsSerialID());
+            params.put("nDownPaym", foVal.getnDownPaym());
+            params.put("nAcctTerm", foVal.getnAcctTerm());
+            params.put("nMonAmort", foVal.getnMonAmort());
+            params.put("sRemarksx", foVal.getsRemarksx());
+            params.put("cTranStat", foVal.getcTranStat());
 
             //upload to database
             String lsResponse = WebClient.sendRequest(
@@ -740,81 +767,14 @@ public class CreditOnlineApplication {
                 return false;
             }
 
+            //update transaction no and send status
             String lsTransNox = loResponse.getString("sTransNox");
             poMContract.UpdateTransNox(lsTransNox, foVal.getsTransNox());
 
             return true;
         } catch (Exception e){
-            e.printStackTrace();
             message = getLocalMessage(e);
             return false;
-        }
-    }
-
-    public boolean InitializeMcInstallmentTerms(DMcModel.McDPInfo args){
-        try{
-
-            org.json.simple.JSONObject loJson = new org.json.simple.JSONObject();
-            loJson.put("sModelIDx", args.ModelIDx);
-            loJson.put("sModelNme", args.ModelNme);
-            loJson.put("nRebatesx", args.Rebatesx);
-            loJson.put("nMiscChrg", args.MiscChrg);
-            loJson.put("nEndMrtgg", args.EndMrtgg);
-            loJson.put("nMinDownx", args.MinDownx);
-            loJson.put("nSelPrice", args.SelPrice);
-            loJson.put("nLastPrce", args.LastPrce);
-
-            poPrice.setModelInfo(loJson);
-
-            return true;
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return false;
-        }
-    }
-
-    public double GetMinimumDownpayment(){
-        return poPrice.getMinimumDP();
-    }
-
-    public double GetMonthlyAmortization(DMcModel.McAmortInfo args, double args1){
-        try{
-            org.json.simple.JSONObject loJson = new org.json.simple.JSONObject();
-            loJson.put("nSelPrice", args.nSelPrice);
-            loJson.put("nMinDownx", args.nMinDownx);
-            loJson.put("nMiscChrg", args.nMiscChrg);
-            loJson.put("nRebatesx", args.nRebatesx);
-            loJson.put("nEndMrtgg", args.nEndMrtgg);
-            loJson.put("nAcctThru", args.nAcctThru);
-            loJson.put("nFactorRt", args.nFactorRt);
-
-            poPrice.setDownPayment(args1);
-            return poPrice.getMonthlyAmort(loJson);
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return 0;
-        }
-    }
-
-    public double GetMonthlyAmortization(DMcModel.McAmortInfo args, int args1){
-        try{
-            org.json.simple.JSONObject loJson = new org.json.simple.JSONObject();
-            loJson.put("nSelPrice", args.nSelPrice);
-            loJson.put("nMinDownx", args.nMinDownx);
-            loJson.put("nMiscChrg", args.nMiscChrg);
-            loJson.put("nRebatesx", args.nRebatesx);
-            loJson.put("nEndMrtgg", args.nEndMrtgg);
-            loJson.put("nAcctThru", args.nAcctThru);
-            loJson.put("nFactorRt", args.nFactorRt);
-
-            poPrice.setPaymentTerm(args1);
-            return poPrice.getMonthlyAmort(loJson);
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return 0;
         }
     }
 

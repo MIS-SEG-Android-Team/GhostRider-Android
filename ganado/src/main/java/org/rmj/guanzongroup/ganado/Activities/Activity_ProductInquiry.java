@@ -142,7 +142,7 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
                     @Override
                     public void OnFailed(String message) {
-
+                        Toast.makeText(Activity_ProductInquiry.this, message, Toast.LENGTH_SHORT).show();
                     }
                 });
             } catch (NullPointerException e){

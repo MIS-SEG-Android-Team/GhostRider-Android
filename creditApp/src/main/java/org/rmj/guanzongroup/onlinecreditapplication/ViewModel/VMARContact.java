@@ -8,11 +8,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditOnlineApplication;
-import org.rmj.g3appdriver.GCircle.Apps.CreditApp.model.LoanInfo;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcModel;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGanadoOnline;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
+import org.rmj.g3appdriver.lib.Ganado.Obj.ProductInquiry;
+import org.rmj.g3appdriver.lib.Ganado.pojo.InquiryInfo;
+import org.rmj.g3appdriver.lib.Ganado.pojo.InstallmentInfo;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -25,11 +27,11 @@ public class VMARContact extends AndroidViewModel {
     private String message;
 
     private final MutableLiveData<String> lsModelIDx = new MutableLiveData<>();
-    private final MutableLiveData<DMcModel.McAmortInfo> poAmort = new MutableLiveData<>();
 
     private final CreditOnlineApplication poApp;
+    private final ProductInquiry poProduct;
     private final ConnectionUtil poConn;
-    private final LoanInfo poModel;
+    private final InquiryInfo poPrdctModel;
 
     public EBranchInfo getBranchInfo(String fsBranchCd){
         return poApp.getBranchInfoNonLive(fsBranchCd);
@@ -46,16 +48,23 @@ public class VMARContact extends AndroidViewModel {
         void OnFailed(String message);
     }
 
+    public interface OnRetrieveInstallmentInfo{
+        void OnRetrieve(InstallmentInfo loResult);
+        void OnFailed(String message);
+    }
+
+    public interface OnCalculateNewDownpayment{
+        void OnCalculate(double lnResult);
+        void OnFailed(String message);
+    }
+
     public VMARContact(@NonNull Application application) {
         super(application);
 
         this.poApp = new CreditOnlineApplication(application);
+        this.poProduct = new ProductInquiry(application);
         this.poConn = new ConnectionUtil(application);
-        this.poModel = new LoanInfo();
-    }
-
-    public void SetModelIDxx(String fsModelIDx){
-        this.lsModelIDx.setValue(fsModelIDx);
+        this.poPrdctModel = new InquiryInfo();
     }
 
     public String CreateIDForContract(){
@@ -70,44 +79,88 @@ public class VMARContact extends AndroidViewModel {
         return poApp.CreateIDForAccountNumber();
     }
 
-    public LoanInfo GetModel(){
-        return poModel;
+    public LiveData<String> GetModelIDxx(){
+        return lsModelIDx;
+    }
+
+    public LiveData<DGanadoOnline.CashPrice> GetCashPrice(String ModelID){
+        return poProduct.GetCashPrice(ModelID);
     }
 
     public ECreditApplication GetApplication(String fsTransNox){
         return poApp.GetApplication(fsTransNox);
     }
 
-    public LiveData<String> GetModelIDxx(){
-        return lsModelIDx;
+    public InquiryInfo GetProductModel(){
+        return poPrdctModel;
     }
 
-    public LiveData<DMcModel.McDPInfo> GetInstallmentPlanDetail(String ModelID) {
-        return poApp.GetInstallmentPlanDetail(ModelID);
+    public EMCContractInfo GetCreditContract(String fsTransNox){
+        return poApp.GetCreditContract(fsTransNox);
     }
 
-    public LiveData<DMcModel.McAmortInfo> GetAmortizationDetail(String args, int args1) {
-        return poApp.GetMonthlyPayment(args, args1);
+    public void SetModelIDxx(String fsModelIDx){
+        this.lsModelIDx.setValue(fsModelIDx);
     }
 
-    public boolean InitializeTermAndDownpayment(DMcModel.McDPInfo args) {
-        return poApp.InitializeMcInstallmentTerms(args);
+    public void SaveError(String fsSource, String fsMessage){
+        poApp.SaveError(fsSource, fsMessage);
     }
 
-    public double GetMinimumDownpayment() {
-        return poApp.GetMinimumDownpayment();
+    public void GetMinimumDownpayment(String ModelID, OnRetrieveInstallmentInfo listener) {
+
+        TaskExecutor.Execute(ModelID, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
+                String lsModelID = (String) args;
+                InstallmentInfo loResult = poProduct.GetMinimumDownpayment(lsModelID);
+
+                if(loResult == null){
+                    message = poProduct.getMessage();
+                    return null;
+                }
+
+                return loResult;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                InstallmentInfo loResult = (InstallmentInfo) object;
+                if(loResult == null){
+                    listener.OnFailed(message);
+                    return;
+                }
+
+                listener.OnRetrieve(loResult);
+            }
+        });
     }
 
-    public double GetMonthlyPayment(int args1) {
-        return poApp.GetMonthlyAmortization(poAmort.getValue(), args1);
-    }
+    public void CalculateNewDownpayment(String ModelID, int term, double Downpayment, OnCalculateNewDownpayment listener){
 
-    public double GetMonthlyPayment(double args1) {
-        return poApp.GetMonthlyAmortization(poAmort.getValue(), args1);
-    }
+        TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
+            @Override
+            public Object DoInBackground(Object args) {
 
-    public void SetModelAmortization(DMcModel.McAmortInfo args) {
-        this.poAmort.setValue(args);
+                double lnResult = poProduct.GetMonthlyAmortization(ModelID, term, Downpayment);
+                if(lnResult == 0.0){
+                    message = poApp.getMessage();
+                    return 0.0;
+                }
+                return lnResult;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                double lnResult = (double) object;
+                if(lnResult == 0.0){
+                    listener.OnFailed(message);
+                    return;
+                }
+                listener.OnCalculate(lnResult);
+            }
+        });
+
     }
 
     public void GetSerials(String fsVal, boolean fByCode, OnSearchLSerial foListener){
@@ -166,7 +219,12 @@ public class VMARContact extends AndroidViewModel {
 
             @Override
             public Object DoInBackground(Object args) {
+
                 EMCContractInfo loVal = (EMCContractInfo) args;
+                if (!poConn.isDeviceConnected()){
+                    loVal.setsSendStat("0");
+                }
+
                 if (!poApp.UploadMContract(loVal)){
                     message = poApp.getMessage();
                     return false;
@@ -183,5 +241,9 @@ public class VMARContact extends AndroidViewModel {
                 }
             }
         });
+    }
+
+    public double GetMonthlyAmortization(int args1) {
+        return poProduct.GetMonthlyAmortization(lsModelIDx.getValue(), args1);
     }
 }

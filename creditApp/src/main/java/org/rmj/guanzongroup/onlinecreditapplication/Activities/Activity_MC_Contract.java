@@ -3,10 +3,8 @@ package org.rmj.guanzongroup.onlinecreditapplication.Activities;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,17 +19,17 @@ import com.google.android.material.textview.MaterialTextView;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditAppConstants;
 import org.rmj.g3appdriver.GCircle.Apps.CreditApp.CreditOnlineApplication;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DMcModel;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGanadoOnline;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
 import org.rmj.g3appdriver.etc.FormatUIText;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
+import org.rmj.g3appdriver.lib.Ganado.pojo.InstallmentInfo;
 import org.rmj.guanzongroup.onlinecreditapplication.Adapter.MCAdapter;
 import org.rmj.guanzongroup.onlinecreditapplication.R;
 import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMARContact;
-import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMCreditApplications;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,11 +38,16 @@ import java.util.Map;
 
 public class Activity_MC_Contract extends AppCompatActivity {
 
+    private final HashMap<String, String> loTerms = CreditAppConstants.TERMS_BY_CODE;
+
     private VMARContact mViewModel;
     private LoadDialog poDialogx;
     private MessageBox poMessage;
+
+    private EMCContractInfo loContract = new EMCContractInfo();
     private List<CreditOnlineApplication.MCSerial> laSerials = new ArrayList<>();
-    private HashMap<String, String> loTerms = CreditAppConstants.TERMS_BY_CODE;
+    private InstallmentInfo loInstallment;
+    private DGanadoOnline.CashPrice loCashPrice;
 
     private TextInputEditText tie_branch, tie_transaction, tie_client, tie_account, tie_downpay, tie_monthly, tie_remarks;
     private MaterialAutoCompleteTextView auto_serial, auto_term;
@@ -69,6 +72,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
         setContentView(R.layout.activity_mcontract);
 
         if (!getIntent().hasExtra("sTransNox")){
+
             InitMessage(0, R.drawable.baseline_error_24, "Invalid transactio number", "Okay", "", new OnMessageButton() {
                 @Override
                 public void OnPositive() {
@@ -108,75 +112,114 @@ public class Activity_MC_Contract extends AppCompatActivity {
             //do not proceed if credit app is empty
             ECreditApplication loApp = mViewModel.GetApplication(getIntent().getStringExtra("sTransNox"));
             if (loApp == null){
+                Toast.makeText(Activity_MC_Contract.this, "Credit application not found", Toast.LENGTH_SHORT).show();
+                finish();
                 return;
             }
 
-            JSONObject loDetail = new JSONObject(loApp.getDetlInfo());
+            if(mViewModel.GetCreditContract(getIntent().getStringExtra("sTransNox")) == null){
 
-            //initialize adapter
-            if (mViewModel.getBranchInfo(loApp.getBranchCd()) == null){
-                tie_branch.setText(loApp.getBranchCd());
+                //set credit app transaction number as refer no
+                loContract.setsReferNox(getIntent().getStringExtra("sTransNox"));
+
+                JSONObject loDetail = new JSONObject(loApp.getDetlInfo());
+
+                //initialize branch
+                if (mViewModel.getBranchInfo(loApp.getBranchCd()) == null){
+                    tie_branch.setText(loApp.getBranchCd());
+                }else {
+                    EBranchInfo loBranch = mViewModel.getBranchInfo(loApp.getBranchCd());
+                    loContract.setsBranchCd(loBranch.getBranchCd());
+                    tie_branch.setText(loBranch.getBranchNm());
+                }
+
+                //initialize transaction ids
+                loContract.setsTransNox(mViewModel.CreateIDForContract());
+                loContract.setsClientID(mViewModel.CreateIDForClient());
+                loContract.setsAcctNmbr(mViewModel.CreateIDForAccountNumber());
+
+                tie_transaction.setText(mViewModel.CreateIDForContract());
+                tie_client.setText(mViewModel.CreateIDForClient());
+                tie_account.setText(mViewModel.CreateIDForAccountNumber());
+
+                //initialize terms
+                String[] laTerms = new String[loTerms.size()];
+                int lnCnt = 0;
+
+                for (Map.Entry<String, String> loEntry: loTerms.entrySet()){
+                    laTerms[lnCnt] = loEntry.getKey();
+
+                    if (loDetail.getInt("nAcctTerm") == Integer.parseInt(loEntry.getValue())){
+                        mViewModel.GetProductModel().setTermIDxx(loEntry.getValue());
+                        auto_term.setText(String.valueOf(loEntry.getKey()));
+                    }
+                    lnCnt += 1;
+                }
+                auto_term.setAdapter(CreditAppConstants.getAdapter(Activity_MC_Contract.this, laTerms));
+
+                //initialize payment type, default to installment as it is credit online app
+                mViewModel.GetProductModel().setPaymForm("1");
+
+                //initialize to model
+                mViewModel.GetProductModel().setDownPaym(String.valueOf(loDetail.getDouble("nDownPaym")));
+
+                //set model id
+                mViewModel.SetModelIDxx(loDetail.getString("sModelIDx"));
+
+                //initialize serial models
+                mViewModel.GetSerials(loDetail.getString("sModelIDx"), true, new VMARContact.OnSearchLSerial() {
+                    @Override
+                    public void OnSuccess(List<CreditOnlineApplication.MCSerial> laResult) {
+
+                        laSerials = laResult;
+
+                        //initialize adapter
+                        auto_serial.setAdapter(new MCAdapter(Activity_MC_Contract.this, R.layout.list_item_mcserial, laSerials));
+                        auto_serial.showDropDown();
+
+                        poDialogx.dismiss();
+                    }
+
+                    @Override
+                    public void OnFailed(String message) {
+                        poDialogx.dismiss();
+
+                        InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
+                        });
+                    }
+                });
+
             }else {
-                EBranchInfo loBranch = mViewModel.getBranchInfo(loApp.getBranchCd());
-                tie_branch.setText(loBranch.getBranchNm());
+
+                loContract = mViewModel.GetCreditContract(getIntent().getStringExtra("sTransNox"));
+
+                //initialize branch
+                if (mViewModel.getBranchInfo(loContract.getsBranchCd()) == null){
+                    tie_branch.setText(loApp.getBranchCd());
+                }else {
+                    EBranchInfo loBranch = mViewModel.getBranchInfo(loContract.getsBranchCd());
+                    loContract.setsBranchCd(loBranch.getBranchCd());
+                    tie_branch.setText(loBranch.getBranchNm());
+                }
+
+                tie_transaction.setText(loContract.getsTransNox());
+                tie_client.setText(loContract.getsClientID());
+                tie_account.setText(loContract.getsAcctNmbr());
+                tie_downpay.setText(String.valueOf(loContract.getnDownPaym()));
+                tie_monthly.setText(String.valueOf(loContract.getnMonAmort()));
+                tie_remarks.setText(loContract.getsRemarksx());
+
+                auto_serial.setText(loContract.getsSerialID());
+                //auto_term.setText();
             }
-
-            //initialize transaction ids
-            tie_transaction.setText(mViewModel.CreateIDForContract());
-            tie_client.setText(mViewModel.CreateIDForClient());
-            tie_account.setText(mViewModel.CreateIDForAccountNumber());
-
-            //initialize terms
-            String[] laTerms = new String[loTerms.size()];
-            int lnCnt = 0;
-
-            for (Map.Entry<String, String> loEntry: loTerms.entrySet()){
-                laTerms[lnCnt] = loEntry.getKey();
-
-                if (loDetail.getInt("nAcctTerm") == Integer.parseInt(loEntry.getValue())){
-                    mViewModel.GetModel().setAccTermxx(lnCnt);
-                    auto_term.setText(String.valueOf(loEntry.getKey()));
-                }
-                lnCnt += 1;
-            }
-            auto_term.setAdapter(CreditAppConstants.getAdapter(Activity_MC_Contract.this, laTerms));
-
-            //initialize to model
-            mViewModel.GetModel().setDownPaymt(loDetail.getDouble("nDownPaym"));
-
-            //set model id
-            mViewModel.SetModelIDxx(loDetail.getString("sModelIDx"));
-
-            //initialize serial models
-            mViewModel.GetSerials(loDetail.getString("sModelIDx"), true, new VMARContact.OnSearchLSerial() {
-                @Override
-                public void OnSuccess(List<CreditOnlineApplication.MCSerial> laResult) {
-
-                    laSerials = laResult;
-
-                    //initialize adapter
-                    auto_serial.setAdapter(new MCAdapter(Activity_MC_Contract.this, R.layout.list_item_mcserial, laSerials));
-                    auto_serial.showDropDown();
-
-                    poDialogx.dismiss();
-                }
-
-                @Override
-                public void OnFailed(String message) {
-                    poDialogx.dismiss();
-
-                    InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnMessageButton() {
-                        @Override
-                        public void OnPositive() {}
-
-                        @Override
-                        public void OnNegative() {}
-                    });
-                }
-            });
 
         }catch (Exception e){
-            e.printStackTrace();
+            mViewModel.SaveError("Activity_MC_Contract", e.getMessage());
         }
 
     }
@@ -278,11 +321,25 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
                     //initialize downpayment
                     double lnDownPaym = FormatUIText.getParseDouble(tie_downpay.getText().toString());
-                    mViewModel.GetModel().setDownPaymt(lnDownPaym);
+                    mViewModel.GetProductModel().setDownPaym(String.valueOf(lnDownPaym));
 
                     //trigger coputation by downpayment
-                    InitializePayment(false);
+                    InitializePayment();
 
+                }
+            }
+        });
+
+        tie_remarks.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if (!hasFocus){
+
+                    if (tie_remarks.getText() == null || tie_remarks.getText().toString().isEmpty()){
+                        return;
+                    }
+                    loContract.setsRemarksx(tie_remarks.getText().toString());
                 }
             }
         });
@@ -291,8 +348,12 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                //set to 0 as it is filtered on every value selected
                 CreditOnlineApplication.MCSerial loSerial = (CreditOnlineApplication.MCSerial) parent.getItemAtPosition(0);
+
+                //set model and serial id
                 mViewModel.SetModelIDxx(loSerial.lsModelIDx);
+                loContract.setsSerialID(loSerial.lsSerialID);
             }
         });
 
@@ -300,9 +361,10 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //initialize monthly and display computed amount
-                mViewModel.GetModel().setAccTermxx(position);
-                InitializePayment(true);
+                String lsTerm = loTerms.get((String) parent.getItemAtPosition(position));
+
+                mViewModel.GetProductModel().setTermIDxx(lsTerm);
+                InitializePayment();
             }
         });
 
@@ -310,27 +372,133 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                EMCContractInfo loContract = new EMCContractInfo();
-                loContract.setsTransNox("");
+                InitMessage(1, R.drawable.baseline_error_24, "Are you sure you want to submit the contract?", "Yes", "No", new OnMessageButton() {
+                    @Override
+                    public void OnPositive() {
 
-                //mViewModel.SubmitMContract();
+                        mViewModel.SubmitMContract(loContract, new VMARContact.OnSubmit() {
+                            @Override
+                            public void OnLoad(String fsTitlexx, String fsMessage) {
+                                poDialogx.initDialog(fsTitlexx, fsMessage, false);
+                                poDialogx.show();
+                            }
+
+                            @Override
+                            public void OnSuccess() {
+                                poDialogx.dismiss();
+
+                                InitMessage(0, R.drawable.baseline_message_24, "Successfully submitted", "Okay", "", new OnMessageButton() {
+                                    @Override
+                                    public void OnPositive() { }
+
+                                    @Override
+                                    public void OnNegative() {}
+                                });
+                            }
+
+                            @Override
+                            public void OnFailed(String message) {
+                                poDialogx.dismiss();
+
+                                InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnMessageButton() {
+                                    @Override
+                                    public void OnPositive() {}
+
+                                    @Override
+                                    public void OnNegative() {}
+                                });
+
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void OnNegative() {}
+                });
             }
         });
     }
 
-    private void InitializePayment(Boolean fByTerms){
+    private void InitObservers(){
 
-        //set computed minimum downpayment
-        double ldbl_down = mViewModel.GetMinimumDownpayment();
+        //observe model id every selection
+        mViewModel.GetModelIDxx().observe(Activity_MC_Contract.this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+
+                //set model id to model
+                mViewModel.GetProductModel().setModelIDx(s);
+
+                //get cash price of model
+                mViewModel.GetCashPrice(mViewModel.GetProductModel().getModelIDx()).observe(Activity_MC_Contract.this, new Observer<DGanadoOnline.CashPrice>() {
+                    @Override
+                    public void onChanged(DGanadoOnline.CashPrice cashPrice) {
+
+                        if (cashPrice == null){
+                            return;
+                        }
+                        loCashPrice = cashPrice;
+                    }
+                });
+
+                //get installment details of model
+                mViewModel.GetMinimumDownpayment(mViewModel.GetProductModel().getModelIDx(), new VMARContact.OnRetrieveInstallmentInfo() {
+                    @Override
+                    public void OnRetrieve(InstallmentInfo loResult) {
+
+                        if (loResult == null){
+                            Toast.makeText(Activity_MC_Contract.this, "Installment info not found00!", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        loInstallment = loResult;
+                    }
+
+                    @Override
+                    public void OnFailed(String message) {
+                        Toast.makeText(Activity_MC_Contract.this, message, Toast.LENGTH_LONG).show();
+                    }
+                });
+                InitializePayment();
+            }
+        });
+    }
+
+    private void InitializePayment(){
+
+        //validate mc payment info
+        if (loInstallment == null){
+            Toast.makeText(Activity_MC_Contract.this, "Could not find installment info", Toast.LENGTH_SHORT);
+            return;
+        }
+
+        if (loCashPrice == null){
+            Toast.makeText(Activity_MC_Contract.this, "Could not find cash info", Toast.LENGTH_SHORT);
+            return;
+        }
 
         //set defualt minimum down, if downpayment is lesser than requried amount
-        if (mViewModel.GetModel().getDownPaymt() < ldbl_down){
+        if (Double.parseDouble(mViewModel.GetProductModel().getDownPaym()) < loInstallment.getMinimumDownpayment()){
 
             InitMessage(0, R.drawable.baseline_error_24, "Downpayment does not meet the required amount", "Okay", "", new OnMessageButton() {
                 @Override
                 public void OnPositive() {
-                    mViewModel.GetModel().setDownPaymt(ldbl_down);
-                    tie_downpay.setText(String.valueOf(ldbl_down));
+                    mViewModel.GetProductModel().setDownPaym(String.valueOf(loInstallment.getMinimumDownpayment()));
+                    tie_downpay.setText(String.valueOf(loInstallment.getMinimumDownpayment()));
+                }
+
+                @Override
+                public void OnNegative() {}
+            });
+
+            return;
+        } else if (Double.parseDouble(mViewModel.GetProductModel().getDownPaym()) >= loCashPrice.CashPrce){
+
+            InitMessage(0, R.drawable.baseline_error_24, "Downpayment cannot exceed or be equal to the cash price", "Okay", "", new OnMessageButton() {
+                @Override
+                public void OnPositive() {
+                    mViewModel.GetProductModel().setDownPaym(String.valueOf(loInstallment.getMinimumDownpayment()));
+                    tie_downpay.setText(String.valueOf(loInstallment.getMinimumDownpayment()));
                 }
 
                 @Override
@@ -341,66 +509,37 @@ public class Activity_MC_Contract extends AppCompatActivity {
         }
 
         //compute monthly, triggered by terms or downpayment
-        double ldbl_monthly = mViewModel.GetMonthlyPayment(mViewModel.GetModel().getAccTermxx());
-        if (!fByTerms){
-            ldbl_monthly = mViewModel.GetMonthlyPayment(mViewModel.GetModel().getDownPaymt());
-        }
-        mViewModel.GetModel().setMonthlyAm(ldbl_monthly);
+        double ldbl_monthly = mViewModel.GetMonthlyAmortization(Integer.parseInt(mViewModel.GetProductModel().getTermIDxx()));
+
+        mViewModel.GetProductModel().setMonthAmr(String.valueOf(ldbl_monthly));
         tie_monthly.setText(String.valueOf(ldbl_monthly));
 
-        Log.d("this is model", mViewModel.GetModel().getModelIDxx());
-        Log.d("this is dp", String.valueOf(mViewModel.GetModel().getDownPaymt()));
-        Log.d("this is terms", String.valueOf(mViewModel.GetModel().getAccTermxx()));
-        Log.d("this is monthly", String.valueOf(ldbl_monthly));
-    }
-
-    private void InitObservers(){
-
-        //observe model id every selection
-        mViewModel.GetModelIDxx().observe(Activity_MC_Contract.this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-
-                if (s == null || s.isEmpty()){
-                    return;
-                }
-
-                //set model id to model
-                mViewModel.GetModel().setModelIDxx(s);
-
-                //get installment details
-                mViewModel.GetInstallmentPlanDetail(mViewModel.GetModel().getModelIDxx()).observe(Activity_MC_Contract.this, new Observer<DMcModel.McDPInfo>() {
+        mViewModel.CalculateNewDownpayment(mViewModel.GetProductModel().getModelIDx(), Integer.parseInt(mViewModel.GetProductModel().getTermIDxx()),
+                Double.parseDouble(mViewModel.GetProductModel().getDownPaym()), new VMARContact.OnCalculateNewDownpayment() {
                     @Override
-                    public void onChanged(DMcModel.McDPInfo mcDPInfo) {
+                    public void OnCalculate(double lnResult) {
+                        mViewModel.GetProductModel().setMonthAmr(String.valueOf(lnResult));
+                        tie_monthly.setText(String.valueOf(lnResult));
+                        btn_submit.setEnabled(true);
+                    }
 
-                        if (mcDPInfo == null){
+                    @Override
+                    public void OnFailed(String message) {
+
+                        btn_submit.setEnabled(false);
+                        if (message == null || message.isEmpty()){
+                            Toast.makeText(Activity_MC_Contract.this, "Failted to calculate downpayment", Toast.LENGTH_SHORT).show();
                             return;
                         }
-
-                        //initialize terms and downpayment
-                        if (mViewModel.InitializeTermAndDownpayment(mcDPInfo)){
-
-                            //get amortization details
-                            mViewModel.GetAmortizationDetail(mViewModel.GetModel().getModelIDxx(), mViewModel.GetModel().getAccTermxx()).observe(Activity_MC_Contract.this, new Observer<DMcModel.McAmortInfo>() {
-                                @Override
-                                public void onChanged(DMcModel.McAmortInfo mcAmortInfo) {
-
-                                    if (mcAmortInfo == null){
-                                        return;
-                                    }
-
-                                    //initialize model for monthly amortization
-                                    mViewModel.SetModelAmortization(mcAmortInfo);
-
-                                    //initialize payment
-                                    InitializePayment(true);
-                                }
-                            });
-                        }
+                        Toast.makeText(Activity_MC_Contract.this, message, Toast.LENGTH_SHORT).show();
                     }
                 });
-            }
-        });
+
+        //set computation to contract object
+        loContract.setnDownPaym(Double.parseDouble(mViewModel.GetProductModel().getDownPaym()));
+        loContract.setnAcctTerm(Integer.parseInt(mViewModel.GetProductModel().getTermIDxx()));
+        loContract.setnMonAmort(Double.parseDouble(mViewModel.GetProductModel().getnMonthAmr()));
+
     }
 
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnMessageButton callback){
