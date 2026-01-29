@@ -6,7 +6,8 @@
             android:name=".Activities.Activity_MC_Contract"
             android:exported="false"
             android:label="MC AR Contract"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateVisible">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

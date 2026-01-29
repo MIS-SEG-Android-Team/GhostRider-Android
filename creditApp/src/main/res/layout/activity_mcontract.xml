@@ -239,6 +239,7 @@
                     android:layout_height="0dp"
                     android:hint="Remarks"
                     android:paddingTop="5dp"
+                    app:layout_constraintHeight_percent="0.15"
                     app:layout_constraintTop_toBottomOf="@+id/layout_terms"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/layout_terms"

@@ -625,6 +625,65 @@ public class CreditOnlineApplication {
         }
     }
 
+    public boolean DownloadMContract(String fsReferNoxx){
+
+        try {
+
+            //initialize parameter
+            JSONObject params = new JSONObject();
+            params.put("sReferNoxx", fsReferNoxx);
+
+            //upload to database
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlImportMContract(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);
+                return false;
+            }
+
+            JSONArray laJson = loResponse.getJSONArray("detail");
+
+            for(int x= 0; x < laJson.length(); x++){
+
+                JSONObject loJson = laJson.getJSONObject(x);
+
+                EMCContractInfo loDetail = new EMCContractInfo();
+                loDetail.setsTransNox(loJson.getString("sTransNox"));
+                loDetail.setsBranchCd(loJson.getString("sBranchCD"));
+                loDetail.setsClientID(loJson.getString("sClientID"));
+                loDetail.setsReferNox(loJson.getString("sReferNox"));
+                loDetail.setsAcctNmbr(loJson.getString("sAcctNmbr"));
+                loDetail.setsSerialID(loJson.getString("sSerialID"));
+                loDetail.setnDownPaym(Integer.parseInt(loJson.getString("nDownPayM")));
+                loDetail.setnAcctTerm(Integer.parseInt(loJson.getString("nAcctTerm")));
+                loDetail.setnMonAmort(Integer.parseInt(loJson.getString("nMonAmort")));
+                loDetail.setnRebatesx(Double.parseDouble(loJson.getString("nRebatesx")));
+                loDetail.setnPenaltyx(Integer.parseInt(loJson.getString("nPenaltyX")));
+                loDetail.setdFirstPay(loJson.getString("dFirstPay"));
+                loDetail.setsRemarksx(loJson.getString("sRemarksX"));
+                loDetail.setcTranStat(loJson.getString("cTranStat"));
+
+                poMContract.Save(loDetail);
+            }
+
+            return true;
+        } catch (Exception e){
+            message = getLocalMessage(e);
+            return false;
+        }
+    }
+
     public boolean UploadApplication(String args){
         try {
             ECreditApplication loApp = poDao.GetCreditOnlineApplication(args);
@@ -769,7 +828,15 @@ public class CreditOnlineApplication {
 
             //update transaction no and send status
             String lsTransNox = loResponse.getString("sTransNox");
-            poMContract.UpdateTransNox(lsTransNox, foVal.getsTransNox());
+            String sClientID = loResponse.getString("sClientID");
+            String sAcctNmbr = loResponse.getString("sAcctNmbr");
+
+            Log.d("Credit REsponse", foVal.getsTransNox());
+            Log.d("Credit REsponse", lsTransNox);
+            Log.d("Credit REsponse", sClientID);
+            Log.d("Credit REsponse", sAcctNmbr);
+
+            poMContract.UpdateTransNox(foVal.getsTransNox(), lsTransNox, sClientID, sAcctNmbr);
 
             return true;
         } catch (Exception e){

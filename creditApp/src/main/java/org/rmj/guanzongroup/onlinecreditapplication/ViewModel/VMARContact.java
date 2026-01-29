@@ -37,6 +37,11 @@ public class VMARContact extends AndroidViewModel {
         return poApp.getBranchInfoNonLive(fsBranchCd);
     }
 
+    public interface OnDownload{
+        void OnLoad(String fsTitlexx, String fsMessage);
+        void OnFinished(String message);
+    }
+
     public interface OnSearchLSerial{
         void OnSuccess(List<CreditOnlineApplication.MCSerial> laSerials);
         void OnFailed(String message);
@@ -209,6 +214,42 @@ public class VMARContact extends AndroidViewModel {
         });
     }
 
+    public void DownloadMContract(String fsReferNox, OnDownload foListener){
+
+        TaskExecutor.Execute(fsReferNox, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                foListener.OnLoad("MC Contract", "Finding MC Contract...");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConn.isDeviceConnected()){
+                    message = poConn.getMessage();
+                    return false;
+                }
+
+                String lsReferNox = (String) args;
+                if (!poApp.DownloadMContract(lsReferNox)){
+                    message = poApp.getMessage();
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if ((Boolean) object){
+                    foListener.OnFinished("Successfully downloaded MC Contract");
+                } else {
+                    foListener.OnFinished(message);
+                }
+            }
+        });
+    }
+
     public void SubmitMContract(EMCContractInfo foVal, OnSubmit foListener){
 
         TaskExecutor.Execute(foVal, new OnTaskExecuteListener() {
@@ -221,10 +262,6 @@ public class VMARContact extends AndroidViewModel {
             public Object DoInBackground(Object args) {
 
                 EMCContractInfo loVal = (EMCContractInfo) args;
-                if (!poConn.isDeviceConnected()){
-                    loVal.setsSendStat("0");
-                }
-
                 if (!poApp.UploadMContract(loVal)){
                     message = poApp.getMessage();
                     return false;
