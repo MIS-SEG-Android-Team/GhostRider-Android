@@ -9,6 +9,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.OpenableColumns;
 
 import java.io.File;
@@ -26,6 +27,11 @@ public class FileUtility {
 
     public FileUtility(Context context){
         this.context = context;
+    }
+
+    public Boolean CreateDirectory(String fsDir){
+        File loDirectory = new File(fsDir);
+        return loDirectory.mkdirs();
     }
 
     public Boolean IsFileExist(String fsPath){

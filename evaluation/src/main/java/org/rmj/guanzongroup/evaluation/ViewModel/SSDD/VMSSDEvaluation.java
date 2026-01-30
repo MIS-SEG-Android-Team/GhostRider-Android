@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.bumptech.glide.Glide;
+
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Apps.SSDD.SSDDEvaluation;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
@@ -368,6 +370,16 @@ public class VMSSDEvaluation extends AndroidViewModel {
                 }
 
                 EImageInfo loImage = (EImageInfo) args;
+
+                String lsDir = loContext.getExternalFilesDir(null).getAbsolutePath() + "/" + "SSDDEvaluation/" + loImage.getSourceNo() + "/" + loImage.getFileCode() + "/";
+                if (!loFile.IsFileExist(lsDir)){
+
+                    if (!loFile.CreateDirectory(lsDir)){
+                        fsMessage = "Unable to create directory";
+                        return false;
+                    }
+                }
+
                 if (loEvaluation.DownloadImageFile(loImage)){
                     return true;
                 }

@@ -828,8 +828,6 @@ public class CreditOnlineApplication {
                 return false;
             }
 
-            poMContract.DeleteMContractInfo(foVal.getsReferNox());
-
             return true;
         } catch (Exception e){
             message = getLocalMessage(e);

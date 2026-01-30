@@ -328,6 +328,8 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                                                 //set button as downloaded
                                                 btn_upload.setImageResource(R.drawable.baseline_check_circle_24);
                                                 btn_upload.setEnabled(false);
+
+                                                InitObservers();
                                             }
 
                                             @Override
