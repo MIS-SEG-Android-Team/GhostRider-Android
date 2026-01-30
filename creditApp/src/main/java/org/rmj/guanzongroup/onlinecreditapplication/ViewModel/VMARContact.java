@@ -168,7 +168,7 @@ public class VMARContact extends AndroidViewModel {
 
     }
 
-    public void GetSerials(String fsVal, boolean fByCode, OnSearchLSerial foListener){
+    public void GetSerials(String fsVal, OnSearchLSerial foListener){
 
         TaskExecutor.Execute(fsVal, new OnDoBackgroundTaskListener() {
             @Override
@@ -184,7 +184,7 @@ public class VMARContact extends AndroidViewModel {
                     return laResult;
                 }
 
-                List<CreditOnlineApplication.MCSerial> laSerials = poApp.DownloadSerials(fsVal, fByCode);
+                List<CreditOnlineApplication.MCSerial> laSerials = poApp.DownloadSerials(fsVal);
                 if (laSerials == null){
                     message = poApp.getMessage();
 

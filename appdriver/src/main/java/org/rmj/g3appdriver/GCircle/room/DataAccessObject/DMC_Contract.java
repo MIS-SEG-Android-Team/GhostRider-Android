@@ -15,8 +15,8 @@ public interface DMC_Contract {
     @Query("SELECT COUNT(*) FROM MC_Contract_Info")
     int CountRecord();
 
-    @Query("UPDATE MC_Contract_Info SET sTransNox = :fsTransNox, sClientID = :fsClientID, sAcctNmbr = :fsAcctNmbr, sSendStat = '1'  WHERE sReferNox = :fsReferNox")
-    void UpdateTransNox(String fsReferNox, String fsTransNox, String fsClientID, String fsAcctNmbr);
+    @Query("DELETE FROM MC_Contract_Info  WHERE sReferNox = :fsReferNox")
+    void DeleteMContractInfo(String fsReferNox);
 
     @Query("SELECT * FROM MC_Contract_Info WHERE sReferNox = :fsTransNox")
     EMCContractInfo GetMContractInfo(String fsTransNox);

@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.json.JSONObject;
@@ -50,6 +51,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
     private InstallmentInfo loInstallment;
     private DGanadoOnline.CashPrice loCashPrice;
 
+    private TextInputLayout layout_serial, layout_terms;
     private TextInputEditText tie_branch, tie_transaction, tie_client, tie_account, tie_downpay, tie_monthly, tie_remarks;
     private MaterialAutoCompleteTextView auto_serial, auto_term;
     private MaterialButton btn_submit;
@@ -93,6 +95,10 @@ public class Activity_MC_Contract extends AppCompatActivity {
     }
 
     private void InitWidgets(){
+
+        layout_serial = findViewById(R.id.layout_serial);
+        layout_terms = findViewById(R.id.layout_terms);
+
         tie_branch = findViewById(R.id.tie_branch);
         tie_transaction = findViewById(R.id.tie_transaction);
         tie_client = findViewById(R.id.tie_client);
@@ -129,7 +135,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
             }
             auto_term.setAdapter(CreditAppConstants.getAdapter(Activity_MC_Contract.this, laTerms));
 
-            Thread.sleep(1000);
+            Thread.sleep(500);
 
             //download existing mc contract
             mViewModel.DownloadMContract(getIntent().getStringExtra("sTransNox"), new VMARContact.OnDownload() {
@@ -146,10 +152,10 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
                     try {
 
-                        String lsSerialtoSearch = "";
-                        if(mViewModel.GetCreditContract(getIntent().getStringExtra("sTransNox")) == null){
+                        JSONObject loDetail = new JSONObject(loApp.getDetlInfo());
 
-                            JSONObject loDetail = new JSONObject(loApp.getDetlInfo());
+                        String lsSerialtoSearch;
+                        if(mViewModel.GetCreditContract(getIntent().getStringExtra("sTransNox")) == null){
 
                             //set contract object values
                             loContract.setsReferNox(getIntent().getStringExtra("sTransNox")); //reference number
@@ -165,8 +171,6 @@ public class Activity_MC_Contract extends AppCompatActivity {
                             mViewModel.GetProductModel().setTermIDxx(loDetail.getString("nAcctTerm")); //installment model terms
                             mViewModel.GetProductModel().setPaymForm("1"); //model installment pay type
                             mViewModel.GetProductModel().setDownPaym(String.valueOf(loDetail.getDouble("nDownPaym"))); //model installment downpayment
-
-                            mViewModel.SetModelIDxx(loDetail.getString("sModelIDx")); //model installment product id
 
                             lsSerialtoSearch = loDetail.getString("sModelIDx");
                         }else {
@@ -185,7 +189,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                             Thread.sleep(1000);
 
                             //initialize serial models
-                            mViewModel.GetSerials(lsSerialtoSearch, true, new VMARContact.OnSearchLSerial() {
+                            mViewModel.GetSerials(lsSerialtoSearch, new VMARContact.OnSearchLSerial() {
                                 @Override
                                 public void OnSuccess(List<CreditOnlineApplication.MCSerial> laResult) {
 
@@ -199,7 +203,11 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                     auto_serial.setThreshold(0);
                                     auto_serial.showDropDown();
 
-                                    mViewModel.SetModelIDxx(laSerials.getLast().lsModelIDx);
+                                    //set model and serial id
+                                    loContract.setsSerialID(laSerials.get(0).lsSerialID);
+                                    mViewModel.SetModelIDxx(laSerials.get(0).lsModelIDx);
+
+                                    auto_serial.setText(loContract.getsSerialID(), false);
                                 }
 
                                 @Override
@@ -208,7 +216,14 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
                                     InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnMessageButton() {
                                         @Override
-                                        public void OnPositive() {}
+                                        public void OnPositive() {
+                                            try {
+                                                mViewModel.SetModelIDxx(loDetail.getString("sModelIDx"));
+                                                auto_serial.setText(loDetail.getString("sModelIDx"));
+                                            }catch (Exception e){
+                                                mViewModel.SaveError("MC Contract", e.getMessage());
+                                            }
+                                        }
 
                                         @Override
                                         public void OnNegative() {}
@@ -217,27 +232,6 @@ public class Activity_MC_Contract extends AppCompatActivity {
                             });
 
                         }
-
-                        //CLOSE status
-                        if (loContract.getcTranStat().equalsIgnoreCase("1")){
-
-                            //disable inputs
-                            auto_serial.setEnabled(false);
-                            tie_downpay.setEnabled(false);
-                            tie_remarks.setEnabled(false);
-
-                            //allow to resend, if not uploaded, else, disable
-                            if (loContract.getsSendStat().equalsIgnoreCase("0")){
-                                btn_submit.setEnabled(true);
-                                return;
-                            }
-                            btn_submit.setEnabled(false);
-                        }
-
-                        //allow inputs if OPEN status
-                        auto_serial.setEnabled(true);
-                        tie_downpay.setEnabled(true);
-                        tie_remarks.setEnabled(true);
 
                         InitDisplay();
 
@@ -282,6 +276,33 @@ public class Activity_MC_Contract extends AppCompatActivity {
             }
         });
 
+        //CLOSE status
+        if (loContract.getcTranStat().equalsIgnoreCase("1")){
+
+            //disable inputs
+            layout_serial.setEnabled(false);
+            layout_terms.setEnabled(false);
+
+            tie_downpay.setEnabled(false);
+            tie_remarks.setEnabled(false);
+
+            //allow to resend, if not uploaded, else, disable
+            btn_submit.setEnabled(false);
+            if (loContract.getsSendStat().equalsIgnoreCase("0")){
+                btn_submit.setEnabled(true);
+            }
+            return;
+        }
+
+        //allow inputs if OPEN status
+        layout_serial.setEnabled(true);
+        layout_terms.setEnabled(true);
+
+        tie_downpay.setEnabled(true);
+        tie_remarks.setEnabled(true);
+
+        btn_submit.setEnabled(true);
+
     }
 
     private void InitListener(){
@@ -290,16 +311,25 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                String lsSerial;
+                boolean fByModel;
                 if (auto_serial.getText() == null || auto_serial.getText().toString().trim().isEmpty()){
 
-                    InitMessage(0, R.drawable.ic_toast_warning, "Please enter the last 5 characters of the serial number", "Okay", "", new OnMessageButton() {
-                        @Override
-                        public void OnPositive() {}
+                    if (loContract.getsSerialID() == null || loContract.getsSerialID().isEmpty()){
 
-                        @Override
-                        public void OnNegative() {}
-                    });
-                    return;
+                        InitMessage(0, R.drawable.ic_toast_warning, "Please enter the last 5 characters of the serial number or exact model or serial id", "Okay", "", new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
+                        });
+                        return;
+
+                    }
+                    lsSerial = loContract.getsSerialID();
+                }else {
+                    lsSerial = auto_serial.getText().toString();
                 }
 
                 InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Reload serial numbers?", "Yes", "No", new OnMessageButton() {
@@ -309,7 +339,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                         poDialogx.initDialog("MC Serials","Loading serials. Please wait . .", false);
                         poDialogx.show();
 
-                        mViewModel.GetSerials(auto_serial.getText().toString(), false, new VMARContact.OnSearchLSerial() {
+                        mViewModel.GetSerials(lsSerial, new VMARContact.OnSearchLSerial() {
                             @Override
                             public void OnSuccess(List<CreditOnlineApplication.MCSerial> laResult) {
 
@@ -414,8 +444,8 @@ public class Activity_MC_Contract extends AppCompatActivity {
                 CreditOnlineApplication.MCSerial loSerial = (CreditOnlineApplication.MCSerial) parent.getItemAtPosition(0);
 
                 //set model and serial id
-                mViewModel.SetModelIDxx(loSerial.lsModelIDx);
                 loContract.setsSerialID(loSerial.lsSerialID);
+                mViewModel.SetModelIDxx(loSerial.lsModelIDx);
             }
         });
 
@@ -435,6 +465,16 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                if (mViewModel.GetProductModel().getModelIDx() == null || mViewModel.GetProductModel().getModelIDx().isEmpty()){
+                    Toast.makeText(Activity_MC_Contract.this, "Please select a model", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (loContract.getsSerialID() == null || loContract.getsSerialID().isEmpty()){
+                    Toast.makeText(Activity_MC_Contract.this, "Please select a model", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 InitMessage(1, R.drawable.baseline_error_24, "Are you sure you want to submit the contract?", "Yes", "No", new OnMessageButton() {
                     @Override
                     public void OnPositive() {
@@ -453,7 +493,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                 InitMessage(0, R.drawable.baseline_message_24, "Successfully submitted", "Okay", "", new OnMessageButton() {
                                     @Override
                                     public void OnPositive() {
-                                        InitData();
+                                        finish();
                                     }
 
                                     @Override
@@ -533,12 +573,12 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
         //validate mc payment info
         if (loInstallment == null){
-            Toast.makeText(Activity_MC_Contract.this, "Could not find installment info", Toast.LENGTH_SHORT);
+            Toast.makeText(Activity_MC_Contract.this, "Could not find installment info", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (loCashPrice == null){
-            Toast.makeText(Activity_MC_Contract.this, "Could not find cash info", Toast.LENGTH_SHORT);
+            Toast.makeText(Activity_MC_Contract.this, "Could not find cash info", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -580,8 +620,13 @@ public class Activity_MC_Contract extends AppCompatActivity {
                     @Override
                     public void OnCalculate(double lnResult) {
                         mViewModel.GetProductModel().setMonthAmr(String.valueOf(lnResult));
-                        tie_monthly.setText(String.valueOf(lnResult));
-                        btn_submit.setEnabled(true);
+
+                        //set computation to contract object
+                        loContract.setnDownPaym(Double.parseDouble(mViewModel.GetProductModel().getDownPaym()));
+                        loContract.setnAcctTerm(Integer.parseInt(mViewModel.GetProductModel().getTermIDxx()));
+                        loContract.setnMonAmort(Double.parseDouble(mViewModel.GetProductModel().getnMonthAmr()));
+
+                        InitDisplay();
                     }
 
                     @Override
@@ -595,13 +640,6 @@ public class Activity_MC_Contract extends AppCompatActivity {
                         Toast.makeText(Activity_MC_Contract.this, message, Toast.LENGTH_SHORT).show();
                     }
                 });
-
-        //set computation to contract object
-        loContract.setnDownPaym(Double.parseDouble(mViewModel.GetProductModel().getDownPaym()));
-        loContract.setnAcctTerm(Integer.parseInt(mViewModel.GetProductModel().getTermIDxx()));
-        loContract.setnMonAmort(Double.parseDouble(mViewModel.GetProductModel().getnMonthAmr()));
-
-        InitDisplay();
     }
 
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnMessageButton callback){

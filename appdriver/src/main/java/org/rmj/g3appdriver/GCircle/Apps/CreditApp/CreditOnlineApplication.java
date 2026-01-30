@@ -269,12 +269,11 @@ public class CreditOnlineApplication {
         return poModel.getMcModelFromBrand(args);
     }
 
-    public List<MCSerial> DownloadSerials(String fsSearch, boolean fbyModel){
+    public List<MCSerial> DownloadSerials(String fsSearch){
 
         try {
             JSONObject params = new JSONObject();
             params.put("sSerial", fsSearch);
-            params.put("byModel", fbyModel);
 
             String lsResponse = WebClient.sendRequest(
                     poApi.getUrlImportMcSerials(),
@@ -651,6 +650,7 @@ public class CreditOnlineApplication {
                 message = getErrorMessage(loError);
                 return false;
             }
+            poMContract.DeleteMContractInfo(fsReferNoxx);
 
             JSONArray laJson = loResponse.getJSONArray("detail");
 
@@ -665,14 +665,16 @@ public class CreditOnlineApplication {
                 loDetail.setsReferNox(loJson.getString("sReferNox"));
                 loDetail.setsAcctNmbr(loJson.getString("sAcctNmbr"));
                 loDetail.setsSerialID(loJson.getString("sSerialID"));
-                loDetail.setnDownPaym(Integer.parseInt(loJson.getString("nDownPayM")));
+                loDetail.setdTransact(loJson.getString("dTransact"));
                 loDetail.setnAcctTerm(Integer.parseInt(loJson.getString("nAcctTerm")));
-                loDetail.setnMonAmort(Integer.parseInt(loJson.getString("nMonAmort")));
+                loDetail.setnDownPaym(Double.parseDouble(loJson.getString("nDownPayM")));
+                loDetail.setnMonAmort(Double.parseDouble(loJson.getString("nMonAmort")));
                 loDetail.setnRebatesx(Double.parseDouble(loJson.getString("nRebatesx")));
-                loDetail.setnPenaltyx(Integer.parseInt(loJson.getString("nPenaltyX")));
+                loDetail.setnPenaltyx(Double.parseDouble(loJson.getString("nPenaltyX")));
                 loDetail.setdFirstPay(loJson.getString("dFirstPay"));
                 loDetail.setsRemarksx(loJson.getString("sRemarksX"));
                 loDetail.setcTranStat(loJson.getString("cTranStat"));
+                loDetail.setsSendStat("1");
 
                 poMContract.Save(loDetail);
             }
@@ -826,17 +828,7 @@ public class CreditOnlineApplication {
                 return false;
             }
 
-            //update transaction no and send status
-            String lsTransNox = loResponse.getString("sTransNox");
-            String sClientID = loResponse.getString("sClientID");
-            String sAcctNmbr = loResponse.getString("sAcctNmbr");
-
-            Log.d("Credit REsponse", foVal.getsTransNox());
-            Log.d("Credit REsponse", lsTransNox);
-            Log.d("Credit REsponse", sClientID);
-            Log.d("Credit REsponse", sAcctNmbr);
-
-            poMContract.UpdateTransNox(foVal.getsTransNox(), lsTransNox, sClientID, sAcctNmbr);
+            poMContract.DeleteMContractInfo(foVal.getsReferNox());
 
             return true;
         } catch (Exception e){
