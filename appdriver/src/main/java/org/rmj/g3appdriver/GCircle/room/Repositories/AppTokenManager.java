@@ -13,6 +13,7 @@ package org.rmj.g3appdriver.GCircle.room.Repositories;
 
 import static org.rmj.g3appdriver.etc.AppConstants.getLocalMessage;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.util.Log;
 
@@ -35,13 +36,11 @@ public class AppTokenManager {
     private final DToken poDao;
 
     private final AppConfigPreference poConfig;
-    private final EmployeeSession poSession;
     private String message;
 
     public AppTokenManager(Application instance){
         this.poDao = GGC_GCircleDB.getInstance(instance).dToken();
         this.poConfig = AppConfigPreference.getInstance(instance);
-        this.poSession = EmployeeSession.getInstance(instance);
     }
 
     public String getMessage() {
@@ -103,7 +102,9 @@ public class AppTokenManager {
 
     public String GetClientToken(){
         try{
+
             ETokenInfo loClientx = poDao.GetClientToken();
+
             if(loClientx == null){
                 Log.d(TAG, "Client token is not available.");
                 Log.d(TAG, "Generating client token...");
@@ -133,29 +134,13 @@ public class AppTokenManager {
                 loToken.setGeneratd(AppConstants.DATE_MODIFIED());
                 loToken.setExpirexx(lsExpiryx);
                 loToken.setTimeStmp(AppConstants.DATE_MODIFIED());
+
                 poDao.SaveToken(loToken);
                 Log.d(TAG, "New client token has been saved.");
                 return loToken.getTokenInf();
             }
-
-            //Check here if client token is still valid...
-//            String lsExpiryx = loClientx.getExpirexx();
-//            Date loExpiryx = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(lsExpiryx);
-//            Date loCurrent = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(new AppConstants().DATE_MODIFIED());
-//
-//            int lnResult = loCurrent.compareTo(loExpiryx);
-//
-//            // If result is less than 0 current date is before the due date
-//            // If result is equal to 0 current date is equal to due date
-//            // if result is more than 0 current date is after the due date
-//            if (lnResult >= 0) {
-//
-//                // Client token might be expired already so we generate another client token...
-//                String lsClient = refreshClientToken();
-//                return lsClient;
-//            }
-
             return loClientx.getTokenInf();
+
         } catch (Exception e){
             e.printStackTrace();
             message = getLocalMessage(e);
@@ -163,6 +148,7 @@ public class AppTokenManager {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     public String GetAccessToken(String fsVal){
         try{
             ETokenInfo loAccessx = poDao.GetAccessToken();
@@ -193,6 +179,7 @@ public class AppTokenManager {
                 loToken.setGeneratd(AppConstants.DATE_MODIFIED());
                 loToken.setExpirexx(lsExpiryx);
                 loToken.setTimeStmp(AppConstants.DATE_MODIFIED());
+
                 poDao.SaveToken(loToken);
                 Log.d(TAG, "New access token has been saved.");
                 return loToken.getTokenInf();
@@ -211,11 +198,39 @@ public class AppTokenManager {
             if (lnResult >= 0) {
 
                 // Access token might be expired already so we generate another access token...
-                String lsAccess = refreshAccessToken(fsVal);
-                return lsAccess;
+                return refreshAccessToken(fsVal);
             }
 
             return loAccessx.getTokenInf();
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return null;
+        }
+    }
+
+    public String GetClientToken(String fsClientID, String fsUserID){
+        try{
+
+            Log.d(TAG, "Client token is not available.");
+            Log.d(TAG, "Generating client token...");
+
+            String lsClient = WebFileServer.RequestClientToken(
+                    poConfig.ProducID(),
+                    fsClientID,
+                    fsUserID);
+
+            if(lsClient == null){
+                message = "Unable to generate client token.";
+                return null;
+            }
+
+            if(lsClient.isEmpty()){
+                message = "Unable to generate client token.";
+                return null;
+            }
+            return lsClient;
+
         } catch (Exception e){
             e.printStackTrace();
             message = getLocalMessage(e);

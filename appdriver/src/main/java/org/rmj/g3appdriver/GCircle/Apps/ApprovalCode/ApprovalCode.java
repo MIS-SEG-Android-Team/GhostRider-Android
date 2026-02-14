@@ -293,6 +293,7 @@ public class ApprovalCode {
                 return false;
             }
 
+            poCASDao.clear();
             JSONArray laDetail = loResponse.getJSONArray("detail");
             for (int i = 0; i < laDetail.length(); i++) {
 
@@ -338,6 +339,7 @@ public class ApprovalCode {
                 return false;
             }
 
+            poCASReqDao.clear();
             JSONArray laDetail = loResponse.getJSONArray("detail");
             for (int i = 0; i < laDetail.length(); i++) {
 

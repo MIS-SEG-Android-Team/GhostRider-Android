@@ -680,7 +680,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
             if (loMaster == null){
 
-                InitMessage(1, R.drawable.baseline_error_24, "Master is empty", "Okay", "", new onMessageButton() {
+                InitMessage(0, R.drawable.baseline_error_24, "Master is empty", "Okay", "", new onMessageButton() {
                     @Override
                     public void onPositive() {}
 
@@ -690,7 +690,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                 return;
             }else if (laDetails == null || laDetails.size() < 1){
 
-                InitMessage(1, R.drawable.baseline_error_24, "Details is empty", "Okay", "", new onMessageButton() {
+                InitMessage(0, R.drawable.baseline_error_24, "Details is empty", "Okay", "", new onMessageButton() {
                     @Override
                     public void onPositive() {}
 
@@ -723,7 +723,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                                 //if images is empty, do not proceed to image uploading
                                 if (laImages == null || laImages.size() < 1){
-                                    return;
+                                    finish();
                                 }
 
                                 //upload images, and disable view to avoid interrupted transactions
@@ -749,10 +749,10 @@ public class Activity_SSDD_Category extends AppCompatActivity {
                                             Toast.makeText(Activity_SSDD_Category.this, fsMessage, Toast.LENGTH_SHORT).show();
                                         }
                                     });
+
                                     Thread.sleep(1000);
                                 }
-                                rcv_adapter.setEnabled(true);
-                                btn_submit.setEnabled(true);
+                                finish();
 
                             }catch (Exception e){
                                 mViewModel.SaveError("SSDD Evaluation", e.getMessage());
@@ -766,8 +766,8 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
                 @Override
                 public void OnFailed(String fsMessage) {
-
                     poDialog.dismiss();
+
                     InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new onMessageButton() {
                         @Override
                         public void onPositive() {}

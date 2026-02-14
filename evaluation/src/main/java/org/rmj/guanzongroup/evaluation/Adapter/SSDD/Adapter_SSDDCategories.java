@@ -126,16 +126,12 @@ public class Adapter_SSDDCategories extends RecyclerView.Adapter<Adapter_SSDDCat
         //disable objects based on master status
         switch (laCategories.get(position).lsTranStat){
             case "0":
-            case "1":
                 holder.rb_rate.setEnabled(true);
                 holder.tie_remarks.setEnabled(true);
                 holder.ib_camera.setEnabled(true);
                 break;
+            case "1":
             case "3":
-                holder.rb_rate.setEnabled(false);
-                holder.tie_remarks.setEnabled(false);
-                holder.ib_camera.setEnabled(false);
-                break;
             default:
                 holder.rb_rate.setEnabled(false);
                 holder.tie_remarks.setEnabled(false);

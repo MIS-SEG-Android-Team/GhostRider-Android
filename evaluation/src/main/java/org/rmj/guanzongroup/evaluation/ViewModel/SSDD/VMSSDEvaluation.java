@@ -79,9 +79,9 @@ public class VMSSDEvaluation extends AndroidViewModel {
     @SuppressLint("SimpleDateFormat")
     public String GetDateToday(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         }else {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+            return new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
         }
     }
 
@@ -91,7 +91,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             LocalDate loDtoday = LocalDate.now();
 
-            String lsdEvaluated = LocalDateTime.parse(fsdEvaluated, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String lsdEvaluated = LocalDate.parse(fsdEvaluated, DateTimeFormatter.ofPattern("yyyy-MM-dd")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             LocalDate loDate = LocalDate.parse(lsdEvaluated, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
             return loDtoday.isAfter(loDate);
@@ -100,7 +100,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
 
             Date loDtoday = Calendar.getInstance().getTime();
 
-            String lsdEvaluated = new SimpleDateFormat("yyyy-MM-dd").format("yyyy-MM-dd HH:mm:ss");
+            String lsdEvaluated = new SimpleDateFormat("yyyy-MM-dd").format("yyyy-MM-dd");
             Date loDate = new SimpleDateFormat("yyyy-MM-dd").parse(lsdEvaluated);
 
             return loDtoday.after(loDate);
@@ -380,7 +380,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
                     }
                 }
 
-                if (loEvaluation.DownloadImageFile(loImage)){
+                if (loEvaluation.DownloadImageFile(loImage.getTransNox())){
                     return true;
                 }
                 fsMessage = loEvaluation.GetMessage();

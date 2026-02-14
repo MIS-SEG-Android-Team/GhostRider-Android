@@ -44,6 +44,7 @@ import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -219,7 +220,6 @@ public class Fragment_SSDD_Evaluation extends Fragment{
             //check selected department id if passed
             if (loBundle.containsKey("dept_id")){
 
-
                 //load master list
                 mViewModel.GetMasterList(lsDfrom, lsDto, loBundle.getString("dept_id"), lsTranstat).observe(getViewLifecycleOwner(), new Observer<List<ESSDDMaster>>() {
                     @SuppressLint("NotifyDataSetChanged")
@@ -283,36 +283,10 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                 if (laMasterlist == null || laMasterlist.size() < 1){
 
                     if (mViewModel.CountMaster(loBundle.getString("dept_id")) < 1){
-
-                        //download history
-                        mViewModel.DownloadEvaluation(loBundle.getString("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
-                            @Override
-                            public void OnLoad(String fsTitlexx, String fsMessage) {
-                                poDialog.initDialog(fsTitlexx, fsMessage, false);
-                                poDialog.show();
-                            }
-
-                            @Override
-                            public void OnSuccess() {
-                                poDialog.dismiss();
-                                Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG).show();
-                            }
-
-                            @Override
-                            public void OnFailed(String fsMessage) {
-                                poDialog.dismiss();
-                                InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
-                                    @Override
-                                    public void OnPositive() {}
-
-                                    @Override
-                                    public void OnNegative() {}
-                                });
-                            }
-                        });
-
+                        ReDownloadData();
                     }
                 }
+
                 return;
             }
 
@@ -430,83 +404,119 @@ public class Fragment_SSDD_Evaluation extends Fragment{
 
     private void ReDownloadData(){
 
-        if (loBundle == null){
+        try {
 
-            //import data for department
-            mViewModel.DownloadDepartments(new VMSSDEvaluation.OnDownloadCallback() {
-                @Override
-                public void OnLoad(String fsTitlexx, String fsMessage) {
-                    poDialog.initDialog(fsTitlexx, fsMessage, false);
-                    poDialog.show();
-                }
+            if (loBundle == null){
 
-                @Override
-                public void OnSuccess() {
-                    poDialog.dismiss();
-                }
+                //import data for department
+                mViewModel.DownloadDepartments(new VMSSDEvaluation.OnDownloadCallback() {
+                    @Override
+                    public void OnLoad(String fsTitlexx, String fsMessage) {
+                        poDialog.initDialog(fsTitlexx, fsMessage, false);
+                        poDialog.show();
+                    }
 
-                @Override
-                public void OnFailed(String fsMessage) {
+                    @Override
+                    public void OnSuccess() {
+                        poDialog.dismiss();
+                    }
 
-                    poDialog.dismiss();
-                    InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
-                        @Override
-                        public void OnPositive() {
+                    @Override
+                    public void OnFailed(String fsMessage) {
 
-                        }
+                        poDialog.dismiss();
 
-                        @Override
-                        public void OnNegative() {
+                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {
 
-                        }
-                    });
-                }
-            });
-        }else {
+                            }
 
-            //import data for categories
-            mViewModel.DownloadCategories(new VMSSDEvaluation.OnDownloadCallback() {
-                @Override
-                public void OnLoad(String fsTitlexx, String fsMessage) {
-                    poDialog.initDialog(fsTitlexx, fsMessage, false);
-                    poDialog.show();
-                }
+                            @Override
+                            public void OnNegative() {
 
-                @Override
-                public void OnSuccess() {
-                    poDialog.dismiss();
-                    Toast.makeText(requireActivity(), "Successfully downloaded categories", Toast.LENGTH_SHORT).show();
-                }
+                            }
+                        });
+                    }
+                });
+            }else {
 
-                @Override
-                public void OnFailed(String fsMessage) {
-                    poDialog.dismiss();
-                    Toast.makeText(requireActivity(), "Failed to download categories", Toast.LENGTH_SHORT).show();
-                }
-            });
+                //import data for categories
+                mViewModel.DownloadCategories(new VMSSDEvaluation.OnDownloadCallback() {
+                    @Override
+                    public void OnLoad(String fsTitlexx, String fsMessage) {
+                        poDialog.initDialog(fsTitlexx, fsMessage, false);
+                        poDialog.show();
+                    }
+
+                    @Override
+                    public void OnSuccess() {
+                        poDialog.dismiss();
+                        Toast.makeText(requireActivity(), "Successfully downloaded categories", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void OnFailed(String fsMessage) {
+                        poDialog.dismiss();
+                        Toast.makeText(requireActivity(), "Failed to download categories", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                Thread.sleep(1000);
+
+                //download history
+                mViewModel.DownloadEvaluation(loBundle.getString("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
+                    @Override
+                    public void OnLoad(String fsTitlexx, String fsMessage) {
+                        poDialog.initDialog(fsTitlexx, fsMessage, false);
+                        poDialog.show();
+                    }
+
+                    @Override
+                    public void OnSuccess() {
+                        poDialog.dismiss();
+                        Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void OnFailed(String fsMessage) {
+                        poDialog.dismiss();
+                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
+                        });
+                    }
+                });
+            }
+
+        }catch (Exception e){
+            mViewModel.SaveError(getClass().getSimpleName(), e.getMessage());
         }
     }
 
     private String GetFirstQuarter(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            return LocalDateTime.now().minusMonths(4).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            return LocalDate.now().minusMonths(4).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         }else {
             Calendar today = Calendar.getInstance();
             today.add(Calendar.MONTH, -4);
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(today.getTime());
+            return new SimpleDateFormat("yyyy-MM-dd").format(today.getTime());
         }
     }
 
     private String GetDateToday(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         }else {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+            return new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
         }
     }
 
     private String GetDateFormat(Long fsDate){
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(fsDate);
+        return new SimpleDateFormat("yyyy-MM-dd").format(fsDate);
     }
 
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnMessageButton callback){

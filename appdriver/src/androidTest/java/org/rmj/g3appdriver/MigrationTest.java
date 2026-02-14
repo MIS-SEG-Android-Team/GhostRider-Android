@@ -291,6 +291,9 @@ public class MigrationTest {
             if (!CheckColumnExists(database, "Barcode_Detail", "sSerialID")){
                 database.execSQL("ALTER TABLE Barcode_Detail ADD COLUMN sSerialID TEXT");
             }
+            if (!CheckColumnExists(database, "Image_Information", "sClientID")){
+                database.execSQL("ALTER TABLE EImageInfo ADD COLUMN sClientID TEXT");
+            }
         }
     };
 

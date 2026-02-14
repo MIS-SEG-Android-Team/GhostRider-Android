@@ -23,12 +23,12 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:cardElevation="5dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintBottom_toTopOf="@+id/btn_disapprove"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintWidth_percent="0.9"
-        app:layout_constraintHeight_percent="0.75">
+        app:layout_constraintHeight_percent="0.8">
         
         <LinearLayout
             android:layout_width="match_parent"
@@ -106,26 +106,25 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingBottom="10dp"
-                android:fillViewport="true"
-                android:layout_marginTop="10dp">
+                android:layout_marginHorizontal="10dp"
+                android:paddingVertical="10dp"
+                android:fillViewport="true">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content">
                     
                     <LinearLayout
                         android:id="@+id/layout_labels"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintWidth_percent="0.25"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        app:layout_constraintWidth_percent="0.25">
 
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Source No:"
-                            android:gravity="end"
                             android:textSize="12sp"
                             android:textStyle="bold"/>
 
@@ -133,7 +132,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Recipient:"
-                            android:gravity="end"
                             android:textSize="12sp"
                             android:textStyle="bold"/>
 
@@ -141,7 +139,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Industry:"
-                            android:gravity="end"
                             android:textSize="12sp"
                             android:textStyle="bold"/>
 
@@ -200,14 +197,12 @@
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/mtv_remarks"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
                         android:textSize="12sp"
-                        android:paddingHorizontal="15dp"
                         android:paddingVertical="10dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/layout_values"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintTop_toBottomOf="@+id/layout_values"/>
                     
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -225,7 +220,8 @@
         android:layout_marginTop="5dp"
         android:backgroundTint="@color/cross_red"
         android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/mcv_details"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/mcv_details"
         app:layout_constraintWidth_percent="0.35"/>
 
@@ -234,9 +230,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Approve"
-        android:layout_marginTop="5dp"
         android:textColor="@color/white"
-        app:layout_constraintTop_toBottomOf="@+id/mcv_details"
+        app:layout_constraintTop_toTopOf="@+id/btn_disapprove"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_disapprove"
         app:layout_constraintEnd_toEndOf="@+id/mcv_details"
         app:layout_constraintWidth_percent="0.35"/>
 

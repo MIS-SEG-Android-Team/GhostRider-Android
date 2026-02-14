@@ -11,7 +11,6 @@ import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.rmj.apprdiver.util.WebFile;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
@@ -28,14 +27,13 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDepartments;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
-import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RImageInfo;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.etc.AppConstants;
-import org.rmj.g3appdriver.etc.FileUtility;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -50,8 +48,6 @@ public class SSDDEvaluation {
     private final EmployeeMaster poEmployee;
     private final GCircleApi poApi;
     private final HttpHeaders poHeaders;
-
-    private final AppTokenManager poToken;
     private final RImageInfo poImage;
 
     private final DSSDDepartment poDeptDao;
@@ -68,7 +64,6 @@ public class SSDDEvaluation {
         this.poApi = new GCircleApi(poApp);
         this.poHeaders = HttpHeaders.getInstance(poApp);
 
-        this.poToken = new AppTokenManager(poApp);
         this.poImage = new RImageInfo(poApp);
 
         this.poDeptDao = GGC_GCircleDB.getInstance(poApp).ssdDepartmentDao();
@@ -84,7 +79,7 @@ public class SSDDEvaluation {
         EErrorLogs logs = new EErrorLogs();
         logs.setnErrorLogID(poErrorDao.GetErrorLogCount() + 1);
         logs.setsMessagex(fsMessage);
-        logs.setdLogDate(GetCurrentDate());
+        logs.setdLogDate(GetCurrentDateTime());
         logs.setsSourceTransNo(fsSource);
         logs.setcRead("0");
 
@@ -135,12 +130,21 @@ public class SSDDEvaluation {
         return lsTransNox;
     }
 
-    private String GetCurrentDate(){
+    private String GetCurrentDateTime(){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }else {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
+        }
+    }
+
+    private String GetCurrentDate(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
         }
     }
 
@@ -419,6 +423,8 @@ public class SSDDEvaluation {
 
                 EImageInfo loDetail = new EImageInfo();
                 loDetail.setTransNox(loResult.getString("sTransNox"));
+                loDetail.setsClientID(loResult.getString("sClientID"));
+                loDetail.setDtlSrcNo(loResult.getString("sUserIDxx"));
                 loDetail.setFileCode(fsCategrID);
                 loDetail.setImageNme(loResult.getString("sImageNme"));
                 loDetail.setFileLoct(loResult.getString("sImagePth"));
@@ -427,7 +433,6 @@ public class SSDDEvaluation {
                 loDetail.setSendStat("1");
                 loDetail.setCaptured(loResult.getString("dImgeDate"));
                 loDetail.setMD5Hashx(loResult.getString("sMD5Hashx"));
-                loDetail.setDtlSrcNo(poSession.getUserID());
                 loDetail.setSendDate(loResult.getString("dTimeStmp"));
                 loDetail.setLongitud("0.0");
                 loDetail.setLatitude("0.0");
@@ -442,46 +447,13 @@ public class SSDDEvaluation {
         }
     }
 
-    public Boolean DownloadImageFile(EImageInfo foImage){
+    public Boolean DownloadImageFile(String fsTransNox){
 
-        try {
-
-            String lsClient = poToken.GetClientToken();
-
-            if(lsClient == null){
-                lsMessage = "No generated client token to upload image.";
-                return false;
-            }
-
-            String lsAccess = poToken.GetAccessToken(lsClient);
-
-            if(lsAccess == null){
-                lsMessage = "No generated access token to upload image.";
-                return false;
-            }
-
-            org.json.simple.JSONObject loDownload = WebFile.DownloadFile(lsAccess, foImage.getFileCode(), foImage.getDtlSrcNo(), foImage.getImageNme(), foImage.getSourceCD(), foImage.getTransNox(), "");
-            if (loDownload == null){
-                lsMessage = "No response from Web Server";
-                return false;
-            }
-            if (loDownload.get("result").equals("success")){
-
-                org.json.simple.JSONObject loResult = (org.json.simple.JSONObject) loDownload.get("payload");
-                if (WebFile.Base64ToFile(loResult.get("data").toString(), loResult.get("hash").toString(), foImage.getFileLoct().substring(0, foImage.getFileLoct().lastIndexOf("/") + 1), foImage.getImageNme() )){
-                    lsMessage = "File downloaded successfully";
-                    return true;
-                }
-                lsMessage = "Failed to download file";
-                return false;
-            }
-            lsMessage = ((org.json.simple.JSONObject) loDownload.get("error")).get("message").toString();
-            return false;
-
-        }catch (Exception e){
-            lsMessage = e.getMessage();
+        if (!poImage.DownloadImageFile(fsTransNox)){
+            lsMessage = poImage.getMessage();
             return false;
         }
+        return true;
     }
 
     public Boolean SubmitSSDDImagesForUpload(){
@@ -554,7 +526,7 @@ public class SSDDEvaluation {
 
     public Object[] SubmitEvaluation(ESSDDMaster foMaster, List<ESSDDetail> faDetails){
 
-        Object[] result= new Object[2];
+        Object[] result = new Object[2];
         try {
 
             JSONObject loParams = new JSONObject();
@@ -632,10 +604,10 @@ public class SSDDEvaluation {
             String lsImageID = poImage.UploadImage(foImages.getTransNox());
             if (lsImageID != null && !lsImageID.isEmpty()){
                 loParams.put("sTransNox", lsImageID);
-                Log.d("SSDDEvaluation", lsImageID);
             }
 
             //initialize other parameters
+            loParams.put("sClientID", poSession.getClientId());
             loParams.put("sReferNox", foImages.getSourceNo());
             loParams.put("sCategrID", foImages.getFileCode());
             loParams.put("sScanndID", "");

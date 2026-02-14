@@ -25,6 +25,8 @@ public class EImageInfo implements Serializable {
     @NonNull
     @ColumnInfo(name = "sTransNox")
     private String TransNox;
+    @ColumnInfo(name = "sClientID")
+    public String sClientID;
     @ColumnInfo(name = "sSourceCD")
     private String SourceCD;
     @ColumnInfo(name = "sSourceNo")
@@ -60,6 +62,14 @@ public class EImageInfo implements Serializable {
 
     public void setTransNox(@NonNull String transNox) {
         TransNox = transNox;
+    }
+
+    public String getsClientID() {
+        return sClientID;
+    }
+
+    public void setsClientID(String sClientID) {
+        this.sClientID = sClientID;
     }
 
     public String getSourceCD() {
