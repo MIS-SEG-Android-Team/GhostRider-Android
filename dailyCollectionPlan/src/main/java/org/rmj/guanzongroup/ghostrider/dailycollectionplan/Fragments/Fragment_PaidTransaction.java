@@ -13,6 +13,7 @@ package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Fragments;
 
 import static android.app.Activity.RESULT_OK;
 import static androidx.core.content.ContextCompat.checkSelfPermission;
+import static org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants.GetPaymentFormIndex;
 import static org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants.GetPaymentTypeIndex;
 
 import android.Manifest;
@@ -41,7 +42,9 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import  com.google.android.material.checkbox.MaterialCheckBox;
 
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -61,6 +64,7 @@ import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.PaidDCP;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_Transaction;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogCheckPayment;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogDisclosure;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Dialog.DialogEWallet;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.OnInitializeCameraCallback;
@@ -89,9 +93,8 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
 
     private final DecimalFormat formatter = new DecimalFormat("###,###,##0.00");
 
-    private MaterialCheckBox cbCheckPymnt;
     private MaterialTextView lblBranch, lblAddress, lblAccNo, lblClientNm, lblTransNo;
-    private MaterialAutoCompleteTextView spnType;
+    private MaterialAutoCompleteTextView spnType, spnPayType;
     private TextInputEditText txtPrNoxx, txtRemarks, txtAmount, txtRebate, txtOthers, txtTotAmnt;
     private TextInputLayout tilDiscount, tilPenaly;
     private MaterialButton btnAmort, btnRBlnce, btnClear;
@@ -196,13 +199,80 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
         poDialog = new LoadDialog(requireActivity());
         dialogDisclosure = new DialogDisclosure(requireActivity());
 
-        initWidgets(view);
+        InitWidgets(view);
+        InitObservers();
+        InitListener();
 
-        String Remarksx = Activity_Transaction.getInstance().getRemarksCode();
-        String TransNox = Activity_Transaction.getInstance().getTransNox();
-        String AccntNox = Activity_Transaction.getInstance().getAccntNox();
-        int EntryNox = Activity_Transaction.getInstance().getEntryNox();
+        spnType.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, DCP_Constants.PAYMENT_TYPE));
+        spnType.setSelection(0);
 
+        spnPayType.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, DCP_Constants.PAYMENT_FORM));
+        spnType.setSelection(0);
+
+        return view;
+    }
+
+    @Override
+    public void OnStartSaving() {
+        poDialog.initDialog("Daily Collection Plan", "Posting transaction.Please wait...", false);
+        poDialog.show();
+    }
+
+    @Override
+    public void OnSuccessResult() {
+        poDialog.dismiss();
+
+         InitMessage(0, R.drawable.baseline_message_24, "Collection info has been save.", "Okay", "", new OnDialogButtonCallback() {
+             @Override
+             public void OnPositive() { requireActivity().finish(); }
+
+             @Override
+             public void OnNegative() {}
+         });
+    }
+
+    @Override
+    public void OnFailedResult(String message) {
+        poDialog.dismiss();
+
+        InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+            @Override
+            public void OnPositive() { requireActivity().finish(); }
+
+            @Override
+            public void OnNegative() {}
+        });
+    }
+
+    private void InitWidgets(View v){
+        lblBranch = v.findViewById(R.id.lbl_headerBranch);
+        lblAddress = v.findViewById(R.id.lbl_headerAddress);
+        lblAccNo = v.findViewById(R.id.lbl_dcpAccNo);
+        lblClientNm = v.findViewById(R.id.lbl_dcpClientNm);
+        lblTransNo = v.findViewById(R.id.lbl_dcpTransNo);
+        spnType = v.findViewById(R.id.spn_paymentType);
+        spnPayType = v.findViewById(R.id.spnPayType);
+        txtPrNoxx = v.findViewById(R.id.txt_dcpPRNumber);
+        txtRemarks = v.findViewById(R.id.txt_dcpRemarks);
+        txtAmount = v.findViewById(R.id.txt_dcpAmount);
+        tilDiscount = v.findViewById(R.id.til_dcpDiscount);
+        tilPenaly = v.findViewById(R.id.til_dcpOthers);
+        txtRebate = v.findViewById(R.id.txt_dcpDiscount);
+        txtOthers = v.findViewById(R.id.txt_dcpOthers);
+        txtTotAmnt = v.findViewById(R.id.txt_dcpTotAmount);
+        btnConfirm = v.findViewById(R.id.btn_confirm);
+        btnAmort = v.findViewById(R.id.btn_amortization);
+        btnRBlnce = v.findViewById(R.id.btn_remainbalance);
+        btnClear = v.findViewById(R.id.btn_clearText);
+
+        txtAmount.addTextChangedListener(new OnAmountEnterTextWatcher(txtAmount));
+        txtRebate.addTextChangedListener(new OnAmountEnterTextWatcher(txtRebate));
+        txtOthers.addTextChangedListener(new OnAmountEnterTextWatcher(txtOthers));
+    }
+
+    private void InitObservers(){
+
+        //initialize user info
         mViewModel.GetUserInfo().observe(getViewLifecycleOwner(), user -> {
             try {
                 lblBranch.setText(user.sBranchNm);
@@ -212,6 +282,11 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
             }
         });
 
+        String TransNox = Activity_Transaction.getInstance().getTransNox();
+        String AccntNox = Activity_Transaction.getInstance().getAccntNox();
+        int EntryNox = Activity_Transaction.getInstance().getEntryNox();
+
+        //initialize collection detail
         mViewModel.GetCollectionDetail(TransNox, EntryNox, AccntNox).observe(getViewLifecycleOwner(), detail -> {
             try {
                 poPaid.setAccntNo(detail.getAcctNmbr());
@@ -286,15 +361,14 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
             }
         });
 
-        spnType.setAdapter(new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_dropdown_item, DCP_Constants.PAYMENT_TYPE));
-        spnType.setSelection(0);
-
+        //initialize pr no
         mViewModel.GetPrNumber().observe(getViewLifecycleOwner(), s -> {
             if(s != null){
                 txtPrNoxx.setText(s);
             }
         });
 
+        //initialize rebate
         mViewModel.getRebate().observe(getViewLifecycleOwner(), aDouble -> {
             try{
                 txtRebate.setText(String.valueOf(aDouble));
@@ -303,6 +377,7 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
             }
         });
 
+        //iniitialize penalty
         mViewModel.getPenalty().observe(getViewLifecycleOwner(), aDouble -> {
             try{
                 txtOthers.setText(String.valueOf(aDouble));
@@ -311,6 +386,7 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
             }
         });
 
+        //initialize rebate notice
         mViewModel.getRebateNotice().observe(getViewLifecycleOwner(), s -> {
             if(!s.isEmpty()){
                 tilDiscount.setErrorEnabled(true);
@@ -320,6 +396,19 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
             }
         });
 
+        //initialize total amount
+        mViewModel.getTotalAmount().observe(getViewLifecycleOwner(), aFloat ->{
+            try {
+                txtTotAmnt.setText(formatter.format(aFloat));
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void InitListener(){
+
+        //rebate field focus change
         txtRebate.setOnFocusChangeListener((v, hasFocus) -> {
             if(!hasFocus) {
                 if (!Objects.requireNonNull(txtRebate.getText()).toString().isEmpty()) {
@@ -333,48 +422,86 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
             }
         });
 
-        mViewModel.getTotalAmount().observe(getViewLifecycleOwner(), aFloat ->{
-            try {
-                txtTotAmnt.setText(formatter.format(aFloat));
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        });
+        spnPayType.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        cbCheckPymnt.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked){
+                switch (position){
 
-                DialogCheckPayment loPayment = new DialogCheckPayment(getActivity());
+                    case 0:
+                        break;
+                    case 1: //check payment
 
-                mViewModel.getBankNameList().observe(getViewLifecycleOwner(), strings -> {
-                    loPayment.initDialog(strings, new DialogCheckPayment.OnCheckPaymentDialogListener() {
-                        @Override
-                        public void OnConfirm(AlertDialog dialog, String bank, String date, String checkNo, String AcctNo) {
-                            poPaid.setCheckDt(date);
-                            poPaid.setCheckNo(checkNo);
-                            poPaid.setAccntNo(AcctNo);
-                            mViewModel.getBankInfoList().observe(getViewLifecycleOwner(), eBankInfos -> {
-                                for(int x = 0; x < eBankInfos.size(); x++){
-                                    if(bank.equalsIgnoreCase(eBankInfos.get(x).getBankName())){
-                                        poPaid.setBankNme(eBankInfos.get(x).getBankIDxx());
-                                        break;
-                                    }
+                        DialogCheckPayment loPayment = new DialogCheckPayment(getActivity());
+                        mViewModel.getBankNameList().observe(getViewLifecycleOwner(), strings -> {
+
+                            loPayment.initDialog(strings, new DialogCheckPayment.OnCheckPaymentDialogListener() {
+                                @Override
+                                public void OnConfirm(AlertDialog dialog, String bank, String date, String checkNo, String AcctNo) {
+
+                                    //initialize check details
+                                    poPaid.setCheckDt(date);
+                                    poPaid.setCheckNo(checkNo);
+                                    poPaid.setAccntNo(AcctNo);
+
+                                    mViewModel.getBankInfoList().observe(getViewLifecycleOwner(), eBankInfos -> {
+                                        for(int x = 0; x < eBankInfos.size(); x++){
+                                            if(bank.equalsIgnoreCase(eBankInfos.get(x).getBankName())){
+                                                poPaid.setBankNme(eBankInfos.get(x).getBankIDxx());
+                                                break;
+                                            }
+                                        }
+                                    });
+                                    dialog.dismiss();
+                                }
+
+                                @Override
+                                public void OnCancel(AlertDialog dialog) {
+                                    dialog.dismiss();
                                 }
                             });
-                            dialog.dismiss();
-                        }
+                            loPayment.show();
+                        });
 
-                        @Override
-                        public void OnCancel(AlertDialog dialog) {
-                            cbCheckPymnt.setChecked(false);
-                            dialog.dismiss();
-                        }
-                    });
-                    loPayment.show();
-                });
+                        break;
+                    case 2: //e wallet
+
+                        DialogEWallet loEWallet = new DialogEWallet(getActivity());
+                        mViewModel.getBankNameList().observe(getViewLifecycleOwner(), strings -> {
+
+                            loEWallet.initDialog(strings, new DialogEWallet.OnEWalletDialogListener() {
+                                @Override
+                                public void OnConfirm(AlertDialog dialog, String bank, String RefNo) {
+
+                                    //initialize e wallet reference no
+                                    poPaid.setReferenceNo(RefNo);
+
+                                    mViewModel.getBankInfoList().observe(getViewLifecycleOwner(), eBankInfos -> {
+                                        for(int x = 0; x < eBankInfos.size(); x++){
+                                            if(bank.equalsIgnoreCase(eBankInfos.get(x).getBankName())){
+                                                poPaid.setBankNme(eBankInfos.get(x).getBankIDxx());
+                                                break;
+                                            }
+                                        }
+                                    });
+                                    dialog.dismiss();
+                                }
+
+                                @Override
+                                public void OnCancel(AlertDialog dialog) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            loEWallet.show();
+                        });
+
+                        break;
+                }
             }
         });
 
+        //confirm click
+        String Remarksx = Activity_Transaction.getInstance().getRemarksCode();
         btnConfirm.setOnClickListener(v -> {
 
             if(checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -386,6 +513,7 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
             }
 
             poPaid.setRemarks(Remarksx);
+            poPaid.setPaymentForm(GetPaymentFormIndex(spnPayType.getText().toString()));
             poPaid.setPayment(GetPaymentTypeIndex(spnType.getText().toString()));
             poPaid.setPrNoxxx(Objects.requireNonNull(txtPrNoxx.getText()).toString());
             poPaid.setRemarks(Objects.requireNonNull(txtRemarks.getText()).toString());
@@ -398,65 +526,6 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
 
         });
 
-        return view;
-    }
-
-    @Override
-    public void OnStartSaving() {
-        poDialog.initDialog("Daily Collection Plan", "Posting transaction.Please wait...", false);
-        poDialog.show();
-    }
-
-    @Override
-    public void OnSuccessResult() {
-        poDialog.dismiss();
-
-         InitMessage(0, R.drawable.baseline_message_24, "Collection info has been save.", "Okay", "", new OnDialogButtonCallback() {
-             @Override
-             public void OnPositive() { requireActivity().finish(); }
-
-             @Override
-             public void OnNegative() {}
-         });
-    }
-
-    @Override
-    public void OnFailedResult(String message) {
-        poDialog.dismiss();
-
-        InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
-            @Override
-            public void OnPositive() { requireActivity().finish(); }
-
-            @Override
-            public void OnNegative() {}
-        });
-    }
-
-    private void initWidgets(View v){
-        lblBranch = v.findViewById(R.id.lbl_headerBranch);
-        lblAddress = v.findViewById(R.id.lbl_headerAddress);
-        lblAccNo = v.findViewById(R.id.lbl_dcpAccNo);
-        lblClientNm = v.findViewById(R.id.lbl_dcpClientNm);
-        lblTransNo = v.findViewById(R.id.lbl_dcpTransNo);
-        spnType = v.findViewById(R.id.spn_paymentType);
-        cbCheckPymnt = v.findViewById(R.id.cb_dcpCheckPayment);
-        txtPrNoxx = v.findViewById(R.id.txt_dcpPRNumber);
-        txtRemarks = v.findViewById(R.id.txt_dcpRemarks);
-        txtAmount = v.findViewById(R.id.txt_dcpAmount);
-        tilDiscount = v.findViewById(R.id.til_dcpDiscount);
-        tilPenaly = v.findViewById(R.id.til_dcpOthers);
-        txtRebate = v.findViewById(R.id.txt_dcpDiscount);
-        txtOthers = v.findViewById(R.id.txt_dcpOthers);
-        txtTotAmnt = v.findViewById(R.id.txt_dcpTotAmount);
-        btnConfirm = v.findViewById(R.id.btn_confirm);
-        btnAmort = v.findViewById(R.id.btn_amortization);
-        btnRBlnce = v.findViewById(R.id.btn_remainbalance);
-        btnClear = v.findViewById(R.id.btn_clearText);
-
-        txtAmount.addTextChangedListener(new OnAmountEnterTextWatcher(txtAmount));
-        txtRebate.addTextChangedListener(new OnAmountEnterTextWatcher(txtRebate));
-        txtOthers.addTextChangedListener(new OnAmountEnterTextWatcher(txtOthers));
     }
 
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnDialogButtonCallback callback){

@@ -91,6 +91,27 @@ public class DCP_Constants {
             "Release",
             "Miscellaneous"};
 
+    public static String[] PAYMENT_FORM = {
+            "Cash",
+            "Check Payment",
+            "E Wallet"
+    };
+
+    public static String GetPaymentFormIndex(String PaymentForm){
+        for(int x = 0; x < PAYMENT_FORM.length; x++){
+            if(PaymentForm.equalsIgnoreCase(PAYMENT_FORM[x])){
+
+                //this is default index on system for e wallet
+                if (PaymentForm.equalsIgnoreCase("E Wallet")){
+                    return "7";
+                } else {
+                    return String.valueOf(x);
+                }
+            }
+        }
+        return "";
+    }
+
     public static String GetPaymentTypeIndex(String PaymentType){
         for(int x = 0; x < PAYMENT_TYPE.length; x++){
             if(PaymentType.equalsIgnoreCase(PAYMENT_TYPE[x])){
@@ -186,12 +207,6 @@ public class DCP_Constants {
             @Override
             public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
-//                //change the color to which ever you want
-//                if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES){
-//                    ((CheckedTextView) view).setTextColor(Color.WHITE);
-//                }else{
-//                    ((CheckedTextView) view).setTextColor(getContext().getResources().getColor(R.color.material_black));
-//                }
                 return view;
             }
         };

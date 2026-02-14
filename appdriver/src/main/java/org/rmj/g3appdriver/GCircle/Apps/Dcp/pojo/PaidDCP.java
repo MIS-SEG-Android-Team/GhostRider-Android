@@ -12,6 +12,9 @@ public class PaidDCP {
     private double Othersx = 0.00;
     private double TotAmnt = 0.00;
 
+    private String PaymentForm = "";
+    private String ReferenceNo = "";
+
     private String BankNme;
     private String CheckDt;
     private String CheckNo;
@@ -50,6 +53,22 @@ public class PaidDCP {
 
     public void setPrNoxxx(String prNoxxx) {
         PrNoxxx = prNoxxx;
+    }
+
+    public String getPaymentForm() {
+        return PaymentForm;
+    }
+
+    public void setPaymentForm(String paymentForm) {
+        PaymentForm = paymentForm;
+    }
+
+    public String getReferenceNo() {
+        return ReferenceNo;
+    }
+
+    public void setReferenceNo(String referenceNo) {
+        ReferenceNo = referenceNo;
     }
 
     public String getPayment() {

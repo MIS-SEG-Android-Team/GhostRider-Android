@@ -368,7 +368,19 @@ public class Activity_SSDD_Category extends AppCompatActivity {
 
     private void InitListener(){
 
-        btn_submit.setOnClickListener(v -> SubmitEvaluation() );
+        btn_submit.setOnClickListener(v -> {
+
+            InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Do you want to submit your evaluation?", "Yes", "No", new onMessageButton() {
+                @Override
+                public void onPositive() {
+                    SubmitEvaluation();
+                }
+
+                @Override
+                public void onNegative() {
+                }
+            });
+        });
     }
 
     @SuppressLint("NotifyDataSetChanged")

@@ -43,14 +43,17 @@ public class PAY extends LRDcp {
                 return null;
             }
 
-            if(foVal.getBankNme() != null){
+            if(foVal.getPaymentForm().equalsIgnoreCase("1")){
                 loDetail.setBankIDxx(foVal.getBankNme());
                 loDetail.setCheckDte(foVal.getCheckDt());
                 loDetail.setCheckNox(foVal.getCheckNo());
                 loDetail.setCheckAct(foVal.getAccntNo());
-                loDetail.setPaymForm("1");
+            } else if (foVal.getPaymentForm().equalsIgnoreCase("7")) {
+                loDetail.setBankIDxx(foVal.getBankNme());
             }
+
             loDetail.setRemCodex("PAY");
+            loDetail.setPaymForm(foVal.getPaymentForm());
             loDetail.setTranType(foVal.getPayment());
             loDetail.setPRNoxxxx(foVal.getPrNoxxx());
             loDetail.setTranAmtx(foVal.getAmountx());

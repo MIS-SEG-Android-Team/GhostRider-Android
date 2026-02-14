@@ -10,11 +10,11 @@
   ~ project file last modified : 4/24/21 3:18 PM
   -->
 
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.Fragment_PaidTransaction"
     android:theme="@style/GhostRiderMaterialTheme.NoActionBar">
 
@@ -126,11 +126,13 @@
                 android:fontFamily="@font/roboto_medium"
                 android:gravity="end"/>
         </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/CustomDropDownTilStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Payment Type">
+            android:hint="Payment Form">
+
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/spn_paymentType"
                 android:layout_width="match_parent"
@@ -141,14 +143,21 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/cb_dcpCheckPayment"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/CustomDropDownTilStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Check Payment"
-            android:fontFamily="@font/roboto_medium"
-            android:textSize="15sp"/>
+            android:hint="Payment Type">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/spnPayType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                style="@style/DropdownStyleTheme"
+                android:padding="10dp"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -304,7 +313,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_confirm"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save Payment"/>
 
