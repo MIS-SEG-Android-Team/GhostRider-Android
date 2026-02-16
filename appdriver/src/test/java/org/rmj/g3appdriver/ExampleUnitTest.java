@@ -67,6 +67,23 @@ public class ExampleUnitTest {
     }
 
     @Test
+    public void test03GetLastDayofMonth(){
+        Calendar loCalendar = Calendar.getInstance();
+
+        int lastDay = loCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        loCalendar.set(Calendar.DAY_OF_MONTH, lastDay);
+
+        // Format the result
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String lastDayString = outputFormat.format(loCalendar.getTime());
+
+        int lnResult = LocalDate.parse(AppConstants.CURRENT_DATE(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).compareTo(
+                LocalDate.parse(lastDayString, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+        System.out.println("Last day of month: " + lnResult);
+    }
+
+    @Test
     public void testConnectionLogic(){
         boolean isBackUp = false;
         String lsAddress1 = "address1";

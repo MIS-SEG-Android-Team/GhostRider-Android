@@ -135,11 +135,11 @@
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/spn_paymentType"
+                style="@style/DropdownStyleTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                style="@style/DropdownStyleTheme"
-                android:padding="10dp"/>
+                android:padding="10dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

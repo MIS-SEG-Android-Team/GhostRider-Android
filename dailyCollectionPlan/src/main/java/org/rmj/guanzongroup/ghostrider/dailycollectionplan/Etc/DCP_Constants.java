@@ -97,6 +97,12 @@ public class DCP_Constants {
             "E Wallet"
     };
 
+    public static String[] REMITTANCE_TYPE = {
+            "Cash Remittance",
+            "Check Remittance",
+            "E-Payment Remittance"
+    };
+
     public static String GetPaymentFormIndex(String PaymentForm){
         for(int x = 0; x < PAYMENT_FORM.length; x++){
             if(PaymentForm.equalsIgnoreCase(PAYMENT_FORM[x])){

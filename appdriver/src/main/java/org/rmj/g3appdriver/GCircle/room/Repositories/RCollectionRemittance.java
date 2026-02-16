@@ -66,6 +66,10 @@ public class RCollectionRemittance {
         return poDao.GetCheckCollection(fsVal);
     }
 
+    public LiveData<String> GetEPayCollection(String fsVal){
+        return poDao.GetEPayCollection(fsVal);
+    }
+
     public LiveData<String> GetBranchRemittanceAmount(String fsVal){
         return poDao.GetBranchRemittanceAmount(fsVal);
     }
@@ -82,6 +86,10 @@ public class RCollectionRemittance {
 
     public LiveData<String> GetCheckOnHand(String fsVal){
         return poDao.GetCheckOnHand(fsVal);
+    }
+
+    public LiveData<String> GetEPayOnHand(String fsVal){
+        return poDao.GetEPayOnHand(fsVal);
     }
 
     public JSONObject SaveRemittance(Remittance foVal){

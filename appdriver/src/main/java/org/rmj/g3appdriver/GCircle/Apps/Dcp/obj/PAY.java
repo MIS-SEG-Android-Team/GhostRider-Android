@@ -49,6 +49,7 @@ public class PAY extends LRDcp {
                 loDetail.setCheckNox(foVal.getCheckNo());
                 loDetail.setCheckAct(foVal.getAccntNo());
             } else if (foVal.getPaymentForm().equalsIgnoreCase("7")) {
+                loDetail.setsEWalletReference(foVal.getReferenceNo());
                 loDetail.setBankIDxx(foVal.getBankNme());
             }
 
@@ -114,6 +115,8 @@ public class PAY extends LRDcp {
 
             JSONObject loData = new JSONObject();
             loData.put("sPRNoxxxx", loDetail.getPRNoxxxx());
+            loData.put("cPaymForm", loDetail.getPaymForm());
+            loData.put("sPaymRefx", loDetail.getsEWalletReference());
             loData.put("nTranAmtx", loDetail.getTranAmtx());
             loData.put("nDiscount", loDetail.getDiscount());
             loData.put("nOthersxx", loDetail.getOthersxx());

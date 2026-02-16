@@ -15,6 +15,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -36,6 +37,7 @@ import org.rmj.g3appdriver.etc.FormatUIText;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.pojo.Remittance;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.VMCollectionRemittance;
 
@@ -53,33 +55,80 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
             lblAddrss,
             lblCltdCash,
             lblCltdChck,
+            lbl_collectedEWallet,
             lblRmtBrnch,
             lblRmtBankx,
             lblRmtOther,
             lblOHCashxx,
-            lblOHCheckx;
-    public MaterialAutoCompleteTextView txtBranch, txtAccNox;
+            lblOHCheckx,
+            lbl_remittanceEPay;
+    public MaterialAutoCompleteTextView txtBranch, txtAccNox, spn_remit;
     private TextInputEditText txtAmount, txtAccName, txtRefNox;
     private LinearLayout linearBrnch, linearBank;
     private TextInputLayout tilRefNox;
-    private RadioGroup rgRemitType, rgRemitance;
+    private RadioGroup rgRemitance;
     private MaterialButton btnRemitAll, btnRemit;
 
-    private String psCltCashx = "0.0",
-            psCltCheck = "0.0";
-
-    private boolean isCheck = false;
+    private String
+            psCltCashx = "0.0",
+            psCltCheck = "0.0",
+            psCltEPay = "0.0";
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(VMCollectionRemittance.class);
         setContentView(R.layout.activity_collection_remittance);
+        mViewModel = new ViewModelProvider(this).get(VMCollectionRemittance.class);
         poDialogx = new LoadDialog(Activity_CollectionRemittance.this);
         poMessage = new MessageBox(Activity_CollectionRemittance.this);
         poRemit = new Remittance();
+
         initWidgets();
+        initObservers();
+        initListeners();
+
+        spn_remit.setAdapter(new ArrayAdapter<>(Activity_CollectionRemittance.this,
+                R.layout.support_simple_spinner_dropdown_item, DCP_Constants.REMITTANCE_TYPE));
+    }
+
+    private void initWidgets(){
+        lblBranch = findViewById(R.id.lbl_headerBranch);
+        lblAddrss = findViewById(R.id.lbl_headerAddress);
+
+        toolbar = findViewById(R.id.toolbar_collectionRemit);
+        toolbar.setTitle("");
+
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        rgRemitance = findViewById(R.id.rg_remittanceOutlet);
+        txtBranch = findViewById(R.id.txt_remitBranch);
+        txtAccNox = findViewById(R.id.txt_remitAcctNox);
+        txtAmount = findViewById(R.id.txt_remitAmount);
+        txtAccName = findViewById(R.id.txt_remitAccName);
+        txtRefNox = findViewById(R.id.txt_remitReferenceNo);
+        tilRefNox = findViewById(R.id.til_remitReferenceNo);
+        linearBrnch = findViewById(R.id.linear_remitBranch);
+        linearBank = findViewById(R.id.linear_remitBankOthers);
+        lblCltdCash = findViewById(R.id.lbl_collectedCash);
+        lblCltdChck = findViewById(R.id.lbl_collectedCheck);
+        lbl_collectedEWallet = findViewById(R.id.lbl_collectedEWallet);
+        lblRmtBrnch = findViewById(R.id.lbl_remittanceBranch);
+        lblRmtBankx = findViewById(R.id.lbl_remittanceBank);
+        lblRmtOther = findViewById(R.id.lbl_remittanceOthers);
+        lblOHCashxx = findViewById(R.id.lbl_remittanceCash);
+        lblOHCheckx = findViewById(R.id.lbl_remittanceCheck);
+        lbl_remittanceEPay = findViewById(R.id.lbl_remittanceEPay);
+        btnRemitAll = findViewById(R.id.btn_remitAll);
+        btnRemit = findViewById(R.id.btn_confirm);
+        spn_remit = findViewById(R.id.spn_remit);
+
+        txtAmount.addTextChangedListener(new FormatUIText.CurrencyFormat(txtAmount));
+        txtAccName.setEnabled(false);
+    }
+
+    private void initObservers(){
 
         mViewModel.GetUserInfo().observe(this, user -> {
             try{
@@ -96,8 +145,10 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
         });
 
         mViewModel.GetCollectionMaster().observe(Activity_CollectionRemittance.this, master -> {
+
             try{
                 poRemit.setsTransNox(master.getTransNox());
+
                 mViewModel.GetCashCollection(master.getTransNox()).observe(Activity_CollectionRemittance.this, s -> {
                     try{
                         lblCltdCash.setText("Total Collected Cash: " + FormatUIText.getCurrencyUIFormat(s));
@@ -113,6 +164,15 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                     } catch (Exception e){
                         e.printStackTrace();
                         lblCltdChck.setText("Total Collected Check: 0.00");
+                    }
+                });
+
+                mViewModel.GetEPayCollection(master.getTransNox()).observe(Activity_CollectionRemittance.this, s -> {
+                    try{
+                        lbl_collectedEWallet.setText("Total Collected E-Payments: " + FormatUIText.getCurrencyUIFormat(s));
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        lbl_collectedEWallet.setText("Total Collected E-Payments: 0.00");
                     }
                 });
 
@@ -145,6 +205,7 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
 
                 mViewModel.GetCashOnHand(master.getTransNox()).observe(Activity_CollectionRemittance.this, s -> {
                     try{
+                        spn_remit.setText("Cash Remittance", false); //autoselect
                         lblOHCashxx.setText("Cash-On-Hand: " + FormatUIText.getCurrencyUIFormat(s));
                         psCltCashx = s;
                         poRemit.setnCollectd(Double.parseDouble(psCltCashx));
@@ -157,11 +218,27 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
 
                 mViewModel.GetCheckOnHand(master.getTransNox()).observe(Activity_CollectionRemittance.this, s -> {
                     try{
+                        spn_remit.setText("Check Remittance", false); //autoselect
                         lblOHCheckx.setText("Check-On-Hand: " + FormatUIText.getCurrencyUIFormat(s));
                         psCltCheck = s;
+                        poRemit.setnCollectd(Double.parseDouble(psCltCheck));
+                        btnRemitAll.setText("Total Check-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCashx));
                     } catch (Exception e){
                         e.printStackTrace();
                         lblOHCheckx.setText("Check-On-Hand: 0.00");
+                    }
+                });
+
+                mViewModel.GetEPayCollection(master.getTransNox()).observe(Activity_CollectionRemittance.this, s -> {
+                    try{
+                        spn_remit.setText("E-Payment Remittance", false); //autoselect
+                        lbl_remittanceEPay.setText("E-Payment-On-Hand: " + FormatUIText.getCurrencyUIFormat(s));
+                        psCltEPay = s;
+                        poRemit.setnCollectd(Double.parseDouble(psCltEPay));
+                        btnRemitAll.setText("Total E-Payment-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCashx));
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        lbl_remittanceEPay.setText("E-Payment-On-Hand: 0.00");
                     }
                 });
 
@@ -170,34 +247,60 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
             }
         });
 
-        rgRemitType.setOnCheckedChangeListener((group, checkedId) -> {
-            if(checkedId == R.id.rb_remitCash){
-                isCheck = false;
-                poRemit.setcPaymForm("0");
-                poRemit.setnCollectd(Double.parseDouble(psCltCashx));
-                txtAmount.setText("");
-                if(psCltCashx != null) {
-                    if (!psCltCashx.isEmpty()) {
-                        btnRemitAll.setText("Total Cash-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCashx));
-                    } else {
-                        btnRemitAll.setText("No Cash On Hand");
-                    }
-                } else {
-                    btnRemitAll.setText("No Cash On Hand");
-                }
-            } else if(checkedId == R.id.rb_remitCheck){
-                isCheck = true;
-                poRemit.setcPaymForm("1");
-                poRemit.setnCollectd(Double.parseDouble(psCltCheck));
-                txtAmount.setText("");
-                if(psCltCheck != null) {
-                    if (!psCltCheck.isEmpty()) {
-                        btnRemitAll.setText("Total Check-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCheck));
-                    } else {
-                        btnRemitAll.setText("No Check Payment On Hand");
-                    }
-                } else {
-                    btnRemitAll.setText("No Check Payment On Hand");
+    }
+
+    private void initListeners(){
+
+        spn_remit.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                switch (position){
+
+                    case 0:
+                        poRemit.setcPaymForm("0");
+                        poRemit.setnCollectd(Double.parseDouble(psCltCashx));
+                        txtAmount.setText("");
+                        if(psCltCashx != null) {
+                            if (!psCltCashx.isEmpty()) {
+                                btnRemitAll.setText("Total Cash-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCashx));
+                            } else {
+                                btnRemitAll.setText("No Cash On Hand");
+                            }
+                        } else {
+                            btnRemitAll.setText("No Cash On Hand");
+                        }
+                        break;
+
+                    case 1:
+                        poRemit.setcPaymForm("1");
+                        poRemit.setnCollectd(Double.parseDouble(psCltCheck));
+                        txtAmount.setText("");
+                        if(psCltCheck != null) {
+                            if (!psCltCheck.isEmpty()) {
+                                btnRemitAll.setText("Total Check-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCheck));
+                            } else {
+                                btnRemitAll.setText("No Check Payment On Hand");
+                            }
+                        } else {
+                            btnRemitAll.setText("No Check Payment On Hand");
+                        }
+                        break;
+
+                    case 2:
+                        poRemit.setcPaymForm("7");
+                        poRemit.setnCollectd(Double.parseDouble(psCltEPay));
+                        txtAmount.setText("");
+                        if(psCltEPay != null) {
+                            if (!psCltEPay.isEmpty()) {
+                                btnRemitAll.setText("Total E-Payment-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltEPay));
+                            } else {
+                                btnRemitAll.setText("No E-Payment On Hand");
+                            }
+                        } else {
+                            btnRemitAll.setText("No E-Payment On Hand");
+                        }
+                        break;
                 }
             }
         });
@@ -332,39 +435,6 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                 }
             });
         });
-    }
-
-    private void initWidgets(){
-        lblBranch = findViewById(R.id.lbl_headerBranch);
-        lblAddrss = findViewById(R.id.lbl_headerAddress);
-
-        toolbar = findViewById(R.id.toolbar_collectionRemit);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
-        rgRemitType = findViewById(R.id.rg_remittance);
-        rgRemitance = findViewById(R.id.rg_remittanceOutlet);
-        txtBranch = findViewById(R.id.txt_remitBranch);
-        txtAccNox = findViewById(R.id.txt_remitAcctNox);
-        txtAmount = findViewById(R.id.txt_remitAmount);
-        txtAccName = findViewById(R.id.txt_remitAccName);
-        txtRefNox = findViewById(R.id.txt_remitReferenceNo);
-        tilRefNox = findViewById(R.id.til_remitReferenceNo);
-        linearBrnch = findViewById(R.id.linear_remitBranch);
-        linearBank = findViewById(R.id.linear_remitBankOthers);
-        lblCltdCash = findViewById(R.id.lbl_collectedCash);
-        lblCltdChck = findViewById(R.id.lbl_collectedCheck);
-        lblRmtBrnch = findViewById(R.id.lbl_remittanceBranch);
-        lblRmtBankx = findViewById(R.id.lbl_remittanceBank);
-        lblRmtOther = findViewById(R.id.lbl_remittanceOthers);
-        lblOHCashxx = findViewById(R.id.lbl_remittanceCash);
-        lblOHCheckx = findViewById(R.id.lbl_remittanceCheck);
-        btnRemitAll = findViewById(R.id.btn_remitAll);
-        btnRemit = findViewById(R.id.btn_confirm);
-
-        txtAmount.addTextChangedListener(new FormatUIText.CurrencyFormat(txtAmount));
-        txtAccName.setEnabled(false);
     }
 
     @Override

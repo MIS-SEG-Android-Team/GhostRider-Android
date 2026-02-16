@@ -47,12 +47,20 @@ public class REMIT extends LRDcp {
         return poRemit.GetCheckCollection(fsVal);
     }
 
+    public LiveData<String> GetEPayCollection(String fsVal){
+        return poRemit.GetEPayCollection(fsVal);
+    }
+
     public LiveData<String> GetCashOnHand(String fsVal){
         return poRemit.GetCashOnHand(fsVal);
     }
 
     public LiveData<String> GetCheckOnHand(String fsVal){
         return poRemit.GetCheckOnHand(fsVal);
+    }
+
+    public LiveData<String> GetEPayOnHand(String fsVal){
+        return poRemit.GetEPayOnHand(fsVal);
     }
 
     public LiveData<String> GetBranchRemittanceAmount(String fsVal){

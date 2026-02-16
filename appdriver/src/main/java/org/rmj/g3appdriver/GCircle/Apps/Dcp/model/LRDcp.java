@@ -794,6 +794,8 @@ public class LRDcp {
 
                     case "PAY": //requires selfie
                         loData.put("sPRNoxxxx", detail.getPRNoxxxx());
+                        loData.put("cPaymForm", detail.getPaymForm());
+                        loData.put("sPaymRefx", detail.getsEWalletReference());
                         loData.put("nTranAmtx", detail.getTranAmtx());
                         loData.put("nDiscount", detail.getDiscount());
                         loData.put("nOthersxx", detail.getOthersxx());

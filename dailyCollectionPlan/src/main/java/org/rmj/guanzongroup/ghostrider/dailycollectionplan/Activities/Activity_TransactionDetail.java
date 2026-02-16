@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -48,6 +50,7 @@ public class Activity_TransactionDetail extends AppCompatActivity {
         setContentView(R.layout.activity_transactionlog);
 
         instance = this;
+
         transNox = getIntent().getStringExtra("sTransNox");
         acctNox = getIntent().getStringExtra("acctNox");
         fullNme = getIntent().getStringExtra("fullNme");
@@ -69,7 +72,9 @@ public class Activity_TransactionDetail extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("");
 
-        viewPager.setAdapter(new FragmentAdapter(getTransactionFragment(remCodex)));
+        FragmentAdapter loAdapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
+        loAdapter.initFragment(getTransactionFragment(remCodex));
+        viewPager.setAdapter(loAdapter);
     }
 
     @Override
@@ -86,10 +91,13 @@ public class Activity_TransactionDetail extends AppCompatActivity {
     }
 
     public static class FragmentAdapter extends FragmentStateAdapter {
-        private final Fragment fragment;
-        public FragmentAdapter(@NonNull Fragment fragment) {
-            super(fragment);
+        private Fragment fragment;
 
+        public FragmentAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+            super(fragmentManager, lifecycle);
+        }
+
+        public void initFragment(Fragment fragment){
             this.fragment = fragment;
         }
 
@@ -98,6 +106,7 @@ public class Activity_TransactionDetail extends AppCompatActivity {
         public Fragment createFragment(int position) {
             return fragment;
         }
+
         @Override
         public int getItemCount() {
             return 1;

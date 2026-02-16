@@ -294,6 +294,9 @@ public class MigrationTest {
             if (!CheckColumnExists(database, "Image_Information", "sClientID")){
                 database.execSQL("ALTER TABLE EImageInfo ADD COLUMN sClientID TEXT");
             }
+            if (!CheckColumnExists(database, "LR_DCP_Collection_Detail", "sEWalletReference")){
+                database.execSQL("ALTER TABLE LR_DCP_Collection_Detail ADD COLUMN sEWalletReference TEXT");
+            }
         }
     };
 

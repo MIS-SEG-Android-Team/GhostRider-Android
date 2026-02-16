@@ -71,6 +71,10 @@ public class VMCollectionRemittance extends AndroidViewModel {
         return poSys.GetCheckCollection(fsVal);
     }
 
+    public LiveData<String> GetEPayCollection(String fsVal){
+        return poSys.GetEPayCollection(fsVal);
+    }
+
     public LiveData<String> GetTotalCollection(String fsVal){
         return poSys.GetTotalCollection(fsVal);
     }
@@ -93,6 +97,10 @@ public class VMCollectionRemittance extends AndroidViewModel {
 
     public LiveData<String> GetCheckOnHand(String fsVal){
         return poSys.GetCheckOnHand(fsVal);
+    }
+
+    public LiveData<String> GetEPayOnHand(String fsVal){
+        return poSys.GetEPayOnHand(fsVal);
     }
 
     public LiveData<List<ERemittanceAccounts>> GetBankAccounts(){

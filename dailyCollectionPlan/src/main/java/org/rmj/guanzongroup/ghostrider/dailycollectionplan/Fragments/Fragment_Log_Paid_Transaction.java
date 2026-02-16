@@ -26,14 +26,16 @@ import androidx.lifecycle.ViewModelProviders;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_TransactionDetail;
+import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Etc.DCP_Constants;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.R;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.ViewModel.VMLogPaidTransaction;
 
 public class Fragment_Log_Paid_Transaction extends Fragment {
     private VMLogPaidTransaction mViewModel;
+    private LinearLayout layout_reference;
     private MaterialTextView txtAcctNo, txtClientName, txtClientAddress, txtTransNo;
     private MaterialTextView txtPaymentTp, txtPRNoxx, txtTransAmtx, txtDiscount, txtPenalty, txtTotalAmtx,
-            txtRemarksx, txtCheckPayment, txtListHeader, txtBank, txtChckDt, txtChckNm, txtChckAc;
+            txtRemarksx, txtPaymentForm, txtListHeader, txtBank, txtChckDt, txtChckNm, txtChckAc, txt_reference_no;
     private LinearLayout lnBank, lnChckDt, lnChckNm, lnChckAc;
 
     public Fragment_Log_Paid_Transaction() { }
@@ -60,43 +62,74 @@ public class Fragment_Log_Paid_Transaction extends Fragment {
         txtClientAddress.setText(Activity_TransactionDetail.clientAddress);
         txtTransNo.setText(Activity_TransactionDetail.transNox);
         txtListHeader.setText(Activity_TransactionDetail.psTransTp + " Transaction");
+
         mViewModel.setParameters(Activity_TransactionDetail.transNox,
                 Activity_TransactionDetail.acctNox,
                 Activity_TransactionDetail.remCodex);
 
         mViewModel.getPostedCollectionDetail().observe(getViewLifecycleOwner(), collectPaidDetl -> {
-            try {
-                if(!collectPaidDetl.getBankIDxx().equalsIgnoreCase("")) {
-                    txtCheckPayment.setVisibility(View.VISIBLE);
-                    lnBank.setVisibility(View.VISIBLE);
-                    lnChckDt.setVisibility(View.VISIBLE);
-                    lnChckNm.setVisibility(View.VISIBLE);
-                    lnChckAc.setVisibility(View.VISIBLE);
 
-                    mViewModel.getBankNameFromId(collectPaidDetl.getBankIDxx()).observe(getViewLifecycleOwner(), bankName -> {
-                        try {
-                            txtBank.setText(bankName);
-                        } catch (NullPointerException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                    txtChckDt.setText(collectPaidDetl.getCheckDte());
-                    txtChckNm.setText(collectPaidDetl.getCheckNox());
-                    txtChckAc.setText(collectPaidDetl.getCheckAct());
-                } else {
-                    txtCheckPayment.setVisibility(View.GONE);
-                    lnBank.setVisibility(View.GONE);
-                    lnChckDt.setVisibility(View.GONE);
-                    lnChckNm.setVisibility(View.GONE);
-                    lnChckAc.setVisibility(View.GONE);
+            try {
+
+                switch (collectPaidDetl.getPaymForm()){
+                    case "0":
+                        txtPaymentForm.setText("Cash Payment");
+
+                        lnBank.setVisibility(View.GONE);
+                        lnChckDt.setVisibility(View.GONE);
+                        lnChckNm.setVisibility(View.GONE);
+                        lnChckAc.setVisibility(View.GONE);
+                        layout_reference.setVisibility(View.GONE);
+
+                        break;
+                    case "1":
+                        txtPaymentForm.setText("Cheque Payment");
+
+                        lnBank.setVisibility(View.VISIBLE);
+                        lnChckDt.setVisibility(View.VISIBLE);
+                        lnChckNm.setVisibility(View.VISIBLE);
+                        lnChckAc.setVisibility(View.VISIBLE);
+                        layout_reference.setVisibility(View.GONE);
+
+                        txtChckDt.setText(collectPaidDetl.getCheckDte());
+                        txtChckNm.setText(collectPaidDetl.getCheckNox());
+                        txtChckAc.setText(collectPaidDetl.getCheckAct());
+
+                        mViewModel.getBankNameFromId(collectPaidDetl.getBankIDxx()).observe(getViewLifecycleOwner(), bankName -> {
+                            try {
+                                txtBank.setText(bankName);
+                            } catch (NullPointerException e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+                        break;
+                    default:
+                        txtPaymentForm.setText("E-Wallet Payment");
+
+                        lnBank.setVisibility(View.VISIBLE);
+                        layout_reference.setVisibility(View.VISIBLE);
+                        txt_reference_no.setText(collectPaidDetl.getsEWalletReference());
+
+                        mViewModel.getBankNameFromId(collectPaidDetl.getBankIDxx()).observe(getViewLifecycleOwner(), bankName -> {
+                            try {
+                                txtBank.setText(bankName);
+                            } catch (NullPointerException e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+                        break;
                 }
-                txtPaymentTp.setText(collectPaidDetl.getTranType());
+
+                txtPaymentTp.setText(DCP_Constants.PAYMENT_TYPE[Integer.parseInt(collectPaidDetl.getTranType())]);
                 txtPRNoxx.setText(collectPaidDetl.getPRNoxxxx());
                 txtTransAmtx.setText(getString(R.string.peso_sign) + collectPaidDetl.getTranAmtx());
                 txtDiscount.setText(getString(R.string.peso_sign) + collectPaidDetl.getDiscount());
                 txtPenalty.setText(getString(R.string.peso_sign) + collectPaidDetl.getOthersxx());
                 txtTotalAmtx.setText(getString(R.string.peso_sign) + collectPaidDetl.getTranTotl());
                 txtRemarksx.setText(collectPaidDetl.getRemarksx());
+
             } catch(NullPointerException e) {
                 e.printStackTrace();
             }
@@ -111,6 +144,9 @@ public class Fragment_Log_Paid_Transaction extends Fragment {
         txtTransNo = v.findViewById(R.id.txt_transno);
         txtListHeader = v.findViewById(R.id.lbl_list_header);
 
+        layout_reference = v.findViewById(R.id.layout_reference);
+        txt_reference_no = v.findViewById(R.id.txt_reference_no);
+
         txtPaymentTp = v.findViewById(R.id.txt_payment_type);
         txtPRNoxx = v.findViewById(R.id.txt_pr_no);
         txtTransAmtx = v.findViewById(R.id.txt_trans_amount);
@@ -118,7 +154,7 @@ public class Fragment_Log_Paid_Transaction extends Fragment {
         txtPenalty = v.findViewById(R.id.txt_penalty);
         txtTotalAmtx = v.findViewById(R.id.txt_total_amount);
         txtRemarksx = v.findViewById(R.id.txt_remarks);
-        txtCheckPayment = v.findViewById(R.id.lbl_check_payment);
+        txtPaymentForm = v.findViewById(R.id.lbl_payment_form);
 
         txtBank = v.findViewById(R.id.txt_bank);
         txtChckDt = v.findViewById(R.id.txt_check_date);

@@ -59,6 +59,8 @@ public class EDCPCollectionDetail {
     private String ReferNox = "";
     @ColumnInfo(name = "cPaymForm")
     private String PaymForm = "0";
+    @ColumnInfo(name = "sEWalletReference")
+    public String sEWalletReference = "";
     @ColumnInfo(name = "cIsDCPxxx")
     private String IsDCPxxx = "";
     @ColumnInfo(name = "sMobileNo")
@@ -266,6 +268,14 @@ public class EDCPCollectionDetail {
 
     public void setPaymForm(String paymForm) {
         PaymForm = paymForm;
+    }
+
+    public String getsEWalletReference() {
+        return sEWalletReference;
+    }
+
+    public void setsEWalletReference(String sEWalletReference) {
+        this.sEWalletReference = sEWalletReference;
     }
 
     public String getIsDCPxxx() {

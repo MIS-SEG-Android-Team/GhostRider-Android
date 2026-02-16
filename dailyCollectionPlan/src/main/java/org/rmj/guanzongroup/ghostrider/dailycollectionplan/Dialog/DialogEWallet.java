@@ -75,6 +75,7 @@ public class DialogEWallet {
             } else if(ls_reference.trim().isEmpty()){
                 GToast.CreateMessage(context, "Please enter reference number", GToast.ERROR).show();
             }
+            listener.OnConfirm(poDialogx, lsBank, ls_reference);
         });
 
         btnCancel.setOnClickListener(v -> listener.OnCancel(poDialogx));

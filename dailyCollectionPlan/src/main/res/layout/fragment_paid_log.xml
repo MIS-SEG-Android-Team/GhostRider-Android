@@ -140,17 +140,17 @@
                     android:textSize="15sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
+
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/lbl_check_payment"
+                    android:id="@+id/lbl_payment_form"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/border_label"
                     android:fontFamily="@font/roboto"
-                    android:text="@string/sLblCheckPayment"
+                    android:text="Cash"
                     android:textSize="11sp"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:visibility="gone"/>
+                    app:layout_constraintTop_toTopOf="parent"/>
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txt_remarks"
                     android:layout_width="0dp"
@@ -263,6 +263,30 @@
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/txt_bank"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:fontFamily="@font/roboto"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_reference"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reference No: "
+                    android:layout_weight=".1"
+                    android:fontFamily="@font/roboto_medium"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txt_reference_no"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

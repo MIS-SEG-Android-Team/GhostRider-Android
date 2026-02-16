@@ -270,6 +270,7 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
         txtOthers.addTextChangedListener(new OnAmountEnterTextWatcher(txtOthers));
     }
 
+    @SuppressLint({"SetTextI18n", "SimpleDateFormat"})
     private void InitObservers(){
 
         //initialize user info
@@ -301,25 +302,52 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
 
                 btnAmort.setText("Amortization : " + FormatUIText.getCurrencyUIFormat(String.valueOf(detail.getMonAmort())));
                 btnRBlnce.setText("Amount Due : " + FormatUIText.getCurrencyUIFormat(String.valueOf(detail.getAmtDuexx())));
+
                 SimpleDateFormat loFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
                 String lsDayDuex = detail.getDueDatex().split("-")[2];
 
                 //Check here if the due date is on the maximum days per month
                 // if true check the maximum day of month and set it as the due date for this current month...
-
                 if(lsDayDuex.equalsIgnoreCase("31")) {
-                    LocalDate lastDayOfMonth = LocalDate.parse(AppConstants.CURRENT_DATE(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                            .with(TemporalAdjusters.lastDayOfMonth());
-                    lsDayDuex = String.valueOf(lastDayOfMonth.getDayOfMonth());
+
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("dd");
+                    Calendar loCalendar = Calendar.getInstance();
+
+                    int lastDay = loCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                    loCalendar.set(Calendar.DAY_OF_MONTH, lastDay);
+
+                    lsDayDuex = outputFormat.format(loCalendar.getTime());
+
+                    //initialize by local date, if version is higher
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+                        LocalDate lastDayOfMonth = LocalDate.parse(AppConstants.CURRENT_DATE(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                                .with(TemporalAdjusters.lastDayOfMonth());
+                        lsDayDuex = String.valueOf(lastDayOfMonth.getDayOfMonth());
+                    }
                 }
 
                 String lsCrtYear = new SimpleDateFormat("yyyy", Locale.getDefault()).format(Calendar.getInstance().getTime());
                 String lsCrtMnth = new SimpleDateFormat("MM", Locale.getDefault()).format(Calendar.getInstance().getTime());
+
+                //initialize by local date, if version is higher
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    lsCrtYear = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy"));
+                    lsCrtMnth = LocalDate.now().format(DateTimeFormatter.ofPattern("MM"));
+                }
                 String lsDueDate = lsCrtYear + "-" + lsCrtMnth + "-" + lsDayDuex;
+
                 Date ldDueDatex = new SimpleDateFormat("yyyy-MM-dd").parse(lsDueDate);
                 Date loCrtDate = loFormatter.parse(AppConstants.CURRENT_DATE());
+
                 int lnResult = loCrtDate.compareTo(ldDueDatex);
+
+                //initliaze result by localdate, if version is higher
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    lnResult = LocalDate.parse(AppConstants.CURRENT_DATE(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).compareTo(
+                            LocalDate.parse(lsDueDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                }
 
                 // If result is less than 0 current date is before the due date
                 // If result is equal to 0 current date is equal to due date

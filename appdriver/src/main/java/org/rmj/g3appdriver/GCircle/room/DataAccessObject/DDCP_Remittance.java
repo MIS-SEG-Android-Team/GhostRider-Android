@@ -37,15 +37,20 @@ public interface DDCP_Remittance {
     @Query("SELECT SUM(nAmountxx) FROM LR_DCP_Remittance WHERE sTransNox =:fsVal")
     LiveData<String> GetRemittedCollection(String fsVal);
 
-    @Query("SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail " +
+    @Query("SELECT IFNULL((SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail " +
             "WHERE sTransNox =:fsVal " +
-            "AND cPaymForm != '1'")
+            "AND cPaymForm = '0'), 0.00) AS nCashClt")
     LiveData<String> GetCashCollection(String fsVal);
 
     @Query("SELECT IFNULL((SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail " +
             "WHERE sTransNox =:fsVal " +
             "AND cPaymForm = '1'), 0.00) AS nCheckClt")
     LiveData<String> GetCheckCollection(String fsVal);
+
+    @Query("SELECT IFNULL((SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail " +
+            "WHERE sTransNox =:fsVal " +
+            "AND cPaymForm = '7'), 0.00) AS nEPayClt")
+    LiveData<String> GetEPayCollection(String fsVal);
 
     @Query("SELECT IFNULL((SELECT SUM(nAmountxx) FROM LR_DCP_Remittance " +
             "WHERE sTransNox =:fsVal " +
@@ -63,9 +68,9 @@ public interface DDCP_Remittance {
     LiveData<String> GetOtherRemittanceAmount(String fsVal);
 
     @Query("SELECT (SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail WHERE sTransNox =:fsVal " +
-            "AND cPaymForm != '1') - " +
+            "AND cPaymForm = '0') - " +
             "IFNULL((SELECT SUM(nAmountxx) FROM LR_DCP_Remittance WHERE sTransNox =:fsVal " +
-            "AND cPaymForm != '1'), 0.00) AS CASH_ON_HAND")
+            "AND cPaymForm = '0'), 0.00) AS CASH_ON_HAND")
     LiveData<String> GetCashOnHand(String fsVal);
 
     @Query("SELECT IFNULL(" +
@@ -75,6 +80,14 @@ public interface DDCP_Remittance {
             "IFNULL((SELECT SUM(nAmountxx) FROM LR_DCP_Remittance WHERE sTransNox =:fsVal " +
             "AND cPaymForm = '1'), 0.00)), 0.00) AS CASH_ON_HAND")
     LiveData<String> GetCheckOnHand(String fsVal);
+
+    @Query("SELECT IFNULL(" +
+            "(SELECT " +
+            "(SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail WHERE sTransNox =:fsVal " +
+            "AND cPaymForm = '7') - " +
+            "IFNULL((SELECT SUM(nAmountxx) FROM LR_DCP_Remittance WHERE sTransNox =:fsVal " +
+            "AND cPaymForm = '7'), 0.00)), 0.00) AS CASH_ON_HAND")
+    LiveData<String> GetEPayOnHand(String fsVal);
 
     @Query("SELECT * FROM LR_DCP_Remittance WHERE sTransNox=:TransNo AND nEntryNox =:EntryNo")
     EDCP_Remittance GetCollectionRemittance(String TransNo, String EntryNo);
