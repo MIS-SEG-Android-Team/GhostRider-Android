@@ -104,7 +104,7 @@ public class Remittance {
             case "1":
             case "2":
                 if(sCompnyNm.trim().isEmpty()){
-                    message = "Please select branch.";
+                    message = "Please select account.";
                     return false;
                 } else if(sBankAcct.trim().isEmpty()){
                     message = "Please select bank or payment partners for remittance.";

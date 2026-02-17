@@ -218,16 +218,20 @@ public class LRDcp {
                 EImageInfo loImage;
 
                 switch (lsRemCode) {
-                    case "PAY":
+
+                    case "PAY": //requires selfie
                         loData.put("sPRNoxxxx", detail.getPRNoxxxx());
+                        loData.put("cPaymForm", detail.getPaymForm());
+                        loData.put("sPaymRefx", detail.getsEWalletReference());
                         loData.put("nTranAmtx", detail.getTranAmtx());
                         loData.put("nDiscount", detail.getDiscount());
                         loData.put("nOthersxx", detail.getOthersxx());
                         loData.put("cTranType", detail.getTranType());
                         loData.put("nTranTotl", detail.getTranTotl());
-                        loData.put("sRemarksx", detail.getRemarksx());
-                        params.put("sRemCodex", detail.getRemCodex());
-                        params.put("dModified", detail.getModified());
+                        loData.put("sBankIDxx", detail.getBankIDxx());
+                        loData.put("sCheckDte", detail.getCheckDte());
+                        loData.put("sCheckNox", detail.getCheckNox());
+                        loData.put("sCheckAct", detail.getCheckAct());
 
                         //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
                         loImage = poDao.GetDcpImageForPosting(
@@ -239,8 +243,8 @@ public class LRDcp {
                             if(!poConfig.getTestStatus()){
                                 loData.put("sImageNme", loImage.getImageNme());
                                 loData.put("sSourceCD", loImage.getSourceCD());
-                                loData.put("nLongitud", loImage.getLongitud());
                                 loData.put("nLatitude", loImage.getLatitude());
+                                loData.put("nLongitud", loImage.getLongitud());
 
                                 String lsImageID = poImage.UploadImage(loImage.getTransNox());
                                 if(lsImageID == null){
@@ -250,7 +254,7 @@ public class LRDcp {
                         }
                         break;
 
-                    case "CNA":
+                    case "CNA": //requires selfie
                         String lsClientID = detail.getClientID();
 
                         JSONObject address = poAddress.GetAddressDetailForPosting(lsClientID);
@@ -269,7 +273,7 @@ public class LRDcp {
                             loData.put("Mobile", mobile);
                         }
 
-                        //TODO ADD IMAGE POSTING FOR PAID TRANSACTION
+                        //TODO ADD IMAGE POSTING FOR CUSTOMER NOT AROUND
                         loImage = poDao.GetDcpImageForPosting(
                                 detail.getTransNox(),
                                 detail.getAcctNmbr());
@@ -370,7 +374,9 @@ public class LRDcp {
                             }
                         }
                 }
+
                 loData.put("sRemarksx", detail.getRemarksx());
+
                 params.put("sRemCodex", detail.getRemCodex());
                 params.put("dModified", detail.getModified());
 
@@ -382,6 +388,7 @@ public class LRDcp {
                 params.put("dReceived", "");
                 params.put("sUserIDxx", poSession.getUserID());
                 params.put("sDeviceID", poDevice.getDeviceID());
+
                 Log.d(TAG, "DCP posting data: " + params);
                 loArray.put(params);
             }
@@ -703,13 +710,23 @@ public class LRDcp {
 
             double lnColChck = poDao.GetCollectedCheckPayments(lsTransNo);
             double lnRmtChck = poDao.GetCheckRemittedCollection(lsTransNo);
-
             lnDiff = lnColChck - lnRmtChck;
             if(lnDiff != 0){
                 message = "Please remit check payments before posting.";
                 return false;
             } else if(lnColChck != lnRmtChck){
                 message = "Please remit all check payments before posting.";
+                return false;
+            }
+
+            double lnColEPayments = poDao.GetCollectedEPayments(lsTransNo);
+            double lnRmtEPayments = poDao.GetEPaymentRemittedCollection(lsTransNo);
+            lnDiff = lnColEPayments - lnRmtEPayments;
+            if(lnDiff != 0){
+                message = "Please remit e-payments before posting.";
+                return false;
+            } else if(lnColEPayments != lnRmtEPayments){
+                message = "Please remit all e-payments before posting.";
                 return false;
             }
 
@@ -949,6 +966,7 @@ public class LRDcp {
                 }
 
                 loData.put("sRemarksx", detail.getRemarksx());
+
                 params.put("sRemCodex", detail.getRemCodex());
                 params.put("dModified", detail.getModified());
 
@@ -990,6 +1008,7 @@ public class LRDcp {
                 detail.setSendStat("1");
                 detail.setTranStat("2");
                 detail.setSendDate(AppConstants.DATE_MODIFIED());
+
                 poDao.UpdateCollectionDetail(detail);
                 Log.d(TAG, "Collection detail has been posted.");
                 Thread.sleep(1000);

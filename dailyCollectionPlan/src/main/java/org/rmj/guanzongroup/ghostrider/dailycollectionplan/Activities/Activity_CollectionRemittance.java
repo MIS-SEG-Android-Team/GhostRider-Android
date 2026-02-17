@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -222,7 +223,7 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                         lblOHCheckx.setText("Check-On-Hand: " + FormatUIText.getCurrencyUIFormat(s));
                         psCltCheck = s;
                         poRemit.setnCollectd(Double.parseDouble(psCltCheck));
-                        btnRemitAll.setText("Total Check-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCashx));
+                        btnRemitAll.setText("Total Check-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCheck));
                     } catch (Exception e){
                         e.printStackTrace();
                         lblOHCheckx.setText("Check-On-Hand: 0.00");
@@ -235,7 +236,7 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                         lbl_remittanceEPay.setText("E-Payment-On-Hand: " + FormatUIText.getCurrencyUIFormat(s));
                         psCltEPay = s;
                         poRemit.setnCollectd(Double.parseDouble(psCltEPay));
-                        btnRemitAll.setText("Total E-Payment-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCashx));
+                        btnRemitAll.setText("Total E-Payment-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltEPay));
                     } catch (Exception e){
                         e.printStackTrace();
                         lbl_remittanceEPay.setText("E-Payment-On-Hand: 0.00");
@@ -332,12 +333,8 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                         txtAccNox.setOnItemClickListener((parent, view, position, id) -> {
                             String[] lsSplitStr = txtAccNox.getText().toString().split(" ");
                             String lsAcctNox = lsSplitStr[0];
-                            for(int x = 0; x < accounts.size(); x++){
-                                if(lsAcctNox.equalsIgnoreCase(accounts.get(x).getActNumbr())){
-                                    txtAccName.setText(accounts.get(x).getActNamex());
-                                    txtAccNox.setText(accounts.get(x).getActNumbr());
-                                    break;
-                                }
+                            if(lsAcctNox.equalsIgnoreCase(accounts.get(position).getActNumbr())){
+                                txtAccName.setText(accounts.get(position).getActNamex());
                             }
                         });
                     } catch (Exception e){
@@ -362,12 +359,9 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                         txtAccNox.setOnItemClickListener((parent, view, position, id) -> {
                             String[] lsSplitStr = txtAccNox.getText().toString().split(" ");
                             String lsAcctNox = lsSplitStr[0];
-                            for(int x = 0; x < accounts.size(); x++){
-                                if(lsAcctNox.equalsIgnoreCase(accounts.get(x).getActNumbr())){
-                                    txtAccName.setText(accounts.get(x).getActNamex());
-                                    txtAccNox.setText(accounts.get(x).getActNumbr());
-                                    break;
-                                }
+                            if(lsAcctNox.equalsIgnoreCase(accounts.get(position).getActNumbr())){
+                                txtAccName.setText(accounts.get(position).getActNamex());
+                                txtAccNox.setText(accounts.get(position).getActNumbr());
                             }
                         });
                     } catch (Exception e){

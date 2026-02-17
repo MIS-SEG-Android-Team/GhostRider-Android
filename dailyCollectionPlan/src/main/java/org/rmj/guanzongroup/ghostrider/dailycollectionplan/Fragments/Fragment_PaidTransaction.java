@@ -540,6 +540,17 @@ public class Fragment_PaidTransaction extends Fragment implements ViewModelCallb
                 return;
             }
 
+            if (txtRemarks.getText() == null || txtRemarks.getText().toString().isEmpty()){
+                InitMessage(0, R.drawable.baseline_error_24, "Remarks is empty", "Okay", "", new OnDialogButtonCallback() {
+                    @Override
+                    public void OnPositive() {}
+
+                    @Override
+                    public void OnNegative() {}
+                });
+                return;
+            }
+
             poPaid.setRemarks(Remarksx);
             poPaid.setPaymentForm(GetPaymentFormIndex(spnPayType.getText().toString()));
             poPaid.setPayment(GetPaymentTypeIndex(spnType.getText().toString()));

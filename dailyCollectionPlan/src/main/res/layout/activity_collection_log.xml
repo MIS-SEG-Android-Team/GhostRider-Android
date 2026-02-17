@@ -50,77 +50,93 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/roboto_bold"
-                        android:text="Transaction Log"
-                        android:textSize="18sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/linear_collectionCashInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
+                    android:layout_marginTop="20dp"
                     android:visibility="gone">
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/lbl_totalCollected"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:drawablePadding="5dp"
-                        android:fontFamily="@font/roboto_bold_italic"
-                        android:text="Total Collection :  ₱ 0.00"
-                        android:textSize="16sp" />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/lbl_totalCollected"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Collection:  ₱ 0.00"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textSize="15sp"
+                            android:maxLines="2"
+                            app:layout_constraintWidth_percent="0.5"
+                            app:layout_constraintStart_toStartOf="parent"/>
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/lbl_totalRemitCollection"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="Remittance:  ₱ 0.00"
+                            android:textSize="15sp"
+                            android:gravity="end"
+                            android:maxLines="2"
+                            app:layout_constraintWidth_percent="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/lbl_totalCollected"/>
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
                         android:gravity="bottom"
                         android:orientation="horizontal">
 
-                        <LinearLayout
-                            android:layout_width="0dp"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center_vertical"
-                            android:orientation="vertical">
-
-                            <com.google.android.material.textview.MaterialTextView
-                                android:id="@+id/lbl_totalRemitCollection"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/roboto_light"
-                                android:text="Total Remitted :  ₱ 0.00"
-                                android:textSize="15sp" />
+                            android:orientation="vertical"
+                            android:layout_marginTop="5dp">
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/lbl_totalCashOnHand"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/roboto_light"
-                                android:text="Cash-On-Hand : ₱ 0.00"
-                                android:textSize="15sp" />
+                                android:text="Cash : ₱ 0.00"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                app:layout_constraintWidth_percent="0.5"
+                                app:layout_constraintStart_toStartOf="parent"/>
 
                             <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/lbl_totalCheckOnHand"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/roboto_light"
-                                android:text="Check-On-Hand : ₱ 0.00"
-                                android:textSize="15sp" />
+                                android:text="Check : ₱ 0.00"
+                                android:textSize="15sp"
+                                android:gravity="end"
+                                android:textStyle="bold"
+                                app:layout_constraintWidth_percent="0.5"
+                                app:layout_constraintStart_toEndOf="@+id/lbl_totalCashOnHand"/>
 
-                        </LinearLayout>
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/lbl_totalEPayOnHand"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_light"
+                                android:text="E-Payment : ₱ 0.00"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                app:layout_constraintWidth_percent="0.5"
+                                app:layout_constraintTop_toBottomOf="@+id/lbl_totalCashOnHand"/>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </LinearLayout>
 
@@ -202,6 +218,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Remit Collection"
+        android:visibility="gone"
         style="@style/MaterialButtonAccent"
         app:layout_constraintBottom_toBottomOf="@+id/recyclerview_collectionLog"
         app:layout_constraintEnd_toEndOf="parent"
@@ -212,6 +229,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
+        android:gravity="center"
+        android:alpha="0.7"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

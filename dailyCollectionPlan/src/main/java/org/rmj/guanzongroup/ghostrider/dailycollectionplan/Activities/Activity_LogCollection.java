@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -67,6 +68,7 @@ public class Activity_LogCollection extends AppCompatActivity {
                         lblTotRemit,
                         lblCashOH,
                         lblCheckOH,
+                        lbl_totalEPayOnHand,
                         lblTotalClt;
 
     private LinearLayoutManager poManager;
@@ -145,44 +147,52 @@ public class Activity_LogCollection extends AppCompatActivity {
                     tilSearch.setVisibility(View.GONE);
                     linearCashInfo.setVisibility(View.GONE);
 
-                    lblTotalClt.setText("Total Collection: 0.0");
-                    lblTotRemit.setText("Total Remitted: 0.0");
-                    lblCashOH.setText("Cash-On-Hand: 0.0");
-                    lblCheckOH.setText("Check-On-Hand: 0.0");
                 } else {
                     mViewModel.GetTotalCollection(master.getTransNox()).observe(Activity_LogCollection.this, value -> {
                         try {
-                            lblTotalClt.setText("Total Collection: " + FormatUIText.getCurrencyUIFormat(value));
+                            lblTotalClt.setText("Collection: " + FormatUIText.getCurrencyUIFormat(value));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            lblTotalClt.setText("Total Collection: 0.0");
+                            lblTotalClt.setText("Collection: 0.0");
                         }
                     });
 
                     mViewModel.GetTotalRemittance(master.getTransNox()).observe(Activity_LogCollection.this, value -> {
                         try {
-                            lblTotRemit.setText("Total Remitted: " + FormatUIText.getCurrencyUIFormat(value));
+                            lblTotRemit.setText("Remittance: " + FormatUIText.getCurrencyUIFormat(value));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            lblTotRemit.setText("Total Remitted: 0.0");
+                            lblTotRemit.setText("Remittance: 0.0");
                         }
                     });
 
                     mViewModel.GetCashOnHand(master.getTransNox()).observe(Activity_LogCollection.this, s1 -> {
                         try {
-                            lblCashOH.setText("Cash-On-Hand: " + FormatUIText.getCurrencyUIFormat(s1));
+                            lblCashOH.setText("Cash : " + FormatUIText.getCurrencyUIFormat(s1));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            lblCashOH.setText("Cash-On-Hand: 0.0");
+                            lblCashOH.setText("Cash : 0.0");
                         }
                     });
 
                     mViewModel.GetCheckOnHand(master.getTransNox()).observe(Activity_LogCollection.this, s12 -> {
                         try {
-                            lblCheckOH.setText("Check-On-Hand: " + FormatUIText.getCurrencyUIFormat(s12));
+                            lblCheckOH.setText("Check : " + FormatUIText.getCurrencyUIFormat(s12));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            lblCheckOH.setText("Check-On-Hand: 0.0");
+                            lblCheckOH.setText("Check : 0.0");
+                        }
+                    });
+
+                    mViewModel.GetEPaymentOnHand(master.getTransNox()).observe(Activity_LogCollection.this, new Observer<String>() {
+                        @Override
+                        public void onChanged(String s) {
+                            try {
+                                lbl_totalEPayOnHand.setText("E-Payment : " + FormatUIText.getCurrencyUIFormat(s));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                lbl_totalEPayOnHand.setText("E-Payment : 0.0");
+                            }
                         }
                     });
 
@@ -191,11 +201,15 @@ public class Activity_LogCollection extends AppCompatActivity {
 
                     mViewModel.GetCollectionDetail(master.getTransNox()).observe(Activity_LogCollection.this, collectionDetails -> {
                         try {
+
                             if (collectionDetails.size() > 0) {
+
                                 lnEmptyList.setVisibility(View.GONE);
+                                txtSearch.setText("");
+
+                                btnRemit.setVisibility(View.VISIBLE);
                                 recyclerView.setVisibility(View.VISIBLE);
                                 tilSearch.setVisibility(View.VISIBLE);
-                                txtSearch.setText("");
                                 linearCashInfo.setVisibility(View.VISIBLE);
 
                                 filteredCollectionDetlx.clear();
@@ -260,6 +274,8 @@ public class Activity_LogCollection extends AppCompatActivity {
 
                             } else {
                                 lnEmptyList.setVisibility(View.VISIBLE);
+
+                                btnRemit.setVisibility(View.GONE);
                                 txtNoName.setVisibility(View.GONE);
                                 recyclerView.setVisibility(View.GONE);
                                 tilSearch.setVisibility(View.GONE);
@@ -307,7 +323,7 @@ public class Activity_LogCollection extends AppCompatActivity {
 
     private void initWidgets(){
         MaterialToolbar toolbar = findViewById(R.id.toolbar_collectionLog);
-        toolbar.setTitle("");
+        toolbar.setTitle("Transaction Log");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
@@ -318,6 +334,7 @@ public class Activity_LogCollection extends AppCompatActivity {
         lblTotRemit = findViewById(R.id.lbl_totalRemitCollection);
         lblCashOH = findViewById(R.id.lbl_totalCashOnHand);
         lblCheckOH = findViewById(R.id.lbl_totalCheckOnHand);
+        lbl_totalEPayOnHand = findViewById(R.id.lbl_totalEPayOnHand);
         lblTotalClt = findViewById(R.id.lbl_totalCollected);
 
         txtDate = findViewById(R.id.txt_collectionDate);

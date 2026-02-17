@@ -81,13 +81,18 @@ public interface DLRDcp {
 
     @Query("SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail " +
             "WHERE sTransNox =:fsVal " +
-            "AND sCheckNox == '' AND sCheckDte == '' AND sCheckAct == ''")
+            "AND cPaymForm = '0'")
     double GetCollectedCashPayments(String fsVal);
 
     @Query("SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail " +
             "WHERE sTransNox =:fsVal " +
-            "AND sCheckNox <> '' AND sCheckDte <> '' AND sCheckAct <> ''")
+            "AND cPaymForm = '1'")
     double GetCollectedCheckPayments(String fsVal);
+
+    @Query("SELECT SUM(nTranTotl) FROM LR_DCP_Collection_Detail " +
+            "WHERE sTransNox =:fsVal " +
+            "AND cPaymForm = '7'")
+    double GetCollectedEPayments(String fsVal);
 
     @Query("SELECT * FROM LR_DCP_Remittance WHERE sTransNox =:fsVal")
     List<EDCP_Remittance> GetCollectionRemittance(String fsVal);
@@ -104,6 +109,11 @@ public interface DLRDcp {
             "WHERE sTransNox =:fsVal " +
             "AND cPaymForm ='1'")
     double GetCheckRemittedCollection(String fsVal);
+
+    @Query("SELECT SUM(nAmountxx) FROM LR_DCP_Remittance " +
+            "WHERE sTransNox =:fsVal " +
+            "AND cPaymForm ='7'")
+    double GetEPaymentRemittedCollection(String fsVal);
 
     @Query("SELECT * FROM LR_DCP_Collection_Master WHERE cSendStat IS NULL")
     LiveData<EDCPCollectionMaster> GetColletionMasterForRemittance();

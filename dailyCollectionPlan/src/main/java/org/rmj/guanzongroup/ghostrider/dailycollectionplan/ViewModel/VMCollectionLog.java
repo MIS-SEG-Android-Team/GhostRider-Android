@@ -99,6 +99,10 @@ public class VMCollectionLog extends AndroidViewModel {
         return poSys.GetCheckOnHand(fsVal);
     }
 
+    public LiveData<String> GetEPaymentOnHand(String fsVal){
+        return poSys.GetEPayOnHand(fsVal);
+    }
+
     public void setDateTransact(String fsTransact){
         try {
             @SuppressLint("SimpleDateFormat") Date loDate = new SimpleDateFormat("MMMM dd, yyyy").parse(fsTransact);
