@@ -84,8 +84,9 @@ public class Remittance {
     }
 
     public boolean isDataValid(){
-        if(nAmountxx < 0){
-            message = "Invalid remittance amount.";
+
+        if(nAmountxx <= 0){
+            message = "Remittance amount must be greater than zero";
             return false;
         }
 

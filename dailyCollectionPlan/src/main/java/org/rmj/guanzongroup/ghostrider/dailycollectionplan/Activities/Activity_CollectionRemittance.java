@@ -12,6 +12,7 @@
 package org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -206,11 +207,14 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
 
                 mViewModel.GetCashOnHand(master.getTransNox()).observe(Activity_CollectionRemittance.this, s -> {
                     try{
+                        psCltCashx = s;
+
                         spn_remit.setText("Cash Remittance", false); //autoselect
                         lblOHCashxx.setText("Cash-On-Hand: " + FormatUIText.getCurrencyUIFormat(s));
-                        psCltCashx = s;
-                        poRemit.setnCollectd(Double.parseDouble(psCltCashx));
                         btnRemitAll.setText("Total Cash-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCashx));
+
+                        poRemit.setcPaymForm("0");
+                        poRemit.setnCollectd(Double.parseDouble(psCltCashx));
                     } catch (Exception e){
                         e.printStackTrace();
                         lblOHCashxx.setText("Cash-On-Hand: 0.00");
@@ -219,11 +223,14 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
 
                 mViewModel.GetCheckOnHand(master.getTransNox()).observe(Activity_CollectionRemittance.this, s -> {
                     try{
+                        psCltCheck = s;
+
                         spn_remit.setText("Check Remittance", false); //autoselect
                         lblOHCheckx.setText("Check-On-Hand: " + FormatUIText.getCurrencyUIFormat(s));
-                        psCltCheck = s;
-                        poRemit.setnCollectd(Double.parseDouble(psCltCheck));
                         btnRemitAll.setText("Total Check-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltCheck));
+
+                        poRemit.setcPaymForm("1");
+                        poRemit.setnCollectd(Double.parseDouble(psCltCheck));
                     } catch (Exception e){
                         e.printStackTrace();
                         lblOHCheckx.setText("Check-On-Hand: 0.00");
@@ -232,11 +239,14 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
 
                 mViewModel.GetEPayCollection(master.getTransNox()).observe(Activity_CollectionRemittance.this, s -> {
                     try{
+                        psCltEPay = s;
+
                         spn_remit.setText("E-Payment Remittance", false); //autoselect
                         lbl_remittanceEPay.setText("E-Payment-On-Hand: " + FormatUIText.getCurrencyUIFormat(s));
-                        psCltEPay = s;
-                        poRemit.setnCollectd(Double.parseDouble(psCltEPay));
                         btnRemitAll.setText("Total E-Payment-On-Hand" + FormatUIText.getCurrencyUIFormat(psCltEPay));
+
+                        poRemit.setcPaymForm("7");
+                        poRemit.setnCollectd(Double.parseDouble(psCltEPay));
                     } catch (Exception e){
                         e.printStackTrace();
                         lbl_remittanceEPay.setText("E-Payment-On-Hand: 0.00");
@@ -331,10 +341,16 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                         txtAccNox.setAdapter(new ArrayAdapter<>(Activity_CollectionRemittance.this, android.R.layout.simple_spinner_dropdown_item, lsAccounts));
 
                         txtAccNox.setOnItemClickListener((parent, view, position, id) -> {
+
                             String[] lsSplitStr = txtAccNox.getText().toString().split(" ");
                             String lsAcctNox = lsSplitStr[0];
+
                             if(lsAcctNox.equalsIgnoreCase(accounts.get(position).getActNumbr())){
+
+                                poRemit.setsBankAcct(accounts.get(position).getActNumbr());
+
                                 txtAccName.setText(accounts.get(position).getActNamex());
+                                txtAccNox.setText(accounts.get(position).getActNumbr(), false);
                             }
                         });
                     } catch (Exception e){
@@ -357,11 +373,16 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                         }
                         txtAccNox.setAdapter(new ArrayAdapter<>(Activity_CollectionRemittance.this, android.R.layout.simple_spinner_dropdown_item, lsAccounts));
                         txtAccNox.setOnItemClickListener((parent, view, position, id) -> {
+
                             String[] lsSplitStr = txtAccNox.getText().toString().split(" ");
                             String lsAcctNox = lsSplitStr[0];
+
                             if(lsAcctNox.equalsIgnoreCase(accounts.get(position).getActNumbr())){
+
+                                poRemit.setsBankAcct(accounts.get(position).getActNumbr());
+
                                 txtAccName.setText(accounts.get(position).getActNamex());
-                                txtAccNox.setText(accounts.get(position).getActNumbr());
+                                txtAccNox.setText(accounts.get(position).getActNumbr(), false);
                             }
                         });
                     } catch (Exception e){
@@ -374,15 +395,45 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
         btnRemitAll.setOnClickListener(v -> {
             if(poRemit.getcPaymForm().equalsIgnoreCase("0")){
                 txtAmount.setText(psCltCashx);
-            } else {
+            } else if(poRemit.getcPaymForm().equalsIgnoreCase("1")){
                 txtAmount.setText(psCltCheck);
+            }else {
+                txtAmount.setText(psCltEPay);
             }
         });
 
         btnRemit.setOnClickListener(v ->{
 
-            poRemit.setcRemitTyp(poRemit.getcRemitTyp());
+            //validate total collection per type
+            boolean isRemittable = true;
+            String lsMessage = "Invalid error";
+            if (poRemit.getcPaymForm().equalsIgnoreCase("0") && Double.parseDouble(psCltCashx) <= 0.0 ){
+                isRemittable = false;
+                lsMessage = "Could not remit collected cash with zero total!";
+            } else if (poRemit.getcPaymForm().equalsIgnoreCase("1") && Double.parseDouble(psCltCheck) <= 0.0){
+                isRemittable = false;
+                lsMessage = "Could not remit collected check with zero total!";
+            } else if (poRemit.getcPaymForm().equalsIgnoreCase("7") && Double.parseDouble(psCltEPay) <= 0.0){
+                isRemittable = false;
+                lsMessage = "Could not remit collected e payment with zero total!";
+            }
 
+            if (!isRemittable){
+                poMessage.initDialog();
+                poMessage.setTitle("Collection Remittance");
+                poMessage.setMessage(lsMessage);
+                poMessage.setIcon(R.drawable.baseline_error_24);
+                poMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                    }
+                });
+                poMessage.show();
+                return;
+            }
+
+            poRemit.setcRemitTyp(poRemit.getcRemitTyp());
             switch (poRemit.getcRemitTyp()) {
                 case "0":
                     poRemit.setsCompnyNm(txtBranch.getText().toString());
@@ -390,7 +441,6 @@ public class Activity_CollectionRemittance extends AppCompatActivity {
                 case "1":
                 case "2":
                     poRemit.setsCompnyNm(Objects.requireNonNull(txtAccName.getText()).toString());
-                    poRemit.setsBankAcct(Objects.requireNonNull(txtAccNox.getText()).toString());
                     poRemit.setsReferNox(Objects.requireNonNull(txtRefNox.getText()).toString());
                     break;
             }
