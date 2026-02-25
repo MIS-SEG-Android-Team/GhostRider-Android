@@ -1,8 +1,12 @@
 package org.rmj.guanzongroup.onlinecreditapplication.Activities;
 
+import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -24,6 +28,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGanadoOnline;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
+import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.FormatUIText;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
@@ -32,9 +37,16 @@ import org.rmj.guanzongroup.onlinecreditapplication.Adapter.MCAdapter;
 import org.rmj.guanzongroup.onlinecreditapplication.R;
 import org.rmj.guanzongroup.onlinecreditapplication.ViewModel.VMARContact;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -51,8 +63,8 @@ public class Activity_MC_Contract extends AppCompatActivity {
     private InstallmentInfo loInstallment;
     private DGanadoOnline.CashPrice loCashPrice;
 
-    private TextInputLayout layout_serial, layout_terms;
-    private TextInputEditText tie_branch, tie_transaction, tie_client, tie_account, tie_downpay, tie_monthly, tie_remarks;
+    private TextInputLayout layout_serial, layout_terms, layout_puchasedt;
+    private TextInputEditText tie_branch, tie_transaction, tie_client, tie_account, tie_downpay, tie_monthly, tie_purchasedt, tie_remarks;
     private MaterialAutoCompleteTextView auto_serial, auto_term;
     private MaterialButton btn_submit;
     private MaterialTextView mtv_refresh;
@@ -98,6 +110,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
         layout_serial = findViewById(R.id.layout_serial);
         layout_terms = findViewById(R.id.layout_terms);
+        layout_puchasedt = findViewById(R.id.layout_puchasedt);
 
         tie_branch = findViewById(R.id.tie_branch);
         tie_transaction = findViewById(R.id.tie_transaction);
@@ -105,6 +118,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
         tie_account = findViewById(R.id.tie_account);
         tie_downpay = findViewById(R.id.tie_downpay);
         tie_monthly = findViewById(R.id.tie_monthly);
+        tie_purchasedt = findViewById(R.id.tie_purchasedt);
         tie_remarks = findViewById(R.id.tie_remarks);
         auto_serial = findViewById(R.id.auto_serial);
         auto_term = findViewById(R.id.auto_term);
@@ -436,6 +450,73 @@ public class Activity_MC_Contract extends AppCompatActivity {
             }
         });
 
+        tie_purchasedt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                @SuppressLint("SimpleDateFormat")
+                final Calendar newCalendar = Calendar.getInstance(Locale.getDefault());
+
+                final DatePickerDialog StartTime = new DatePickerDialog(Activity_MC_Contract.this,
+                        android.R.style.Theme_Holo_Dialog, (view131, year, monthOfYear, dayOfMonth) -> {
+
+                    try {
+
+                        Calendar loCalendar = Calendar.getInstance();
+                        loCalendar.set(year, monthOfYear, dayOfMonth);
+
+                        String lsMonth = String.valueOf(loCalendar.get(Calendar.MONTH) + 1);
+                        String lsDate = String.valueOf(loCalendar.get(Calendar.DATE));
+
+                        if (loCalendar.get(Calendar.MONTH) < 10){
+                            lsMonth = "0" + String.valueOf(loCalendar.get(Calendar.MONTH) + 1);
+                        }
+
+                        if (loCalendar.get(Calendar.DATE) < 10){
+                            lsDate = "0" + String.valueOf(loCalendar.get(Calendar.DATE));
+                        }
+
+
+                        String lsDateSelect = String.valueOf(loCalendar.get(Calendar.YEAR)) + "/" + lsMonth + "/" + lsDate;
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+                            LocalDate localDate = LocalDate.now();
+
+                            LocalDate currentDate = LocalDate.parse(localDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd")), DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+                            LocalDate compDate = LocalDate.parse(lsDateSelect, DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+
+                            //purchase date should be on or after current day
+                            if (currentDate.isAfter(compDate)){
+                                Toast.makeText(Activity_MC_Contract.this, "Purchase Date should On or After this day " + compDate, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            tie_purchasedt.setText(compDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+
+                        }else {
+
+                            Date currentDate = loCalendar.getTime();
+                            Date compDate = new SimpleDateFormat("yyyy/MM/dd").parse(lsDateSelect);
+
+                            //purchase date should be on or after current day
+                            if (currentDate.after(compDate)){
+                                Toast.makeText(Activity_MC_Contract.this, "Purchase Date should On or After this day", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            tie_purchasedt.setText(new SimpleDateFormat("MMMM dd, yyyy").format(compDate));
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+
+                StartTime.show();
+            }
+        });
+
         auto_serial.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -664,4 +745,5 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
         poMessage.show();
     }
+
 }
