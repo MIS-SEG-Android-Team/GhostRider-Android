@@ -28,6 +28,7 @@ public class TestDate {
 
         System.out.println(currentDate.isAfter(compDate));
         System.out.println(compDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+        System.out.println(LocalDate.parse("2026-02-28", DateTimeFormatter.ofPattern("yyyy-MM-dd")).format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
     }
 
     @Test
@@ -42,6 +43,7 @@ public class TestDate {
 
             System.out.println(currentDate.before(compDate));
             System.out.println(new SimpleDateFormat("MMMM dd, yyyy").format(compDate));
+            System.out.println(new SimpleDateFormat("MMMM dd, yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse("2026-02-28")));
 
         }catch (Exception e){
             e.printStackTrace();

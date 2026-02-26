@@ -239,7 +239,6 @@
                     android:layout_height="wrap_content"
                     android:hint="Date of Purchase"
                     android:paddingTop="5dp"
-                    android:focusableInTouchMode="true"
                     app:layout_constraintTop_toBottomOf="@+id/layout_terms"
                     app:layout_constraintStart_toStartOf="@+id/layout_terms"
                     app:layout_constraintEnd_toEndOf="@+id/layout_monthly">
@@ -249,10 +248,30 @@
                         android:id="@+id/tie_purchasedt"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:maxLines="5"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
                         android:focusedByDefault="false"
+                        android:imeOptions="actionNext"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/TextInputStyle"
+                    android:id="@+id/layout_drno"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="DR Number"
+                    android:paddingTop="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_puchasedt"
+                    app:layout_constraintStart_toStartOf="@+id/layout_puchasedt"
+                    app:layout_constraintEnd_toEndOf="@+id/layout_puchasedt">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/TextInputStyle.Edittext"
+                        android:id="@+id/tie_drno"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="number"
                         android:imeOptions="actionNext"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -265,10 +284,10 @@
                     android:hint="Remarks"
                     android:paddingTop="5dp"
                     app:layout_constraintHeight_percent="0.15"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_puchasedt"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_drno"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/layout_terms"
-                    app:layout_constraintEnd_toEndOf="@+id/layout_monthly">
+                    app:layout_constraintStart_toStartOf="@+id/layout_drno"
+                    app:layout_constraintEnd_toEndOf="@+id/layout_drno">
 
                     <com.google.android.material.textfield.TextInputEditText
                         style="@style/TextInputStyle.Edittext"

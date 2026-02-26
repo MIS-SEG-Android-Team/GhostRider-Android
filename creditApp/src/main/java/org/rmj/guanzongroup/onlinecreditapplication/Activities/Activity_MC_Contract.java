@@ -63,8 +63,8 @@ public class Activity_MC_Contract extends AppCompatActivity {
     private InstallmentInfo loInstallment;
     private DGanadoOnline.CashPrice loCashPrice;
 
-    private TextInputLayout layout_serial, layout_terms, layout_puchasedt;
-    private TextInputEditText tie_branch, tie_transaction, tie_client, tie_account, tie_downpay, tie_monthly, tie_purchasedt, tie_remarks;
+    private TextInputLayout layout_serial, layout_terms;
+    private TextInputEditText tie_branch, tie_transaction, tie_client, tie_account, tie_downpay, tie_monthly, tie_purchasedt, tie_drno, tie_remarks;
     private MaterialAutoCompleteTextView auto_serial, auto_term;
     private MaterialButton btn_submit;
     private MaterialTextView mtv_refresh;
@@ -110,7 +110,6 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
         layout_serial = findViewById(R.id.layout_serial);
         layout_terms = findViewById(R.id.layout_terms);
-        layout_puchasedt = findViewById(R.id.layout_puchasedt);
 
         tie_branch = findViewById(R.id.tie_branch);
         tie_transaction = findViewById(R.id.tie_transaction);
@@ -119,6 +118,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
         tie_downpay = findViewById(R.id.tie_downpay);
         tie_monthly = findViewById(R.id.tie_monthly);
         tie_purchasedt = findViewById(R.id.tie_purchasedt);
+        tie_drno = findViewById(R.id.tie_drno);
         tie_remarks = findViewById(R.id.tie_remarks);
         auto_serial = findViewById(R.id.auto_serial);
         auto_term = findViewById(R.id.auto_term);
@@ -179,6 +179,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                             loContract.setsTransNox(mViewModel.CreateIDForContract()); //transaction number
                             loContract.setsClientID(mViewModel.CreateIDForClient()); //client id
                             loContract.setsAcctNmbr(mViewModel.CreateIDForAccountNumber()); //account number
+                            loContract.setdPurchase(GetDateToday()); //purchase date
                             loContract.setsSendStat("0");
                             loContract.setcTranStat("0"); //status to new entry
 
@@ -261,61 +262,88 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SimpleDateFormat")
     private void InitDisplay(){
 
-        //initialize values to display
-        if (mViewModel.getBranchInfo(loContract.getsBranchCd()) == null){
-            tie_branch.setText(loContract.getsBranchCd());
-        }else {
+        try {
 
-            EBranchInfo loBranch = mViewModel.getBranchInfo(loContract.getsBranchCd());
-            tie_branch.setText(loBranch.getBranchNm());
-        }
+            //initialize values to display
+            if (mViewModel.getBranchInfo(loContract.getsBranchCd()) == null){
+                tie_branch.setText(loContract.getsBranchCd());
+            }else {
 
-        tie_transaction.setText(loContract.getsTransNox());
-        tie_client.setText(loContract.getsClientID());
-        tie_account.setText(loContract.getsAcctNmbr());
-        tie_remarks.setText(loContract.getsRemarksx());
+                EBranchInfo loBranch = mViewModel.getBranchInfo(loContract.getsBranchCd());
+                tie_branch.setText(loBranch.getBranchNm());
+            }
 
-        tie_downpay.setText(String.valueOf(loContract.getnDownPaym()));
-        tie_monthly.setText(String.valueOf(loContract.getnMonAmort()));
+            tie_transaction.setText(loContract.getsTransNox());
+            tie_client.setText(loContract.getsClientID());
+            tie_account.setText(loContract.getsAcctNmbr());
+            tie_remarks.setText(loContract.getsRemarksx());
 
-        loTerms.entrySet().forEach(new Consumer<Map.Entry<String, String>>() {
-            @Override
-            public void accept(Map.Entry<String, String> stringStringEntry) {
+            if (loContract.getdPurchase() != null){
 
-                if (stringStringEntry.getValue().equalsIgnoreCase(String.valueOf(loContract.getnAcctTerm()))){
-                    auto_term.setText(stringStringEntry.getKey(), false);
+                if (!loContract.getdPurchase().isEmpty()){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        tie_purchasedt.setText(LocalDate.parse(loContract.getdPurchase(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+                    }else {
+                        tie_purchasedt.setText(new SimpleDateFormat("MMMM dd, yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(loContract.getdPurchase())));
+                    }
+
+                }
+
+            }
+
+            if (loContract.getDrNo() != null){
+                
+                if (!loContract.getDrNo().isEmpty()){
+                    tie_drno.setText(loContract.getDrNo());
                 }
             }
-        });
 
-        //CLOSE status
-        if (loContract.getcTranStat().equalsIgnoreCase("1")){
+            tie_downpay.setText(String.valueOf(loContract.getnDownPaym()));
+            tie_monthly.setText(String.valueOf(loContract.getnMonAmort()));
 
-            //disable inputs
-            layout_serial.setEnabled(false);
-            layout_terms.setEnabled(false);
+            loTerms.entrySet().forEach(new Consumer<Map.Entry<String, String>>() {
+                @Override
+                public void accept(Map.Entry<String, String> stringStringEntry) {
 
-            tie_downpay.setEnabled(false);
-            tie_remarks.setEnabled(false);
+                    if (stringStringEntry.getValue().equalsIgnoreCase(String.valueOf(loContract.getnAcctTerm()))){
+                        auto_term.setText(stringStringEntry.getKey(), false);
+                    }
+                }
+            });
 
-            //allow to resend, if not uploaded, else, disable
-            btn_submit.setEnabled(false);
-            if (loContract.getsSendStat().equalsIgnoreCase("0")){
-                btn_submit.setEnabled(true);
+            //CLOSE status
+            if (loContract.getcTranStat().equalsIgnoreCase("1")){
+
+                //disable inputs
+                layout_serial.setEnabled(false);
+                layout_terms.setEnabled(false);
+
+                tie_downpay.setEnabled(false);
+                tie_remarks.setEnabled(false);
+
+                //allow to resend, if not uploaded, else, disable
+                btn_submit.setEnabled(false);
+                if (loContract.getsSendStat().equalsIgnoreCase("0")){
+                    btn_submit.setEnabled(true);
+                }
+                return;
             }
-            return;
+
+            //allow inputs if OPEN status
+            layout_serial.setEnabled(true);
+            layout_terms.setEnabled(true);
+
+            tie_downpay.setEnabled(true);
+            tie_remarks.setEnabled(true);
+
+            btn_submit.setEnabled(true);
+
+        }catch (Exception e){
+            mViewModel.SaveError("Activity_MC_Contract", e.getMessage());
         }
-
-        //allow inputs if OPEN status
-        layout_serial.setEnabled(true);
-        layout_terms.setEnabled(true);
-
-        tie_downpay.setEnabled(true);
-        tie_remarks.setEnabled(true);
-
-        btn_submit.setEnabled(true);
 
     }
 
@@ -450,6 +478,20 @@ public class Activity_MC_Contract extends AppCompatActivity {
             }
         });
 
+        tie_drno.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if (!hasFocus){
+
+                    if (tie_drno.getText() == null || tie_drno.getText().toString().isEmpty()){
+                        return;
+                    }
+                    loContract.setDrNo(tie_drno.getText().toString());
+                }
+            }
+        });
+
         tie_purchasedt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -492,7 +534,8 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                 return;
                             }
 
-                            tie_purchasedt.setText(compDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+                            loContract.setdPurchase(compDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                            InitDisplay();
 
                         }else {
 
@@ -505,7 +548,8 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                 return;
                             }
 
-                            tie_purchasedt.setText(new SimpleDateFormat("MMMM dd, yyyy").format(compDate));
+                            loContract.setdPurchase(new SimpleDateFormat("yyyy-MM-dd").format(compDate));
+                            InitDisplay();
                         }
 
                     } catch (Exception e) {
@@ -553,6 +597,11 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
                 if (loContract.getsSerialID() == null || loContract.getsSerialID().isEmpty()){
                     Toast.makeText(Activity_MC_Contract.this, "Please select a model", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (loContract.getdPurchase() == null || loContract.getdPurchase().isEmpty()){
+                    Toast.makeText(Activity_MC_Contract.this, "Please enter purchase date", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -721,6 +770,15 @@ public class Activity_MC_Contract extends AppCompatActivity {
                         Toast.makeText(Activity_MC_Contract.this, message, Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private String GetDateToday(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+        }
     }
 
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnMessageButton callback){

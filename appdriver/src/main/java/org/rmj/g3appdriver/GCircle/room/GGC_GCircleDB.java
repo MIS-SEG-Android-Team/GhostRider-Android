@@ -495,7 +495,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `MC_Contract_Info` (" +
                     "sTransNox TEXT NOT NULL, sBranchCd TEXT, dTransact TEXT, sClientID TEXT, " +
-                    "sReferNox TEXT, sAcctNmbr TEXT, sSerialID TEXT, nAcctTerm INTEGER, nDownPaym DOUBLE, nMonAmort DOUBLE, " +
+                    "sReferNox TEXT, sAcctNmbr TEXT, dPurchase TEXT, sSerialID TEXT, nAcctTerm INTEGER, nDownPaym DOUBLE, nMonAmort DOUBLE, " +
                     "nRebatesx DOUBLE, nPenaltyx DOUBLE, dFirstPay TEXT, sRemarksx TEXT, cTranStat TEXT, sSendStat TEXT, " +
                     "PRIMARY KEY(sTransNox))");
 

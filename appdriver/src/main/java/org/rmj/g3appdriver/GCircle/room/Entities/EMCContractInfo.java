@@ -28,6 +28,12 @@ public class EMCContractInfo {
     @ColumnInfo(name = "sAcctNmbr")
     public String sAcctNmbr;
 
+    @ColumnInfo(name = "dPurchase")
+    public String dPurchase;
+
+    @ColumnInfo(name = "drNo")
+    public String drNo;
+
     @ColumnInfo(name = "sSerialID")
     public String sSerialID;
 
@@ -105,6 +111,22 @@ public class EMCContractInfo {
 
     public void setsAcctNmbr(String sAcctNmbr) {
         this.sAcctNmbr = sAcctNmbr;
+    }
+
+    public String getdPurchase() {
+        return dPurchase;
+    }
+
+    public void setdPurchase(String dPurchase) {
+        this.dPurchase = dPurchase;
+    }
+
+    public String getDrNo() {
+        return drNo;
+    }
+
+    public void setDrNo(String drNo) {
+        this.drNo = drNo;
     }
 
     public String getsSerialID() {

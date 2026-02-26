@@ -664,6 +664,8 @@ public class CreditOnlineApplication {
                 loDetail.setsClientID(loJson.getString("sClientID"));
                 loDetail.setsReferNox(loJson.getString("sReferNox"));
                 loDetail.setsAcctNmbr(loJson.getString("sAcctNmbr"));
+                loDetail.setDrNo(loJson.getString("drNo"));
+                loDetail.setdPurchase(loJson.getString("dPurchase"));
                 loDetail.setsSerialID(loJson.getString("sSerialID"));
                 loDetail.setdTransact(loJson.getString("dTransact"));
                 loDetail.setnAcctTerm(Integer.parseInt(loJson.getString("nAcctTerm")));
@@ -802,12 +804,19 @@ public class CreditOnlineApplication {
             params.put("sClientID", foVal.getsClientID());
             params.put("sReferNox", foVal.getsReferNox());
             params.put("sAcctNmbr", foVal.getsAcctNmbr());
+            params.put("dPurchase", foVal.getdPurchase());
             params.put("sSerialID", foVal.getsSerialID());
             params.put("nDownPaym", foVal.getnDownPaym());
             params.put("nAcctTerm", foVal.getnAcctTerm());
             params.put("nMonAmort", foVal.getnMonAmort());
             params.put("sRemarksx", foVal.getsRemarksx());
             params.put("cTranStat", foVal.getcTranStat());
+
+            if (foVal.getDrNo() != null){
+                if (!foVal.getDrNo().isEmpty()){
+                    params.put("drNo", foVal.getDrNo());
+                }
+            }
 
             //upload to database
             String lsResponse = WebClient.sendRequest(
