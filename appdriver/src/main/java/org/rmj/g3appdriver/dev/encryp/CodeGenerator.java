@@ -20,12 +20,17 @@ public class CodeGenerator {
     MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
     MySQLAESCrypt poEncrypt = new MySQLAESCrypt();
     BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+
     static String EncryptedQrCode = "";
     static String scanType = "";
 
 
     public void setEncryptedQrCode(String encryptedQrCode){
         EncryptedQrCode = encryptedQrCode;
+    }
+
+    public void setEncryptionKEY(String encryptKey){
+        EncryptionKEY = encryptKey;
     }
 
     public void setScanType(String ScanType){
@@ -139,6 +144,25 @@ public class CodeGenerator {
         }
     }
 
+    public static Bitmap generateEmployeeQR(String fsUser){
+
+        //initialize class drivers for QR
+        Bitmap GcardCodex = null;
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+        BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+
+        //encrypt key for employee qr
+        String EncryptedCode = MySQLAESCrypt.Encrypt(fsUser, EncryptionKEY);
+        try {
+            BitMatrix bitMatrix = multiFormatWriter.encode(EncryptedCode, BarcodeFormat.QR_CODE, 1080, 1080);
+            GcardCodex = barcodeEncoder.createBitmap(bitMatrix);
+            return GcardCodex;
+        }catch(Exception e){
+            e.printStackTrace();
+            return GcardCodex;
+        }
+    }
+
     public static String generateSecureNo(String SecureNo){
         return MySQLAESCrypt.Encrypt(SecureNo, EncryptionKEY);
     }
@@ -244,6 +268,7 @@ public class CodeGenerator {
         String decryptedQrCode = decryptedQrCodeValue();
         return getKeyValueOf(decryptedQrCode,2).replaceAll("[^\\\\x20-\\\\x7e]", "");
     }
+
     public String getUserID(){
         String decryptedQrCode = decryptedQrCodeValue();
         return getKeyValueOf(decryptedQrCode, 3).replaceAll("[^\\\\x20-\\\\x7e]", "");
@@ -265,10 +290,12 @@ public class CodeGenerator {
         String decryptedQrCode = decryptedQrCodeValue();
             return getKeyValueOf(decryptedQrCode, 7);
     }
+
     public String getSourceNo(){
             String decryptedQrCode = decryptedQrCodeValue();
             return getKeyValueOf(decryptedQrCode, 8);
     }
+
     public String getSourceCD(){
             String decryptedQrCode = decryptedQrCodeValue();
             return getKeyValueOf(decryptedQrCode, 9);
@@ -276,36 +303,6 @@ public class CodeGenerator {
     public String getPointsxx(){
         String decryptedQrCode = decryptedQrCodeValue();
             return getKeyValueOf(decryptedQrCode, 10);
-    }
-    /**If Conditions above is not met
-     *Display an INVALID TRANSACTION...
-     *
-     *
-     * */
-
-
-    /**
-     * Encryption Functions below are use to encrypt all points in local database
-     *
-     *
-     * */
-    public String encryptPointsxx(double sPointsxx){
-        return MySQLAESCrypt.Encrypt(String.valueOf(Double.valueOf(sPointsxx)), EncryptionKEY);
-    }
-
-    public String decryptPointsxx(String encryptedPointsxx){
-        return MySQLAESCrypt.Decrypt(encryptedPointsxx, EncryptionKEY);
-    }
-
-    public String generateTransNox(){
-        String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        int count = 12;
-        StringBuilder builder = new StringBuilder();
-            while (count-- != 0) {
-                int character = (int)(Math.random()*ALPHA_NUMERIC_STRING.length());
-                builder.append(ALPHA_NUMERIC_STRING.charAt(character));
-            }
-        return builder.toString();
     }
 
     public boolean isCodeValid(){
@@ -343,10 +340,6 @@ public class CodeGenerator {
         //        mobileNo.equalsIgnoreCase(MobileNo) &&
         //       user.equalsIgnoreCase(UserID);
     }
-
-    public boolean isQrCodeApplication(){
-        return getTransSource().equalsIgnoreCase("APPLICATION");
-}
 
     public boolean isQrCodeTransaction(){
         return getTransSource().equalsIgnoreCase("PREORDER") ||

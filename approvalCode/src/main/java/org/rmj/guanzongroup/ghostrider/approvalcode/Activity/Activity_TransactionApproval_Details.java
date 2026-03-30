@@ -192,7 +192,12 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
 
     private void ApproveRequest(String fsAuthType, String fsTransNox, String fscTranStat){
 
-        InitMessage(3, "Are you sure you want to approve this request?", new onMessageButton() {
+        String lsMessage = "Are you sure you want to approve this request?";
+        if (fscTranStat.equalsIgnoreCase("3")){
+            lsMessage = "Are you sure you want to disapprove this request?";
+        }
+
+        InitMessage(3, lsMessage, new onMessageButton() {
             @Override
             public void onPositive() {
 
@@ -207,11 +212,9 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
                     public void OnSuccess() {
                         loDialog.dismiss();
 
-                        String lsMessage = "";
+                        String lsMessage = "Request has been approved!";
                         if (fscTranStat.equals("3")){
                             lsMessage = "Request has been disapproved!";
-                        }else if (fscTranStat.equals("1")) {
-                            lsMessage = "Request has been approved!";
                         }
 
                         InitMessage(1, lsMessage, new onMessageButton() {

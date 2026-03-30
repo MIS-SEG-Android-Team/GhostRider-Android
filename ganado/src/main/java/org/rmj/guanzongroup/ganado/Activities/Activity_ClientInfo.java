@@ -45,20 +45,82 @@ public class Activity_ClientInfo extends AppCompatActivity {
     private MaterialButton btnContinue;
     private MaterialToolbar toolbar;
 
+    private interface OnDialogButtonCallback{
+        void OnPositive();
+        void OnNegative();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_client_info);
 
-        initWidgets();
-
         poMessage = new MessageBox(Activity_ClientInfo.this);
         poDialogx = new LoadDialog(Activity_ClientInfo.this);
 
-        mViewModel.InitializeApplication(getIntent());
+        initWidgets();
+        initData();
+        initObservers();
+        initListener();
 
+    }
+
+    private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnDialogButtonCallback callback){
+
+        poMessage.initDialog();
+        poMessage.setTitle("Product Inquiry");
+        poMessage.setIcon(statusIcon);
+        poMessage.setMessage(message);
+
+        poMessage.setPositiveButton(posText, (view, dialog) -> {
+            dialog.dismiss();
+            callback.OnPositive();
+        });
+
+        if (messageType == 1){
+            poMessage.setNegativeButton(negText, (view, dialog) -> {
+                dialog.dismiss();
+                callback.OnNegative();
+
+            });
+        }
+
+        poMessage.show();
+    }
+
+    private void initWidgets() {
+
+        toolbar = findViewById(R.id.toolbar_PersonalInfo);
+        mViewModel = new ViewModelProvider(Activity_ClientInfo.this).get(VMPersonalInfo.class);
+        poMessage = new MessageBox(Activity_ClientInfo.this);
+
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        txtLastNm = findViewById(R.id.txt_lastname);
+        txtFrstNm = findViewById(R.id.txt_firstname);
+        txtMiddNm = findViewById(R.id.txt_middname);
+        txtSuffixx = findViewById(R.id.txt_suffix);
+        txtBirthDt = findViewById(R.id.txt_birthdate);
+        txtBPlace = findViewById(R.id.txt_bpTown);
+        rgGender = findViewById(R.id.rg_gender);
+        txtMobileNo = findViewById(R.id.txt_mobile);
+        txtEmailAdd = findViewById(R.id.txt_emailAdd);
+        txtHouseNox = findViewById(R.id.txt_houseNox);
+        txtAddress = findViewById(R.id.txt_address);
+        txtMunicipl = findViewById(R.id.txt_town);
+        spinner_relation = findViewById(R.id.spinner_relation);
+
+        btnContinue = findViewById(R.id.btnContinue);
+    }
+
+    private void initData(){
+        mViewModel.InitializeApplication(getIntent());
         mViewModel.InitLocation();
+    }
+
+    private void initObservers(){
 
         mViewModel.getRelation().observe(Activity_ClientInfo.this, eRelations->{
             try {
@@ -69,6 +131,7 @@ public class Activity_ClientInfo extends AppCompatActivity {
 
                 }
                 ArrayAdapter<String> adapters = new ArrayAdapter<>(Activity_ClientInfo.this, android.R.layout.simple_spinner_dropdown_item, string.toArray(new String[0]));
+
                 spinner_relation.setText(eRelations.get(0).getRelatnDs());
                 spinner_relation.setText(eRelations.get(0).getRelatnDs());
                 mViewModel.getModel().setsReltionx(eRelations.get(0).getRelatnID());
@@ -77,7 +140,6 @@ public class Activity_ClientInfo extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
-        spinner_relation.setOnItemClickListener(new Activity_ClientInfo.OnItemClickListener(spinner_relation));
 
         mViewModel.GetTownProvinceList().observe(Activity_ClientInfo.this, new Observer<List<DTownInfo.TownProvinceInfo>>() {
             @Override
@@ -134,8 +196,15 @@ public class Activity_ClientInfo extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void initListener(){
+
+        spinner_relation.setOnItemClickListener(new Activity_ClientInfo.OnItemClickListener(spinner_relation));
+
         txtBirthDt.setOnClickListener(v -> {
             final Calendar newCalendar = Calendar.getInstance();
+
             @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd, yyyy");
             final DatePickerDialog StartTime = new DatePickerDialog(Activity_ClientInfo.this,
                     android.R.style.Theme_Holo_Dialog, (view131, year, monthOfYear, dayOfMonth) -> {
@@ -178,14 +247,14 @@ public class Activity_ClientInfo extends AppCompatActivity {
             mViewModel.getModel().setMobileNo(txtMobileNo.getText().toString());
 
             if (!mViewModel.InitLocation()){
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_error_24);
-                poMessage.setTitle("BENTA");
-                poMessage.setMessage(mViewModel.GetMessage());
-                poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                    dialog.dismiss();
+
+                InitMessage(0, R.drawable.baseline_error_24, mViewModel.GetMessage(), "Okay", "", new OnDialogButtonCallback() {
+                    @Override
+                    public void OnPositive() {}
+
+                    @Override
+                    public void OnNegative() {}
                 });
-                poMessage.show();
             }else {
                 mViewModel.SaveData(new VMPersonalInfo.OnSaveInquiry() {
                     @Override
@@ -197,74 +266,62 @@ public class Activity_ClientInfo extends AppCompatActivity {
                     public void OnSuccess(String args) {
                         poDialogx.dismiss();
 
-                        poMessage.initDialog();
-                        poMessage.setIcon(R.drawable.baseline_message_24);
-                        poMessage.setTitle("BENTA");
-                        poMessage.setMessage(args);
-                        poMessage.setPositiveButton("Okay", (view, dialog) -> {
-                            dialog.dismiss();
-                            Intent loIntent = new Intent(Activity_ClientInfo.this, Activity_Inquiries.class);
-                            loIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        InitMessage(0, R.drawable.baseline_info_details, args, "Okay", "", new OnDialogButtonCallback() {
+                            @Override
+                            public void OnPositive() {
 
-                            startActivity(loIntent);
-                            overridePendingTransition(org.rmj.g3appdriver.R.anim.anim_intent_slide_in_right, org.rmj.g3appdriver.R.anim.anim_intent_slide_out_left);
+                                //return back to brand selection
+                                Intent loIntent = new Intent(Activity_ClientInfo.this, Activity_BrandSelection.class);
+                                loIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                            finish();
+                                startActivity(loIntent);
+                                overridePendingTransition(org.rmj.g3appdriver.R.anim.anim_intent_slide_in_right, org.rmj.g3appdriver.R.anim.anim_intent_slide_out_left);
+
+                                finish();
+                            }
+
+                            @Override
+                            public void OnNegative() {}
                         });
-                        poMessage.show();
                     }
                     @Override
                     public void OnFailed(String message) {
                         poDialogx.dismiss();
 
-                        poMessage.initDialog();
-                        poMessage.setIcon(R.drawable.baseline_error_24);
-                        poMessage.setTitle("BENTA");
-                        poMessage.setMessage(message);
-                        poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                        poMessage.show();
+                        InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+                            @Override
+                            public void OnPositive() {}
+
+                            @Override
+                            public void OnNegative() {}
+                        });
                     }
                 });
             }
         });
+
     }
-    private void initWidgets() {
 
-        toolbar = findViewById(R.id.toolbar_PersonalInfo);
-        mViewModel = new ViewModelProvider(Activity_ClientInfo.this).get(VMPersonalInfo.class);
-        poMessage = new MessageBox(Activity_ClientInfo.this);
-
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-
-        txtLastNm = findViewById(R.id.txt_lastname);
-        txtFrstNm = findViewById(R.id.txt_firstname);
-        txtMiddNm = findViewById(R.id.txt_middname);
-        txtSuffixx = findViewById(R.id.txt_suffix);
-        txtBirthDt = findViewById(R.id.txt_birthdate);
-        txtBPlace = findViewById(R.id.txt_bpTown);
-        rgGender = findViewById(R.id.rg_gender);
-        txtMobileNo = findViewById(R.id.txt_mobile);
-        txtEmailAdd = findViewById(R.id.txt_emailAdd);
-        txtHouseNox = findViewById(R.id.txt_houseNox);
-        txtAddress = findViewById(R.id.txt_address);
-        txtMunicipl = findViewById(R.id.txt_town);
-        spinner_relation = findViewById(R.id.spinner_relation);
-
-        btnContinue = findViewById(R.id.btnContinue);
-    }
     @Override
     public void finish() {
         super.finish();
+
+        //every back pressed, clear saved inquiry, to avoid incomplete details and unusual entries
+        mViewModel.DeleteInquiry();
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){
+
+            //every back pressed, clear saved inquiry, to avoid incomplete details and unusual entries
+            mViewModel.DeleteInquiry();
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
+
     private class OnItemClickListener implements AdapterView.OnItemClickListener {
 
         private final View loView;

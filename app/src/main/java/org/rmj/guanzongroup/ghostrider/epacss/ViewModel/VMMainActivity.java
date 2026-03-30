@@ -22,12 +22,15 @@ import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Apps.Dcp.model.LRDcp;
+import org.rmj.g3appdriver.GCircle.Etc.DeptCode;
+import org.rmj.g3appdriver.GCircle.Etc.PositionCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DLRDcp;
 import org.rmj.g3appdriver.GCircle.room.Entities.EDCPCollectionMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EEmployeeRole;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
+import org.rmj.g3appdriver.dev.encryp.CodeGenerator;
 import org.rmj.g3appdriver.lib.Panalo.Obj.ILOVEMYJOB;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -107,6 +110,7 @@ public class VMMainActivity extends AndroidViewModel {
         return userLevel;
     }
 
+
     public void ResetRaffleStatus() {
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
@@ -125,12 +129,63 @@ public class VMMainActivity extends AndroidViewModel {
         });
     }
 
+    public void GenerateQR(onDownload callback){
+
+        String lsEmpID = poUser.getUserNonLiveData().getEmployID();
+        String lsUserNm = poUser.getUserNonLiveData().getUserName();
+        String lsBranch = poUser.getUserNonLiveData().getBranchNm();
+        String lsDept = DeptCode.getDepartmentName(poUser.getUserNonLiveData().getDeptIDxx());
+        String lsPosition = PositionCode.getPositionName(poUser.getUserNonLiveData().getPositnID());
+
+        String lsQRInfo = lsEmpID + "»" + lsUserNm + "»" + lsBranch + "»" + lsDept + "»" + lsPosition;
+
+        TaskExecutor.Execute(lsQRInfo, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.onLoad("Employee QR", "Generating QR . . .");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+                try {
+
+                    CodeGenerator loCode = new CodeGenerator();
+                    loCode.setEncryptionKEY("08220326"); //encryption key for employee qr
+
+                    Bitmap loQR = loCode.generateEmployeeQR((String) args);
+                    if (loQR != null){
+                        bmp = loQR;
+                        return true;
+                    }else {
+                        message = "Could not generate QR for employee.";
+                        return false;
+                    }
+                }catch (Exception e){
+                    message = "Could not generate QR for employee.";
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                Boolean aBoolean = (Boolean) object;
+                if(aBoolean){
+                    callback.onDisplay(bmp);
+                }else {
+                    callback.onFailed(message);
+                }
+            }
+        });
+    }
+
     public void DisplayURLImage(String urlink, onDownload callback){
         TaskExecutor.Execute(urlink, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
                 callback.onLoad("Employee QR", "Downloading QR");
             }
+
             @Override
             public Object DoInBackground(Object args) {
                 try {
@@ -140,12 +195,12 @@ public class VMMainActivity extends AndroidViewModel {
                     if (bmp != null){
                         return true;
                     }else {
-                        message = "No generated QR for employee";
+                        message = "No generated QR for employee.";
                         return false;
                     }
 
                 }catch (Exception e){
-                    message = "No generated QR for employee";
+                    message = "No generated QR for employee.";
                     e.printStackTrace();
                     return false;
                 }
@@ -161,6 +216,7 @@ public class VMMainActivity extends AndroidViewModel {
             }
         });
     }
+
     public interface onDownload{
         void onLoad(String title, String message);
         void onDisplay(Bitmap loImg);

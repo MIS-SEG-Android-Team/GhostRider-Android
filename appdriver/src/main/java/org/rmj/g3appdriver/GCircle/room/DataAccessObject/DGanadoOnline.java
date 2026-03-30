@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
+import androidx.room.Upsert;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EGanadoOnline;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCColor;
@@ -16,11 +17,14 @@ import java.util.List;
 @Dao
 public interface DGanadoOnline {
 
-    @Insert
+    @Upsert
     void Save(EGanadoOnline foVal);
 
     @Update
     void Update(EGanadoOnline foVal);
+
+    @Query("DELETE FROM Ganado_Online WHERE sTransNox =:TransNox")
+    void Delete(String TransNox);
 
     @Query("SELECT * FROM Ganado_Online WHERE sTransNox =:TransNox")
     EGanadoOnline GetInquiry(String TransNox);

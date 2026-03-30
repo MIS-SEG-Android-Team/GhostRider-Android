@@ -23,6 +23,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGanadoOnline;
 import org.rmj.g3appdriver.etc.FormatUIText;
 import org.rmj.g3appdriver.etc.MessageBox;
@@ -49,7 +50,13 @@ public class Activity_ProductInquiry extends AppCompatActivity {
     private MaterialAutoCompleteTextView spn_color, spnPayment, spnAcctTerm;
     private MaterialButton btnContinue,btnCalculate;
     private ShapeableImageView imgMC;
-    private String lsModelID, lsBrandID, lsImgLink, lsBrandNm;
+    private String lsModelID, lsBrandID, lsImgLink, lsBrandNm;private interface OnDialogButtonCallback{
+        void OnPositive();
+        void OnNegative();
+    }
+
+
+
     private Double nMinDownPay;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +65,82 @@ public class Activity_ProductInquiry extends AppCompatActivity {
         setContentView(R.layout.activity_product_inquiry);
 
         initWidgets();
+        initData();
+        CheckMinimumDown();
+        initObservers();
+        initListener();
+
+    }
+
+    private void CheckMinimumDown(){
+        if (nMinDownPay != null){
+            if (nMinDownPay > 0){
+                btnCalculate.setEnabled(true);
+                btnContinue.setEnabled(true);
+            }else {
+                btnCalculate.setEnabled(false);
+                btnContinue.setEnabled(false);
+            }
+        }else {
+            btnCalculate.setEnabled(false);
+            btnContinue.setEnabled(false);
+        }
+    }
+
+    private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnDialogButtonCallback callback){
+
+        poMessage.initDialog();
+        poMessage.setTitle("Product Inquiry");
+        poMessage.setIcon(statusIcon);
+        poMessage.setMessage(message);
+
+        poMessage.setPositiveButton(posText, (view, dialog) -> {
+            dialog.dismiss();
+            callback.OnPositive();
+        });
+
+        if (messageType == 1){
+            poMessage.setNegativeButton(negText, (view, dialog) -> {
+                dialog.dismiss();
+                callback.OnNegative();
+
+            });
+        }
+
+        poMessage.show();
+    }
+
+    private void initWidgets(){
+        mViewModel = new ViewModelProvider(Activity_ProductInquiry.this).get(VMProductInquiry.class);
+        poMessage = new MessageBox(Activity_ProductInquiry.this);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar_Inquiry);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        txtBrandNm = findViewById(R.id.lblBrand);
+        txtModelCd = findViewById(R.id.lblModelCde);
+        txtModelNm = findViewById(R.id.lblModelNme);
+        txtCashPrce = findViewById(R.id.txt_cashPrice);
+        txtDownPymnt = findViewById(R.id.txt_downpayment);
+        txtAmort = findViewById(R.id.txt_monthlyAmort);
+        txtDTarget = findViewById(R.id.txt_targetDate);
+        spnPayment = findViewById(R.id.spn_paymentMethod);
+        spnAcctTerm = findViewById(R.id.spn_installmentTerm);
+        spn_color = findViewById(R.id.spn_color);
+        imgMC = findViewById(R.id.imgMC);
+        txtyourmnmdp = findViewById(R.id.txtyourmnmdp);
+
+        btnContinue = findViewById(R.id.btnContinue);
+        btnCalculate = findViewById(R.id.btnCalculate);
+    }
+
+    private void initData(){
 
         spnPayment.setAdapter(GConstants.getAdapter(Activity_ProductInquiry.this, GConstants.PAYMENT_FORM));
         spnAcctTerm.setText(GConstants.INSTALLMENT_TERM[0]);
+
         spnAcctTerm.setAdapter(GConstants.getAdapter(Activity_ProductInquiry.this, GConstants.INSTALLMENT_TERM));
+
         mViewModel.setBrandID(getIntent().getStringExtra("lsBrandID"));
         mViewModel.setModelID(getIntent().getStringExtra("lsModelID"));
 
@@ -74,7 +153,9 @@ public class Activity_ProductInquiry extends AppCompatActivity {
         mViewModel.getModel().setModelIDx(lsModelID);
         mViewModel.getModel().setTermIDxx("36");
 
-        CheckMinimumDown();
+    }
+
+    private void initObservers(){
 
         mViewModel.GetModelBrand(lsBrandID, lsModelID).observe(Activity_ProductInquiry.this, eMcModel -> {
             try {
@@ -106,10 +187,6 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
-
-        spn_color.setOnItemClickListener(new OnItemClickListener(spn_color));
-        spnAcctTerm.setOnItemClickListener(new OnItemClickListener(spnAcctTerm));
-        txtDownPymnt.addTextChangedListener(new FormatUIText.CurrencyFormat(txtDownPymnt));
 
         mViewModel.GetModelID().observe(Activity_ProductInquiry.this, modelID -> {
             try{
@@ -151,6 +228,13 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void initListener(){
+
+        spn_color.setOnItemClickListener(new OnItemClickListener(spn_color));
+        spnAcctTerm.setOnItemClickListener(new OnItemClickListener(spnAcctTerm));
+        txtDownPymnt.addTextChangedListener(new FormatUIText.CurrencyFormat(txtDownPymnt));
 
         txtDTarget.setOnClickListener(v -> {
             final Calendar newCalendar = Calendar.getInstance();
@@ -245,13 +329,12 @@ public class Activity_ProductInquiry extends AppCompatActivity {
             Double lnInput = FormatUIText.getParseDouble(lsInput);
 
             if (nMinDownPay > lnInput){
-                poMessage.initDialog();
-                poMessage.setIcon(R.drawable.baseline_error_24);
-                poMessage.setTitle("Product Inquiry");
-                poMessage.setMessage("The downpayment should not be less than the minimum required amount");
-                poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                poMessage.show();
-
+                InitMessage(0, R.drawable.baseline_error_24, "The downpayment should not be less than the minimum required amount", "Okay", "", new OnDialogButtonCallback() {
+                    @Override
+                    public void OnPositive() {}
+                    @Override
+                    public void OnNegative() {}
+                });
                 return;
             }
 
@@ -274,12 +357,12 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
                         @Override
                         public void OnFailed(String message) {
-                            poMessage.initDialog();
-                            poMessage.setIcon(R.drawable.baseline_error_24);
-                            poMessage.setTitle("Product Inquiry");
-                            poMessage.setMessage(message);
-                            poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                            poMessage.show();
+                            InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+                                @Override
+                                public void OnPositive() {}
+                                @Override
+                                public void OnNegative() {}
+                            });
                         }
                     });
 
@@ -287,41 +370,21 @@ public class Activity_ProductInquiry extends AppCompatActivity {
 
                 @Override
                 public void OnFailed(String message) {
-                    poMessage.initDialog();
-                    poMessage.setIcon(R.drawable.baseline_error_24);
-                    poMessage.setTitle("Product Inquiry");
-                    poMessage.setMessage(message);
-                    poMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                    poMessage.show();
-                    txtAmort.setText("0");
-                    mViewModel.getModel().setMonthAmr("0");
+                    InitMessage(0, R.drawable.baseline_error_24, message, "Okay", "", new OnDialogButtonCallback() {
+                        @Override
+                        public void OnPositive() {
+                            txtAmort.setText("0");
+                            mViewModel.getModel().setMonthAmr("0");
+                        }
+                        @Override
+                        public void OnNegative() {}
+                    });
                 }
             });
         });
-    }
-    private void initWidgets(){
-        mViewModel = new ViewModelProvider(Activity_ProductInquiry.this).get(VMProductInquiry.class);
-        poMessage = new MessageBox(Activity_ProductInquiry.this);
-        MaterialToolbar toolbar = findViewById(R.id.toolbar_Inquiry);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        txtBrandNm = findViewById(R.id.lblBrand);
-        txtModelCd = findViewById(R.id.lblModelCde);
-        txtModelNm = findViewById(R.id.lblModelNme);
-        txtCashPrce = findViewById(R.id.txt_cashPrice);
-        txtDownPymnt = findViewById(R.id.txt_downpayment);
-        txtAmort = findViewById(R.id.txt_monthlyAmort);
-        txtDTarget = findViewById(R.id.txt_targetDate);
-        spnPayment = findViewById(R.id.spn_paymentMethod);
-        spnAcctTerm = findViewById(R.id.spn_installmentTerm);
-        spn_color = findViewById(R.id.spn_color);
-        imgMC = findViewById(R.id.imgMC);
-        txtyourmnmdp = findViewById(R.id.txtyourmnmdp);
-
-        btnContinue = findViewById(R.id.btnContinue);
-        btnCalculate = findViewById(R.id.btnCalculate);
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -329,15 +392,18 @@ public class Activity_ProductInquiry extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onBackPressed () {
         finish();
     }
+
     @Override
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.anim_intent_slide_in_left, R.anim.anim_intent_slide_out_right);
     }
+
     @Override
     protected void onDestroy () {
         getViewModelStore().clear();
@@ -406,21 +472,6 @@ public class Activity_ProductInquiry extends AppCompatActivity {
                     }
                 });
             }
-        }
-    }
-
-    private void CheckMinimumDown(){
-        if (nMinDownPay != null){
-            if (nMinDownPay > 0){
-                btnCalculate.setEnabled(true);
-                btnContinue.setEnabled(true);
-            }else {
-                btnCalculate.setEnabled(false);
-                btnContinue.setEnabled(false);
-            }
-        }else {
-            btnCalculate.setEnabled(false);
-            btnContinue.setEnabled(false);
         }
     }
 }

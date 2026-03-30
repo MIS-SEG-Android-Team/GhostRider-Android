@@ -314,11 +314,14 @@ public class ApprovalCode {
         }
     }
 
-    public boolean ImportCASRequests(String fsEmployID, String fsSrcCd){
+    public boolean ImportCASRequests(String fsEmployID, String fsSrcCd, String fsDtFrom, String fsDto, Boolean fbyHistory){
         try{
             JSONObject params = new JSONObject();
             params.put("sEmployID", fsEmployID);
             params.put("sSourceCD", fsSrcCd);
+            params.put("dFrom", fsDtFrom);
+            params.put("dTo", fsDto);
+            params.put("fByHistory", fbyHistory);
 
             String lsResponse = WebClient.sendRequest(
                     poApi.getUrlCasRequests(),

@@ -41,13 +41,16 @@ public class VMPersonalInfo extends AndroidViewModel implements GanadoUI {
     public String GetMessage(){
         return message;
     }
+
     public Boolean InitLocation(){
         message = this.poApp.getMessage();
         return this.poApp.InitGeoLocation();
     }
+
     public ClientInfo getModel() {
         return poModel;
     }
+
     public LiveData<List<ERelation>> getRelation() {
         return poApp.GetRelations();
     }
@@ -57,22 +60,28 @@ public class VMPersonalInfo extends AndroidViewModel implements GanadoUI {
         TransNox = params.getStringExtra("sTransNox");
         poModel.setsTransNox(TransNox);
     }
+
     @Override
     public LiveData<EGanadoOnline> GetApplication() {
         return null;
     }
+
     @Override
     public void ParseData(EGanadoOnline args, OnParseListener listener) {
     }
+
     @Override
     public void Validate(Object args) {
     }
+
     @Override
     public void SaveData(OnSaveInfoListener listener) {
     }
+
     public LiveData<List<DTownInfo.TownProvinceInfo>> GetTownProvinceList() {
         return poTown.getTownProvinceInfo();
     }
+
     public void SaveData(OnSaveInquiry listener) {
         TaskExecutor.Execute(poModel, new OnTaskExecuteListener() {
             @Override
@@ -107,5 +116,9 @@ public class VMPersonalInfo extends AndroidViewModel implements GanadoUI {
                 }
             }
         });
+    }
+
+    public void DeleteInquiry(){
+        poApp.DeleteInquiry(TransNox);
     }
 }

@@ -1,6 +1,4 @@
-package org.rmj.g3appdriver;
-
-import android.os.Build;
+package org.rmj.g3appdriver.GRider.Etc;
 
 import org.junit.Test;
 

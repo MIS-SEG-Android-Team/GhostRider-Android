@@ -1,6 +1,4 @@
-package org.rmj.g3appdriver;
-
-import static com.huawei.hms.feature.dynamic.b.s;
+package org.rmj.g3appdriver.GRider.Etc;
 
 import org.junit.Test;
 

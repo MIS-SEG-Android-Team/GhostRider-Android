@@ -12,6 +12,7 @@
 package org.rmj.guanzongroup.ghostrider.epacss.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -59,6 +60,7 @@ import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.ImportData.ImportEmployeeRole;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Etc.FragmentAdapter;
+import org.rmj.guanzongroup.ghostrider.approvalcode.Activity.Activity_TransactionApproval_Details;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_CollectionList;
 import org.rmj.guanzongroup.ghostrider.dailycollectionplan.Activities.Activity_LogCollection;
 import org.rmj.guanzongroup.ghostrider.epacss.Dialog.DialogQrCode;
@@ -186,12 +188,14 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                         if(!poParentLst.get(groupPosition).isParent()){
                             loIntent = poParentLst.get(groupPosition).getIntent(Activity_Main.this);
                             if(loIntent == null){
-                                loMessage.initDialog();
-                                loMessage.setIcon(R.drawable.baseline_error_24);
-                                loMessage.setTitle("Dashboard");
-                                loMessage.setMessage("Feature not available.");
-                                loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                                loMessage.show();
+
+                                InitMessage(2, "Feature not available.", new onMessageButton() {
+                                    @Override
+                                    public void onPositive() {}
+
+                                    @Override
+                                    public void onNegative() {}
+                                });
                             } else {
                                 startActivity(loIntent);
                                 overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
@@ -203,12 +207,14 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                     expListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
                         loIntent = poChild.get(poParentLst.get(groupPosition)).get(childPosition).getIntent(Activity_Main.this);
                         if(loIntent == null){
-                            loMessage.initDialog();
-                            loMessage.setIcon(R.drawable.baseline_error_24);
-                            loMessage.setTitle("Dashboard");
-                            loMessage.setMessage("Feature not available.");
-                            loMessage.setPositiveButton("Okay", (view, dialog) -> dialog.dismiss());
-                            loMessage.show();
+
+                            InitMessage(2, "Feature not available.", new onMessageButton() {
+                                @Override
+                                public void onPositive() {}
+
+                                @Override
+                                public void onNegative() {}
+                            });
                         } else {
                             startActivity(loIntent);
                             overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
@@ -271,12 +277,13 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                 @Override
                 public void OnFailed(String message) {
                     poDialog.dismiss();
-                    loMessage.initDialog();
-                    loMessage.setIcon(R.drawable.baseline_error_24);
-                    loMessage.setTitle("Guanzon Circle");
-                    loMessage.setMessage(message);
-                    loMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
-                    loMessage.show();
+                    InitMessage(2, message, new onMessageButton() {
+                        @Override
+                        public void onPositive() {}
+
+                        @Override
+                        public void onNegative() {}
+                    });
                 }
             });
         });
@@ -307,13 +314,45 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
                     public void onFailed(String message) {
                         poDialog.dismiss();
 
-                        loMessage.initDialog();
-                        loMessage.setIcon(R.drawable.baseline_error_24);
-                        loMessage.setTitle("Employee QR");
-                        loMessage.setMessage(message);
-                        loMessage.setPositiveButton("Okay", (view1, dialog) -> dialog.dismiss());
+                        //if qr not found, generate new qr encrypted with the username
+                        InitMessage(3, message + " Do you want to generate QR on your account?", new onMessageButton() {
+                            @Override
+                            public void onPositive() {
 
-                        loMessage.show();
+                                mViewModel.GenerateQR(new VMMainActivity.onDownload() {
+                                    @Override
+                                    public void onLoad(String title, String message) {
+                                        poDialog.initDialog(title, message, false);
+                                        poDialog.show();
+                                    }
+
+                                    @Override
+                                    public void onDisplay(Bitmap loImg) {
+                                        poDialog.dismiss();
+
+                                        DialogQrCode qrDialog = new DialogQrCode(Activity_Main.this);
+                                        qrDialog.setBitmap(loImg);
+
+                                        qrDialog.show();
+                                    }
+
+                                    @Override
+                                    public void onFailed(String message) {
+
+                                        InitMessage(2, message, new onMessageButton() {
+                                            @Override
+                                            public void onPositive() {}
+
+                                            @Override
+                                            public void onNegative() {}
+                                        });
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onNegative() {}
+                        });
                     }
                 });
             }
@@ -380,6 +419,7 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onDestroy() {
         unregisterReceiver(poNetRecvr);
+
         Log.e(TAG, "Internet status receiver has been unregistered.");
         AppConfigPreference.getInstance(Activity_Main.this).setIsMainActive(false);
         mViewModel.ResetRaffleStatus();
@@ -430,16 +470,15 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }else{
-            loMessage.initDialog();
-            loMessage.setPositiveButton("Yes", (view, dialog) -> {
-                dialog.dismiss();
-                finish();
+            InitMessage(3, "Exit Guanzon Circle app?", new onMessageButton() {
+                @Override
+                public void onPositive() {
+                    finish();
+                }
+
+                @Override
+                public void onNegative() {}
             });
-            loMessage.setNegativeButton("No", (view, dialog) -> dialog.dismiss());
-            loMessage.setIcon(R.drawable.baseline_contact_support_24);
-            loMessage.setTitle("Guanzon Circle");
-            loMessage.setMessage("Exit Guanzon Circle app?");
-            loMessage.show();
         }
     }
 
@@ -461,19 +500,20 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
             startActivity(new Intent(Activity_Main.this, Activity_Manual.class));
             overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
         } else if(item.getItemId() == R.id.action_logout){
-            loMessage.initDialog();
-            loMessage.setNegativeButton("No", (view, dialog) -> dialog.dismiss());
-            loMessage.setPositiveButton("Yes", (view, dialog) -> {
-                dialog.dismiss();
-                finish();
-                new EmployeeMaster(getApplication()).LogoutUserSession();
-                AppConfigPreference.getInstance(Activity_Main.this).setIsAppFirstLaunch(false);
-                startActivity(new Intent(Activity_Main.this, Activity_SplashScreen.class));
+            InitMessage(3, "Are you sure you want to end session/logout?", new onMessageButton() {
+                @Override
+                public void onPositive() {
+
+                    finish();
+
+                    new EmployeeMaster(getApplication()).LogoutUserSession();
+                    AppConfigPreference.getInstance(Activity_Main.this).setIsAppFirstLaunch(false);
+                    startActivity(new Intent(Activity_Main.this, Activity_SplashScreen.class));
+                }
+
+                @Override
+                public void onNegative() {}
             });
-            loMessage.setIcon(R.drawable.baseline_contact_support_24);
-            loMessage.setTitle("Account Session");
-            loMessage.setMessage("Are you sure you want to end session/logout?");
-            loMessage.show();
         } else if (item.getItemId() == R.id.action_error) {
             startActivity(new Intent(Activity_Main.this, Activity_ErrorLogs.class));
             overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
@@ -484,9 +524,6 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        Log.e("request code:", String.valueOf(requestCode));
-        Log.e("result code:", String.valueOf(resultCode));
 
         if(requestCode == AppConstants.INTENT_SELFIE_LOGIN && resultCode == RESULT_OK){
             Intent intent = new Intent(Activity_Main.this, Activity_Application.class);
@@ -499,5 +536,60 @@ public class Activity_Main extends AppCompatActivity implements NavigationView.O
             Intent  intent = new Intent(Activity_Main.this, Activity_CollectionList.class);
             startActivity(intent);
         }
+    }
+
+    private void InitMessage(int mode, String message, onMessageButton callback){
+
+        loMessage.initDialog();
+        loMessage.setTitle("Guanzon Circle");
+        loMessage.setMessage(message);
+
+        switch (mode){
+
+            case 1, 2:
+                if (mode == 1){
+                    loMessage.setIcon(org.rmj.guanzongroup.ghostrider.approvalcode.R.drawable.baseline_message_24);
+                }
+
+                if (mode == 2){
+                    loMessage.setIcon(org.rmj.guanzongroup.ghostrider.approvalcode.R.drawable.baseline_error_24);
+                }
+
+                loMessage.setPositiveButton("Okay", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                        callback.onPositive();
+                    }
+                });
+
+                break;
+
+            case 3:
+                loMessage.setIcon(org.rmj.guanzongroup.ghostrider.approvalcode.R.drawable.baseline_contact_support_24);
+                loMessage.setPositiveButton("Yes", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                        callback.onPositive();
+                    }
+                });
+                loMessage.setNegativeButton("No", new MessageBox.DialogButton() {
+                    @Override
+                    public void OnButtonClick(View view, AlertDialog dialog) {
+                        dialog.dismiss();
+                        callback.onNegative();
+                    }
+                });
+
+                break;
+        }
+
+        loMessage.show();
+    }
+
+    private interface onMessageButton{
+        void onPositive();
+        void onNegative();
     }
 }

@@ -34,10 +34,6 @@ public class ProductInquiry {
         return message;
     }
 
-    public static String[] getPaymentForm(){
-        return new String[]{"Cash", "Installment"};
-    }
-
     public LiveData<List<EMcBrand>> GetMotorcycleBrands(){
         return poDao.getAllMcBrand();
     }
@@ -54,14 +50,6 @@ public class ProductInquiry {
     }
     public DGanadoOnline.McInfo GetMCInfo(String ModelID, String BrandID, String ColorID){
         return poDao.GetMCInfo(ModelID, BrandID, ColorID);
-    }
-
-    public DGanadoOnline.McAmortization GetMonthlyPayment(String ModelID, int Term){
-        return poDao.GetMonthlyPayment(ModelID, Term);
-    }
-
-    public DGanadoOnline.McDownpayment GetInstallmentPlanDetail(String ModelID){
-        return poDao.getDownpayment(ModelID);
     }
 
     public LiveData<DGanadoOnline.CashPrice> GetCashPrice(String ModelID){
@@ -193,25 +181,6 @@ public class ProductInquiry {
 
             poPrice.setDownPayment(args1);
             return poPrice.getMonthlyAmort(joAmort);
-        } catch (Exception e){
-            e.printStackTrace();
-            message = getLocalMessage(e);
-            return 0;
-        }
-    }
-    public double GetMonthlyAmortization(DGanadoOnline.McAmortization args, double args1){
-        try{
-            org.json.simple.JSONObject loJson = new org.json.simple.JSONObject();
-            loJson.put("nSelPrice", ((args.nSelPrice == null) ? 0:args.nSelPrice));
-            loJson.put("nMinDownx", args.nMinDownx);
-            loJson.put("nMiscChrg", args.nMiscChrg);
-            loJson.put("nRebatesx", args.nRebatesx);
-            loJson.put("nEndMrtgg", args.nEndMrtgg);
-            loJson.put("nAcctThru", args.nAcctThru);
-            loJson.put("nFactorRt", args.nFactorRt);
-
-            poPrice.setDownPayment(args1);
-            return poPrice.getMonthlyAmort(loJson);
         } catch (Exception e){
             e.printStackTrace();
             message = getLocalMessage(e);

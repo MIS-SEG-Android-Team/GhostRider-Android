@@ -27,11 +27,6 @@
             android:theme="@style/GhostRiderMaterialTheme"
             android:exported="false" />
         <activity
-            android:name=".Activities.Activity_CategorySelection"
-            android:screenOrientation="userPortrait"
-            android:theme="@style/GhostRiderMaterialTheme"
-            android:exported="false" />
-        <activity
             android:name=".Activities.Activity_BrandSelection"
             android:screenOrientation="userPortrait"
             android:theme="@style/GhostRiderMaterialTheme"

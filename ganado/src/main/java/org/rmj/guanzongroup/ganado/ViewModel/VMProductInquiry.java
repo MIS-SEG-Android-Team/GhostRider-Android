@@ -61,12 +61,15 @@ public class VMProductInquiry extends AndroidViewModel implements GanadoUI {
     public LiveData<List<EMCColor>> GetModelColor(String ModelID){
         return poApp.GetModelColor(ModelID);
     }
+
     public LiveData<EMcModel> GetModelBrand(String BrandID, String ModelID){
         return poApp.GetModel(BrandID, ModelID);
     }
+
     public LiveData<DGanadoOnline.CashPrice> GetCashPrice(String ModelID){
         return poApp.GetCashPrice(ModelID);
     }
+
     public InquiryInfo getModel() {
         return poModel;
     }
@@ -105,6 +108,7 @@ public class VMProductInquiry extends AndroidViewModel implements GanadoUI {
             }
         });
     }
+
     public void CalculateNewDownpayment(String ModelID, int term, double Downpayment, OnCalculateNewDownpayment listener){
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
@@ -130,19 +134,11 @@ public class VMProductInquiry extends AndroidViewModel implements GanadoUI {
         });
 
     }
+
     public double GetMonthlyAmortization(int args1) {
         return poApp.GetMonthlyAmortization(psModelID.getValue(), args1);
     }
-    public Boolean ValidateDownPayment(String sModelID, double newDownPaym){
-        InstallmentInfo loResult = poApp.GetMinimumDownpayment(sModelID);
-        double minDownPaym = loResult.getMinimumDownpayment();
 
-        if (newDownPaym < minDownPaym){
-            return false;
-        }else {
-            return true;
-        }
-    }
     @Override
     public void InitializeApplication(Intent params) {
         Log.d(TAG, "No data to initialize on introductory question");

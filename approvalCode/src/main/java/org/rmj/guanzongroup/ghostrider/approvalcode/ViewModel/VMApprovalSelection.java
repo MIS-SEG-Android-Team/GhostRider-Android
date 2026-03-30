@@ -124,16 +124,16 @@ public class VMApprovalSelection extends AndroidViewModel {
             }
         });
     }
-    public void importCASRequests(String fsSrcCd, onDownload foCallback){
+    public void importCASRequests(String fsSrcCd, String fsDtFrom, String fsDto, Boolean fbyHistory, onDownload foCallback){
 
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
             @Override
             public Object DoInBackground(Object args) {
 
-                if (!poSys.ImportCASRequests(poMaster.getEmployeeID(), fsSrcCd)){
+                if (!poSys.ImportCASRequests(poMaster.getEmployeeID(), fsSrcCd, fsDtFrom, fsDto, fbyHistory)){
                     return poSys.getMessage();
                 }
-                return "CAS Requests successfully downloaded";
+                return "CAS Transactions successfully downloaded";
             }
 
             @Override

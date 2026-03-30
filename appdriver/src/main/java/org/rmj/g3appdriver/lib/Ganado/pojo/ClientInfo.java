@@ -197,13 +197,20 @@ public class ClientInfo {
         if(sMobileNo.isEmpty()){
             message = "Please enter mobile number.";
             return false;
+        }else{
+
+            //should be valid philippine mobile format
+            String lsregPattern = "^(09|\\+639)\\d{9}$";
+            if (!sMobileNo.matches(lsregPattern)){
+                message = "Please enter valid mobile number!.";
+                return false;
+            }
         }
 
         if(sReltionx.isEmpty()){
             message = "Please select relationship.";
             return false;
         }
-
         return true;
     }
 }

@@ -58,15 +58,19 @@ public class Ganado {
     public LiveData<List<EGanadoOnline>> GetInquiries() {
         return poDao.GetInquiries();
     }
+
     public LiveData<List<ERelation>> GetRelations() {
         return poRelate.GetRelations();
     }
+
     public String getMessage() {
         return message;
     }
+
     public EGanadoOnline GetInquiry(String TransNox) {
         return poDao.GetInquiry(TransNox);
     }
+
     public String CreateInquiry(InquiryInfo loInfo) {
         try {
             InquiryInfo.InquiryInfoValidator loValid = new InquiryInfo.InquiryInfoValidator();
@@ -125,6 +129,11 @@ public class Ganado {
             return null;
         }
     }
+
+    public void DeleteInquiry(String TransNox) {
+        poDao.Delete(TransNox);
+    }
+
     public boolean SaveClientInfo(ClientInfo loInfo) {
         try {
             if (!loInfo.isDataValid()) {
@@ -176,6 +185,7 @@ public class Ganado {
             return false;
         }
     }
+
     public boolean SaveInquiry(String TransNox) {
         try {
             EGanadoOnline loDetail = poDao.GetInquiry(TransNox);
@@ -214,6 +224,7 @@ public class Ganado {
             }
 
             Log.d(TAG, lsResponse);
+
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
             if (lsResult.equalsIgnoreCase("error")) {
@@ -234,6 +245,7 @@ public class Ganado {
             return false;
         }
     }
+
     public boolean ImportInquiries() {
         try {
             JSONObject params = new JSONObject();
@@ -254,6 +266,8 @@ public class Ganado {
                 return false;
             }
 
+            Log.d("GANADO RESPONSE", lsResponse);
+
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
             if (lsResult.equalsIgnoreCase("error")) {
@@ -266,51 +280,27 @@ public class Ganado {
             for (int x = 0; x < laJson.length(); x++) {
                 JSONObject loJson = laJson.getJSONObject(x);
 
-                String lsTransNo = loJson.getString("sTransNox");
+                EGanadoOnline loInfo = new EGanadoOnline();
+                loInfo.setTransNox(loJson.getString("sTransNox"));
+                loInfo.setTransact(loJson.getString("dTransact"));
+                loInfo.setGanadoTp(loJson.getString("cGanadoTp"));
+                loInfo.setPaymForm(loJson.getString("cPaymForm"));
+                loInfo.setClientNm(loJson.getString("sClientNm"));
+                loInfo.setClntInfo(loJson.getString("sCltInfox"));
+                loInfo.setProdInfo(loJson.getString("sPrdctInf"));
+                loInfo.setPaymInfo(loJson.getString("sPaymInfo"));
+                loInfo.setTargetxx(loJson.getString("dTargetxx"));
+                loInfo.setFollowUp(loJson.getString("dFollowUp"));
+                loInfo.setRemarksx(loJson.getString("sRemarksx"));
+                loInfo.setReferdBy(loJson.getString("sReferdBy"));
+                loInfo.setRelatnID(loJson.getString("sRelatnID"));
+                loInfo.setCreatedx(loJson.getString("dCreatedx"));
+                loInfo.setSendStat("1");
+                loInfo.setTranStat(loJson.getString("cTranStat"));
+                loInfo.setTimeStmp(loJson.getString("dTimeStmp"));
 
-                EGanadoOnline loDetail = poDao.GetInquiry(lsTransNo);
-
-                if (loDetail == null) {
-                    EGanadoOnline loInfo = new EGanadoOnline();
-                    loInfo.setTransNox(loJson.getString("sTransNox"));
-                    loInfo.setTransact(loJson.getString("dTransact"));
-                    loInfo.setGanadoTp(loJson.getString("cGanadoTp"));
-                    loInfo.setPaymForm(loJson.getString("cPaymForm"));
-                    loInfo.setClientNm(loJson.getString("sClientNm"));
-                    loInfo.setClntInfo(loJson.getString("sCltInfox"));
-                    loInfo.setProdInfo(loJson.getString("sPrdctInf"));
-                    loInfo.setPaymInfo(loJson.getString("sPaymInfo"));
-                    loInfo.setTargetxx(loJson.getString("dTargetxx"));
-                    loInfo.setFollowUp(loJson.getString("dFollowUp"));
-                    loInfo.setRemarksx(loJson.getString("sRemarksx"));
-                    loInfo.setReferdBy(loJson.getString("sReferdBy"));
-                    loInfo.setRelatnID(loJson.getString("sRelatnID"));
-                    loInfo.setCreatedx(loJson.getString("dCreatedx"));
-                    loInfo.setTranStat(loJson.getString("cTranStat"));
-                    loInfo.setTimeStmp(loJson.getString("dTimeStmp"));
-                    poDao.Save(loInfo);
-                    Log.d(TAG, "Inquiry record has been saved!");
-                } else {
-
-                    loDetail.setTransNox(loJson.getString("sTransNox"));
-                    loDetail.setTransact(loJson.getString("dTransact"));
-                    loDetail.setGanadoTp(loJson.getString("cGanadoTp"));
-                    loDetail.setPaymForm(loJson.getString("cPaymForm"));
-                    loDetail.setClientNm(loJson.getString("sClientNm"));
-                    loDetail.setClntInfo(loJson.getString("sCltInfox"));
-                    loDetail.setProdInfo(loJson.getString("sPrdctInf"));
-                    loDetail.setPaymInfo(loJson.getString("sPaymInfo"));
-                    loDetail.setTargetxx(loJson.getString("dTargetxx"));
-                    loDetail.setFollowUp(loJson.getString("dFollowUp"));
-                    loDetail.setRemarksx(loJson.getString("sRemarksx"));
-                    loDetail.setReferdBy(loJson.getString("sReferdBy"));
-                    loDetail.setRelatnID(loJson.getString("sRelatnID"));
-                    loDetail.setCreatedx(loJson.getString("dCreatedx"));
-                    loDetail.setTranStat(loJson.getString("cTranStat"));
-                    loDetail.setTimeStmp(loJson.getString("dTimeStmp"));
-                    poDao.Update(loDetail);
-                    Log.d(TAG, "Inquiry record has been updated!");
-                }
+                poDao.Save(loInfo);
+                Log.d(TAG, "Inquiry record has been saved!");
             }
 
             return true;
@@ -320,6 +310,7 @@ public class Ganado {
             return false;
         }
     }
+
     private String CreateUniqueID() {
         String lsUniqIDx = "";
         try {
@@ -339,6 +330,7 @@ public class Ganado {
         Log.d(TAG, lsUniqIDx);
         return lsUniqIDx;
     }
+
     public Boolean InitGeoLocation(){
         if (ActivityCompat.checkSelfPermission(instance, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(instance, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {

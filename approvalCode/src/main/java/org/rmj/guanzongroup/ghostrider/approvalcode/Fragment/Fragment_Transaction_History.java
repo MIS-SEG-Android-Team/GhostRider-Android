@@ -5,7 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,25 +20,20 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
-import com.google.android.material.datepicker.RangeDateSelector;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textview.MaterialTextView;
-
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
+import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Activity.Activity_TransactionApproval_Details;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Etc.Adapter_Transaction_History;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
 import org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel.VMApprovalSelection;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class Fragment_Transaction_History extends Fragment {
@@ -68,11 +62,7 @@ public class Fragment_Transaction_History extends Fragment {
         ib_filter = v.findViewById(R.id.ib_filter);
         rcv_list = v.findViewById(R.id.rcv_list);
 
-        if (lsArgType.equals("3")){
-            ImportTransactionRequests();
-        }else {
-            InitTransactionRequests(GetLastMonth(), GetDateToday());
-        }
+        ImportTransactionRequests(GetLastMonth(), GetDateToday());
         InitListener();
 
         return v;
@@ -92,14 +82,14 @@ public class Fragment_Transaction_History extends Fragment {
         }
     }
 
-    private void ImportTransactionRequests(){
+    private void ImportTransactionRequests(String fsStartDt, String fsEndDt){
 
-        mViewModel.importCASRequests(lsArgCode, new VMApprovalSelection.onDownload() {
+        mViewModel.importCASRequests(lsArgCode, fsStartDt, fsEndDt, lsArgType.equals("4"),  new VMApprovalSelection.onDownload() {
             @Override
             public void onFinished(String message) {
 
                 Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
-                InitTransactionRequests(GetLastMonth(), GetDateToday());
+                InitTransactionRequests(fsStartDt, fsEndDt);
             }
         });
     }
@@ -124,6 +114,7 @@ public class Fragment_Transaction_History extends Fragment {
         ib_filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 MaterialDatePicker.Builder<Pair<Long, Long>> loBuilder = MaterialDatePicker.Builder.dateRangePicker();
                 loBuilder.setTitleText("Select Date Range");
 
@@ -134,7 +125,7 @@ public class Fragment_Transaction_History extends Fragment {
                         Long startRange = selection.first;
                         Long endRange = selection.second;
 
-                        InitTransactionRequests(GetDateFormat(startRange), GetDateFormat(endRange));
+                        ImportTransactionRequests(GetDateFormat(startRange), GetDateFormat(endRange));
                     }
                 });
                 loPicker.show(getParentFragmentManager(), "DATE_RANGE_PICKER");
