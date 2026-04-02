@@ -231,15 +231,6 @@ public class Fragment_SelfieLog extends Fragment {
             }
         });
 
-        btn_detect.setOnClickListener( v -> {
-            try{
-
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        });
-
         mViewModel.GetSelectedDate().observe(getViewLifecycleOwner(), date -> {
             try{
                 mViewModel.GetTimeLogForTheDay(date).observe(getViewLifecycleOwner(), eLog_selfies -> {
@@ -365,7 +356,6 @@ public class Fragment_SelfieLog extends Fragment {
     private void initWidgets(View view){
         lblBranch = view.findViewById(R.id.lbl_userBranch);
         btnCamera = view.findViewById(R.id.btn_takeSelfie);
-        btn_detect = view.findViewById(R.id.btn_detect);
         btnBranch = view.findViewById(R.id.btn_selectBranch);
         recyclerView = view.findViewById(R.id.recyclerview_timeLog);
         txtDate = view.findViewById(R.id.txt_selfieDate);
