@@ -64,6 +64,7 @@ public class Activity_AppVersion extends AppCompatActivity {
             public void onClick(View v) {
 
                 mViewModel.GetUpdate(poGMS, new VMAppVersion.onDownload() {
+
                     @Override
                     public void onDownloading(int status) {
                         poload.initDialog("Guanzon Circle", "Downloading Updates " + status, false);

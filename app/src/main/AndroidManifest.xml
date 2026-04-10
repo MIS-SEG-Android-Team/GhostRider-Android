@@ -47,6 +47,7 @@
     <application
         android:allowBackup="false"
         android:enableOnBackInvokedCallback="true"
+        android:extractNativeLibs="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/menu_home"
@@ -56,6 +57,11 @@
         android:theme="@style/GhostRiderMaterialTheme.NoActionBar"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:label">
+
+        <property
+            android:name="android.pageSizeCompat"
+            android:value="true" />
+
         <activity
             android:name="org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual"
             android:exported="false" />
@@ -111,17 +117,11 @@
         <service
             android:name="org.rmj.guanzongroup.ghostrider.dailycollectionplan.Service.GLocatorService"
             android:foregroundServiceType="location" />
-        <!--
- Set custom default icon. This is used when no icon is set for incoming notification messages.
-            See README(https://goo.gl/l4GJaQ) for more.
-        -->
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_guanzon_logo" />
-        <!--
- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more.
-        -->
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/guanzon_digital_orange" />

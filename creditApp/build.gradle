@@ -1,7 +1,13 @@
-
-
-
-
+/*
+ * Created by Android Team MIS-SEG Year 2021
+ * Copyright (c) 2021. Guanzon Central Office
+ * Guanzon Bldg., Perez Blvd., Dagupan City, Pangasinan 2400
+ * Project name : GhostRider_Android
+ * Module : GhostRider_Android.onlinecreditapplication
+ * Electronic Personnel Access Control Security System
+ * project file created : 4/24/21 3:19 PM
+ * project file last modified : 4/24/21 3:17 PM
+ */
 
 plugins {
     id 'com.android.library'
@@ -29,12 +35,25 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    packagingOptions {
-        resources.merges.add("core.properties")
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
-        pickFirst 'lib/x86/libc++_shared.so'
-        pickFirst 'lib/x86_64/libc++_shared.so'
+    packaging {
+        resources {
+            merges.add("core.properties")
+        }
+        jniLibs {
+            // Setting this to false allows the OS to mmap the library directly from the APK.
+            // This requires the library to be page-aligned (16KB for Android 15).
+            useLegacyPackaging = false
+
+            // Permanently remove x86 and x86_64 libraries to resolve conflicts
+            // and ensure 16KB page size compatibility.
+            excludes.add("lib/arm64-v8a/**")
+            excludes.add("lib/x86_64/**")
+            excludes.add("lib/x86/**")
+            excludes.add("lib/armeabi-v7a/**")
+        }
+        dex {
+            useLegacyPackaging = false
+        }
     }
 }
 

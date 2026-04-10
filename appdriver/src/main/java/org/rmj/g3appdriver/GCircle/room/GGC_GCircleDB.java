@@ -517,8 +517,8 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             if (!CheckColumnExists(database, "Barcode_Detail", "sSerialID")){
                 database.execSQL("ALTER TABLE Barcode_Detail ADD COLUMN sSerialID TEXT");
             }
-            if (!CheckColumnExists(database, "Image_Information", "sAccessCD")){
-                database.execSQL("ALTER TABLE EImageInfo ADD COLUMN sAccessCD TEXT");
+            if (!CheckColumnExists(database, "Image_Information", "sClientID")){
+                database.execSQL("ALTER TABLE Image_Information ADD COLUMN sClientID TEXT");
             }
             if (!CheckColumnExists(database, "LR_DCP_Collection_Detail", "sEWalletReference")){
                 database.execSQL("ALTER TABLE LR_DCP_Collection_Detail ADD COLUMN sEWalletReference TEXT");

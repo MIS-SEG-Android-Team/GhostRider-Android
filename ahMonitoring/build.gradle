@@ -39,11 +39,21 @@ android {
     buildFeatures {
         viewBinding true
     }
-    packagingOptions {
-        resources.merges.add("core.properties")
+    packaging {
+        resources {
+            merges.add("core.properties")
+        }
+        jniLibs {
+            // Setting this to false allows the OS to mmap the library directly from the APK.
+            // This requires the library to be page-aligned (16KB for Android 15).
+            useLegacyPackaging = false
+        }
+        dex {
+            useLegacyPackaging = false
+        }
     }
     namespace 'org.rmj.guanzongroup.ghostrider.ahmonitoring'
-    ndkVersion '27.0.11902837 rc2'
+    ndkVersion '27.0.11902837'
 }
 
 dependencies {
