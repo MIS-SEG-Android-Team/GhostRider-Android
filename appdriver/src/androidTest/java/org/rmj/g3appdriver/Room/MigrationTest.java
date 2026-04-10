@@ -1,4 +1,4 @@
-package org.rmj.g3appdriver;
+package org.rmj.g3appdriver.Room;
 
 /**
  * DATE UPDATED : 2026-01-24
@@ -317,7 +317,7 @@ public class MigrationTest {
         //migrate database to new version
         GGC_GCircleDB appDB = Room.databaseBuilder(
                 InstrumentationRegistry.getInstrumentation().getTargetContext(),
-                GGC_GCircleDB.class,
+                        GGC_GCircleDB.class,
                 "GGC_ISysDBF.db"
         ).addMigrations(MIGRATION_V45, MIGRATION_V46)
                 .build();
