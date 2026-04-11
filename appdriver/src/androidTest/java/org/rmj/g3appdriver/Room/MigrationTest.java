@@ -254,7 +254,7 @@ public class MigrationTest {
 
             //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Master` " +
-                    "(`sTransNox` TEXT NOT NULL, `dTransact` TEXT, `cTranStat` TEXT, `sDeptIDxx` TEXT, " +
+                    "(`sTransNox` TEXT NOT NULL, `dTransact` TEXT, `cTranStat` TEXT, `sDeptIDxx` TEXT, `cSendStat` TEXT, " +
                     "PRIMARY KEY(`sTransNox`))");
 
             //Add the new table
@@ -262,14 +262,9 @@ public class MigrationTest {
                     "(sTransNox TEXT NOT NULL, sCategrID TEXT NOT NULL, nRatingxx REAL, sRemarksx TEXT, dEvaluate TEXT, PRIMARY KEY(sTransNox, sCategrID))");
 
             //Add the new table
-            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Images` (" +
-                    "sTransNox TEXT NOT NULL, sReferNox TEXT, sCategrID TEXT, nEntryNox TEXT, " +
-                    "sScanndID TEXT, sImageNme TEXT, sMD5Hashx TEXT, sImagePth TEXT, dImgeDate TEXT, cImgeStat TEXT, PRIMARY KEY(sTransNox))");
-
-            //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `MC_Contract_Info` (" +
                     "sTransNox TEXT NOT NULL, sBranchCd TEXT, dTransact TEXT, sClientID TEXT, " +
-                    "sReferNox TEXT, sAcctNmbr TEXT, dPurchase TEXT, sSerialID TEXT, nAcctTerm INTEGER, nDownPaym DOUBLE, nMonAmort DOUBLE, " +
+                    "sReferNox TEXT, sAcctNmbr TEXT, dPurchase TEXT, drNo TEXT, sSerialID TEXT, nAcctTerm INTEGER, nDownPaym DOUBLE, nMonAmort DOUBLE, " +
                     "nRebatesx DOUBLE, nPenaltyx DOUBLE, dFirstPay TEXT, sRemarksx TEXT, cTranStat TEXT, sSendStat TEXT, " +
                     "PRIMARY KEY(sTransNox))");
 
