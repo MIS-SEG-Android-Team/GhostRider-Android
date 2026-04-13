@@ -17,7 +17,7 @@ android {
     compileSdk 35
 
     defaultConfig {
-        minSdk 21
+        minSdk 24
         targetSdk 35
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -62,7 +62,7 @@ dependencies {
     testImplementation 'org.json:json:20200518'
     implementation 'commons-io:commons-io:2.16.1'
 
-    implementation 'com.github.amitshekhariitbhu:PRDownloader:1.0.1'
+    //implementation 'com.github.amitshekhariitbhu:PRDownloader:1.0.1'
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'com.github.mhiew:android-pdf-viewer:3.2.0-beta.3'
 
