@@ -7,6 +7,9 @@
 
     <application android:usesCleartextTraffic="true">
         <activity
+            android:name=".Activity.Activity_Branch_Checklist"
+            android:exported="false" />
+        <activity
             android:name=".Activity.Activity_BranchPerformanceMonitoring"
             android:exported="false"
             android:screenOrientation="userPortrait"
