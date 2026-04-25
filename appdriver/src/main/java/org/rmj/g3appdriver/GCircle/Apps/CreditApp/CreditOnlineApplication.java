@@ -397,7 +397,7 @@ public class CreditOnlineApplication {
             ECreditApplication loApp = poDao.GetLatestRecord();
 
             if(loApp != null){
-                params.put("sUserIDxx", loApp.getTimeStmp());
+                params.put("dTimeStmp", loApp.getTimeStmp());
             }
 
             String lsResponse = WebClient.sendRequest(
@@ -423,64 +423,32 @@ public class CreditOnlineApplication {
             for(int x = 0; x < laJson.length(); x++){
                 JSONObject loJson = laJson.getJSONObject(x);
 
-                ECreditApplication loDetail = poDao.GetCreditOnlineApplication(loJson.getString("sTransNox"));
+                ECreditApplication info = new ECreditApplication();
+                info.setTransNox(loJson.getString("sTransNox"));
+                info.setBranchCd(loJson.getString("sBranchCd"));
+                info.setTransact(loJson.getString("dTransact"));
+                info.setClientNm(loJson.getString("sClientNm"));
+                info.setGOCASNox(loJson.getString("sGOCASNox"));
+                //TODO : Unit Applied is default to 0 cuz empty String is return from Server upon request
+                // this must be update when credit is available in for mobile phone
+                info.setUnitAppl(loJson.getString("cUnitAppl"));
+                info.setSourceCD(loJson.getString("sSourceCD"));
+                info.setDetlInfo(loJson.getString("sDetlInfo"));
+                info.setQMatchNo(loJson.getString("sQMatchNo"));
+                info.setWithCIxx(loJson.getString("cWithCIxx"));
+                info.setDownPaym(Double.parseDouble(loJson.getString("nDownPaym")));
+                info.setRemarksx(loJson.getString("sRemarksx"));
+                info.setCreatedx(loJson.getString("sCreatedx"));
+                info.setDateCreatedx(loJson.getString("dCreatedx"));
+                info.setSendStat("1");
+                info.setVerified(loJson.getString("sVerified"));
+                info.setDateVerified(loJson.getString("dVerified"));
+                info.setTranStat(loJson.getString("cTranStat"));
+                info.setDivision(loJson.getString("cDivision"));
+                info.setReceived(loJson.getString("dReceived"));
+                info.setTimeStmp(loJson.getString("dTimeStmp"));
 
-                if(loDetail == null) {
-                    ECreditApplication info = new ECreditApplication();
-                    info.setTransNox(loJson.getString("sTransNox"));
-                    info.setBranchCd(loJson.getString("sBranchCd"));
-                    info.setTransact(loJson.getString("dTransact"));
-                    info.setClientNm(loJson.getString("sClientNm"));
-                    info.setGOCASNox(loJson.getString("sGOCASNox"));
-                    //TODO : Unit Applied is default to 0 cuz empty String is return from Server upon request
-                    // this must be update when credit is available in for mobile phone
-                    info.setUnitAppl("0");
-                    info.setSourceCD(loJson.getString("sSourceCD"));
-                    info.setDetlInfo(loJson.getString("sDetlInfo"));
-                    info.setQMatchNo(loJson.getString("sQMatchNo"));
-                    info.setWithCIxx(loJson.getString("cWithCIxx"));
-                    info.setDownPaym(Double.parseDouble(loJson.getString("nDownPaym")));
-                    info.setRemarksx(loJson.getString("sRemarksx"));
-                    info.setCreatedx(loJson.getString("sCreatedx"));
-                    info.setDateCreatedx(loJson.getString("dCreatedx"));
-                    info.setSendStat("1");
-                    info.setVerified(loJson.getString("sVerified"));
-                    info.setDateVerified(loJson.getString("dVerified"));
-                    info.setTranStat(loJson.getString("cTranStat"));
-                    info.setDivision(loJson.getString("cDivision"));
-                    info.setReceived(loJson.getString("dReceived"));
-                    info.setTimeStmp(loJson.getString("dTimeStmp"));
-                    poDao.Save(info);
-                } else {
-                    Date ldDate1 = SQLUtil.toDate(loDetail.getTimeStmp(), SQLUtil.FORMAT_TIMESTAMP);
-                    Date ldDate2 = SQLUtil.toDate((String) loJson.get("dTimeStmp"), SQLUtil.FORMAT_TIMESTAMP);
-
-                    if(!ldDate1.equals(ldDate2)){
-                        loDetail.setTransNox(loJson.getString("sTransNox"));
-                        loDetail.setBranchCd(loJson.getString("sBranchCd"));
-                        loDetail.setTransact(loJson.getString("dTransact"));
-                        loDetail.setClientNm(loJson.getString("sClientNm"));
-                        loDetail.setGOCASNox(loJson.getString("sGOCASNox"));
-                        //TODO : Unit Applied is default to 0 cuz empty String is return from Server upon request
-                        // this must be update when credit is available in for mobile phone
-                        loDetail.setUnitAppl("0");
-                        loDetail.setSourceCD(loJson.getString("sSourceCD"));
-                        loDetail.setDetlInfo(loJson.getString("sDetlInfo"));
-                        loDetail.setQMatchNo(loJson.getString("sQMatchNo"));
-                        loDetail.setWithCIxx(loJson.getString("cWithCIxx"));
-                        loDetail.setDownPaym(Double.parseDouble(loJson.getString("nDownPaym")));
-                        loDetail.setRemarksx(loJson.getString("sRemarksx"));
-                        loDetail.setCreatedx(loJson.getString("sCreatedx"));
-                        loDetail.setDateCreatedx(loJson.getString("dCreatedx"));
-                        loDetail.setSendStat("1");
-                        loDetail.setVerified(loJson.getString("sVerified"));
-                        loDetail.setDateVerified(loJson.getString("dVerified"));
-                        loDetail.setTranStat(loJson.getString("cTranStat"));
-                        loDetail.setDivision(loJson.getString("cDivision"));
-                        loDetail.setReceived(loJson.getString("dReceived"));
-                        loDetail.setTimeStmp(loJson.getString("dTimeStmp"));
-                    }
-                }
+                poDao.Save(info);
             }
 
             return true;

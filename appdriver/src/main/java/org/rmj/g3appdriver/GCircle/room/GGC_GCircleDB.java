@@ -266,7 +266,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         ESSDDCategories.class,
         ESSDDMaster.class,
         ESSDDetail.class,
-        EMCContractInfo.class}, version = 46,exportSchema = true)
+        EMCContractInfo.class}, version = 46,exportSchema = false)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -485,13 +485,13 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
 
             //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Detail` " +
-                    "(sTransNox TEXT NOT NULL, sCategrID TEXT NOT NULL, nRatingxx REAL, sRemarksx TEXT, dEvaluate TEXT, PRIMARY KEY(sTransNox, sCategrID))");
+                    "(sTransNox TEXT NOT NULL, sCategrID TEXT NOT NULL, nRatingxx TEXT, sRemarksx TEXT, dEvaluate TEXT, PRIMARY KEY(sTransNox, sCategrID))");
 
             //Add the new table
             database.execSQL("CREATE TABLE IF NOT EXISTS `MC_Contract_Info` (" +
                     "sTransNox TEXT NOT NULL, sBranchCd TEXT, dTransact TEXT, sClientID TEXT, " +
-                    "sReferNox TEXT, sAcctNmbr TEXT, dPurchase TEXT, drNo TEXT, sSerialID TEXT, nAcctTerm INTEGER, nDownPaym DOUBLE, nMonAmort DOUBLE, " +
-                    "nRebatesx DOUBLE, nPenaltyx DOUBLE, dFirstPay TEXT, sRemarksx TEXT, cTranStat TEXT, sSendStat TEXT, " +
+                    "sReferNox TEXT, sAcctNmbr TEXT, dPurchase TEXT, drNo TEXT, sSerialID TEXT, nAcctTerm INTEGER NOT NULL, nDownPaym REAL NOT NULL, nMonAmort REAL NOT NULL, " +
+                    "nRebatesx REAL NOT NULL, nPenaltyx REAL NOT NULL, dFirstPay TEXT, sRemarksx TEXT, cTranStat TEXT, sSendStat TEXT, " +
                     "PRIMARY KEY(sTransNox))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){

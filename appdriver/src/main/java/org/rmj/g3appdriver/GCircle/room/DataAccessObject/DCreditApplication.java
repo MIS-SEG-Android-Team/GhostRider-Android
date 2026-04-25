@@ -16,6 +16,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
+import androidx.room.Upsert;
 
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplicantInfo;
@@ -27,7 +28,7 @@ import java.util.List;
 @Dao
 public interface DCreditApplication {
 
-    @Insert
+    @Upsert
     void Save(ECreditApplication creditApplication);
 
     @Insert
