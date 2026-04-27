@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/HeaderLabelBlack"
+        android:id="@+id/mtv_checklist"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="N/A"
+        app:layout_constraintTop_toTopOf="@+id/btn_camera"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_camera"
+        app:layout_constraintWidth_percent="0.85"/>
+
+    <ImageButton
+        android:id="@+id/btn_camera"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_camera_24"
+        android:background="@color/zxing_transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/mtv_checklist"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Remarks"
+        app:layout_constraintTop_toBottomOf="@+id/mtv_checklist"
+        app:layout_constraintStart_toStartOf="@+id/mtv_checklist"
+        app:layout_constraintEnd_toEndOf="@+id/btn_camera"
+        style="@style/TextInputStyle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/txt_remarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine|textCapWords"
+            android:maxLength="50"
+            android:lines="3"
+            android:maxLines="5"
+            android:layout_marginBottom="10dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

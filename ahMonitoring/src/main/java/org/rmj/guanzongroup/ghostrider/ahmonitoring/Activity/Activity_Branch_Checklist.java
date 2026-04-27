@@ -16,6 +16,6 @@ public class Activity_Branch_Checklist extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        setContentView(R.layout.activity_branch_checklist);
     }
 }
