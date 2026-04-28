@@ -295,6 +295,136 @@ public class MigrationTest {
         }
     };
 
+    static final Migration MIGRATION_V47 = new Migration(46, 47) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+
+            // Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `MC_Cash_Price` " +
+                    "(`sModelIDx` TEXT NOT NULL, `sMCCatNme` TEXT NOT NULL, " +
+                    "`sModelNme` TEXT NOT NULL, `sBrandNme` TEXT, `nSelPrice` REAL, " +
+                    "`nLastPrce` REAL, `nDealrPrc` REAL, `dPricexxx` TEXT, " +
+                    "`sBrandIDx` TEXT, `sMCCatIDx` TEXT, " +
+                    "PRIMARY KEY(`sModelIDx`, `sMCCatNme`, `sModelNme`))");
+
+            // Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SCA_Rqst_Emp` " +
+                    "(`sSCACodex` TEXT NOT NULL, `sEmployIDx` TEXT NOT NULL, " +
+                    "`sRecdStat` TEXT, `dTimeStmpx` TEXT, " +
+                    "PRIMARY KEY(`sSCACodex`, `sEmployIDx`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Barcode " +
+                    "(barcode_id TEXT NOT NULL, barcode TEXT, " +
+                    "PRIMARY KEY(barcode_id))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Barcode_Detail " +
+                    "(barcode_id TEXT NOT NULL, nEntryNox INTEGER NOT NULL, " +
+                    "sSerialID TEXT, sDescript TEXT, " +
+                    "PRIMARY KEY(barcode_id, nEntryNox))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS User_Guides " +
+                    "(sTransNox TEXT NOT NULL, type TEXT NOT NULL, sTitlexx TEXT, sURlxx TEXT, " +
+                    "PRIMARY KEY(sTransNox, type))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Policy_Menus " +
+                    "(sTransNoxx TEXT NOT NULL, sNamexx TEXT, sDescription TEXT, " +
+                    "PRIMARY KEY(sTransNoxx))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Article_Head " +
+                    "(sCodexx TEXT NOT NULL, sTitle TEXT, sImage TEXT, sDescription TEXT, sSubtitle TEXT, " +
+                    "PRIMARY KEY(sCodexx))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Policy_Contents " +
+                    "(sTransNoxx TEXT NOT NULL, sParentIDxx TEXT, sContentxx TEXT, " +
+                    "PRIMARY KEY(sTransNoxx))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS Article_Details " +
+                    "(sCodexx TEXT NOT NULL, sContentxx TEXT, " +
+                    "PRIMARY KEY(sCodexx))");
+
+            // Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Error_Logs` " +
+                    "(`nErrorLogID` INTEGER NOT NULL, `sSourceTransNo` TEXT, " +
+                    "`sMessagex` TEXT, `dLogDate` TEXT, `cRead` TEXT, "+
+                    "PRIMARY KEY(`nErrorLogID`))");
+
+            // Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `CAS_Approval_Code` " +
+                    "(`sSourceCD` TEXT NOT NULL, `sDescript` TEXT, " +
+                    "PRIMARY KEY(`sSourceCD`))");
+
+            // Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `CAS_Requests` " +
+                    "(`sTransNox` TEXT NOT NULL, `dTransact` TEXT, `sSourceCD` TEXT," +
+                    "`sSourceNo` TEXT, `sAuthType` TEXT, `sDescript` TEXT, `sCompnyNm` TEXT, `sRemarksx` TEXT," +
+                    "`cTranStat` TEXT, `dApproved` TEXT, `sAppSrcNo` TEXT," +
+                    "PRIMARY KEY(`sTransNox`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Department` " +
+                    "(`sDeptIDxx` TEXT NOT NULL, `sDescript` TEXT, " +
+                    "PRIMARY KEY(`sDeptIDxx`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Categories` " +
+                    "(`sCategrID` TEXT NOT NULL, `sDescript` TEXT, `sMemoLink` TEXT, `nPageNumber` TEXT, " +
+                    "PRIMARY KEY(`sCategrID`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Master` " +
+                    "(`sTransNox` TEXT NOT NULL, `dTransact` TEXT, `cTranStat` TEXT, `sDeptIDxx` TEXT, `cSendStat` TEXT, " +
+                    "PRIMARY KEY(`sTransNox`))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `SSDD_Detail` " +
+                    "(sTransNox TEXT NOT NULL, sCategrID TEXT NOT NULL, nRatingxx TEXT, sRemarksx TEXT, dEvaluate TEXT, PRIMARY KEY(sTransNox, sCategrID))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `MC_Contract_Info` (" +
+                    "sTransNox TEXT NOT NULL, sBranchCd TEXT, dTransact TEXT, sClientID TEXT, " +
+                    "sReferNox TEXT, sAcctNmbr TEXT, dPurchase TEXT, drNo TEXT, sSerialID TEXT, nAcctTerm INTEGER NOT NULL, nDownPaym REAL NOT NULL, nMonAmort REAL NOT NULL, " +
+                    "nRebatesx REAL NOT NULL, nPenaltyx REAL NOT NULL, dFirstPay TEXT, sRemarksx TEXT, cTranStat TEXT, sSendStat TEXT, " +
+                    "PRIMARY KEY(sTransNox))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Branch_Checklist` (" +
+                    "sCategrID TEXT NOT NULL, sDescript TEXT, cRecdStat TEXT, " +
+                    "PRIMARY KEY(sCategrID))");
+
+            if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
+                database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");
+            }
+            if (!CheckColumnExists(database, "Ganado_Online", "dPricexxx")){
+                database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN dPricexxx TEXT");
+            }
+            if (!CheckColumnExists(database, "Credit_Applicant_Info", "sRemarksx")){
+                database.execSQL("ALTER TABLE Credit_Applicant_Info ADD COLUMN sRemarksx TEXT");
+            }
+            if (!CheckColumnExists(database, "Barcode", "checked")){
+                database.execSQL("ALTER TABLE Barcode ADD COLUMN checked INTEGER DEFAULT 0");
+            }
+            if (!CheckColumnExists(database, "Barcode", "description")){
+                database.execSQL("ALTER TABLE Barcode ADD COLUMN description TEXT");
+            }
+            if (!CheckColumnExists(database, "Barcode_Detail", "sSerialID")){
+                database.execSQL("ALTER TABLE Barcode_Detail ADD COLUMN sSerialID TEXT");
+            }
+            if (!CheckColumnExists(database, "Image_Information", "sClientID")){
+                database.execSQL("ALTER TABLE Image_Information ADD COLUMN sClientID TEXT");
+            }
+            if (!CheckColumnExists(database, "LR_DCP_Collection_Detail", "sEWalletReference")){
+                database.execSQL("ALTER TABLE LR_DCP_Collection_Detail ADD COLUMN sEWalletReference TEXT");
+            }
+        }
+    };
+
     @Rule
     public MigrationTestHelper migrationTestHelper = new MigrationTestHelper(
             InstrumentationRegistry.getInstrumentation(),
@@ -306,7 +436,7 @@ public class MigrationTest {
     public void TestMIgration() throws IOException {
 
         //create database with version
-        SupportSQLiteDatabase db = migrationTestHelper.createDatabase("GGC_ISysDBF.db", 46);
+        SupportSQLiteDatabase db = migrationTestHelper.createDatabase("GGC_ISysDBF.db", 47);
         db.close();
 
         //migrate database to new version
@@ -314,12 +444,12 @@ public class MigrationTest {
                 InstrumentationRegistry.getInstrumentation().getTargetContext(),
                         GGC_GCircleDB.class,
                 "GGC_ISysDBF.db"
-        ).addMigrations(MIGRATION_V45, MIGRATION_V46)
+        ).addMigrations(MIGRATION_V46, MIGRATION_V47)
                 .build();
 
         appDB.getOpenHelper().getWritableDatabase();
         appDB.close();
 
-        Assert.assertTrue(migrationTestHelper.runMigrationsAndValidate("GGC_ISysDBF.db", 46, true, MIGRATION_V45, MIGRATION_V46).isDatabaseIntegrityOk());
+        Assert.assertTrue(migrationTestHelper.runMigrationsAndValidate("GGC_ISysDBF.db", 47, true, MIGRATION_V46, MIGRATION_V47).isDatabaseIntegrityOk());
     }
 }

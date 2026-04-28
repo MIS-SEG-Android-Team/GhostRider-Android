@@ -69,7 +69,7 @@ dependencies {
     implementation 'androidx.test:core:1.5.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation project(path: ':appDriver')
-    implementation 'androidx.activity:activity:1.13.0'
+    implementation 'androidx.activity:activity:1.10.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'junit:junit:4.13.2'
     testImplementation project(':petManager')
