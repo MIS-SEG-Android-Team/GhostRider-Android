@@ -124,6 +124,10 @@ public class GCircleApi extends WebApi {
     private static final String GET_SSDD_DETAILS = "gcircle/ssdd/download_evaluations_detail.php";
     private static final String GET_SSDD_IMAGE_CATEGORY = "gcircle/ssdd/download_evaluations_image.php";
 
+    private static final String GET_CHECKLIST = "gcircle/branchmonitoring/download_checklist.php";
+    private static final String GET_BRANCH_VISIT_MASTER = "gcircle/branchmonitoring/download_branch_visit_master.php";
+    private static final String GET_BRANCH_VISIT_DETAIL = "gcircle/branchmonitoring/download_branch_visit_detail.php";
+
     private static final String URL_SUBMIT_INQUIRY = "gcircle/ganado/submit_inquiry.php";
     private static final String URL_DOWNLOAD_INQUIRIES = "gcircle/ganado/import_inquiries.php";
     private static final String URL_SUBMIT_BARCODE = "gcircle/general/submit_order.php";
@@ -1125,6 +1129,34 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + UPDATE_SSDD_TRANSACTION);
         return LIVE + UPDATE_SSDD_TRANSACTION;
+    }
+
+
+    public String getUrlBranchChecklist(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + GET_CHECKLIST);
+            return LOCAL + GET_CHECKLIST;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + GET_CHECKLIST);
+        return LIVE + GET_CHECKLIST;
+    }
+
+    public String getUrlBranchVisitMaster(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + GET_BRANCH_VISIT_MASTER);
+            return LOCAL + GET_BRANCH_VISIT_MASTER;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + GET_BRANCH_VISIT_MASTER);
+        return LIVE + GET_BRANCH_VISIT_MASTER;
+    }
+
+    public String getUrlBranchVisitDetail(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + GET_BRANCH_VISIT_DETAIL);
+            return LOCAL + GET_BRANCH_VISIT_DETAIL;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + GET_BRANCH_VISIT_DETAIL);
+        return LIVE + GET_BRANCH_VISIT_DETAIL;
     }
 
 }

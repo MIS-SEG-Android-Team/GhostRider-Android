@@ -16,7 +16,6 @@ import android.database.Cursor;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -32,11 +31,13 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBankInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarangayInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBarcodeDetail;
-import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchChecklist;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchOpeningMonitor;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchPerformance;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASRequests;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCIEvaluation;
@@ -115,11 +116,13 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EBankInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarangayInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcode;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBarcodeDetail;
-import org.rmj.g3appdriver.GCircle.room.Entities.EBranchChecklist;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchLoanApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchOpenMonitor;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchPerformance;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECIEvaluation;
@@ -269,7 +272,9 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         ESSDDMaster.class,
         ESSDDetail.class,
         EMCContractInfo.class,
-        EBranchChecklist.class}, version = 47,exportSchema = true)
+        EBranchVisitChecklist.class,
+        EBranchVisitMaster.class,
+        EBranchVisitDetail.class}, version = 47,exportSchema = true)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -356,7 +361,9 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
     public abstract DSSDDMaster ssdMasterDao();
     public abstract DSSDDetail ssdDetailDao();
     public abstract DMC_Contract mcontractDao();
-    public abstract DBranchChecklist branchChecklistDao();
+    public abstract DBranchVisitChecklist branchChecklistDao();
+    public abstract DBranchVisitMaster branchVisitMasterDao();
+    public abstract DBranchVisitDetail branchVisitDetailDao();
 
 
     public static synchronized GGC_GCircleDB getInstance(Context context){

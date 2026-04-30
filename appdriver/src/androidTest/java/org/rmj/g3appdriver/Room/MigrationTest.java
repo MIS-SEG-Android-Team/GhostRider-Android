@@ -394,9 +394,19 @@ public class MigrationTest {
                     "PRIMARY KEY(sTransNox))");
 
             //Add the new table
-            database.execSQL("CREATE TABLE IF NOT EXISTS `Branch_Checklist` (" +
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Branch_Visit_Checklist` (" +
                     "sCategrID TEXT NOT NULL, sDescript TEXT, cRecdStat TEXT, " +
                     "PRIMARY KEY(sCategrID))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Branch_Visit_Master` (" +
+                    "sTransNox TEXT NOT NULL, dTransact TEXT, sBranchCd TEXT, sUserIDxx TEXT, cTranStat TEXT, cSendStat TEXT, " +
+                    "PRIMARY KEY(sTransNox))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Branch_Visit_Detail` (" +
+                    "sTransNox TEXT NOT NULL, sCategrID TEXT, sRemarksx TEXT, " +
+                    "PRIMARY KEY(sTransNox))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");

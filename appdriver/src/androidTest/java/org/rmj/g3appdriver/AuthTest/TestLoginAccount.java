@@ -33,7 +33,8 @@ public class TestLoginAccount {
     public void setup() throws Exception{
         instance = ApplicationProvider.getApplicationContext();
         poUser = new EmployeeMaster(instance);
-        AppConfigPreference.getInstance(instance).setTestCase(true);
+        AppConfigPreference loConfig = AppConfigPreference.getInstance(instance);
+        loConfig.setTestCase(true);
     }
 
     @Test
