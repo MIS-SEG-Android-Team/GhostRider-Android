@@ -237,7 +237,6 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
             }
         });
 
-        Log.d("Branch checklist size is  ", String.valueOf(laChecklist.size()));
         if (laChecklist.size() <= 0){
             return;
         } else if (lsSourceNo == null || lsSourceNo.isEmpty()) {
@@ -247,59 +246,62 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         mviewModel.GetMasterTransaction(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<EBranchVisitMaster>() {
             @Override
             public void onChanged(EBranchVisitMaster eBranchVisitMaster) {
+
                 loMaster = eBranchVisitMaster;
-            }
-        });
+                Log.d("Master is ", "initialized");
 
-        if (loMaster == null){
-            return;
-        }
-
-        mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
-            @Override
-            public void onChanged(List<DBranchVisitDetail.BranchVisitDetail> eBranchVisitDetails) {
-
-                if (eBranchVisitDetails == null || eBranchVisitDetails.size() <= 0){
-
-                    Log.d("Branch checklist status is  ", loMaster.getcSendStat());
-                    if (loMaster.getcSendStat().equalsIgnoreCase("1")){
-
-                        InitMessage(3, "Details not found! Do you want to re-download data?", new onMessageButton() {
-                            @Override
-                            public void onPositive() {
-                                InitData();
-                            }
-                            @Override
-                            public void onNegative() { finish(); }
-                        });
-
-                    }
+                if (loMaster == null){
+                    Log.d("Master is ", "null");
                     return;
                 }
 
-                //initialize checklist
-                laDetails = eBranchVisitDetails;
-
-                ///initialize adapter
-                loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
+                mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
                     @Override
-                    public void OnCamera(String fsCategrID) {
+                    public void onChanged(List<DBranchVisitDetail.BranchVisitDetail> eBranchVisitDetails) {
 
-                    }
+                        if (eBranchVisitDetails == null || eBranchVisitDetails.size() <= 0){
 
-                    @Override
-                    public void OnViewDetails(String fsCategrID) {
+                            Log.d("Branch checklist status is  ", loMaster.getcSendStat());
+                            if (loMaster.getcSendStat().equalsIgnoreCase("1")){
 
-                    }
+                                InitMessage(3, "Details not found! Do you want to re-download data?", new onMessageButton() {
+                                    @Override
+                                    public void onPositive() {
+                                        InitData();
+                                    }
+                                    @Override
+                                    public void onNegative() { finish(); }
+                                });
 
-                    @Override
-                    public void OnRemarks(String fsCategrID, String sRemarks) {
+                            }
+                            return;
+                        }
 
+                        //initialize checklist
+                        laDetails = eBranchVisitDetails;
+
+                        ///initialize adapter
+                        loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
+                            @Override
+                            public void OnCamera(String fsCategrID) {
+
+                            }
+
+                            @Override
+                            public void OnViewDetails(String fsCategrID) {
+
+                            }
+
+                            @Override
+                            public void OnRemarks(String fsCategrID, String sRemarks) {
+
+                            }
+                        });
+
+                        recyclerview_checklist.setAdapter(loAdapter);
+                        recyclerview_checklist.setLayoutManager(new LinearLayoutManager(Activity_Branch_Visit_Checklist.this,  LinearLayoutManager.VERTICAL, false));
                     }
                 });
-
-                recyclerview_checklist.setAdapter(loAdapter);
-                recyclerview_checklist.setLayoutManager(new LinearLayoutManager(Activity_Branch_Visit_Checklist.this,  LinearLayoutManager.VERTICAL, false));
             }
         });
     }
