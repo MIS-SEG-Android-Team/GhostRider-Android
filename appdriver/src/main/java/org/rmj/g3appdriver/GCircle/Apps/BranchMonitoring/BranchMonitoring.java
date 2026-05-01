@@ -88,7 +88,7 @@ public class BranchMonitoring {
         poError.SaveErrorLogs(loError);
     }
 
-    public void SaveNewMaster(String fsBranchCd){
+    public String SaveNewMaster(String fsBranchCd){
 
         EBranchVisitMaster loMaster = new EBranchVisitMaster();
         loMaster.setsTransNox(GenerateTransNox());
@@ -99,6 +99,7 @@ public class BranchMonitoring {
         loMaster.setcSendStat("0");
 
         poMaster.Save(loMaster);
+        return loMaster.getsTransNox();
     }
 
     public void SaveNewDetail(String fsTransNox, String fsCategrID, String fsRemarks){
@@ -194,15 +195,14 @@ public class BranchMonitoring {
         }
     }
 
-    public Boolean ImportBranchVisitMaster(String fsDfrom, String fsDto, String fsBranchCd, String fsUserIDxx){
+    public Boolean ImportBranchVisitMaster(String fsDfrom, String fsDto){
 
         try {
 
             JSONObject loParams = new JSONObject();
             loParams.put("dFrom", fsDfrom);
             loParams.put("dTo", fsDto);
-            loParams.put("sBranchCd", fsBranchCd);
-            loParams.put("sUserIDxx", fsUserIDxx);
+            loParams.put("sUserIDxx", poSession.getUserID());
 
             String lsResult = WebClient.sendRequest(poApi.getUrlBranchVisitMaster() , loParams.toString(), poHeaders.getHeaders());
             if (lsResult == null || lsResult.isEmpty()){
@@ -226,6 +226,7 @@ public class BranchMonitoring {
                 loEntity.setsBranchCd(loMaster.getString("sBranchCd"));
                 loEntity.setsBranchCd(loMaster.getString("sUserIDxx"));
                 loEntity.setsBranchCd(loMaster.getString("cTranStat"));
+                loEntity.setcSendStat("1"); //donwloaded from server, mark as sent
 
                 poMaster.Save(loEntity);
             }
@@ -240,7 +241,19 @@ public class BranchMonitoring {
         return poChecklist.GetChecklist();
     }
 
-    public LiveData<List<EBranchVisitDetail>> GetDetails(String fsTransNox){
+    public EBranchVisitMaster GetEntryToday(){
+        return poMaster.GetEntryToday(poSession.getUserID(), GetCurrentDate());
+    }
+
+    public LiveData<EBranchVisitMaster> GetMasterTransaction(String fsTransNox){
+        return poMaster.GetMasterTransaction(fsTransNox);
+    }
+
+    public LiveData<List<DBranchVisitMaster.MasterHistory>> GetHistory(){
+        return poMaster.GetHistory(poSession.getUserID());
+    }
+
+    public LiveData<List<DBranchVisitDetail.BranchVisitDetail>> GetDetails(String fsTransNox){
         return poDetail.GetDetails(fsTransNox);
     }
 }

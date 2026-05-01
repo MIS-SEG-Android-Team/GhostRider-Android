@@ -2,6 +2,7 @@ package org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -11,20 +12,25 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Adapter.Adapter_Branch_Vist_Checklist;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.R;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.ViewModel.VMBranchVisit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
     private String lsSourceNo;
-    private List<EBranchVisitChecklist> laChecklist;
+    private List<EBranchVisitChecklist> laChecklist = new ArrayList<>();
+    private EBranchVisitMaster loMaster;
+    private List<DBranchVisitDetail.BranchVisitDetail> laDetails;
 
     private VMBranchVisit mviewModel;
     private Adapter_Branch_Vist_Checklist loAdapter;
@@ -49,7 +55,33 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         poDialog = new LoadDialog(this);
         loMessage = new MessageBox(this);
 
+        //do not continue if required arguments is empty
+        if (!getIntent().hasExtra("type")){
+
+            InitMessage(2, "Could not verify type of transaction", new onMessageButton() {
+                @Override
+                public void onPositive() {
+                    finish();
+                }
+                @Override
+                public void onNegative() {}
+            });
+            return;
+        }else if (!getIntent().hasExtra("branch")){
+
+            InitMessage(2, "Could not verify source branch", new onMessageButton() {
+                @Override
+                public void onPositive() {
+                    finish();
+                }
+                @Override
+                public void onNegative() {}
+            });
+            return;
+        }
+
         InitWidgets();
+        InitObservers();
         InitData();
     }
 
@@ -109,81 +141,86 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
     private void InitData(){
 
-        //do not continue if transaction type is empty
-        if (!getIntent().hasExtra("type")){
-
-            InitMessage(2, "Could not verify type of transaction", new onMessageButton() {
-                @Override
-                public void onPositive() {
-                    finish();
-                }
-                @Override
-                public void onNegative() {}
-            });
-            return;
-        }
-
-        //do not continue if source number is empty
-        if (!getIntent().hasExtra("sSourceNo")){
-
-            InitMessage(2, "Source number not found!", new onMessageButton() {
-                @Override
-                public void onPositive() {
-                    finish();
-                }
-                @Override
-                public void onNegative() {}
-            });
-            return;
-        }
-        lsSourceNo = getIntent().getStringExtra("sSourceNo");
-
-        //always reload checklist
-        mviewModel.ImportChecklistDetails(lsSourceNo, new VMBranchVisit.OnImportChecklist() {
+        //always reload checklist to get updated checklists
+        mviewModel.ImportChecklist(new VMBranchVisit.OnImportChecklist() {
             @Override
             public void OnLoad() {
                 poDialog.initDialog(getClass().getSimpleName(), "Downloading checklist details . . .", false);
                 poDialog.show();
             }
-
             @Override
-            public void OnSuccess() {
+            public void OnFinished(String fsMessage) {
                 poDialog.dismiss();
+                Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
 
-                //start data observation
-                InitObservers();
-                Toast.makeText(Activity_Branch_Visit_Checklist.this, "Checklist details downloaded successfully", Toast.LENGTH_LONG).show();
-            }
+                if (laChecklist.size() <= 0){
+                    return;
+                }
 
-            @Override
-            public void OnFailed(String fsMessage) {
-                poDialog.dismiss();
+                //'0' create new entry master & detail then initialize transaction number, '1' initialize only transaction number from intent
+                if (getIntent().getStringExtra("type").equalsIgnoreCase("0")) {
 
-                //show error and ask user to try again, else, finish activity
-                InitMessage(3, fsMessage + ". Do you want to try downloading again?", new onMessageButton() {
-                    @Override
-                    public void onPositive() {
-                        InitData();
+                    EBranchVisitMaster loMaster = mviewModel.GetEntryToday();
+                    if (loMaster == null){
+                        lsSourceNo = mviewModel.SaveNewMaster(getIntent().getStringExtra("branch"));
+                    }else {
+                        lsSourceNo = loMaster.getsTransNox();
                     }
 
-                    @Override
-                    public void onNegative() { finish(); }
-                });
+                    laChecklist.forEach(eBranchVisitChecklist -> {
+                        mviewModel.SaveNewDetail(lsSourceNo, eBranchVisitChecklist.getsCategrID(), "");
+                    });
+
+                } else if (getIntent().getStringExtra("type").equalsIgnoreCase("1")) {
+
+                    //if transaction number not set from history, finish activity
+                    if (!getIntent().hasExtra("source")){
+
+                        InitMessage(2, "Could not verify transaction number", new onMessageButton() {
+                            @Override
+                            public void onPositive() {
+                                finish();
+                            }
+                            @Override
+                            public void onNegative() {}
+                        });
+                        return;
+                    }
+                    lsSourceNo = getIntent().getStringExtra("source");
+                }
+                InitObservers();
+
+
+                if (loMaster == null) return; //do not proceed if master is empty
+
+                //download details if master transaction is from database
+                if (loMaster.getcSendStat().equalsIgnoreCase("1")){
+
+                    mviewModel.ImportDetails(lsSourceNo, new VMBranchVisit.OnImportChecklist() {
+                        @Override
+                        public void OnLoad() {
+                            Toast.makeText(Activity_Branch_Visit_Checklist.this, "Downloading details . . .", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void OnFinished(String fsMessage) {
+                            Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                InitObservers();
             }
         });
     }
 
     private void InitObservers(){
 
-        //do not proceed, if source no is empty
-        if (lsSourceNo == null || lsSourceNo.isEmpty()) return;
-
         mviewModel.GetChecklist().observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EBranchVisitChecklist>>() {
             @Override
             public void onChanged(List<EBranchVisitChecklist> eBranchVisitChecklists) {
 
                 //if checklist is empty, ask user to re download checklist, if declined, finish activity
-                if (eBranchVisitChecklists.size() <= 0){
+                if (eBranchVisitChecklists == null || eBranchVisitChecklists.size() <= 0){
 
                     InitMessage(3, "Checklist not found! Do you want to re-download data?", new onMessageButton() {
                         @Override
@@ -197,16 +234,61 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
                 //initialize checklist
                 laChecklist = eBranchVisitChecklists;
+            }
+        });
 
-                //initialize adapter
-                loAdapter = new Adapter_Branch_Vist_Checklist(lsSourceNo, eBranchVisitChecklists, new Adapter_Branch_Vist_Checklist.OnItemListener() {
+        Log.d("Branch checklist size is  ", String.valueOf(laChecklist.size()));
+        if (laChecklist.size() <= 0){
+            return;
+        } else if (lsSourceNo == null || lsSourceNo.isEmpty()) {
+            return;
+        }
+
+        mviewModel.GetMasterTransaction(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<EBranchVisitMaster>() {
+            @Override
+            public void onChanged(EBranchVisitMaster eBranchVisitMaster) {
+                loMaster = eBranchVisitMaster;
+            }
+        });
+
+        if (loMaster == null){
+            return;
+        }
+
+        mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
+            @Override
+            public void onChanged(List<DBranchVisitDetail.BranchVisitDetail> eBranchVisitDetails) {
+
+                if (eBranchVisitDetails == null || eBranchVisitDetails.size() <= 0){
+
+                    Log.d("Branch checklist status is  ", loMaster.getcSendStat());
+                    if (loMaster.getcSendStat().equalsIgnoreCase("1")){
+
+                        InitMessage(3, "Details not found! Do you want to re-download data?", new onMessageButton() {
+                            @Override
+                            public void onPositive() {
+                                InitData();
+                            }
+                            @Override
+                            public void onNegative() { finish(); }
+                        });
+
+                    }
+                    return;
+                }
+
+                //initialize checklist
+                laDetails = eBranchVisitDetails;
+
+                ///initialize adapter
+                loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
                     @Override
                     public void OnCamera(String fsCategrID) {
 
                     }
 
                     @Override
-                    public void OnViewDetails(String fsSourceNo, String fsCategrID) {
+                    public void OnViewDetails(String fsCategrID) {
 
                     }
 
@@ -218,28 +300,6 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
                 recyclerview_checklist.setAdapter(loAdapter);
                 recyclerview_checklist.setLayoutManager(new LinearLayoutManager(Activity_Branch_Visit_Checklist.this,  LinearLayoutManager.VERTICAL, false));
-            }
-        });
-
-        //do not proceed if checklist is empty
-        if (laChecklist == null || laChecklist.size() <= 0) return;
-
-        mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EBranchVisitDetail>>() {
-            @Override
-            public void onChanged(List<EBranchVisitDetail> eBranchVisitDetails) {
-
-                //if checklist is empty, ask user to re download checklist, if declined, finish activity
-                if (eBranchVisitDetails.size() <= 0){
-
-                    InitMessage(3, "Details not found! Do you want to re-download data?", new onMessageButton() {
-                        @Override
-                        public void onPositive() {
-                            InitData();
-                        }
-                        @Override
-                        public void onNegative() { finish(); }
-                    });
-                }
             }
         });
     }

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.R;
 
@@ -23,19 +24,17 @@ import java.util.List;
 
 public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_Branch_Vist_Checklist.VHBranchChecklist> {
 
-    private String lsSourceNo;
-    private List<EBranchVisitChecklist> laChecklist;
+    private List<DBranchVisitDetail.BranchVisitDetail> laChecklist;
     private OnItemListener loListener;
 
-    public Adapter_Branch_Vist_Checklist(String fsSourceNo, List<EBranchVisitChecklist> faChecklist, OnItemListener foListener){
-        lsSourceNo = fsSourceNo;
+    public Adapter_Branch_Vist_Checklist(List<DBranchVisitDetail.BranchVisitDetail> faChecklist, OnItemListener foListener){
         laChecklist = faChecklist;
         loListener = foListener;
     }
 
     public interface OnItemListener{
         void OnCamera(String fsCategrID);
-        void OnViewDetails(String fsSourceNo, String fsCategrID);
+        void OnViewDetails(String fsCategrID);
         void OnRemarks(String fsCategrID, String sRemarks);
     }
 
@@ -51,13 +50,14 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
     @Override
     public void onBindViewHolder(@NonNull VHBranchChecklist holder, int position) {
 
-        holder.mtv_checklist.setText(laChecklist.get(position).getsDescript());
+        holder.mtv_checklist.setText(laChecklist.get(position).sDescript);
+        holder.txt_remarks.setText(laChecklist.get(position).sRemarksx);
 
         //add listener for camera button
         holder.btn_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loListener.OnCamera(laChecklist.get(position).getsCategrID());
+                loListener.OnCamera(laChecklist.get(position).sCategrID);
             }
         });
 
@@ -65,7 +65,7 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
         holder.ib_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loListener.OnViewDetails(lsSourceNo, laChecklist.get(position).getsCategrID());
+                loListener.OnViewDetails(laChecklist.get(position).sCategrID);
             }
         });
 
@@ -91,7 +91,7 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
         holder.mtv_confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loListener.OnRemarks(laChecklist.get(position).getsCategrID(), holder.txt_remarks.getText().toString());
+                loListener.OnRemarks(laChecklist.get(position).sCategrID, holder.txt_remarks.getText().toString());
             }
         });
     }

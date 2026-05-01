@@ -29,7 +29,7 @@
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Branch Checklist"
+                android:text="Branch Visit History"
                 android:fontFamily="@font/roboto"
                 android:textSize="22sp"
                 android:layout_gravity="center"
@@ -39,8 +39,43 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layout_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Search Transaction"
+            app:boxBackgroundColor="?attr/colorSurface"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="0.85">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txt_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/zxing_transparent"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/ib_filter"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/baseline_filter_list_24"
+            android:background="@color/zxing_transparent"
+            app:layout_constraintTop_toTopOf="@+id/layout_search"
+            app:layout_constraintBottom_toBottomOf="@+id/layout_search"
+            app:layout_constraintStart_toEndOf="@+id/layout_search"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_checklist"
+        android:id="@+id/recyclerview_history"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="10dp" />

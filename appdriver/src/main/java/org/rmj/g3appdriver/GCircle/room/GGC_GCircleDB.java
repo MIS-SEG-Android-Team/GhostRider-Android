@@ -372,7 +372,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                             GGC_GCircleDB.class, "GGC_ISysDBF.db")
                     .allowMainThreadQueries()
                     .addCallback(roomCallBack)
-                    .addMigrations(MIGRATION_V46)
+                    .addMigrations(MIGRATION_V47)
                     .build();
         }
         return instance;
@@ -407,7 +407,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
         }
     }
 
-    static final Migration MIGRATION_V46 = new Migration(45, 46) {
+    static final Migration MIGRATION_V47 = new Migration(46, 47) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
 
@@ -504,6 +504,21 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                     "sReferNox TEXT, sAcctNmbr TEXT, dPurchase TEXT, drNo TEXT, sSerialID TEXT, nAcctTerm INTEGER NOT NULL, nDownPaym REAL NOT NULL, nMonAmort REAL NOT NULL, " +
                     "nRebatesx REAL NOT NULL, nPenaltyx REAL NOT NULL, dFirstPay TEXT, sRemarksx TEXT, cTranStat TEXT, sSendStat TEXT, " +
                     "PRIMARY KEY(sTransNox))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Branch_Visit_Checklist` (" +
+                    "sCategrID TEXT NOT NULL, sDescript TEXT, cRecdStat TEXT, " +
+                    "PRIMARY KEY(sCategrID))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Branch_Visit_Master` (" +
+                    "sTransNox TEXT NOT NULL, dTransact TEXT, sBranchCd TEXT, sUserIDxx TEXT, cTranStat TEXT, cSendStat TEXT, " +
+                    "PRIMARY KEY(sTransNox))");
+
+            //Add the new table
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Branch_Visit_Detail` (" +
+                    "sTransNox TEXT NOT NULL, sCategrID TEXT NOT NULL, sRemarksx TEXT, " +
+                    "PRIMARY KEY(sTransNox, sCategrID))");
 
             if (!CheckColumnExists(database, "Ganado_Online", "nCashPrce")){
                 database.execSQL("ALTER TABLE Ganado_Online ADD COLUMN nCashPrce REAL");

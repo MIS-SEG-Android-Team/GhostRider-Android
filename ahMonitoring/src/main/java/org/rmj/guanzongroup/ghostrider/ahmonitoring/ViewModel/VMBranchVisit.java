@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import org.rmj.g3appdriver.GCircle.Apps.BranchMonitoring.BranchMonitoring;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
@@ -24,8 +26,7 @@ public class VMBranchVisit extends AndroidViewModel {
 
     public interface OnImportChecklist{
         void OnLoad();
-        void OnSuccess();
-        void OnFailed(String fsMessage);
+        void OnFinished(String fsMessage);
     }
 
     public VMBranchVisit(@NonNull Application application) {
@@ -35,15 +36,75 @@ public class VMBranchVisit extends AndroidViewModel {
         poSys = new BranchMonitoring(application);
     }
 
-    public void SaveNewMaster(String fsBranchCd){
-        poSys.SaveNewMaster(fsBranchCd);
+    public String SaveNewMaster(String fsBranchCd){
+        return poSys.SaveNewMaster(fsBranchCd);
     }
 
     public void SaveNewDetail(String fsTransNox, String fsCategrID, String fsRemarks){
         poSys.SaveNewDetail(fsTransNox, fsCategrID, fsRemarks);
     }
 
-    public void ImportChecklistDetails(String fsTransNox, OnImportChecklist foListener){
+    public void ImportChecklist(OnImportChecklist foListener){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                foListener.OnLoad();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isDeviceConnected()){
+                    return poConnection.getMessage();
+                }
+
+                if (!poSys.ImportChecklist()){
+                    return poSys.GetMessage();
+                }
+                return "Checklist downloaded successfully";
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                String lsMessage = (String) object;
+                foListener.OnFinished(lsMessage);
+            }
+        });
+    }
+
+    public void ImportMaster(String fsDfrom, String fsDto, OnImportChecklist foListener){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                foListener.OnLoad();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isDeviceConnected()){
+                    return poConnection.getMessage();
+                }
+
+                if (!poSys.ImportBranchVisitMaster(fsDfrom, fsDto)){
+                    return poSys.GetMessage();
+                }
+
+                return "Master downloaded successfully";
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                String lsMessage = (String) object;
+                foListener.OnFinished(lsMessage);
+            }
+        });
+    }
+
+    public void ImportDetails(String fsTransNox, OnImportChecklist foListener){
 
         TaskExecutor.Execute(fsTransNox, new OnTaskExecuteListener() {
             @Override
@@ -54,41 +115,22 @@ public class VMBranchVisit extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
-                try {
+                String lsTransNox = (String) args;
 
-                    String lsTransNox = (String) args;
-
-                    if (!poConnection.isDeviceConnected()){
-                        lsMessage = poConnection.getMessage();
-                        return false;
-                    }
-                    Thread.sleep(500);
-
-                    if (!poSys.ImportChecklist()){
-                        lsMessage = poSys.GetMessage();
-                        return false;
-                    }
-                    Thread.sleep(1000);
-
-                    if (!poSys.ImportBranchVisitDetails(lsTransNox)){
-                        lsMessage = poSys.GetMessage();
-                        return false;
-                    }
-                    return true;
-
-                }catch (Exception e){
-                    lsMessage = e.getMessage();
-                    return false;
+                if (!poConnection.isDeviceConnected()){
+                    return poConnection.getMessage();
                 }
+
+                if (!poSys.ImportBranchVisitDetails(lsTransNox)){
+                    return poSys.GetMessage();
+                }
+                return "Details downloaded successfully";
             }
 
             @Override
             public void OnPostExecute(Object object) {
-                if ((Boolean) object){
-                    foListener.OnSuccess();
-                }else{
-                    foListener.OnFailed(lsMessage);
-                }
+                String lsMessage = (String) object;
+                foListener.OnFinished(lsMessage);
             }
         });
     }
@@ -97,7 +139,19 @@ public class VMBranchVisit extends AndroidViewModel {
         return poSys.GetChecklist();
     }
 
-    public LiveData<List<EBranchVisitDetail>> GetDetails(String fsTransNox){
+    public EBranchVisitMaster GetEntryToday(){
+        return poSys.GetEntryToday();
+    }
+
+    public LiveData<EBranchVisitMaster> GetMasterTransaction(String fsTransNox){
+        return poSys.GetMasterTransaction(fsTransNox);
+    }
+
+    public LiveData<List<DBranchVisitMaster.MasterHistory>> GetHistory(){
+        return poSys.GetHistory();
+    }
+
+    public LiveData<List<DBranchVisitDetail.BranchVisitDetail>> GetDetails(String fsTransNox){
         return poSys.GetDetails(fsTransNox);
     }
 }
