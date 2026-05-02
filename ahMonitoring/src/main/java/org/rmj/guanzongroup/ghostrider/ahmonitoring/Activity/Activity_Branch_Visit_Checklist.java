@@ -3,14 +3,18 @@ package org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.MaterialToolbar;
 
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
@@ -35,6 +39,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
     private VMBranchVisit mviewModel;
     private Adapter_Branch_Vist_Checklist loAdapter;
 
+    private MaterialToolbar toolbar;
     private RecyclerView recyclerview_checklist;
 
     private LoadDialog poDialog;
@@ -81,8 +86,18 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         }
 
         InitWidgets();
-        InitObservers();
         InitData();
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == android.R.id.home){
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void InitMessage(int mode, String message, onMessageButton callback){
@@ -136,7 +151,13 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
     }
 
     private void InitWidgets(){
+        toolbar = findViewById(R.id.toolbar);
         recyclerview_checklist = findViewById(R.id.recyclerview_checklist);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
     }
 
     private void InitData(){
@@ -153,44 +174,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                 poDialog.dismiss();
                 Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
 
-                if (laChecklist.size() <= 0){
-                    return;
-                }
-
-                //'0' create new entry master & detail then initialize transaction number, '1' initialize only transaction number from intent
-                if (getIntent().getStringExtra("type").equalsIgnoreCase("0")) {
-
-                    EBranchVisitMaster loMaster = mviewModel.GetEntryToday();
-                    if (loMaster == null){
-                        lsSourceNo = mviewModel.SaveNewMaster(getIntent().getStringExtra("branch"));
-                    }else {
-                        lsSourceNo = loMaster.getsTransNox();
-                    }
-
-                    laChecklist.forEach(eBranchVisitChecklist -> {
-                        mviewModel.SaveNewDetail(lsSourceNo, eBranchVisitChecklist.getsCategrID(), "");
-                    });
-
-                } else if (getIntent().getStringExtra("type").equalsIgnoreCase("1")) {
-
-                    //if transaction number not set from history, finish activity
-                    if (!getIntent().hasExtra("source")){
-
-                        InitMessage(2, "Could not verify transaction number", new onMessageButton() {
-                            @Override
-                            public void onPositive() {
-                                finish();
-                            }
-                            @Override
-                            public void onNegative() {}
-                        });
-                        return;
-                    }
-                    lsSourceNo = getIntent().getStringExtra("source");
-                }
                 InitObservers();
-
-
                 if (loMaster == null) return; //do not proceed if master is empty
 
                 //download details if master transaction is from database
@@ -208,7 +192,6 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                         }
                     });
                 }
-                InitObservers();
             }
         });
     }
@@ -234,72 +217,116 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
                 //initialize checklist
                 laChecklist = eBranchVisitChecklists;
-            }
-        });
 
-        if (laChecklist.size() <= 0){
-            return;
-        } else if (lsSourceNo == null || lsSourceNo.isEmpty()) {
-            return;
-        }
-
-        mviewModel.GetMasterTransaction(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<EBranchVisitMaster>() {
-            @Override
-            public void onChanged(EBranchVisitMaster eBranchVisitMaster) {
-
-                loMaster = eBranchVisitMaster;
-                Log.d("Master is ", "initialized");
-
-                if (loMaster == null){
-                    Log.d("Master is ", "null");
+                //do not proceed if checklist is empty
+                if (laChecklist.size() <= 0){
                     return;
                 }
 
-                mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
-                    @Override
-                    public void onChanged(List<DBranchVisitDetail.BranchVisitDetail> eBranchVisitDetails) {
+                //'0' create new entry master & detail then initialize transaction number, '1' initialize only transaction number from intent
+                if (getIntent().getStringExtra("type").equalsIgnoreCase("0")) {
 
-                        if (eBranchVisitDetails == null || eBranchVisitDetails.size() <= 0){
+                    //create new entry if no existing record today, else, initialize source number only
+                    EBranchVisitMaster loMaster = mviewModel.GetEntryToday();
+                    if (loMaster == null){
+                        lsSourceNo = mviewModel.SaveNewMaster(getIntent().getStringExtra("branch"));
 
-                            Log.d("Branch checklist status is  ", loMaster.getcSendStat());
-                            if (loMaster.getcSendStat().equalsIgnoreCase("1")){
+                        laChecklist.forEach(eBranchVisitChecklist -> {
+                            mviewModel.SaveNewDetail(lsSourceNo, eBranchVisitChecklist.getsCategrID(), "");
+                        });
+                    }else {
+                        lsSourceNo = loMaster.getsTransNox();
+                    }
 
-                                InitMessage(3, "Details not found! Do you want to re-download data?", new onMessageButton() {
-                                    @Override
-                                    public void onPositive() {
-                                        InitData();
-                                    }
-                                    @Override
-                                    public void onNegative() { finish(); }
-                                });
+                } else if (getIntent().getStringExtra("type").equalsIgnoreCase("1")) {
 
+                    //if transaction number not set from history, finish activity
+                    if (!getIntent().hasExtra("source")){
+
+                        InitMessage(2, "Could not verify transaction number", new onMessageButton() {
+                            @Override
+                            public void onPositive() {
+                                finish();
                             }
+                            @Override
+                            public void onNegative() {}
+                        });
+                        return;
+                    }
+                    lsSourceNo = getIntent().getStringExtra("source");
+                }
+
+                //do not proceed if transaction number is not initialized
+                if (lsSourceNo == null || lsSourceNo.isEmpty()) {
+                    return;
+                }
+
+                //initialize master and details
+                mviewModel.GetMasterTransaction(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<EBranchVisitMaster>() {
+                    @Override
+                    public void onChanged(EBranchVisitMaster eBranchVisitMaster) {
+
+                        loMaster = eBranchVisitMaster;
+
+                        if (loMaster == null){
                             return;
                         }
 
-                        //initialize checklist
-                        laDetails = eBranchVisitDetails;
-
-                        ///initialize adapter
-                        loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
+                        mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
                             @Override
-                            public void OnCamera(String fsCategrID) {
+                            public void onChanged(List<DBranchVisitDetail.BranchVisitDetail> eBranchVisitDetails) {
 
-                            }
+                                if (eBranchVisitDetails == null || eBranchVisitDetails.size() <= 0){
 
-                            @Override
-                            public void OnViewDetails(String fsCategrID) {
+                                    if (loMaster.getcSendStat().equalsIgnoreCase("1")){
 
-                            }
+                                        InitMessage(3, "Details not found! Do you want to re-download data?", new onMessageButton() {
+                                            @Override
+                                            public void onPositive() {
+                                                InitData();
+                                            }
+                                            @Override
+                                            public void onNegative() { finish(); }
+                                        });
 
-                            @Override
-                            public void OnRemarks(String fsCategrID, String sRemarks) {
+                                    }
+                                    return;
+                                }
 
+                                //initialize checklist
+                                laDetails = eBranchVisitDetails;
+
+                                ///initialize adapter
+                                loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
+                                    @Override
+                                    public void OnCamera(String fsCategrID) {
+
+                                    }
+
+                                    @Override
+                                    public void OnViewDetails(String fsCategrID) {
+
+                                    }
+
+                                    @Override
+                                    public void OnRemarks(String fsCategrID, String sRemarks) {
+                                        mviewModel.UpdateRemarks(sRemarks, lsSourceNo, fsCategrID);
+                                    }
+                                });
+
+                                //if transaction is from previous date, else if not "OPEN", do not allow modification
+                                if (!loMaster.getdTransact().equalsIgnoreCase(mviewModel.GetCurrentDate())){
+                                    loAdapter.AllowEdit(false);
+                                } else if (!loMaster.getcTranStat().equalsIgnoreCase("0")) {
+                                    loAdapter.AllowEdit(false);
+                                }else {
+                                    loAdapter.AllowEdit(true);
+                                }
+
+                                recyclerview_checklist.setAdapter(loAdapter);
+                                recyclerview_checklist.setLayoutManager(new LinearLayoutManager(Activity_Branch_Visit_Checklist.this,  LinearLayoutManager.VERTICAL, false));
                             }
                         });
-
-                        recyclerview_checklist.setAdapter(loAdapter);
-                        recyclerview_checklist.setLayoutManager(new LinearLayoutManager(Activity_Branch_Visit_Checklist.this,  LinearLayoutManager.VERTICAL, false));
                     }
                 });
             }

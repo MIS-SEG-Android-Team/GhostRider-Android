@@ -19,8 +19,6 @@ import java.util.List;
 
 public class VMBranchVisit extends AndroidViewModel {
 
-    private String lsMessage;
-
     private ConnectionUtil poConnection;
     private BranchMonitoring poSys;
 
@@ -42,6 +40,10 @@ public class VMBranchVisit extends AndroidViewModel {
 
     public void SaveNewDetail(String fsTransNox, String fsCategrID, String fsRemarks){
         poSys.SaveNewDetail(fsTransNox, fsCategrID, fsRemarks);
+    }
+
+    public void UpdateRemarks(String fsRemarksx, String fsTransNox, String fsCategrID){
+        poSys.UpdateRemarks(fsRemarksx, fsTransNox, fsCategrID);
     }
 
     public void ImportChecklist(OnImportChecklist foListener){
@@ -135,6 +137,10 @@ public class VMBranchVisit extends AndroidViewModel {
         });
     }
 
+    public String GetCurrentDate(){
+        return poSys.GetCurrentDate();
+    }
+
     public LiveData<List<EBranchVisitChecklist>> GetChecklist(){
         return poSys.GetChecklist();
     }
@@ -147,8 +153,8 @@ public class VMBranchVisit extends AndroidViewModel {
         return poSys.GetMasterTransaction(fsTransNox);
     }
 
-    public LiveData<List<DBranchVisitMaster.MasterHistory>> GetHistory(){
-        return poSys.GetHistory();
+    public LiveData<List<DBranchVisitMaster.MasterHistory>> GetHistory(String fsTransTat){
+        return poSys.GetHistory(fsTransTat);
     }
 
     public LiveData<List<DBranchVisitDetail.BranchVisitDetail>> GetDetails(String fsTransNox){

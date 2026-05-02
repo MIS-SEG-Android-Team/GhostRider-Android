@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_by_date" android:title="By Date"/>
+    <item android:id="@+id/menu_by_status" android:title="By Status">
+        <menu>
+            <item android:id="@+id/menu_item_all" android:title="All"/>
+            <item android:id="@+id/menu_item_open" android:title="Open"/>
+            <item android:id="@+id/menu_item_closed" android:title="Closed"/>
+            <item android:id="@+id/menu_item_posted" android:title="Posted"/>
+        </menu>
+    </item>
+</menu>

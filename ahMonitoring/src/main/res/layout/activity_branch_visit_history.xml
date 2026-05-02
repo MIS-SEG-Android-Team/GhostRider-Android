@@ -45,6 +45,7 @@
         android:padding="10dp">
 
         <com.google.android.material.textfield.TextInputLayout
+
             android:id="@+id/layout_search"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -74,11 +75,34 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <LinearLayout
+        android:id="@+id/layout_norecord"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/kay"
+            android:scaleType="fitCenter"
+            android:alpha="0.2"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No record found"
+            android:alpha="0.5"/>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_history"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp" />
+        android:layout_marginTop="10dp"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:id="@+id/layout_noRecord"

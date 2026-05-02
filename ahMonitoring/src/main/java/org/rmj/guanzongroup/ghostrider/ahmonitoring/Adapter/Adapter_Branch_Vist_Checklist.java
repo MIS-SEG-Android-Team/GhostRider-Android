@@ -26,6 +26,7 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
 
     private List<DBranchVisitDetail.BranchVisitDetail> laChecklist;
     private OnItemListener loListener;
+    private Boolean lbAllowEdit = false;
 
     public Adapter_Branch_Vist_Checklist(List<DBranchVisitDetail.BranchVisitDetail> faChecklist, OnItemListener foListener){
         laChecklist = faChecklist;
@@ -36,6 +37,10 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
         void OnCamera(String fsCategrID);
         void OnViewDetails(String fsCategrID);
         void OnRemarks(String fsCategrID, String sRemarks);
+    }
+
+    public void AllowEdit(Boolean fbAllow){
+        lbAllowEdit = fbAllow;
     }
 
     @NonNull
@@ -49,6 +54,9 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
 
     @Override
     public void onBindViewHolder(@NonNull VHBranchChecklist holder, int position) {
+
+        holder.txt_remarks.setEnabled(lbAllowEdit);
+        holder.btn_camera.setEnabled(lbAllowEdit);
 
         holder.mtv_checklist.setText(laChecklist.get(position).sDescript);
         holder.txt_remarks.setText(laChecklist.get(position).sRemarksx);

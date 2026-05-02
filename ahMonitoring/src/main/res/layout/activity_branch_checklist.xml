@@ -12,7 +12,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay">
+        android:theme="@style/GhostRiderMaterialTheme.AppBarOverlay"
+        android:paddingBottom="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,7 +44,7 @@
         android:id="@+id/recyclerview_checklist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp" />
+        android:padding="10dp"/>
 
     <LinearLayout
         android:id="@+id/layout_noRecord"

@@ -26,6 +26,7 @@ import org.rmj.guanzongroup.documentscanner.Activity_DocumentScan;
 import org.rmj.guanzongroup.ganado.Activities.Activity_BrandSelection;
 import org.rmj.guanzongroup.ganado.Activities.Activity_Inquiries;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_AreaPerformanceMonitoring;
+import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_Branch_Visit_History;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCountLog;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_CashCounter;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity.Activity_Inventory;
@@ -170,6 +171,9 @@ public class ChildObject {
                 loIntent.putExtra("sysCode", "4");
                 break;
 
+            case "branch monitoring":
+                loIntent = new Intent(context, Activity_Branch_Visit_History.class);
+                break;
             case "random stock inventory":
                 loIntent = new Intent(context, Activity_Inventory.class);
                 break;

@@ -15,6 +15,9 @@ public interface DBranchVisitDetail {
     @Upsert
     void Save(EBranchVisitDetail foVal);
 
+    @Query("UPDATE Branch_Visit_Detail SET sRemarksx= :fsRemarksx WHERE sTransNox = :fsTransNox AND sCategrID = :fsCategrID")
+    void UpdateRemarks(String fsRemarksx, String fsTransNox, String fsCategrID);
+
     @Query("SELECT " +
                 "a.sCategrID," +
                 "b.sDescript, " +
@@ -32,7 +35,7 @@ public interface DBranchVisitDetail {
     @Query("SELECT * FROM Branch_Visit_Detail WHERE sTransNox = :sTransNox")
     List<EBranchVisitDetail> GetDetailsForTest(String sTransNox);
 
-    public static class BranchVisitDetail{
+    class BranchVisitDetail{
         public String sCategrID;
         public String sDescript;
         public String sRemarksx;

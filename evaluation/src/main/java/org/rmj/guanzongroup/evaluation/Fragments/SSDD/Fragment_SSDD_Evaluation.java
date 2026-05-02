@@ -515,6 +515,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private String GetDateFormat(Long fsDate){
         return new SimpleDateFormat("yyyy-MM-dd").format(fsDate);
     }

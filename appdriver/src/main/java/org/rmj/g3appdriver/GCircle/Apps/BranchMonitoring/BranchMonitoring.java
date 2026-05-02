@@ -1,10 +1,12 @@
 package org.rmj.g3appdriver.GCircle.Apps.BranchMonitoring;
 
+import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
+
 import android.app.Application;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.sqlite.db.SimpleSQLiteQuery;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,12 +53,21 @@ public class BranchMonitoring {
         poError = GGC_GCircleDB.getInstance(foApplication).errorLogsDao();
     }
 
-    private String GetCurrentDate(){
+    private String GetCurrentDateTime(){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }else {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
+        }
+    }
+
+    public String GetCurrentDate(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime());
         }
     }
 
@@ -80,7 +91,7 @@ public class BranchMonitoring {
 
         EErrorLogs loError = new EErrorLogs();
         loError.setnErrorLogID(poError.GetErrorLogCount() + 1);
-        loError.setdLogDate(GetCurrentDate());
+        loError.setdLogDate(GetCurrentDateTime());
         loError.setsSourceTransNo(source);
         loError.setsMessagex(message);
         loError.setcRead("0");
@@ -111,6 +122,10 @@ public class BranchMonitoring {
         poDetail.Save(loDetail);
     }
 
+    public void UpdateRemarks(String fsRemarksx, String fsTransNox, String fsCategrID){
+        poDetail.UpdateRemarks(fsRemarksx, fsTransNox, fsCategrID);
+    }
+
     public String GetMessage(){
         return lsMessage;
     }
@@ -125,13 +140,16 @@ public class BranchMonitoring {
                 return false;
             }
 
-            JSONObject loResult = new JSONObject(lsResult);
-            if (loResult.getString("result").equalsIgnoreCase("error")){
-                lsMessage = loResult.getString("message");
+            JSONObject loResponse = new JSONObject(lsResult);
+            String lsResponse = loResponse.getString("result");
+
+            if(lsResponse.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                lsMessage = getErrorMessage(loError);;
                 return false;
             }
 
-            JSONArray laChecklist= loResult.getJSONArray("detail");
+            JSONArray laChecklist= loResponse.getJSONArray("detail");
             for (int i = 0; i < laChecklist.length(); i++){
                 JSONObject loChecklist = laChecklist.getJSONObject(i);
 
@@ -148,6 +166,7 @@ public class BranchMonitoring {
             }
             return true;
         }catch (Exception e){
+            lsMessage = e.getMessage();
             SaveError("Branch Monitoring Checklist" , e.getMessage());
             return false;
         }
@@ -166,13 +185,16 @@ public class BranchMonitoring {
                 return false;
             }
 
-            JSONObject loResult = new JSONObject(lsResult);
-            if (loResult.getString("result").equalsIgnoreCase("error")){
-                lsMessage = loResult.getString("message");
+            JSONObject loResponse = new JSONObject(lsResult);
+            String lsResponse = loResponse.getString("result");
+
+            if(lsResponse.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                lsMessage = getErrorMessage(loError);;
                 return false;
             }
 
-            JSONArray laChecklist= loResult.getJSONArray("detail");
+            JSONArray laChecklist= loResponse.getJSONArray("detail");
             for (int i = 0; i < laChecklist.length(); i++){
                 JSONObject loChecklist = laChecklist.getJSONObject(i);
 
@@ -190,6 +212,7 @@ public class BranchMonitoring {
             return true;
 
         }catch (Exception e){
+            lsMessage = e.getMessage();
             SaveError("Branch Monitoring Details" , e.getMessage());
             return false;
         }
@@ -210,13 +233,16 @@ public class BranchMonitoring {
                 return false;
             }
 
-            JSONObject loResult = new JSONObject(lsResult);
-            if (loResult.getString("result").equalsIgnoreCase("error")){
-                lsMessage = loResult.getString("message");
+            JSONObject loResponse = new JSONObject(lsResult);
+            String lsResponse = loResponse.getString("result");
+
+            if(lsResponse.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                lsMessage = getErrorMessage(loError);;
                 return false;
             }
 
-            JSONArray laMaster= loResult.getJSONArray("detail");
+            JSONArray laMaster= loResponse.getJSONArray("detail");
             for (int i = 0; i < laMaster.length(); i++){
                 JSONObject loMaster = laMaster.getJSONObject(i);
 
@@ -232,6 +258,7 @@ public class BranchMonitoring {
             }
             return true;
         }catch (Exception e){
+            lsMessage = e.getMessage();
             SaveError("Branch Monitoring Master" , e.getMessage());
             return false;
         }
@@ -249,8 +276,25 @@ public class BranchMonitoring {
         return poMaster.GetMasterTransaction(fsTransNox);
     }
 
-    public LiveData<List<DBranchVisitMaster.MasterHistory>> GetHistory(){
-        return poMaster.GetHistory(poSession.getUserID());
+    public LiveData<List<DBranchVisitMaster.MasterHistory>> GetHistory(String fsTransTat){
+        return poMaster.GetHistory(
+                new SimpleSQLiteQuery(
+                        "SELECT " +
+                                "IFNULL((SELECT b.sBranchNm FROM Branch_Info b WHERE b.sBranchCd = a.sBranchCd), " +
+                                "a.sBranchCd) sBranchNm, " +
+                                "a.sTransNox, " +
+                                "a.sBranchCd, " +
+                                "a.dTransact, " +
+                                "a.cSendStat, " +
+                                "a.cTranStat " +
+                        "FROM " +
+                                "Branch_Visit_Master a " +
+                        "WHERE " +
+                                "a.sUserIDxx = '" + poSession.getUserID() + "' " +
+                        "AND " +
+                                fsTransTat
+                )
+        );
     }
 
     public LiveData<List<DBranchVisitDetail.BranchVisitDetail>> GetDetails(String fsTransNox){

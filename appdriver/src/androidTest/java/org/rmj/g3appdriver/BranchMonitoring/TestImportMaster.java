@@ -72,7 +72,7 @@ public class TestImportMaster {
         loParams.put("sBranchCd", "M002");
         loParams.put("sUserIDxx", "GAP023000374");
 
-        String lsResult = WebClient.sendRequest("http://192.165.10.175/GMC%20SEG%20Folder%20-%20PHP/eclipse-workspace/apps/gcircle/branchmonitoring/download_branch_visit_master.php",
+        String lsResult = WebClient.sendRequest("http://192.165.10.170/GMC%20SEG%20Folder%20-%20PHP/eclipse-workspace/apps/gcircle/branchmonitoring/download_branch_visit_master.php",
                 loParams.toString(), (HashMap<String, String>) headers);
 
         if (lsResult == null || lsResult.isEmpty()){
@@ -81,6 +81,8 @@ public class TestImportMaster {
 
         JSONObject loResult = new JSONObject(lsResult);
         if (loResult.getString("result").equalsIgnoreCase("error")){
+            JSONObject loError = loResult.getJSONObject("error");
+            System.out.println(loError.getString("message"));
             return;
         }
 
