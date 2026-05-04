@@ -17,7 +17,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
-import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.R;
 
 import java.util.List;
@@ -35,7 +34,7 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
 
     public interface OnItemListener{
         void OnCamera(String fsCategrID);
-        void OnViewDetails(String fsCategrID);
+        void OnPreviewImage(String fsCategrID);
         void OnRemarks(String fsCategrID, String sRemarks);
     }
 
@@ -73,7 +72,7 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
         holder.ib_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loListener.OnViewDetails(laChecklist.get(position).sCategrID);
+                loListener.OnPreviewImage(laChecklist.get(position).sCategrID);
             }
         });
 

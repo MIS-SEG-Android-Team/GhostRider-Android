@@ -8,8 +8,8 @@ import androidx.lifecycle.LiveData;
 import org.rmj.g3appdriver.GCircle.Apps.BranchMonitoring.BranchMonitoring;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitMaster;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
-import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -32,6 +32,10 @@ public class VMBranchVisit extends AndroidViewModel {
 
         poConnection = new ConnectionUtil(application);
         poSys = new BranchMonitoring(application);
+    }
+
+    public EBranchInfo GetBranchName(String fsBranchCd){
+        return poSys.GetBranch(fsBranchCd);
     }
 
     public String SaveNewMaster(String fsBranchCd){

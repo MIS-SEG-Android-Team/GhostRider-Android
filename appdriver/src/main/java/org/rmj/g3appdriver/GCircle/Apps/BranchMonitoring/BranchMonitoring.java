@@ -12,10 +12,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.rmj.g3appdriver.GCircle.Account.EmployeeSession;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitMaster;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DErrorLogs;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
@@ -39,6 +41,7 @@ public class BranchMonitoring {
     private HttpHeaders poHeaders;
 
     private DErrorLogs poError;
+    private DBranchInfo poBranch;
     private DBranchVisitChecklist poChecklist;
     private DBranchVisitMaster poMaster;
     private DBranchVisitDetail poDetail;
@@ -47,6 +50,7 @@ public class BranchMonitoring {
         poSession = EmployeeSession.getInstance(foApplication);
         poApi = new GCircleApi(foApplication);
         poHeaders = HttpHeaders.getInstance(foApplication);
+        poBranch = GGC_GCircleDB.getInstance(foApplication).BranchDao();
         poChecklist = GGC_GCircleDB.getInstance(foApplication).branchChecklistDao();
         poMaster = GGC_GCircleDB.getInstance(foApplication).branchVisitMasterDao();
         poDetail = GGC_GCircleDB.getInstance(foApplication).branchVisitDetailDao();
@@ -97,6 +101,10 @@ public class BranchMonitoring {
         loError.setcRead("0");
 
         poError.SaveErrorLogs(loError);
+    }
+
+    public EBranchInfo GetBranch(String fsBranchCd){
+        return poBranch.GetBranchInfo(fsBranchCd);
     }
 
     public String SaveNewMaster(String fsBranchCd){

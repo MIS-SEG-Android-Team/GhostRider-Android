@@ -1,20 +1,29 @@
 package org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
@@ -39,8 +48,18 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
     private VMBranchVisit mviewModel;
     private Adapter_Branch_Vist_Checklist loAdapter;
 
+    //record detail objects
     private MaterialToolbar toolbar;
+    private FrameLayout frame_record;
+    private LinearLayout layout_noRecord;
+    private MaterialTextView mtv_branch, mtv_transactionno, mtv_status, mtv_date, mtv_send;
     private RecyclerView recyclerview_checklist;
+
+    //image preview objects
+    private ConstraintLayout layout_imgPreview, layout_imgInfo;
+    private ImageButton btn_close, btn_upload;
+    private MaterialTextView mtv_category, mtv_imgNm, mtv_imgDate;
+    private ShapeableImageView img_selfie;
 
     private LoadDialog poDialog;
     private MessageBox loMessage;
@@ -87,8 +106,8 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
         InitWidgets();
         InitData();
+        InitListener();
     }
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -151,8 +170,27 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
     }
 
     private void InitWidgets(){
+
+        //record detail objects
         toolbar = findViewById(R.id.toolbar);
+        frame_record = findViewById(R.id.frame_record);
+        layout_noRecord = findViewById(R.id.layout_noRecord);
+        mtv_branch = findViewById(R.id.mtv_branch);
+        mtv_transactionno = findViewById(R.id.mtv_transactionno);
+        mtv_status = findViewById(R.id.mtv_status);
+        mtv_date = findViewById(R.id.mtv_date);
+        mtv_send = findViewById(R.id.mtv_send);
         recyclerview_checklist = findViewById(R.id.recyclerview_checklist);
+
+        //image preview objects
+        layout_imgPreview = findViewById(R.id.layout_imgPreview);
+        layout_imgInfo = findViewById(R.id.layout_imgInfo);
+        btn_close = findViewById(R.id.btn_close);
+        mtv_category = findViewById(R.id.mtv_category);
+        mtv_imgNm = findViewById(R.id.mtv_imgNm);
+        mtv_imgDate = findViewById(R.id.mtv_imgDate);
+        btn_upload = findViewById(R.id.btn_upload);
+        img_selfie= findViewById(R.id.img_selfie);
 
         setSupportActionBar(toolbar);
 
@@ -174,6 +212,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                 poDialog.dismiss();
                 Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
 
+                //initialize observers
                 InitObservers();
                 if (loMaster == null) return; //do not proceed if master is empty
 
@@ -196,7 +235,70 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         });
     }
 
+    private void InitDisplayMaster(){
+
+        if (loMaster == null) return;
+
+        mtv_branch.setText(mviewModel.GetBranchName(loMaster.getsBranchCd()).getBranchNm());
+        mtv_transactionno.setText(loMaster.getsTransNox());
+        mtv_date.setText(loMaster.getdTransact());
+
+        switch (loMaster.getcTranStat()){
+
+            case "0":
+                mtv_status.setText("Open");
+                break;
+            case "1":
+                mtv_status.setText("Closed");
+                break;
+            case "2":
+                mtv_status.setText("Posted");
+                break;
+        }
+
+        if (loMaster.getcSendStat().equalsIgnoreCase("1")){
+            mtv_send.setText("Sent");
+            mtv_send.setTextColor(Color.GREEN);
+        }else {
+            mtv_send.setText("Pending");
+            mtv_send.setTextColor(Color.RED);
+        }
+    }
+
+    private void InitDisplayRecord(Boolean fbisDisplay){
+        if (fbisDisplay){
+            frame_record.setVisibility(View.VISIBLE);
+            layout_noRecord.setVisibility(View.GONE);
+        }else {
+            frame_record.setVisibility(View.GONE);
+            layout_noRecord.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void InitPreviewImage(Boolean fbisDisplay){
+        if (fbisDisplay){
+            if (layout_imgPreview.getVisibility() == View.VISIBLE) return;
+            layout_imgPreview.setVisibility(View.VISIBLE);
+        }else {
+            if (layout_imgPreview.getVisibility() == View.GONE) return;
+            layout_imgPreview.setVisibility(View.GONE);
+        }
+    }
+
+    private void InitShowImageDetails(Boolean fbisDisplay){
+        if (fbisDisplay){
+            if (layout_imgInfo.getVisibility() == View.VISIBLE) return;
+            layout_imgInfo.setVisibility(View.VISIBLE);
+        }else {
+            if (layout_imgInfo.getVisibility() == View.GONE) return;
+            layout_imgInfo.setVisibility(View.GONE);
+        }
+    }
+
     private void InitObservers(){
+
+        //show no record
+        InitDisplayRecord(false);
 
         mviewModel.GetChecklist().observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EBranchVisitChecklist>>() {
             @Override
@@ -272,6 +374,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                             return;
                         }
 
+                        //initialize details
                         mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
                             @Override
                             public void onChanged(List<DBranchVisitDetail.BranchVisitDetail> eBranchVisitDetails) {
@@ -296,6 +399,12 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                                 //initialize checklist
                                 laDetails = eBranchVisitDetails;
 
+                                //show record list
+                                InitDisplayRecord(true);
+
+                                //display master info
+                                InitDisplayMaster();
+
                                 ///initialize adapter
                                 loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
                                     @Override
@@ -304,8 +413,9 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                                     }
 
                                     @Override
-                                    public void OnViewDetails(String fsCategrID) {
-
+                                    public void OnPreviewImage(String fsCategrID) {
+                                        InitPreviewImage(true);
+                                        InitShowImageDetails(true);
                                     }
 
                                     @Override
@@ -329,6 +439,33 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                         });
                     }
                 });
+            }
+        });
+    }
+
+    private void InitListener(){
+
+        btn_close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                InitPreviewImage(false);
+                InitShowImageDetails(false);
+            }
+        });
+
+        layout_imgPreview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                InitShowImageDetails(true);
+                return false;
+            }
+        });
+
+        layout_imgInfo.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                InitShowImageDetails(false);
+                return false;
             }
         });
     }

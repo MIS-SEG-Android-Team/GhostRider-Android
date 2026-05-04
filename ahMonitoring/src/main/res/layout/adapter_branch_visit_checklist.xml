@@ -64,7 +64,7 @@
         android:id="@+id/ib_info"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:src="@drawable/baseline_info_grey"
+        android:src="@drawable/ic_image_preview"
         android:scaleType="fitCenter"
         android:background="@color/zxing_transparent"
         android:layout_marginEnd="5dp"

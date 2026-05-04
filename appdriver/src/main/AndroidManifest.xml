@@ -18,6 +18,9 @@
 
     <application android:usesCleartextTraffic="true">
         <activity
+            android:name=".etc.ImageViewer"
+            android:exported="false" />
+        <activity
             android:name=".GCircle.Apps.CompanyPolicies.Activity.Activity_Policy_Contents"
             android:exported="false" />
     </application>
