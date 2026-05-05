@@ -5,6 +5,8 @@ package org.rmj.g3appdriver.BranchMonitoring;
  * Test Date: 04/30/2026**/
 
 
+import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
+
 import android.app.Application;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -66,41 +68,51 @@ public class TestImportDetail {
     @Test
     public void TestDownloadBMDetails() throws IOException, JSONException {
 
-        JSONObject loParams = new JSONObject();
-        loParams.put("sTransNox", "MX0125000001");
+        try {
 
-        String lsResult = WebClient.sendRequest("http://192.165.10.175/GMC%20SEG%20Folder%20-%20PHP/eclipse-workspace/apps/gcircle/branchmonitoring/download_branch_visit_detail.php",
-                loParams.toString(), (HashMap<String, String>) headers);
+            JSONObject loParams = new JSONObject();
+            loParams.put("sTransNox", "MX0125000001");
 
-        if (lsResult == null || lsResult.isEmpty()){
-            return;
+            String lsResult = WebClient.sendRequest("http://192.165.10.175/GMC%20SEG%20Folder%20-%20PHP/eclipse-workspace/apps/gcircle/branchmonitoring/download_branch_visit_detail.php",
+                    loParams.toString(), (HashMap<String, String>) headers);
+
+            if (lsResult == null) {
+                System.out.println("Server no response");
+                return;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResult);
+            String lsResponse = loResponse.getString("result");
+
+            if (lsResponse.equalsIgnoreCase("error")) {
+                JSONObject loError = loResponse.getJSONObject("error");
+                System.out.println(getErrorMessage(loError));
+                return;
+            }
+
+            JSONArray laChecklist = loResponse.getJSONArray("detail");
+            for (int i = 0; i < laChecklist.length(); i++) {
+                JSONObject loChecklist = laChecklist.getJSONObject(i);
+
+                loChecklist.getString("sTransNox");
+                loChecklist.getString("sCategrID");
+                loChecklist.getString("sRemarksx");
+
+                EBranchVisitDetail loEntity = new EBranchVisitDetail();
+                loEntity.setsTransNox(loChecklist.getString("sTransNox"));
+                loEntity.setsCategrID(loChecklist.getString("sCategrID"));
+                loEntity.setsRemarksx(loChecklist.getString("sRemarksx"));
+
+                dao.Save(loEntity);
+            }
+
+            for (EBranchVisitDetail loEntity : dao.GetDetailsForTest("MX0125000001")) {
+                System.out.println(loEntity.getsCategrID());
+                System.out.println(loEntity.getsRemarksx());
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-
-        JSONObject loResult = new JSONObject(lsResult);
-        if (loResult.getString("result").equalsIgnoreCase("error")){
-            return;
-        }
-
-        JSONArray laChecklist= loResult.getJSONArray("detail");
-        for (int i = 0; i < laChecklist.length(); i++){
-            JSONObject loChecklist = laChecklist.getJSONObject(i);
-
-            loChecklist.getString("sTransNox");
-            loChecklist.getString("sCategrID");
-            loChecklist.getString("sRemarksx");
-
-            EBranchVisitDetail loEntity = new EBranchVisitDetail();
-            loEntity.setsTransNox(loChecklist.getString("sTransNox"));
-            loEntity.setsCategrID(loChecklist.getString("sCategrID"));
-            loEntity.setsRemarksx(loChecklist.getString("sRemarksx"));
-
-            dao.Save(loEntity);
-        }
-
-        for (EBranchVisitDetail loEntity : dao.GetDetailsForTest("MX0125000001")){
-            System.out.println(loEntity.getsCategrID());
-            System.out.println(loEntity.getsRemarksx());
-        }
-
     }
 }

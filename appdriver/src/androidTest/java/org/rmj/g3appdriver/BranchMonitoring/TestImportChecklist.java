@@ -4,6 +4,8 @@ package org.rmj.g3appdriver.BranchMonitoring;
  * Test By: Guillier
  * Test Date: 04/30/2026**/
 
+import static org.rmj.g3appdriver.dev.Api.ApiResult.getErrorMessage;
+
 import android.app.Application;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -63,36 +65,47 @@ public class TestImportChecklist {
     @Test
     public void TestDownloadChecklist() throws IOException, JSONException {
 
-        String lsResult = WebClient.sendRequest("http://192.165.10.175/GMC%20SEG%20Folder%20-%20PHP/eclipse-workspace/apps/gcircle/branchmonitoring/download_checklist.php",
-                new JSONObject().toString(), (HashMap<String, String>) headers);
+        try {
 
-        if (lsResult == null || lsResult.isEmpty()){
-            return;
-        }
+            String lsResult = WebClient.sendRequest("http://192.165.10.175/GMC%20SEG%20Folder%20-%20PHP/eclipse-workspace/apps/gcircle/branchmonitoring/download_checklist.php",
+                    new JSONObject().toString(), (HashMap<String, String>) headers);
 
-        JSONObject loResult = new JSONObject(lsResult);
-        if (loResult.getString("result").equalsIgnoreCase("error")){
-            return;
-        }
+            if (lsResult == null){
+                System.out.println("Server no response");
+                return;
+            }
 
-        JSONArray laChecklist= loResult.getJSONArray("detail");
-        for (int i = 0; i < laChecklist.length(); i++){
-            JSONObject loChecklist = laChecklist.getJSONObject(i);
+            JSONObject loResponse = new JSONObject(lsResult);
+            String lsResponse = loResponse.getString("result");
 
-            loChecklist.getString("sCategrID");
-            loChecklist.getString("sDescript");
-            loChecklist.getString("cRecdStat");
+            if(lsResponse.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                System.out.println(getErrorMessage(loError));
+                return;
+            }
 
-            EBranchVisitChecklist loEntity = new EBranchVisitChecklist();
-            loEntity.setsCategrID(loChecklist.getString("sCategrID"));
-            loEntity.setsDescript(loChecklist.getString("sDescript"));
-            loEntity.setcRecdStat(loChecklist.getString("cRecdStat"));
+            JSONArray laChecklist= loResponse.getJSONArray("detail");
+            for (int i = 0; i < laChecklist.length(); i++){
+                JSONObject loChecklist = laChecklist.getJSONObject(i);
 
-            dao.Save(loEntity);
-        }
+                loChecklist.getString("sCategrID");
+                loChecklist.getString("sDescript");
+                loChecklist.getString("cRecdStat");
 
-        for (EBranchVisitChecklist loEntity : dao.GetChecklistForTest()){
-            System.out.println(loEntity.getsDescript());
+                EBranchVisitChecklist loEntity = new EBranchVisitChecklist();
+                loEntity.setsCategrID(loChecklist.getString("sCategrID"));
+                loEntity.setsDescript(loChecklist.getString("sDescript"));
+                loEntity.setcRecdStat(loChecklist.getString("cRecdStat"));
+
+                dao.Save(loEntity);
+            }
+
+            for (EBranchVisitChecklist loEntity : dao.GetChecklistForTest()){
+                System.out.println(loEntity.getsDescript());
+            }
+
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
 
     }

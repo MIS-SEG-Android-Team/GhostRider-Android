@@ -15,6 +15,9 @@ public interface DBranchVisitDetail {
     @Upsert
     void Save(EBranchVisitDetail foVal);
 
+    @Query("UPDATE Branch_Visit_Detail SET sTransNox = :fsTransNox WHERE sTransNox = :fsOldTransNox")
+    void UpdateTransactionNumber(String fsTransNox, String fsOldTransNox);
+
     @Query("UPDATE Branch_Visit_Detail SET sRemarksx= :fsRemarksx WHERE sTransNox = :fsTransNox AND sCategrID = :fsCategrID")
     void UpdateRemarks(String fsRemarksx, String fsTransNox, String fsCategrID);
 

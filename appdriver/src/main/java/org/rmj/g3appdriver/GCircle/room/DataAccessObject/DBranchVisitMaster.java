@@ -18,6 +18,12 @@ public interface DBranchVisitMaster {
     @Upsert
     void Save(EBranchVisitMaster foVal);
 
+    @Query("UPDATE Branch_Visit_Master SET cTranStat = :fStatus WHERE sTransNox = :fsTransNox")
+    void UpdateStatus(String fsTransNox, String fStatus);
+
+    @Query("UPDATE Branch_Visit_Master SET sTransNox = :fsTransNox WHERE sTransNox = :fsOldTransNox")
+    void UpdateTransactionNumber(String fsTransNox, String fsOldTransNox);
+
     @Query("SELECT COUNT(*) FROM Branch_Visit_Master")
     int CountMaster();
 

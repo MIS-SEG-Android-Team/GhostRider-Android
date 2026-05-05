@@ -10,6 +10,7 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
+import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
@@ -27,11 +28,21 @@ public class VMBranchVisit extends AndroidViewModel {
         void OnFinished(String fsMessage);
     }
 
+    public interface OnSubmit{
+        void OnLoad();
+        void OnSuccess();
+        void OnFailed(String fsMessage);
+    }
+
     public VMBranchVisit(@NonNull Application application) {
         super(application);
 
         poConnection = new ConnectionUtil(application);
         poSys = new BranchMonitoring(application);
+    }
+
+    public void SaveError(String fsSource, String fsMessage){
+        poSys.SaveError(fsSource, fsMessage);
     }
 
     public EBranchInfo GetBranchName(String fsBranchCd){
@@ -44,6 +55,45 @@ public class VMBranchVisit extends AndroidViewModel {
 
     public void SaveNewDetail(String fsTransNox, String fsCategrID, String fsRemarks){
         poSys.SaveNewDetail(fsTransNox, fsCategrID, fsRemarks);
+    }
+
+    public void SubmitBranchVisit(EBranchVisitMaster foMaster, List<DBranchVisitDetail.BranchVisitDetail> faDetails, OnSubmit foListener){
+
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                foListener.OnLoad();
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+                Object[] result = new Object[2];
+
+                if (!poConnection.isDeviceConnected()){
+                    result[0] = false;
+                    result[1] = poConnection.getMessage();
+                    return result;
+                }
+
+                Object[] laRresult = poSys.SubmitBranchVisit(foMaster, faDetails);
+
+                result[0] = laRresult[0];
+                result[1] = laRresult[1];
+
+                return result;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+                Object[] laResult = (Object[]) object;
+
+                if (!(Boolean) laResult[0]){
+                    foListener.OnFailed((String) laResult[1]);
+                }else {
+                    foListener.OnSuccess();
+                }
+            }
+        });
     }
 
     public void UpdateRemarks(String fsRemarksx, String fsTransNox, String fsCategrID){

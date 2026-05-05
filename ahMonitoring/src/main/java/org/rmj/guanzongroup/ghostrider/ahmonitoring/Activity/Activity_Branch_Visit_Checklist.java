@@ -1,8 +1,15 @@
 package org.rmj.guanzongroup.ghostrider.ahmonitoring.Activity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -21,14 +28,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
-import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
+import org.rmj.g3appdriver.etc.DialogDisclosure;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Adapter.Adapter_Branch_Vist_Checklist;
@@ -47,6 +55,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
     private VMBranchVisit mviewModel;
     private Adapter_Branch_Vist_Checklist loAdapter;
+    private DialogDisclosure dialogDisclosure;
 
     //record detail objects
     private MaterialToolbar toolbar;
@@ -54,6 +63,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
     private LinearLayout layout_noRecord;
     private MaterialTextView mtv_branch, mtv_transactionno, mtv_status, mtv_date, mtv_send;
     private RecyclerView recyclerview_checklist;
+    private MaterialButton btn_submit;
 
     //image preview objects
     private ConstraintLayout layout_imgPreview, layout_imgInfo;
@@ -78,6 +88,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         mviewModel = new ViewModelProvider(this).get(VMBranchVisit.class);
         poDialog = new LoadDialog(this);
         loMessage = new MessageBox(this);
+        dialogDisclosure = new DialogDisclosure(this);
 
         //do not continue if required arguments is empty
         if (!getIntent().hasExtra("type")){
@@ -181,6 +192,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         mtv_date = findViewById(R.id.mtv_date);
         mtv_send = findViewById(R.id.mtv_send);
         recyclerview_checklist = findViewById(R.id.recyclerview_checklist);
+        btn_submit = findViewById(R.id.btn_submit);
 
         //image preview objects
         layout_imgPreview = findViewById(R.id.layout_imgPreview);
@@ -206,11 +218,15 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
             public void OnLoad() {
                 poDialog.initDialog(getClass().getSimpleName(), "Downloading checklist details . . .", false);
                 poDialog.show();
+
+                btn_submit.setEnabled(false);
             }
             @Override
             public void OnFinished(String fsMessage) {
                 poDialog.dismiss();
                 Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+
+                btn_submit.setEnabled(true);
 
                 //initialize observers
                 InitObservers();
@@ -374,6 +390,9 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                             return;
                         }
 
+                        //enable submit button if transaction is not open(0)
+                        btn_submit.setEnabled(loMaster.getcTranStat().equalsIgnoreCase("0"));
+
                         //initialize details
                         mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
                             @Override
@@ -409,7 +428,6 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                                 loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
                                     @Override
                                     public void OnCamera(String fsCategrID) {
-
                                     }
 
                                     @Override
@@ -424,14 +442,8 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                                     }
                                 });
 
-                                //if transaction is from previous date, else if not "OPEN", do not allow modification
-                                if (!loMaster.getdTransact().equalsIgnoreCase(mviewModel.GetCurrentDate())){
-                                    loAdapter.AllowEdit(false);
-                                } else if (!loMaster.getcTranStat().equalsIgnoreCase("0")) {
-                                    loAdapter.AllowEdit(false);
-                                }else {
-                                    loAdapter.AllowEdit(true);
-                                }
+                                //allow modification, if transaction is open(0)
+                                loAdapter.AllowEdit(loMaster.getcTranStat().equalsIgnoreCase("0"));
 
                                 recyclerview_checklist.setAdapter(loAdapter);
                                 recyclerview_checklist.setLayoutManager(new LinearLayoutManager(Activity_Branch_Visit_Checklist.this,  LinearLayoutManager.VERTICAL, false));
@@ -443,6 +455,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void InitListener(){
 
         btn_close.setOnClickListener(new View.OnClickListener() {
@@ -453,20 +466,108 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
             }
         });
 
-        layout_imgPreview.setOnTouchListener(new View.OnTouchListener() {
+        btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                InitShowImageDetails(true);
-                return false;
+            public void onClick(View view) {
+
+                btn_submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        mviewModel.SubmitBranchVisit(loMaster, laDetails, new VMBranchVisit.OnSubmit() {
+                            @Override
+                            public void OnLoad() {
+                                poDialog.initDialog("Branch Visit Checklist", "Submitting Details. Please wait . . .", false);
+                                poDialog.show();
+                            }
+
+                            @Override
+                            public void OnSuccess() {
+                                poDialog.dismiss();
+                                finish();
+                            }
+
+                            @Override
+                            public void OnFailed(String fsMessage) {
+                                poDialog.dismiss();
+
+                                InitMessage(2, fsMessage, new onMessageButton() {
+                                    @Override
+                                    public void onPositive() { finish(); }
+
+                                    @Override
+                                    public void onNegative() {}
+                                });
+                            }
+                        });
+                    }
+                });
             }
         });
 
-        layout_imgInfo.setOnTouchListener(new View.OnTouchListener() {
+        layout_imgInfo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+            public void onClick(View view) {
                 InitShowImageDetails(false);
-                return false;
             }
         });
+
+        img_selfie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                InitShowImageDetails(true);
+            }
+        });
+    }
+
+    private void OpenPermission(){
+
+        //ask user to grant permission
+        dialogDisclosure.initDialog(new DialogDisclosure.onDisclosure() {
+            @Override
+            public void onAccept() {
+
+                try {
+
+                    Intent loIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    loIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    loIntent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(loIntent);
+
+                }catch (ActivityNotFoundException e){
+
+                    Intent loIntent = new Intent(Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS);
+                    loIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(loIntent);
+
+                }catch (Exception e){
+                    mviewModel.SaveError("Branch Visit Checklist", e.getMessage());
+                }
+
+                dialogDisclosure.dismiss();
+
+            }
+
+            @Override
+            public void onDecline() {
+                Toast.makeText(Activity_Branch_Visit_Checklist.this, "Please allow missing permissions to continue", Toast.LENGTH_LONG).show();
+                dialogDisclosure.dismiss();
+            }
+        });
+        dialogDisclosure.setMessage("Guanzon Circle requires camera and storage permissions to take SSDD images when the app is in use.");
+        dialogDisclosure.show();
+    }
+
+    private void InitCamera(){
+
+        //check permission
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            OpenPermission();
+            return;
+        }
+
     }
 }

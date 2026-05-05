@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
@@ -57,6 +58,7 @@ public class Activity_Branch_Visit_History extends AppCompatActivity {
     private String lsDto;
     private String lsTranstat;
 
+    private ConstraintLayout layout_record;
     private LinearLayout layout_norecord;
     private TextInputEditText txt_search;
     private ImageButton ib_filter;
@@ -84,6 +86,13 @@ public class Activity_Branch_Visit_History extends AppCompatActivity {
         InitWidgets();
         InitData(lsDfrom, lsDto);
         InitListener();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        InitData(lsDfrom, lsDto);
     }
 
     private String GetCurrentDate(){
@@ -161,6 +170,7 @@ public class Activity_Branch_Visit_History extends AppCompatActivity {
     }
 
     private void InitWidgets(){
+        layout_record = findViewById(R.id.layout_record);
         layout_norecord = findViewById(R.id.layout_norecord);
         txt_search = findViewById(R.id.txt_search);
         ib_filter = findViewById(R.id.ib_filter);
@@ -203,13 +213,13 @@ public class Activity_Branch_Visit_History extends AppCompatActivity {
                         }
                     });
                     layout_norecord.setVisibility(VISIBLE);
-                    recyclerview_history.setVisibility(GONE);
+                    layout_record.setVisibility(GONE);
                     return;
                 }
                 laHistories = masterHistories;
 
                 layout_norecord.setVisibility(GONE);
-                recyclerview_history.setVisibility(VISIBLE);
+                layout_record.setVisibility(VISIBLE);
 
                 loAdapter = new Adapter_Branch_Vist_History(laHistories, new Adapter_Branch_Vist_History.OnItemListener() {
                     @Override

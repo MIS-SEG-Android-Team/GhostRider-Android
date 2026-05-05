@@ -22,6 +22,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
+import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
@@ -91,7 +93,7 @@ public class BranchMonitoring {
         return lsTransNox;
     }
 
-    private void SaveError(String source, String message){
+    public void SaveError(String source, String message){
 
         EErrorLogs loError = new EErrorLogs();
         loError.setnErrorLogID(poError.GetErrorLogCount() + 1);
@@ -258,8 +260,8 @@ public class BranchMonitoring {
                 loEntity.setsTransNox(loMaster.getString("sTransNox"));
                 loEntity.setdTransact(loMaster.getString("dTransact"));
                 loEntity.setsBranchCd(loMaster.getString("sBranchCd"));
-                loEntity.setsBranchCd(loMaster.getString("sUserIDxx"));
-                loEntity.setsBranchCd(loMaster.getString("cTranStat"));
+                loEntity.setsUserIDxx(loMaster.getString("sUserIDxx"));
+                loEntity.setcTranStat(loMaster.getString("cTranStat"));
                 loEntity.setcSendStat("1"); //donwloaded from server, mark as sent
 
                 poMaster.Save(loEntity);
@@ -269,6 +271,68 @@ public class BranchMonitoring {
             lsMessage = e.getMessage();
             SaveError("Branch Monitoring Master" , e.getMessage());
             return false;
+        }
+    }
+
+    public Object[] SubmitBranchVisit(EBranchVisitMaster foMaster, List<DBranchVisitDetail.BranchVisitDetail> faDetails){
+
+        Object[] result = new Object[2];
+        try {
+
+            //update status first, submit will CLOSE(1) the transaction to avoid modifications
+            poMaster.UpdateStatus(foMaster.getsTransNox(), "1");
+
+            JSONObject loParams = new JSONObject();
+            loParams.put("sTransNox", foMaster.getsTransNox());
+            loParams.put("sBranchCd", foMaster.getsBranchCd());
+            loParams.put("cTranStat", "1");
+
+            JSONArray laDetails = new JSONArray();
+            for (DBranchVisitDetail.BranchVisitDetail loDetail : faDetails){
+
+                JSONObject loParam = new JSONObject();
+                loParam.put("sCategrID", loDetail.sCategrID);
+                loParam.put("sRemarksx", loDetail.sRemarksx);
+
+                laDetails.put(loParam);
+            }
+            loParams.put("sPayloadxx", laDetails);
+
+            String lsResponse = WebClient.sendRequest(poApi.getUrlSubmitBranchVisit(), loParams.toString(), poHeaders.getHeaders());
+            if (lsResponse == null){
+                lsMessage = "Server no response";
+                result[0] = false;
+                result[1] = lsMessage;
+                return result;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                lsMessage = getErrorMessage(loError);;
+                result[0] = false;
+                result[1] = lsMessage;
+                return result;
+            }
+
+            String lsTransNox = loResponse.getString("sTransNox");
+
+            //update master transaction no
+            poMaster.UpdateTransactionNumber(lsTransNox, foMaster.getsTransNox());
+
+            //update detail transaction no
+            poDetail.UpdateTransactionNumber(lsTransNox, foMaster.getsTransNox());
+
+            result[0] = true;
+            result[1] = lsTransNox;
+            return result;
+        }catch (Exception e){
+            lsMessage = e.getMessage();
+            result[0] = false;
+            result[1] = lsMessage;
+            return result;
         }
     }
 

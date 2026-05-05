@@ -83,7 +83,7 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.length() <= 0){
+                if (charSequence.length() <= 0 || !holder.txt_remarks.hasFocus()){
                     holder.mtv_confirm.setVisibility(GONE);
                 }else {
                     holder.mtv_confirm.setVisibility(VISIBLE);
@@ -99,6 +99,7 @@ public class Adapter_Branch_Vist_Checklist extends RecyclerView.Adapter<Adapter_
             @Override
             public void onClick(View view) {
                 loListener.OnRemarks(laChecklist.get(position).sCategrID, holder.txt_remarks.getText().toString());
+                view.setVisibility(View.GONE);
             }
         });
     }

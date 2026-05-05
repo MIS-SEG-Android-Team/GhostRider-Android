@@ -106,11 +106,29 @@
                 android:layout_marginTop="5dp"
                 app:cardElevation="10dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerview_checklist"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="10dp"/>
+                    android:layout_height="match_parent">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerview_checklist"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:padding="10dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/btn_submit"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_submit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="SUBMIT"
+                        android:layout_margin="10dp"
+                        android:layout_gravity="bottom"
+                        android:enabled="false"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -121,6 +139,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/img_selfie"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/app_background_dark"
+                android:scaleType="centerCrop"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_imgInfo"
@@ -153,7 +178,7 @@
                             android:id="@+id/mtv_category"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Company Wall Groupie"
+                            android:text="N/A"
                             android:gravity="center_vertical"
                             android:paddingStart="10dp"
                             android:textSize="18sp"/>
@@ -177,7 +202,7 @@
                             android:id="@+id/mtv_imgNm"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="IMG202605010001"
+                            android:text="N/A"
                             android:textSize="15sp"
                             android:textStyle="bold"
                             app:layout_constraintWidth_percent="0.7"/>
@@ -186,7 +211,7 @@
                             android:id="@+id/mtv_imgDate"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="2026-05-01 13:00:56"
+                            android:text="1900-00:00 00:00:00"
                             android:textSize="12sp"
                             app:layout_constraintTop_toBottomOf="@+id/mtv_imgNm"
                             app:layout_constraintWidth_percent="0.7"/>
@@ -200,21 +225,13 @@
                             app:layout_constraintStart_toEndOf="@+id/mtv_imgNm"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/mtv_imgNm"
-                            app:layout_constraintBottom_toBottomOf="@+id/mtv_date"/>
+                            app:layout_constraintBottom_toBottomOf="@+id/mtv_imgDate"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/img_selfie"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/app_background_dark"
-                android:scaleType="centerCrop"
-                android:visibility="visible"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
