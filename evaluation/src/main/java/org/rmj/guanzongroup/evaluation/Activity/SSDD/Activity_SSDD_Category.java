@@ -32,7 +32,6 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.etc.DialogDisclosure;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
-import org.rmj.g3appdriver.etc.OnInitializeCameraCallback;
 import org.rmj.guanzongroup.evaluation.Adapter.SSDD.Adapter_SSDDCategories;
 import org.rmj.guanzongroup.evaluation.R;
 import org.rmj.guanzongroup.evaluation.ViewModel.SSDD.VMSSDEvaluation;
@@ -352,7 +351,7 @@ public class Activity_SSDD_Category extends AppCompatActivity {
         });
 
         //get pending images for upload, send to database
-        mViewModel.GetTransactionImagesForUpload(GetTransNox()).observe(Activity_SSDD_Category.this, new Observer<List<EImageInfo>>() {
+        mViewModel.GetTransactionImagesForUpload(GetTransNox(), "SSDD").observe(Activity_SSDD_Category.this, new Observer<List<EImageInfo>>() {
             @Override
             public void onChanged(List<EImageInfo> eImageInfos) {
 

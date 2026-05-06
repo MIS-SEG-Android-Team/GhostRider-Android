@@ -128,6 +128,7 @@ public class GCircleApi extends WebApi {
     private static final String GET_BRANCH_VISIT_MASTER = "gcircle/branchmonitoring/download_branch_visit_master.php";
     private static final String GET_BRANCH_VISIT_DETAIL = "gcircle/branchmonitoring/download_branch_visit_detail.php";
     private static final String SUBMIT_BRANCH_VISIT = "gcircle/branchmonitoring/submit_branch_visit.php";
+    private static final String SUBMIT_BRANCH_VISIT_SELFIE = "gcircle/branchmonitoring/submit_branch_visit_selfie.php";
 
     private static final String URL_SUBMIT_INQUIRY = "gcircle/ganado/submit_inquiry.php";
     private static final String URL_DOWNLOAD_INQUIRIES = "gcircle/ganado/import_inquiries.php";
@@ -1167,6 +1168,15 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + SUBMIT_BRANCH_VISIT);
         return LIVE + SUBMIT_BRANCH_VISIT;
+    }
+
+    public String getUrlSubmitBranchVisitSelfie(){
+        if(isUnitTest()) {
+            Log.d(TAG, "Initialize api:" + LOCAL + SUBMIT_BRANCH_VISIT_SELFIE);
+            return LOCAL + SUBMIT_BRANCH_VISIT_SELFIE;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + SUBMIT_BRANCH_VISIT_SELFIE);
+        return LIVE + SUBMIT_BRANCH_VISIT_SELFIE;
     }
 
 }

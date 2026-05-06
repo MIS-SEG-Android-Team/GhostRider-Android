@@ -33,6 +33,7 @@ public class AppConstants {
     public static final String SUB_FOLDER_CREDIT_APP = "/CreditApp";
     public static final String SUB_FOLDER_SELFIE_LOG = "/SelfieLog";
     public static final String SUB_FOLDER_SSDD_EVALUATION = "/SSDDEvaluation";
+    public static final String SUB_FOLDER_BRANCH_VISIT = "/Branchvisit";
     public static final String SUB_FOLDER_CREDIT_APP_DOCUMENTS = "/COAD";
     public static final String SUB_FOLDER_EXPORTS = "/Exported Files";
     public static final String SUB_FOLDER_CI_ADDRESS = "/CI Address";

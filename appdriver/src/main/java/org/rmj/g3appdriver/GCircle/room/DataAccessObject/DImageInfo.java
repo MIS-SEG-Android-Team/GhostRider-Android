@@ -43,8 +43,8 @@ public interface DImageInfo {
     @Query("SELECT COUNT(*) FROM Image_Information " +
             "WHERE sSourceNo = :fsSource " +
             "AND sFileCode = :fsCategrID " +
-            "AND sSourceCD = 'SSDD'")
-    int CountImagePerCategory(String fsSource, String fsCategrID);
+            "AND sSourceCD = :fsSourceCD")
+    int CountImagePerCategory(String fsSource, String fsCategrID, String fsSourceCD);
 
     @Query("SELECT COUNT(*) FROM Image_Information " +
             "WHERE sSourceNo = :fsSource " +
@@ -91,10 +91,10 @@ public interface DImageInfo {
     LiveData<List<EImageInfo>> GetSSDDImagesPerCategory(String fsSource, String fsCategrID);
 
     @Query("SELECT * FROM Image_Information " +
-            "WHERE sSourceCD = 'SSDD' " +
+            "WHERE sSourceCD = :fsSourceCD " +
             "AND cSendStat <> '1' " +
             "AND sSourceNo = :fsSourceNo")
-    LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo);
+    LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo, String fsSourceCD);
 
     @Query("SELECT * FROM Image_Information " +
             "WHERE sDtlSrcNo = :sDtlSrcNo AND " +

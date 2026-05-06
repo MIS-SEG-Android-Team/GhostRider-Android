@@ -364,7 +364,6 @@ public class RImageInfo {
             String lsTransNo = CreateUniqueID();
 
             loImage.setTransNox(lsTransNo);
-            loImage.setFileCode(args5);
             loImage.setsClientID(poSession.getClientId());
             loImage.setDtlSrcNo(poSession.getUserID());
             loImage.setSourceCD("SSDD");
@@ -375,9 +374,51 @@ public class RImageInfo {
             loImage.setFileLoct(args2);
             loImage.setLongitud(args3);
             loImage.setLatitude(args4);
+            loImage.setFileCode(args5);
 
             poDao.SaveImageInfo(loImage);
             Log.d(TAG, "SSDD Image has been saved.");
+
+            return lsTransNo;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return null;
+        }
+
+    }
+
+    /**
+     *
+     * @param args Branc_Visit_Master Transaction Number
+     * @param args1 image file name
+     * @param args2 image file location
+     * @param args3 current device location (Longitude)
+     * @param args4 current device location (Latitude)
+     * @param args5 category id / file code
+     * @return returns transaction no. if operation succeed, else null if operation fails. Call getMessage() to get error message.
+     */
+    public String SaveBranchVisitImage(String args, String args1, String args2, String args3, String args4, String args5){
+
+        try{
+            EImageInfo loImage = new EImageInfo();
+            String lsTransNo = CreateUniqueID();
+
+            loImage.setTransNox(lsTransNo);
+            loImage.setsClientID(poSession.getClientId());
+            loImage.setDtlSrcNo(poSession.getUserID());
+            loImage.setSourceCD("BVS");
+            loImage.setMD5Hashx(WebFileServer.createMD5Hash(args2));
+            loImage.setCaptured(AppConstants.DATE_MODIFIED());
+            loImage.setSourceNo(args);
+            loImage.setImageNme(args1);
+            loImage.setFileLoct(args2);
+            loImage.setLongitud(args3);
+            loImage.setLatitude(args4);
+            loImage.setFileCode(args5);
+
+            poDao.SaveImageInfo(loImage);
+            Log.d(TAG, "Branch Visit Image has been saved.");
 
             return lsTransNo;
         } catch (Exception e){

@@ -17,13 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.graphics.Insets;
 import androidx.core.util.Pair;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,7 +30,6 @@ import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClic
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitMaster;
-import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.Adapter.Adapter_Branch_Vist_History;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.R;
@@ -179,7 +174,7 @@ public class Activity_Branch_Visit_History extends AppCompatActivity {
 
     private void InitData(String fsDfrom, String fsDto){
 
-        mViewModel.ImportMaster(fsDfrom, fsDto, new VMBranchVisit.OnImportChecklist() {
+        mViewModel.ImportMaster(fsDfrom, fsDto, new VMBranchVisit.OnImport() {
             @Override
             public void OnLoad() {
                 Toast.makeText(Activity_Branch_Visit_History.this, "Downloading history . .", Toast.LENGTH_LONG).show();

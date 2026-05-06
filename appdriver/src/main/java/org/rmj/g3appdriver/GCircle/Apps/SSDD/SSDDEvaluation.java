@@ -110,8 +110,8 @@ public class SSDDEvaluation {
         return poMasterDao.GetCountByDepartment(fsTransNox);
     }
 
-    public int CountImagePerCategory(String fsRefernox, String fsCategrID){
-        return poImageDao.CountImagePerCategory(fsRefernox, fsCategrID);
+    public int CountImagePerCategory(String fsRefernox, String fsCategrID, String fsSourceCD){
+        return poImageDao.CountImagePerCategory(fsRefernox, fsCategrID, fsSourceCD);
     }
 
     private String GenerateTransNox(){
@@ -212,8 +212,8 @@ public class SSDDEvaluation {
         return poImageDao.GetSSDDImagesPerCategory(fsTransNox, fsCategory);
     }
 
-    public LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo){
-        return poImageDao.GetTransactionImagesForUpload(fsSourceNo);
+    public LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo, String fsSourceCD){
+        return poImageDao.GetTransactionImagesForUpload(fsSourceNo, fsSourceCD);
     }
 
     public ESSDDCategories GetCategory(String fsCategory){

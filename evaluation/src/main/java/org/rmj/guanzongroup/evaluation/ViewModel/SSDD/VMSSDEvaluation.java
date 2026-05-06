@@ -136,8 +136,8 @@ public class VMSSDEvaluation extends AndroidViewModel {
         return loEvaluation.GetCategoryImages(fsTransNox, fsCategory);
     }
 
-    public LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo){
-        return loEvaluation.GetTransactionImagesForUpload(fsSourceNo);
+    public LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo, String fsSourceCD){
+        return loEvaluation.GetTransactionImagesForUpload(fsSourceNo, fsSourceCD);
     }
 
     public ESSDDCategories GetCategory(String fsCategory){
@@ -503,7 +503,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
             public Object DoInBackground(Object args) {
 
                 //do not allow more than 2 images per category
-                if (loEvaluation.CountImagePerCategory(fsRefernox, foCategories.sCategryID) >= 2){
+                if (loEvaluation.CountImagePerCategory(fsRefernox, foCategories.sCategryID, "SSDD") >= 2){
                     fsMessage = "Only 2 images per category is allowed for evaluation";
                     return false;
                 }
@@ -517,7 +517,7 @@ public class VMSSDEvaluation extends AndroidViewModel {
                 //return image result
                 lsResult[0]= loImage.getFilePath(); //image path
                 lsResult[1]= loImage.getFileName(); //image filename
-                lsResult[2]= foCategories.sCategryID; //image filename
+                lsResult[2]= foCategories.sCategryID; //file code
 
                 String lsCompx = android.os.Build.MANUFACTURER.toLowerCase();
                 LocationRetriever.iLocationRetriever location;

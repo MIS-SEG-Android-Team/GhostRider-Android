@@ -7,18 +7,23 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -29,13 +34,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
+import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.etc.DialogDisclosure;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
@@ -43,8 +48,10 @@ import org.rmj.guanzongroup.ghostrider.ahmonitoring.Adapter.Adapter_Branch_Vist_
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.R;
 import org.rmj.guanzongroup.ghostrider.ahmonitoring.ViewModel.VMBranchVisit;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
@@ -52,6 +59,8 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
     private List<EBranchVisitChecklist> laChecklist = new ArrayList<>();
     private EBranchVisitMaster loMaster;
     private List<DBranchVisitDetail.BranchVisitDetail> laDetails;
+    private EImageInfo loImage;
+    private List<EImageInfo> laImages;
 
     private VMBranchVisit mviewModel;
     private Adapter_Branch_Vist_Checklist loAdapter;
@@ -79,6 +88,78 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         void onNegative();
     }
 
+    private final ActivityResultLauncher<Intent> poCamera = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult o) {
+            try {
+
+                if (o.getResultCode() == RESULT_OK){
+
+                    //TODO: 1. GET COORDINATES OF CAPTURED IMAGE'S PROPERTIES,
+                    // NOTE: TO GET THIS PROPERLY. ENABLE MANUALLY THE TAG LOCATION SETTINGS ON CAMERA WITHIN THE APP
+                    @SuppressLint({"NewApi", "LocalSuppress"}) ExifInterface exifInterface =
+                            new ExifInterface(
+                                    Objects.requireNonNull(getContentResolver().openInputStream(
+                                            MediaStore.setRequireOriginal(Uri.fromFile(new File(loImage.getFileLoct())))
+                                    ))
+                            );
+
+                    //TODO: 2. SET IMAGE COORDINATES, IF NOT EMPTY
+                    if (exifInterface.getLatLong() != null){
+
+                        Log.d("Activity_Branch_Visit_Checklist", "Image Longitude is " + String.valueOf(Objects.requireNonNull(exifInterface.getLatLong())[1])
+                                + " and Image Latitude is " + String.valueOf(exifInterface.getLatLong()[0]));
+
+                        loImage.setLatitude(String.valueOf(exifInterface.getLatLong()[0]));
+                        loImage.setLongitud(String.valueOf(exifInterface.getLatLong()[1]));
+                    }
+
+                    //TODO: 3. VALIDATE SAVED COORDINATES
+                    if (loImage.getLongitud() == null || loImage.getLatitude() == null){
+                        InitMessage(2, "Unable to get location coordinates. Please inform your superior for this matter.", new onMessageButton() {
+                            @Override
+                            public void onPositive() {}
+
+                            @Override
+                            public void onNegative() {}
+                        });
+                        return;
+                    }
+
+                    if (loImage.getLongitud().isEmpty() || loImage.getLatitude().isEmpty()){
+                        InitMessage(2, "Unable to get location coordinates. Please inform your superior for this matter.", new onMessageButton() {
+                            @Override
+                            public void onPositive() {}
+
+                            @Override
+                            public void onNegative() {}
+                        });
+                        return;
+                    }
+
+                    if (loImage.getLongitud().equalsIgnoreCase("0.00000000000") || loImage.getLatitude().equalsIgnoreCase("0.00000000000")) {
+                        InitMessage(2, "Location coordinates is invalid. Please inform your superior for this matter.", new onMessageButton() {
+                            @Override
+                            public void onPositive() {}
+
+                            @Override
+                            public void onNegative() {}
+                        });
+                        return;
+                    }
+
+                    mviewModel.SaveImage(lsSourceNo, loImage.getImageNme(), loImage.getFileLoct(), loImage.getLongitud(), loImage.getLatitude(), loImage.getFileCode());
+
+                    Toast.makeText(Activity_Branch_Visit_Checklist.this, "Image saved succesfully", Toast.LENGTH_SHORT).show();
+                }
+
+            }catch (Exception e){
+                mviewModel.SaveError("Branch Visit Selfie", e.getMessage());
+            }
+
+        }
+    });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +170,8 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         poDialog = new LoadDialog(this);
         loMessage = new MessageBox(this);
         dialogDisclosure = new DialogDisclosure(this);
+        loImage = new EImageInfo();
+        laImages = new ArrayList<>();
 
         //do not continue if required arguments is empty
         if (!getIntent().hasExtra("type")){
@@ -212,43 +295,69 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
     private void InitData(){
 
-        //always reload checklist to get updated checklists
-        mviewModel.ImportChecklist(new VMBranchVisit.OnImportChecklist() {
-            @Override
-            public void OnLoad() {
-                poDialog.initDialog(getClass().getSimpleName(), "Downloading checklist details . . .", false);
-                poDialog.show();
+        try {
 
-                btn_submit.setEnabled(false);
-            }
-            @Override
-            public void OnFinished(String fsMessage) {
-                poDialog.dismiss();
-                Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+            //always reload checklist to get updated checklists
+            mviewModel.ImportChecklist(new VMBranchVisit.OnImport() {
+                @Override
+                public void OnLoad() {
+                    poDialog.initDialog(getClass().getSimpleName(), "Downloading checklist details . . .", false);
+                    poDialog.show();
 
-                btn_submit.setEnabled(true);
-
-                //initialize observers
-                InitObservers();
-                if (loMaster == null) return; //do not proceed if master is empty
-
-                //download details if master transaction is from database
-                if (loMaster.getcSendStat().equalsIgnoreCase("1")){
-
-                    mviewModel.ImportDetails(lsSourceNo, new VMBranchVisit.OnImportChecklist() {
-                        @Override
-                        public void OnLoad() {
-                            Toast.makeText(Activity_Branch_Visit_Checklist.this, "Downloading details . . .", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void OnFinished(String fsMessage) {
-                            Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    btn_submit.setEnabled(false);
                 }
+                @Override
+                public void OnFinished(String fsMessage) {
+                    poDialog.dismiss();
+                    Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+
+                    btn_submit.setEnabled(true);
+
+                    //initialize observers
+                    InitObservers();
+                }
+            });
+            Thread.sleep(500);
+
+            if (loMaster == null) return; //do not proceed if master is empty
+
+            //download details & images if master transaction is from database
+            if (loMaster.getcSendStat().equalsIgnoreCase("1")){
+
+                if (lsSourceNo == null || lsSourceNo.isEmpty()) return;
+
+                mviewModel.ImportDetails(lsSourceNo, new VMBranchVisit.OnImport() {
+                    @Override
+                    public void OnLoad() {
+                        Toast.makeText(Activity_Branch_Visit_Checklist.this, "Downloading details . . .", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void OnFinished(String fsMessage) {
+                        Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+
+                        //initialize observers
+                        InitObservers();
+                    }
+                });
+                Thread.sleep(1000);
+
+                mviewModel.ImportBranchVisitSelfie(lsSourceNo, new VMBranchVisit.OnImport() {
+                    @Override
+                    public void OnLoad() {
+                        Toast.makeText(Activity_Branch_Visit_Checklist.this, "Downloading images . . .", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void OnFinished(String fsMessage) {
+                        Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-        });
+
+        }catch (Exception e){
+            mviewModel.SaveError("Branch Visit Checklist", e.getMessage());
+        }
     }
 
     private void InitDisplayMaster(){
@@ -256,7 +365,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         if (loMaster == null) return;
 
         mtv_branch.setText(mviewModel.GetBranchName(loMaster.getsBranchCd()).getBranchNm());
-        mtv_transactionno.setText(loMaster.getsTransNox());
+        mtv_transactionno.setText(lsSourceNo);
         mtv_date.setText(loMaster.getdTransact());
 
         switch (loMaster.getcTranStat()){
@@ -391,7 +500,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                         }
 
                         //enable submit button if transaction is not open(0)
-                        btn_submit.setEnabled(loMaster.getcTranStat().equalsIgnoreCase("0"));
+                        btn_submit.setEnabled(loMaster.getcTranStat().equalsIgnoreCase("0") && loMaster.getdTransact().equals(mviewModel.GetCurrentDate()));
 
                         //initialize details
                         mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
@@ -428,6 +537,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                                 loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
                                     @Override
                                     public void OnCamera(String fsCategrID) {
+                                        InitCamera(fsCategrID);
                                     }
 
                                     @Override
@@ -443,12 +553,24 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                                 });
 
                                 //allow modification, if transaction is open(0)
-                                loAdapter.AllowEdit(loMaster.getcTranStat().equalsIgnoreCase("0"));
+                                loAdapter.AllowEdit(loMaster.getcTranStat().equalsIgnoreCase("0") && loMaster.getdTransact().equals(mviewModel.GetCurrentDate()));
 
                                 recyclerview_checklist.setAdapter(loAdapter);
                                 recyclerview_checklist.setLayoutManager(new LinearLayoutManager(Activity_Branch_Visit_Checklist.this,  LinearLayoutManager.VERTICAL, false));
                             }
                         });
+                    }
+                });
+
+                mviewModel.GetTransactionImagesForUpload(lsSourceNo, "BVS").observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EImageInfo>>() {
+                    @Override
+                    public void onChanged(List<EImageInfo> eImageInfos) {
+
+                        //do not proceed, if empty
+                        if (eImageInfos == null || eImageInfos.size() < 1){
+                            return;
+                        }
+                        laImages = eImageInfos;
                     }
                 });
             }
@@ -484,7 +606,35 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                             @Override
                             public void OnSuccess() {
                                 poDialog.dismiss();
-                                finish();
+
+                                try {
+
+                                    for (EImageInfo loImage : laImages){
+
+                                        //upload images
+                                        mviewModel.SubmitImage(loImage, new VMBranchVisit.OnSubmitImageCallback() {
+                                            @Override
+                                            public void OnLoad(String fsTitlexx, String fsMessage) {
+                                                Toast.makeText(Activity_Branch_Visit_Checklist.this, "Uploading image. Please wait . .", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            @Override
+                                            public void OnSuccess(String fsTransnox) {
+                                                Toast.makeText(Activity_Branch_Visit_Checklist.this, "Uploading successful", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            @Override
+                                            public void OnFailed(String fsMessage) {
+                                                Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                        Thread.sleep(1000);
+                                    }
+                                    finish();
+
+                                }catch (Exception e){
+                                    mviewModel.SaveError("Branch Visit Checklist", e.getMessage());
+                                }
                             }
 
                             @Override
@@ -558,7 +708,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         dialogDisclosure.show();
     }
 
-    private void InitCamera(){
+    private void InitCamera(String fsCategrID){
 
         //check permission
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
@@ -568,6 +718,62 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
             OpenPermission();
             return;
         }
+
+        mviewModel.InitCamera(lsSourceNo, fsCategrID, new VMBranchVisit.OnInitializeCameraListner() {
+            @Override
+            public void OnInit() {
+                poDialog.initDialog("Camera Launch", "Initializing camera. Please wait . .", false);
+                poDialog.show();
+            }
+
+            @Override
+            public void OnSuccess(Intent intent, String[] args) {
+
+                poDialog.dismiss();
+
+                loImage.setSourceNo(lsSourceNo);
+                loImage.setFileLoct(args[0]); //pass file path
+                loImage.setImageNme(args[1]); //pass file name
+                loImage.setFileCode(args[2]); //pass category id
+                loImage.setLongitud(args[3]); //pass longitude
+                loImage.setLatitude(args[4]); //pass latitude
+
+                //start camera intent
+                poCamera.launch(intent);
+            }
+
+            @Override
+            public void OnFailed(String message, Intent intent, String[] args) {
+
+                poDialog.dismiss();
+
+                loImage.setSourceNo(lsSourceNo);
+                loImage.setFileLoct(args[0]); //pass file path
+                loImage.setImageNme(args[1]); //pass file name
+                loImage.setFileCode(args[2]); //pass category id
+                loImage.setLongitud(args[3]); //pass longitude
+                loImage.setLatitude(args[4]); //pass latitude
+
+                //start camera intent
+                poCamera.launch(intent);
+
+            }
+
+            @Override
+            public void OnError(String fsMessage) {
+
+                poDialog.dismiss();
+
+                InitMessage(2, fsMessage, new onMessageButton() {
+                    @Override
+                    public void onPositive() {}
+
+                    @Override
+                    public void onNegative() {}
+                });
+
+            }
+        });
 
     }
 }
