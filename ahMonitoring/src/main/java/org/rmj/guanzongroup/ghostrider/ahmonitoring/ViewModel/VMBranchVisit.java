@@ -18,6 +18,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitChecklist;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.etc.AppConstants;
+import org.rmj.g3appdriver.etc.FileUtility;
 import org.rmj.g3appdriver.etc.ImageFileCreator;
 import org.rmj.g3appdriver.lib.Location.GmsLocationRetriever;
 import org.rmj.g3appdriver.lib.Location.HmsLocationRetriever;
@@ -37,6 +38,7 @@ public class VMBranchVisit extends AndroidViewModel {
     private final EmployeeSession poSession;
     private final ConnectionUtil poConnection;
     private final BranchMonitoring poSys;
+    private final FileUtility loFile;
 
     public interface OnImport {
         void OnLoad();
@@ -45,6 +47,12 @@ public class VMBranchVisit extends AndroidViewModel {
 
     public interface OnSubmit{
         void OnLoad();
+        void OnSuccess();
+        void OnFailed(String fsMessage);
+    }
+
+    public interface OnDownload{
+        void OnLoad(String fsTitle, String fsMessage);
         void OnSuccess();
         void OnFailed(String fsMessage);
     }
@@ -69,6 +77,7 @@ public class VMBranchVisit extends AndroidViewModel {
         poSession = EmployeeSession.getInstance(application);
         poConnection = new ConnectionUtil(application);
         poSys = new BranchMonitoring(application);
+        loFile = new FileUtility(application);
     }
 
     public void SaveError(String fsSource, String fsMessage){
@@ -213,9 +222,9 @@ public class VMBranchVisit extends AndroidViewModel {
         });
     }
 
-    public void ImportBranchVisitSelfie(String fsTransNox, OnImport foListener){
+    public void ImportBranchVisitSelfie(String fsTransNox, String fsCategrID, OnImport foListener){
 
-        TaskExecutor.Execute(fsTransNox, new OnTaskExecuteListener() {
+        TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
                 foListener.OnLoad();
@@ -224,16 +233,14 @@ public class VMBranchVisit extends AndroidViewModel {
             @Override
             public Object DoInBackground(Object args) {
 
-                String lsTransNox = (String) args;
-
                 if (!poConnection.isDeviceConnected()){
                     return poConnection.getMessage();
                 }
 
-                if (!poSys.ImportBranchVisitSelfie(lsTransNox)){
+                if (!poSys.ImportBranchVisitSelfie(fsTransNox, fsCategrID)){
                     return poSys.GetMessage();
                 }
-                return "Branch Visit Images downloaded successfully";
+                return "Selfie image detail downloaded successfully";
             }
 
             @Override
@@ -263,7 +270,7 @@ public class VMBranchVisit extends AndroidViewModel {
             public Object DoInBackground(Object args) {
 
                 //do not allow more than 2 images per category
-                if (poSys.CountImagePerCategory(fsTransNox, fsCategrID, "BVS") >= 1){
+                if (poSys.CountImagePerCategory(fsTransNox, fsCategrID) >= 1){
                     lsMessage = "Only 1 image per category is allowed!";
                     return false;
                 }
@@ -330,6 +337,52 @@ public class VMBranchVisit extends AndroidViewModel {
         poSys.SaveBranchVisitImage(fsTransNox, fsFileName, fsFilePath, fsLongitude, fsLatitude, fsCategrID);
     }
 
+    public void DownloadImageFile(EImageInfo foImage, OnDownload callback){
+
+        TaskExecutor.Execute(foImage, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnLoad("Branch Visit Selfie", "Downloading image files. Please wait . .");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isDeviceConnected()){
+                    lsMessage = poConnection.getMessage();
+                    return false;
+                }
+
+                EImageInfo loImage = (EImageInfo) args;
+
+                String lsDir = loInstance.getExternalFilesDir(null).getAbsolutePath() + "/" + "BranchVisit/" + loImage.getFileCode() + "/" + loImage.getSourceNo() + "/";
+                if (!loFile.IsFileExist(lsDir)){
+
+                    if (!loFile.CreateDirectory(lsDir)){
+                        lsMessage = "Unable to create directory";
+                        return false;
+                    }
+                }
+
+                if (poSys.DownloadImageFile(loImage.getTransNox())){
+                    return true;
+                }
+                lsMessage = poSys.GetMessage();
+                return false;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if ((Boolean) object){
+                    callback.OnSuccess();
+                }else {
+                    callback.OnFailed(lsMessage);
+                }
+            }
+        });
+    }
+
     public void SubmitImage(EImageInfo foImages, OnSubmitImageCallback foCallback){
 
         TaskExecutor.Execute(foImages, new OnTaskExecuteListener() {
@@ -371,6 +424,18 @@ public class VMBranchVisit extends AndroidViewModel {
         });
     }
 
+    public int CountTransactionDetails(String fsTransNox){
+        return poSys.CountTransactionDetails(fsTransNox);
+    }
+
+    public int CountImagePerCategory(String fsRefernox, String fsCategrID){
+        return poSys.CountImagePerCategory(fsRefernox, fsCategrID);
+    }
+
+    public Boolean IsFileExist(String fsPath){
+        return loFile.IsFileExist(fsPath);
+    }
+
     public EBranchInfo GetBranchName(String fsBranchCd){
         return poSys.GetBranch(fsBranchCd);
     }
@@ -381,6 +446,10 @@ public class VMBranchVisit extends AndroidViewModel {
 
     public String GetCurrentDate(){
         return poSys.GetCurrentDate();
+    }
+
+    public String GetCategoryDescr(String fsCategrID){
+        return poSys.GetDescription(fsCategrID);
     }
 
     public LiveData<List<EBranchVisitChecklist>> GetChecklist(){
@@ -401,6 +470,10 @@ public class VMBranchVisit extends AndroidViewModel {
 
     public LiveData<List<DBranchVisitDetail.BranchVisitDetail>> GetDetails(String fsTransNox){
         return poSys.GetDetails(fsTransNox);
+    }
+
+    public LiveData<List<EImageInfo>> GetCategoryImages(String fsTransNox, String fsCategory){
+        return poSys.GetCategoryImages(fsTransNox, fsCategory);
     }
 
     public LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo, String fsSourceCD){

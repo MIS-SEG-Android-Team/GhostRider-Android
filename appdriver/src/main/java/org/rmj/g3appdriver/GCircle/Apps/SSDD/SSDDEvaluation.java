@@ -209,7 +209,7 @@ public class SSDDEvaluation {
     }
 
     public LiveData<List<EImageInfo>> GetCategoryImages(String fsTransNox, String fsCategory){
-        return poImageDao.GetSSDDImagesPerCategory(fsTransNox, fsCategory);
+        return poImageDao.GetImagesPerCategory(fsTransNox, fsCategory, "SSDD");
     }
 
     public LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo, String fsSourceCD){

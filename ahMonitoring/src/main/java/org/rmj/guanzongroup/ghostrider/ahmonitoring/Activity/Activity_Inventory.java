@@ -119,50 +119,46 @@ public class Activity_Inventory extends AppCompatActivity {
                 if(branchCd.isEmpty()) {
                     Toast.makeText(Activity_Inventory.this, "Unable to post empty inventory", Toast.LENGTH_SHORT).show();
                 } else {
-                    Intent loIntent = new Intent(Activity_Inventory.this, Activity_Branch_Visit_Checklist.class);
-                    loIntent.putExtra("type", "0");
-                    loIntent.putExtra("branch", branchCd);
+                    new DialogPostInventory(Activity_Inventory.this).initDialog(Remarks -> mViewModel.PostInventory(branchCd, Remarks, new VMInventory.OnSaveInventoryMaster() {
+                        @Override
+                        public void OnSave() {
+                            poDialog.initDialog("Random Stock Inventory", "Saving entries. Please wait...", false);
+                            poDialog.show();
+                        }
 
-                    startActivity(loIntent);
-//                    new DialogPostInventory(Activity_Inventory.this).initDialog(Remarks -> mViewModel.PostInventory(branchCd, Remarks, new VMInventory.OnSaveInventoryMaster() {
-//                        @Override
-//                        public void OnSave() {
-//                            poDialog.initDialog("Random Stock Inventory", "Saving entries. Please wait...", false);
-//                            poDialog.show();
-//                        }
-//
-//                        @Override
-//                        public void OnSuccess() {
-//                            poDialog.dismiss();
-//                            poMessage.initDialog();
-//                            poMessage.setIcon(R.drawable.baseline_message_24);
-//                            poMessage.setTitle("Random Stock Inventory");
-//                            poMessage.setMessage("Inventory has been save. Successfully.");
-//                            poMessage.setPositiveButton("Okay", (view, dialog) -> {
-//                                dialog.dismiss();
-//
-//                                Intent loIntent = new Intent(Activity_Inventory.this, Activity_Branch_Visit_Checklist.class);
-//                                loIntent.putExtra("type", "0");
-//                                loIntent.putExtra("branch", branchCd);
-//
-//                                startActivity(loIntent);
-//                            });
-//                            poMessage.show();
-//                        }
-//
-//                        @Override
-//                        public void OnFailed(String message) {
-//                            poDialog.dismiss();
-//                            poMessage.initDialog();
-//                            poMessage.setIcon(R.drawable.baseline_error_24);
-//                            poMessage.setTitle("Random Stock Inventory");
-//                            poMessage.setMessage(message);
-//                            poMessage.setPositiveButton("Okay", (view, dialog) -> {
-//                                dialog.dismiss();
-//                            });
-//                            poMessage.show();
-//                        }
-//                    }));
+                        @Override
+                        public void OnSuccess() {
+                            poDialog.dismiss();
+                            poMessage.initDialog();
+                            poMessage.setIcon(R.drawable.baseline_message_24);
+                            poMessage.setTitle("Random Stock Inventory");
+                            poMessage.setMessage("Inventory has been save. Successfully.");
+                            poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                                dialog.dismiss();
+
+                                //open branch visit checklist for selfie and evaluation
+                                Intent loIntent = new Intent(Activity_Inventory.this, Activity_Branch_Visit_Checklist.class);
+                                loIntent.putExtra("type", "0");
+                                loIntent.putExtra("branch", branchCd);
+
+                                startActivity(loIntent);
+                            });
+                            poMessage.show();
+                        }
+
+                        @Override
+                        public void OnFailed(String message) {
+                            poDialog.dismiss();
+                            poMessage.initDialog();
+                            poMessage.setIcon(R.drawable.baseline_error_24);
+                            poMessage.setTitle("Random Stock Inventory");
+                            poMessage.setMessage(message);
+                            poMessage.setPositiveButton("Okay", (view, dialog) -> {
+                                dialog.dismiss();
+                            });
+                            poMessage.show();
+                        }
+                    }));
                 }
             });
         });

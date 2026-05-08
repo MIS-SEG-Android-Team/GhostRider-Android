@@ -32,6 +32,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -56,6 +57,8 @@ import java.util.Objects;
 public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
     private String lsSourceNo;
+    private String lsCategrID;
+
     private List<EBranchVisitChecklist> laChecklist = new ArrayList<>();
     private EBranchVisitMaster loMaster;
     private List<DBranchVisitDetail.BranchVisitDetail> laDetails;
@@ -76,9 +79,9 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
     //image preview objects
     private ConstraintLayout layout_imgPreview, layout_imgInfo;
+    private ShapeableImageView img_selfie;
     private ImageButton btn_close, btn_upload;
     private MaterialTextView mtv_category, mtv_imgNm, mtv_imgDate;
-    private ShapeableImageView img_selfie;
 
     private LoadDialog poDialog;
     private MessageBox loMessage;
@@ -199,7 +202,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         }
 
         InitWidgets();
-        InitData();
+        InitActivity();
         InitListener();
     }
 
@@ -293,70 +296,117 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         getSupportActionBar().setTitle("");
     }
 
-    private void InitData(){
+    private void InitActivity(){
+
+        //show no record by default
+        InitDisplayRecord(false);
+        DownloadData(0);
+    }
+
+    private void DownloadData(int fnType){
 
         try {
 
-            //always reload checklist to get updated checklists
-            mviewModel.ImportChecklist(new VMBranchVisit.OnImport() {
-                @Override
-                public void OnLoad() {
-                    poDialog.initDialog(getClass().getSimpleName(), "Downloading checklist details . . .", false);
-                    poDialog.show();
+            switch (fnType){
 
-                    btn_submit.setEnabled(false);
-                }
-                @Override
-                public void OnFinished(String fsMessage) {
-                    poDialog.dismiss();
-                    Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+                case 0: //download checklist
 
-                    btn_submit.setEnabled(true);
+                    mviewModel.ImportChecklist(new VMBranchVisit.OnImport() {
+                        @Override
+                        public void OnLoad() {
+                            poDialog.initDialog(getClass().getSimpleName(), "Downloading checklist details . . .", false);
+                            poDialog.show();
+                        }
+                        @Override
+                        public void OnFinished(String fsMessage) {
+                            poDialog.dismiss();
+                            Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
 
-                    //initialize observers
-                    InitObservers();
-                }
-            });
-            Thread.sleep(500);
+                            InitObservers();
+                        }
+                    });
 
-            if (loMaster == null) return; //do not proceed if master is empty
+                    break;
 
-            //download details & images if master transaction is from database
-            if (loMaster.getcSendStat().equalsIgnoreCase("1")){
+                case 1: //download details
 
-                if (lsSourceNo == null || lsSourceNo.isEmpty()) return;
+                    mviewModel.ImportDetails(lsSourceNo, new VMBranchVisit.OnImport() {
+                        @Override
+                        public void OnLoad() {
+                            poDialog.initDialog(getClass().getSimpleName(), "Downloading details . . .", false);
+                            poDialog.show();
+                        }
 
-                mviewModel.ImportDetails(lsSourceNo, new VMBranchVisit.OnImport() {
-                    @Override
-                    public void OnLoad() {
-                        Toast.makeText(Activity_Branch_Visit_Checklist.this, "Downloading details . . .", Toast.LENGTH_SHORT).show();
-                    }
+                        @Override
+                        public void OnFinished(String fsMessage) {
+                            poDialog.dismiss();
+                            Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
 
-                    @Override
-                    public void OnFinished(String fsMessage) {
-                        Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+                            InitObservers();
+                        }
+                    });
 
-                        //initialize observers
-                        InitObservers();
-                    }
-                });
-                Thread.sleep(1000);
+                    break;
 
-                mviewModel.ImportBranchVisitSelfie(lsSourceNo, new VMBranchVisit.OnImport() {
-                    @Override
-                    public void OnLoad() {
-                        Toast.makeText(Activity_Branch_Visit_Checklist.this, "Downloading images . . .", Toast.LENGTH_SHORT).show();
-                    }
+                case 2: //download selfie images
 
-                    @Override
-                    public void OnFinished(String fsMessage) {
-                        Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    mviewModel.ImportBranchVisitSelfie(lsSourceNo, lsCategrID, new VMBranchVisit.OnImport() {
+                        @Override
+                        public void OnLoad() {
+                            poDialog.initDialog(getClass().getSimpleName(), "Downloading images . . .", false);
+                            poDialog.show();
+                        }
+
+                        @Override
+                        public void OnFinished(String fsMessage) {
+                            poDialog.dismiss();
+                            Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    break;
             }
 
         }catch (Exception e){
             mviewModel.SaveError("Branch Visit Checklist", e.getMessage());
+        }
+    }
+
+    private void InitSourceNo(){
+
+        //'0' create new entry master & detail then initialize transaction number, '1' initialize only transaction number from intent
+        if (getIntent().getStringExtra("type").equalsIgnoreCase("0")) {
+
+            //create new entry if no existing record today, else, initialize source number only
+            EBranchVisitMaster loMaster = mviewModel.GetEntryToday();
+            if (loMaster == null){
+
+                lsSourceNo = mviewModel.SaveNewMaster(getIntent().getStringExtra("branch"));
+
+                laChecklist.forEach(eBranchVisitChecklist -> {
+                    mviewModel.SaveNewDetail(lsSourceNo, eBranchVisitChecklist.getsCategrID(), "");
+                });
+
+            }else {
+                lsSourceNo = loMaster.getsTransNox();
+            }
+
+        } else if (getIntent().getStringExtra("type").equalsIgnoreCase("1")) {
+
+            //if transaction number not set from history, finish activity
+            if (!getIntent().hasExtra("source")){
+
+                InitMessage(2, "Could not verify transaction number", new onMessageButton() {
+                    @Override
+                    public void onPositive() {
+                        finish();
+                    }
+                    @Override
+                    public void onNegative() {}
+                });
+                return;
+            }
+            lsSourceNo = getIntent().getStringExtra("source");
         }
     }
 
@@ -404,6 +454,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         if (fbisDisplay){
             if (layout_imgPreview.getVisibility() == View.VISIBLE) return;
             layout_imgPreview.setVisibility(View.VISIBLE);
+
         }else {
             if (layout_imgPreview.getVisibility() == View.GONE) return;
             layout_imgPreview.setVisibility(View.GONE);
@@ -420,112 +471,174 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
         }
     }
 
-    private void InitObservers(){
+    private void LoadImage(EImageInfo foImage){
 
-        //show no record
-        InitDisplayRecord(false);
+        //show image info
+        InitPreviewImage(true);
+        InitShowImageDetails(true);
 
-        mviewModel.GetChecklist().observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EBranchVisitChecklist>>() {
-            @Override
-            public void onChanged(List<EBranchVisitChecklist> eBranchVisitChecklists) {
+        //load image
+        Glide.with(img_selfie.getRootView())
+                .load(foImage.getFileLoct())
+                .fitCenter()
+                .error(R.drawable.img_imageview_place_holder)
+                .into(img_selfie);
 
-                //if checklist is empty, ask user to re download checklist, if declined, finish activity
-                if (eBranchVisitChecklists == null || eBranchVisitChecklists.size() <= 0){
+        //display image details
+        mtv_category.setText(mviewModel.GetCategoryDescr(foImage.getFileCode()));
+        mtv_imgNm.setText(foImage.getImageNme());
+        mtv_imgDate.setText(foImage.getCaptured());
 
-                    InitMessage(3, "Checklist not found! Do you want to re-download data?", new onMessageButton() {
-                        @Override
-                        public void onPositive() {
-                            InitData();
-                        }
-                        @Override
-                        public void onNegative() { finish(); }
-                    });
-                }
+        if (foImage.getSendStat().equalsIgnoreCase("0")){ //allow submit, if image is not sent
 
-                //initialize checklist
-                laChecklist = eBranchVisitChecklists;
+            btn_upload.setImageResource(R.drawable.baseline_cloud_upload_24);
 
-                //do not proceed if checklist is empty
-                if (laChecklist.size() <= 0){
-                    return;
-                }
+            btn_upload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                //'0' create new entry master & detail then initialize transaction number, '1' initialize only transaction number from intent
-                if (getIntent().getStringExtra("type").equalsIgnoreCase("0")) {
+                    if (!mviewModel.IsFileExist(foImage.getFileLoct())){
 
-                    //create new entry if no existing record today, else, initialize source number only
-                    EBranchVisitMaster loMaster = mviewModel.GetEntryToday();
-                    if (loMaster == null){
-                        lsSourceNo = mviewModel.SaveNewMaster(getIntent().getStringExtra("branch"));
-
-                        laChecklist.forEach(eBranchVisitChecklist -> {
-                            mviewModel.SaveNewDetail(lsSourceNo, eBranchVisitChecklist.getsCategrID(), "");
-                        });
-                    }else {
-                        lsSourceNo = loMaster.getsTransNox();
-                    }
-
-                } else if (getIntent().getStringExtra("type").equalsIgnoreCase("1")) {
-
-                    //if transaction number not set from history, finish activity
-                    if (!getIntent().hasExtra("source")){
-
-                        InitMessage(2, "Could not verify transaction number", new onMessageButton() {
+                        InitMessage(2, "Invalid image. File not found!", new onMessageButton() {
                             @Override
-                            public void onPositive() {
-                                finish();
-                            }
+                            public void onPositive() {}
+
                             @Override
                             public void onNegative() {}
                         });
                         return;
                     }
-                    lsSourceNo = getIntent().getStringExtra("source");
-                }
 
-                //do not proceed if transaction number is not initialized
-                if (lsSourceNo == null || lsSourceNo.isEmpty()) {
+                    //upload image file
+                    mviewModel.SubmitImage(foImage, new VMBranchVisit.OnSubmitImageCallback() {
+                        @Override
+                        public void OnLoad(String fsTitlexx, String fsMessage) {
+                            poDialog.initDialog("Branch Visit Selfie", "Uploading Image. Please wait . . .", false);
+                            poDialog.show();
+                        }
+
+                        @Override
+                        public void OnSuccess(String fsTransnox) {
+                            poDialog.dismiss();
+                        }
+
+                        @Override
+                        public void OnFailed(String fsMessage) {
+                            poDialog.dismiss();
+                        }
+                    });
+                }
+            });
+        }else { //allow download if sent but image not found on device
+
+            if (!mviewModel.IsFileExist(foImage.getFileLoct())){
+
+                btn_upload.setImageResource(R.drawable.ic_baseline_file_download_24);
+                btn_upload.setEnabled(true);
+
+                //download image file
+                btn_upload.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        mviewModel.DownloadImageFile(foImage, new VMBranchVisit.OnDownload() {
+                            @Override
+                            public void OnLoad(String fsTitlexx, String fsMessage) {
+                                poDialog.initDialog(fsTitlexx, fsMessage, false);
+                                poDialog.show();
+                            }
+
+                            @Override
+                            public void OnSuccess() {
+                                poDialog.dismiss();
+                                Toast.makeText(Activity_Branch_Visit_Checklist.this, "Image downloaded successfully", Toast.LENGTH_LONG).show();
+
+                                //set button as downloaded
+                                btn_upload.setImageResource(R.drawable.baseline_check_circle_24);
+                                btn_upload.setEnabled(false);
+
+                                InitObservers();
+                            }
+
+                            @Override
+                            public void OnFailed(String fsMessage) {
+                                poDialog.dismiss();
+                                Toast.makeText(Activity_Branch_Visit_Checklist.this, fsMessage, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                });
+
+                return;
+            }
+
+            //display icon for successful upload
+            btn_upload.setImageResource(R.drawable.baseline_check_circle_24);
+            btn_upload.setEnabled(false);
+        }
+    }
+
+    private void InitObservers(){
+
+        //initialize checklist
+        mviewModel.GetChecklist().observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EBranchVisitChecklist>>() {
+            @Override
+            public void onChanged(List<EBranchVisitChecklist> eBranchVisitChecklists) {
+
+                if (eBranchVisitChecklists == null || eBranchVisitChecklists.size() <= 0){
+
+                    InitMessage(3, "Checklists not found! Do you want to re-download data?", new onMessageButton() {
+                        @Override
+                        public void onPositive() { DownloadData(0); }
+
+                        @Override
+                        public void onNegative() { finish(); }
+                    });
                     return;
                 }
 
-                //initialize master and details
+                //initialize checklist
+                laChecklist = eBranchVisitChecklists;
+
+                InitSourceNo();
+
+                //do not proceed if transaction number is not initialized
+                if (lsSourceNo == null || lsSourceNo.isEmpty()) return;
+
+                //initialize master
                 mviewModel.GetMasterTransaction(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<EBranchVisitMaster>() {
                     @Override
                     public void onChanged(EBranchVisitMaster eBranchVisitMaster) {
 
+                        if (eBranchVisitMaster == null) return;
+
+                        //initialize master
                         loMaster = eBranchVisitMaster;
 
-                        if (loMaster == null){
-                            return;
+                        if (loMaster.getcSendStat().equalsIgnoreCase("1")){
+
+                            //if details not found and master transaction is from database, ask user to re download
+                            if (mviewModel.CountTransactionDetails(lsSourceNo) < 1){
+
+                                InitMessage(3, "Details not found! Do you want to re-download data?", new onMessageButton() {
+                                    @Override
+                                    public void onPositive() { DownloadData(1); }
+
+                                    @Override
+                                    public void onNegative() { finish(); }
+                                });
+                                return;
+                            }
                         }
 
-                        //enable submit button if transaction is not open(0)
-                        btn_submit.setEnabled(loMaster.getcTranStat().equalsIgnoreCase("0") && loMaster.getdTransact().equals(mviewModel.GetCurrentDate()));
-
-                        //initialize details
                         mviewModel.GetDetails(lsSourceNo).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<DBranchVisitDetail.BranchVisitDetail>>() {
                             @Override
-                            public void onChanged(List<DBranchVisitDetail.BranchVisitDetail> eBranchVisitDetails) {
+                            public void onChanged(List<DBranchVisitDetail.BranchVisitDetail> branchVisitDetails) {
 
-                                if (eBranchVisitDetails == null || eBranchVisitDetails.size() <= 0){
+                                if (branchVisitDetails == null || branchVisitDetails.size() < 1) return;
 
-                                    if (loMaster.getcSendStat().equalsIgnoreCase("1")){
-
-                                        InitMessage(3, "Details not found! Do you want to re-download data?", new onMessageButton() {
-                                            @Override
-                                            public void onPositive() {
-                                                InitData();
-                                            }
-                                            @Override
-                                            public void onNegative() { finish(); }
-                                        });
-
-                                    }
-                                    return;
-                                }
-
-                                //initialize checklist
-                                laDetails = eBranchVisitDetails;
+                                //initialize details
+                                laDetails = branchVisitDetails;
 
                                 //show record list
                                 InitDisplayRecord(true);
@@ -542,8 +655,32 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
 
                                     @Override
                                     public void OnPreviewImage(String fsCategrID) {
-                                        InitPreviewImage(true);
-                                        InitShowImageDetails(true);
+
+                                        lsCategrID = fsCategrID;
+
+                                        if (mviewModel.CountImagePerCategory(lsSourceNo, lsCategrID) < 1){
+
+                                            InitMessage(3, "Image info not found! Do you want to download?", new onMessageButton() {
+                                                @Override
+                                                public void onPositive() {
+                                                    DownloadData(2);
+                                                }
+
+                                                @Override
+                                                public void onNegative() {}
+                                            });
+                                            return;
+                                        }
+
+                                        mviewModel.GetCategoryImages(lsSourceNo, lsCategrID).observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EImageInfo>>() {
+                                            @Override
+                                            public void onChanged(List<EImageInfo> eImageInfos) {
+
+                                                if (eImageInfos == null || eImageInfos.size() < 1) return;
+
+                                                LoadImage(eImageInfos.get(0)); //considered 1 image per category is allowed
+                                            }
+                                        });
                                     }
 
                                     @Override
@@ -552,25 +689,27 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                                     }
                                 });
 
-                                //allow modification, if transaction is open(0)
-                                loAdapter.AllowEdit(loMaster.getcTranStat().equalsIgnoreCase("0") && loMaster.getdTransact().equals(mviewModel.GetCurrentDate()));
-
                                 recyclerview_checklist.setAdapter(loAdapter);
                                 recyclerview_checklist.setLayoutManager(new LinearLayoutManager(Activity_Branch_Visit_Checklist.this,  LinearLayoutManager.VERTICAL, false));
+
+                                //allow modification, if transaction is open(0) & date transaction is current date
+                                btn_submit.setEnabled(loMaster.getcTranStat().equalsIgnoreCase("0") && loMaster.getdTransact().equals(mviewModel.GetCurrentDate()));
+
+                                //allow modification, if transaction is open(0) & date transaction is current date
+                                loAdapter.AllowEdit(loMaster.getcTranStat().equalsIgnoreCase("0") && loMaster.getdTransact().equals(mviewModel.GetCurrentDate()));
                             }
                         });
-                    }
-                });
 
-                mviewModel.GetTransactionImagesForUpload(lsSourceNo, "BVS").observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EImageInfo>>() {
-                    @Override
-                    public void onChanged(List<EImageInfo> eImageInfos) {
+                        mviewModel.GetTransactionImagesForUpload(lsSourceNo, "BVS").observe(Activity_Branch_Visit_Checklist.this, new Observer<List<EImageInfo>>() {
+                            @Override
+                            public void onChanged(List<EImageInfo> eImageInfos) {
 
-                        //do not proceed, if empty
-                        if (eImageInfos == null || eImageInfos.size() < 1){
-                            return;
-                        }
-                        laImages = eImageInfos;
+                                if (eImageInfos == null || eImageInfos.size() < 1) return;
+
+                                laImages = eImageInfos;
+                            }
+                        });
+
                     }
                 });
             }

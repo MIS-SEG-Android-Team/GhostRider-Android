@@ -93,8 +93,12 @@ public class BranchMonitoring {
         poDetail.UpdateRemarks(fsRemarksx, fsTransNox, fsCategrID);
     }
 
-    public int CountImagePerCategory(String fsRefernox, String fsCategrID, String fsSourceCD){
-        return poImageDao.CountImagePerCategory(fsRefernox, fsCategrID, fsSourceCD);
+    public int CountTransactionDetails(String fsTransNox){
+        return poDetail.CountTransactionDetails(fsTransNox);
+    }
+
+    public int CountImagePerCategory(String fsRefernox, String fsCategrID){
+        return poImageDao.CountImagePerCategory(fsRefernox, fsCategrID, "BVS");
     }
 
     public void SaveBranchVisitImage(String fsTransNox, String fsFileName, String fsFilePath, String fsLongitude, String fsLatitude, String fsCategrID){
@@ -273,20 +277,19 @@ public class BranchMonitoring {
         }
     }
 
-    public Boolean ImportBranchVisitSelfie(String fsTransNox){
+    public Boolean ImportBranchVisitSelfie(String fsTransNox, String fsCategrID){
 
         try {
 
             JSONObject loParams = new JSONObject();
             loParams.put("sTransNox", fsTransNox);
+            loParams.put("sCategrID", fsCategrID);
 
-            String lsResponse = WebClient.sendRequest(poApi.getUrlSSDImageCategory(),loParams.toString(), poHeaders.getHeaders());
+            String lsResponse = WebClient.sendRequest(poApi.getUrlBranchVisitSelfie(),loParams.toString(), poHeaders.getHeaders());
             if (lsResponse == null){
                 lsMessage = "Server no response";
                 return false;
             }
-
-            Log.d("Branch visit selfie result", lsResponse);
 
             JSONObject loResponse = new JSONObject(lsResponse);
             String lsResult = loResponse.getString("result");
@@ -326,6 +329,15 @@ public class BranchMonitoring {
             lsMessage = e.getMessage();
             return false;
         }
+    }
+
+    public Boolean DownloadImageFile(String fsTransNox){
+
+        if (!poImage.DownloadImageFile(fsTransNox)){
+            lsMessage = poImage.getMessage();
+            return false;
+        }
+        return true;
     }
 
     public Object[] SubmitBranchVisit(EBranchVisitMaster foMaster, List<DBranchVisitDetail.BranchVisitDetail> faDetails){
@@ -415,7 +427,6 @@ public class BranchMonitoring {
             loParams.put("sMD5Hashx", foImages.getMD5Hashx());
             loParams.put("sImagePth", foImages.getFileLoct());
             loParams.put("dImgeDate", foImages.getCaptured());
-            loParams.put("dImgeDate", foImages.getCaptured());
 
             //upload image details
             String lsResponse = WebClient.sendRequest(poApi.getUrlSubmitBranchVisitSelfie(), loParams.toString(), poHeaders.getHeaders());
@@ -456,10 +467,6 @@ public class BranchMonitoring {
         }
     }
 
-    public LiveData<List<EBranchVisitChecklist>> GetChecklist(){
-        return poChecklist.GetChecklist();
-    }
-
     public EBranchVisitMaster GetEntryToday(){
         return poMaster.GetEntryToday(poSession.getUserID(), GetCurrentDate());
     }
@@ -480,6 +487,14 @@ public class BranchMonitoring {
 
         poMaster.Save(loMaster);
         return loMaster.getsTransNox();
+    }
+
+    public String GetDescription(String fsCategrID){
+        return poChecklist.GetDescription(fsCategrID);
+    }
+
+    public LiveData<List<EBranchVisitChecklist>> GetChecklist(){
+        return poChecklist.GetChecklist();
     }
 
     public LiveData<EBranchVisitMaster> GetMasterTransaction(String fsTransNox){
@@ -509,6 +524,10 @@ public class BranchMonitoring {
 
     public LiveData<List<DBranchVisitDetail.BranchVisitDetail>> GetDetails(String fsTransNox){
         return poDetail.GetDetails(fsTransNox);
+    }
+
+    public LiveData<List<EImageInfo>> GetCategoryImages(String fsTransNox, String fsCategory){
+        return poImageDao.GetImagesPerCategory(fsTransNox, fsCategory, "BVS");
     }
 
     public LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo, String fsSourceCD){

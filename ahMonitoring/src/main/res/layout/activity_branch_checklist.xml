@@ -26,7 +26,7 @@
         android:id="@+id/frame_record"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -203,18 +203,18 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="N/A"
-                            android:textSize="15sp"
+                            android:textSize="12sp"
                             android:textStyle="bold"
-                            app:layout_constraintWidth_percent="0.7"/>
+                            app:layout_constraintWidth_percent="0.9"/>
 
                         <com.google.android.material.textview.MaterialTextView
                             android:id="@+id/mtv_imgDate"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="1900-00:00 00:00:00"
-                            android:textSize="12sp"
+                            android:textSize="10sp"
                             app:layout_constraintTop_toBottomOf="@+id/mtv_imgNm"
-                            app:layout_constraintWidth_percent="0.7"/>
+                            app:layout_constraintWidth_percent="0.9"/>
 
                         <ImageButton
                             android:id="@+id/btn_upload"
@@ -242,7 +242,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone"
+        android:visibility="visible"
         android:gravity="center"
         android:layout_gravity="center">
 

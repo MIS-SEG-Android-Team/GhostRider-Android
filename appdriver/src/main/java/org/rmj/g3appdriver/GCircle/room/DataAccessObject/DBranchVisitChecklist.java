@@ -15,6 +15,9 @@ public interface DBranchVisitChecklist {
     @Upsert
     void Save(EBranchVisitChecklist foVal);
 
+    @Query("SELECT sDescript FROM Branch_Visit_Checklist WHERE sCategrID = :fsCategrID")
+    String GetDescription(String fsCategrID);
+
     @Query("SELECT * FROM Branch_Visit_Checklist WHERE cRecdStat = '1' ORDER BY sDescript ASC")
     LiveData<List<EBranchVisitChecklist>> GetChecklist();
 

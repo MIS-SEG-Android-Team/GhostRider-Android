@@ -523,11 +523,11 @@ public class RImageInfo {
 
             EImageInfo loDetail = poDao.GetImageInfo(fsVal);
             if(loDetail == null){
-                message = "Unable to find image to upload.";
+                message = "Unable to find image to download.";
                 return false;
             }
 
-            //initialize client access, set static token for SSDD Images to be downloaded BY ANY USERS
+            //initialize client access, set static token for image to be downloaded BY ANY USERS
             String lsAccess = getClientToken(loDetail.getsClientID(), loDetail.getDtlSrcNo());
             if(lsAccess == null){
                 message = "Unable to generate access key";

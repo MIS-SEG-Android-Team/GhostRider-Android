@@ -87,8 +87,8 @@ public interface DImageInfo {
     @Query("SELECT * FROM Image_Information " +
             "WHERE sSourceNo = :fsSource " +
             "AND sFileCode = :fsCategrID " +
-            "AND sSourceCD = 'SSDD'")
-    LiveData<List<EImageInfo>> GetSSDDImagesPerCategory(String fsSource, String fsCategrID);
+            "AND sSourceCD = :fsSourceCD")
+    LiveData<List<EImageInfo>> GetImagesPerCategory(String fsSource, String fsCategrID, String fsSourceCD);
 
     @Query("SELECT * FROM Image_Information " +
             "WHERE sSourceCD = :fsSourceCD " +

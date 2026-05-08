@@ -21,6 +21,9 @@ public interface DBranchVisitDetail {
     @Query("UPDATE Branch_Visit_Detail SET sRemarksx= :fsRemarksx WHERE sTransNox = :fsTransNox AND sCategrID = :fsCategrID")
     void UpdateRemarks(String fsRemarksx, String fsTransNox, String fsCategrID);
 
+    @Query("SELECT COUNT(*) FROM Branch_Visit_Detail WHERE sTransNox = :fsTransNox")
+    int CountTransactionDetails(String fsTransNox);
+
     @Query("SELECT " +
                 "a.sCategrID," +
                 "b.sDescript, " +
