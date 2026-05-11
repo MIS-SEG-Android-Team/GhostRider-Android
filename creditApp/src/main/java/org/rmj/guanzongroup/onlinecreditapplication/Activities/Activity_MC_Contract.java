@@ -280,7 +280,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                         //if serial id is not initialized, display model id from credit app, else, display serial id
                         JSONObject loDetail  = new JSONObject(loApp.getDetlInfo());
                         if (loContract.getsSerialID() == null || loContract.getsSerialID().isEmpty()){
-                            auto_serial.setHint("Model ID");
+                            layout_serial.setHint("Model ID");
                             auto_serial.setText(loDetail.getString("sModelIDx"));
                         }else {
                             laSerials
@@ -288,7 +288,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                     .filter(mcSerial -> mcSerial.lsSerialID.equalsIgnoreCase(loContract.getsSerialID()))
                                     .findFirst()
                                     .ifPresent(mcSerial -> {
-                                        auto_serial.setHint("Engine Number");
+                                        layout_serial.setHint("Engine Number");
                                         auto_serial.setText(mcSerial.lsEngine);
                                     });
                         }
@@ -343,7 +343,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                         //if serial id is not initialized, display model id from credit app, else, display serial id
                         JSONObject loDetail  = new JSONObject(loApp.getDetlInfo());
                         if (loContract.getsSerialID() == null || loContract.getsSerialID().isEmpty()){
-                            auto_serial.setHint("Model ID");
+                            layout_serial.setHint("Model ID");
                             auto_serial.setText(loDetail.getString("sModelIDx"));
                         }else {
                             laSerials
@@ -351,7 +351,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                     .filter(mcSerial -> mcSerial.lsSerialID.equalsIgnoreCase(loContract.getsSerialID()))
                                     .findFirst()
                                     .ifPresent(mcSerial -> {
-                                        auto_serial.setHint("Engine Number");
+                                        layout_serial.setHint("Engine Number");
                                         auto_serial.setText(mcSerial.lsEngine);
                                     });
                         }
