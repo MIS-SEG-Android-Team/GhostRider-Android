@@ -177,12 +177,12 @@ public class Activity_Branch_Visit_History extends AppCompatActivity {
         mViewModel.ImportMaster(fsDfrom, fsDto, new VMBranchVisit.OnImport() {
             @Override
             public void OnLoad() {
-                Toast.makeText(Activity_Branch_Visit_History.this, "Downloading history . .", Toast.LENGTH_LONG).show();
+                Toast.makeText(Activity_Branch_Visit_History.this, "Downloading history . .", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void OnFinished(String fsMessage) {
-                Toast.makeText(Activity_Branch_Visit_History.this, fsMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(Activity_Branch_Visit_History.this, fsMessage, Toast.LENGTH_SHORT).show();
                 InitObservers();
             }
         });
@@ -196,7 +196,7 @@ public class Activity_Branch_Visit_History extends AppCompatActivity {
 
                 if (masterHistories == null){
 
-                    InitMessage(3, "History not found! Do you want to re-download data?", new onMessageButton() {
+                    InitMessage(3, "Transactions from " + lsDfrom + " to " + lsDto + " not found! Do you want to re-download data?", new onMessageButton() {
                         @Override
                         public void onPositive() {
                             InitData(lsDfrom, lsDto);

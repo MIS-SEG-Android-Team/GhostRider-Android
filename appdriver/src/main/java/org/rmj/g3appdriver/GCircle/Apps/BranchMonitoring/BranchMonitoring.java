@@ -25,12 +25,12 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitDetail;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchVisitMaster;
 import org.rmj.g3appdriver.GCircle.room.Entities.EErrorLogs;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDMaster;
-import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RImageInfo;
 import org.rmj.g3appdriver.dev.Api.HttpHeaders;
 import org.rmj.g3appdriver.dev.Api.WebClient;
+import org.rmj.g3appdriver.etc.AppConstants;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -340,6 +340,73 @@ public class BranchMonitoring {
         return true;
     }
 
+    public Boolean SubmitBranchVisitImagesForUpload(){
+
+        try {
+
+            if (poImageDao.GetImagesForUpload("BVS") == null || poImageDao.GetImagesForUpload("BVS").size() < 1){
+                lsMessage = "No Branch Visit images to upload";
+                return false;
+            }
+            boolean isSuccess = true;
+
+            List<EImageInfo> laImages =  poImageDao.GetImagesForUpload("BVS");
+            for (EImageInfo loImage : laImages){
+
+                String lsOldTransnox = loImage.getTransNox();
+
+                //if uploading successful,
+                String lsImageID = poImage.UploadImage(loImage.getTransNox());
+                if (lsImageID != null && !lsImageID.isEmpty()){
+
+                    Thread.sleep(1000);
+
+                    JSONObject loParams = new JSONObject();
+                    loParams.put("sTransNox", lsImageID);
+                    loParams.put("sSourceNo", lsOldTransnox);
+
+                    String lsResponse = WebClient.sendRequest(poApi.getUrlUpdateSSDDTransaction(), loParams.toString(), poHeaders.getHeaders());
+                    if (lsResponse == null){
+                        lsMessage = "Server no response";
+                        isSuccess = false;
+                        break;
+                    }
+                    Log.d("Branch Visit Image Upload", lsResponse);
+
+                    JSONObject loResponse = new JSONObject(lsResponse);
+                    String lsResult = loResponse.getString("result");
+
+                    if(lsResult.equalsIgnoreCase("error")){
+                        JSONObject loError = loResponse.getJSONObject("error");
+                        lsMessage = getErrorMessage(loError);;
+                        isSuccess = false;
+                        break;
+                    }
+                    if (loResponse.getString("sTransNox") == null || loResponse.getString("sTransNox").isEmpty()){
+                        isSuccess = false;
+                        break;
+                    }
+
+                    //update send status, after update of transaction number
+                    loImage.setSendStat("1");
+                    loImage.setSendDate(AppConstants.DATE_MODIFIED());
+
+                    poImageDao.update(loImage);
+
+                    //update transaction number
+                    poImageDao.UpdateTransNox(lsImageID, lsOldTransnox);
+
+                    Thread.sleep(1000);
+                }
+            }
+            return isSuccess;
+
+        }catch (Exception e){
+            lsMessage = e.getMessage();
+            return false;
+        }
+    }
+
     public Object[] SubmitBranchVisit(EBranchVisitMaster foMaster, List<DBranchVisitDetail.BranchVisitDetail> faDetails){
 
         Object[] result = new Object[2];
@@ -385,11 +452,16 @@ public class BranchMonitoring {
 
             String lsTransNox = loResponse.getString("sTransNox");
 
-            //update master transaction no
+            //update master transaction no generated from server, meaning, sent successful so update sent status
             poMaster.UpdateTransactionNumber(lsTransNox, foMaster.getsTransNox());
 
             //update detail transaction no
             poDetail.UpdateTransactionNumber(lsTransNox, foMaster.getsTransNox());
+
+            //update image reference no
+            if (poImageDao.GetCountPerTransaction(foMaster.getsTransNox(), "BVS") > 0){
+                poImageDao.UpdateSourceNo(lsTransNox, foMaster.getsTransNox(), "BVS");
+            }
 
             result[0] = true;
             result[1] = lsTransNox;

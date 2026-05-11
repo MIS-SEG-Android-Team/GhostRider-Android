@@ -646,7 +646,7 @@ public class Activity_Branch_Visit_Checklist extends AppCompatActivity {
                                 //display master info
                                 InitDisplayMaster();
 
-                                ///initialize adapter
+                                //initialize adapter
                                 loAdapter = new Adapter_Branch_Vist_Checklist(laDetails, new Adapter_Branch_Vist_Checklist.OnItemListener() {
                                     @Override
                                     public void OnCamera(String fsCategrID) {

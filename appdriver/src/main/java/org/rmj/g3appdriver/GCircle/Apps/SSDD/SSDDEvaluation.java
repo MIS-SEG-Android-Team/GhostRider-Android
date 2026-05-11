@@ -460,14 +460,13 @@ public class SSDDEvaluation {
 
         try {
 
-            if (poImageDao.GetSSDDImagesForUpload() == null || poImageDao.GetSSDDImagesForUpload().size() < 1){
+            if (poImageDao.GetImagesForUpload("SSDD") == null || poImageDao.GetImagesForUpload("SSDD").size() < 1){
                 lsMessage = "No SSDD image to upload";
                 return false;
             }
-
             boolean isSuccess = true;
 
-            List<EImageInfo> laImages =  poImageDao.GetSSDDImagesForUpload();
+            List<EImageInfo> laImages =  poImageDao.GetImagesForUpload("SSDD");
             for (EImageInfo loImage : laImages){
 
                 String lsOldTransnox = loImage.getTransNox();
@@ -488,7 +487,7 @@ public class SSDDEvaluation {
                         isSuccess = false;
                         break;
                     }
-                    Log.d("SSDDEvaluation", lsResponse);
+                    Log.d("SSDD Image Upload", lsResponse);
 
                     JSONObject loResponse = new JSONObject(lsResponse);
                     String lsResult = loResponse.getString("result");
@@ -578,8 +577,8 @@ public class SSDDEvaluation {
             poDetailDao.Submit(lsTransNox, foMaster.getsTransNox());
 
             //update image reference no
-            if (poImageDao.GetCountPerTransaction(foMaster.getsTransNox()) > 0){
-                poImageDao.UpdateSourceNo(lsTransNox, foMaster.getsTransNox());
+            if (poImageDao.GetCountPerTransaction(foMaster.getsTransNox(), "SSDD") > 0){
+                poImageDao.UpdateSourceNo(lsTransNox, foMaster.getsTransNox(), "SSDD");
             }
 
             result[0] = true;

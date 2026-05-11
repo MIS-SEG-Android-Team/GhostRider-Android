@@ -142,7 +142,7 @@
                     android:id="@+id/layout_serial"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="Serial ID"
+                    android:hint="Engine Number / Model ID"
                     android:layout_marginVertical="10dp"
                     app:layout_constraintTop_toBottomOf="@+id/label"
                     app:layout_constraintStart_toStartOf="@+id/layout_1"
@@ -212,13 +212,25 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/mtv_confirmdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm DP"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorPrimary"
+                    android:visibility="gone"
+                    android:padding="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_dp"
+                    app:layout_constraintEnd_toEndOf="@+id/layout_monthly"/>
+
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/CustomDropDownTilStyle"
                     android:id="@+id/layout_terms"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:hint="Terms"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_dp"
+                    app:layout_constraintTop_toBottomOf="@+id/mtv_confirmdp"
                     app:layout_constraintStart_toStartOf="@+id/layout_dp"
                     app:layout_constraintEnd_toEndOf="@+id/layout_monthly">
 
@@ -276,6 +288,19 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/mtv_confirmdrno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm DR"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorPrimary"
+                    android:background="@color/zxing_transparent"
+                    android:visibility="gone"
+                    android:padding="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_drno"
+                    app:layout_constraintEnd_toEndOf="@+id/layout_drno"/>
+
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/TextInputTextAreaStyle"
                     android:id="@+id/layout_remarks"
@@ -284,8 +309,8 @@
                     android:hint="Remarks"
                     android:paddingTop="5dp"
                     app:layout_constraintHeight_percent="0.15"
-                    app:layout_constraintTop_toBottomOf="@+id/layout_drno"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/mtv_confirmdrno"
+                    app:layout_constraintBottom_toTopOf="@+id/mtv_confirmRemarks"
                     app:layout_constraintStart_toStartOf="@+id/layout_drno"
                     app:layout_constraintEnd_toEndOf="@+id/layout_drno">
 
@@ -297,6 +322,19 @@
                         android:maxLines="5"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/mtv_confirmRemarks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm Remarks"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorPrimary"
+                    android:visibility="gone"
+                    android:padding="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_remarks"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/layout_remarks"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

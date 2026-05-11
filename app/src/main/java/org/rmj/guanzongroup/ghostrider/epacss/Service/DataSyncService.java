@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.ApprovalCode;
+import org.rmj.g3appdriver.GCircle.Apps.BranchMonitoring.BranchMonitoring;
 import org.rmj.g3appdriver.GCircle.Apps.Itinerary.Obj.EmployeeItinerary;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLeave;
 import org.rmj.g3appdriver.GCircle.Apps.PetManager.Obj.EmployeeLoan;
@@ -89,6 +90,16 @@ public class DataSyncService extends BroadcastReceiver {
                         TaskExecutor.ShowProgress(() -> GNotifBuilder.createNotification(instance, GNotifBuilder.BROADCAST_RECEIVER, message, GNotifBuilder.SYNC_PROGRESS).show());
                     } else {
                         message = loSSDD.GetMessage();
+                        Log.e(TAG, message);
+                    }
+                    Thread.sleep(1000);
+
+                    BranchMonitoring loBM = new BranchMonitoring(instance);
+                    if (loBM.SubmitBranchVisitImagesForUpload()){
+                        message = "Branch Visit image/s uploaded successfully";
+                        TaskExecutor.ShowProgress(() -> GNotifBuilder.createNotification(instance, GNotifBuilder.BROADCAST_RECEIVER, message, GNotifBuilder.SYNC_PROGRESS).show());
+                    } else {
+                        message = loBM.GetMessage();
                         Log.e(TAG, message);
                     }
                     Thread.sleep(1000);

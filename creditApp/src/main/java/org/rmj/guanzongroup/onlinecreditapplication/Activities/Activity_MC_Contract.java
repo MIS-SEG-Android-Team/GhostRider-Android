@@ -1,12 +1,14 @@
 package org.rmj.guanzongroup.onlinecreditapplication.Activities;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -28,7 +30,6 @@ import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DGanadoOnline;
 import org.rmj.g3appdriver.GCircle.room.Entities.EBranchInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECreditApplication;
 import org.rmj.g3appdriver.GCircle.room.Entities.EMCContractInfo;
-import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.FormatUIText;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
@@ -58,6 +59,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
     private LoadDialog poDialogx;
     private MessageBox poMessage;
 
+    ECreditApplication loApp;
     private EMCContractInfo loContract = new EMCContractInfo();
     private List<CreditOnlineApplication.MCSerial> laSerials = new ArrayList<>();
     private InstallmentInfo loInstallment;
@@ -67,7 +69,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
     private TextInputEditText tie_branch, tie_transaction, tie_client, tie_account, tie_downpay, tie_monthly, tie_purchasedt, tie_drno, tie_remarks;
     private MaterialAutoCompleteTextView auto_serial, auto_term;
     private MaterialButton btn_submit;
-    private MaterialTextView mtv_refresh;
+    private MaterialTextView mtv_refresh, mtv_confirmdp, mtv_confirmdrno, mtv_confirmRemarks;
 
     public interface OnMessageButton {
         void OnPositive();
@@ -124,6 +126,9 @@ public class Activity_MC_Contract extends AppCompatActivity {
         auto_term = findViewById(R.id.auto_term);
         mtv_refresh = findViewById(R.id.mtv_refresh);
         btn_submit = findViewById(R.id.btn_submit);
+        mtv_confirmdp = findViewById(R.id.mtv_confirmdp);
+        mtv_confirmdrno = findViewById(R.id.mtv_confirmdrno);
+        mtv_confirmRemarks = findViewById(R.id.mtv_confirmRemarks);
     }
 
     private void InitData(){
@@ -131,7 +136,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
         try {
 
             //do not proceed if credit app is empty
-            ECreditApplication loApp = mViewModel.GetApplication(getIntent().getStringExtra("sTransNox"));
+            loApp = mViewModel.GetApplication(getIntent().getStringExtra("sTransNox"));
             if (loApp == null){
                 Toast.makeText(Activity_MC_Contract.this, "Credit application not found", Toast.LENGTH_SHORT).show();
                 finish();
@@ -221,8 +226,6 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                     //set model and serial id
                                     loContract.setsSerialID(laSerials.get(0).lsSerialID);
                                     mViewModel.SetModelIDxx(laSerials.get(0).lsModelIDx);
-
-                                    auto_serial.setText(loContract.getsSerialID(), false);
                                 }
 
                                 @Override
@@ -234,7 +237,6 @@ public class Activity_MC_Contract extends AppCompatActivity {
                                         public void OnPositive() {
                                             try {
                                                 mViewModel.SetModelIDxx(loDetail.getString("sModelIDx"));
-                                                auto_serial.setText(loDetail.getString("sModelIDx"));
                                             }catch (Exception e){
                                                 mViewModel.SaveError("MC Contract", e.getMessage());
                                             }
@@ -248,7 +250,8 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
                         }
 
-                        InitDisplay();
+                        //display all fields value
+                        InitDisplay(0);
 
                     }catch (Exception e){
                         mViewModel.SaveError("MC Contract", e.getMessage());
@@ -263,56 +266,133 @@ public class Activity_MC_Contract extends AppCompatActivity {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private void InitDisplay(){
+    private void InitDisplay(int fnIndex){
 
         try {
 
-            //initialize values to display
-            if (mViewModel.getBranchInfo(loContract.getsBranchCd()) == null){
-                tie_branch.setText(loContract.getsBranchCd());
-            }else {
+            switch (fnIndex){
 
-                EBranchInfo loBranch = mViewModel.getBranchInfo(loContract.getsBranchCd());
-                tie_branch.setText(loBranch.getBranchNm());
-            }
+                case  1: //unit, downpayment and monthly
 
-            tie_transaction.setText(loContract.getsTransNox());
-            tie_client.setText(loContract.getsClientID());
-            tie_account.setText(loContract.getsAcctNmbr());
-            tie_remarks.setText(loContract.getsRemarksx());
+                    //engine number or model id
+                    if (loApp != null){
 
-            if (loContract.getdPurchase() != null){
-
-                if (!loContract.getdPurchase().isEmpty()){
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        tie_purchasedt.setText(LocalDate.parse(loContract.getdPurchase(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-                    }else {
-                        tie_purchasedt.setText(new SimpleDateFormat("MMMM dd, yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(loContract.getdPurchase())));
+                        //if serial id is not initialized, display model id from credit app, else, display serial id
+                        JSONObject loDetail  = new JSONObject(loApp.getDetlInfo());
+                        if (loContract.getsSerialID() == null || loContract.getsSerialID().isEmpty()){
+                            auto_serial.setHint("Model ID");
+                            auto_serial.setText(loDetail.getString("sModelIDx"));
+                        }else {
+                            laSerials
+                                    .stream()
+                                    .filter(mcSerial -> mcSerial.lsSerialID.equalsIgnoreCase(loContract.getsSerialID()))
+                                    .findFirst()
+                                    .ifPresent(mcSerial -> {
+                                        auto_serial.setHint("Engine Number");
+                                        auto_serial.setText(mcSerial.lsEngine);
+                                    });
+                        }
                     }
 
-                }
+                    tie_downpay.setText(String.valueOf(loContract.getnDownPaym()));
+                    tie_monthly.setText(String.valueOf(loContract.getnMonAmort()));
+                    break;
 
-            }
+                case 2: //purchase date
+                    if (loContract.getdPurchase() != null){
 
-            if (loContract.getDrNo() != null){
-                
-                if (!loContract.getDrNo().isEmpty()){
+                        //if purchase date is not initialized, display current date, else, display purchase date
+                        if (!loContract.getdPurchase().isEmpty()){
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                tie_purchasedt.setText(LocalDate.parse(loContract.getdPurchase(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+                            }else {
+                                tie_purchasedt.setText(new SimpleDateFormat("MMMM dd, yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(loContract.getdPurchase())));
+                            }
+
+                        }
+
+                    }
+                    break;
+                case 3: //dr number
                     tie_drno.setText(loContract.getDrNo());
-                }
-            }
+                    break;
+                case 4: //remarks
+                    tie_remarks.setText(loContract.getsRemarksx());
+                    break;
+                default: //all fields
 
-            tie_downpay.setText(String.valueOf(loContract.getnDownPaym()));
-            tie_monthly.setText(String.valueOf(loContract.getnMonAmort()));
+                    Toast.makeText(Activity_MC_Contract.this, "Information has been refreshed", Toast.LENGTH_SHORT).show();
 
-            loTerms.entrySet().forEach(new Consumer<Map.Entry<String, String>>() {
-                @Override
-                public void accept(Map.Entry<String, String> stringStringEntry) {
+                    //branch
+                    if (mViewModel.getBranchInfo(loContract.getsBranchCd()) == null){
+                        tie_branch.setText(loContract.getsBranchCd());
+                    }else {
 
-                    if (stringStringEntry.getValue().equalsIgnoreCase(String.valueOf(loContract.getnAcctTerm()))){
-                        auto_term.setText(stringStringEntry.getKey(), false);
+                        EBranchInfo loBranch = mViewModel.getBranchInfo(loContract.getsBranchCd());
+                        tie_branch.setText(loBranch.getBranchNm());
                     }
-                }
-            });
+
+                    //generated ids
+                    tie_transaction.setText(loContract.getsTransNox());
+                    tie_client.setText(loContract.getsClientID());
+                    tie_account.setText(loContract.getsAcctNmbr());
+
+                    //engine number or model id
+                    if (loApp != null){
+
+                        //if serial id is not initialized, display model id from credit app, else, display serial id
+                        JSONObject loDetail  = new JSONObject(loApp.getDetlInfo());
+                        if (loContract.getsSerialID() == null || loContract.getsSerialID().isEmpty()){
+                            auto_serial.setHint("Model ID");
+                            auto_serial.setText(loDetail.getString("sModelIDx"));
+                        }else {
+                            laSerials
+                                    .stream()
+                                    .filter(mcSerial -> mcSerial.lsSerialID.equalsIgnoreCase(loContract.getsSerialID()))
+                                    .findFirst()
+                                    .ifPresent(mcSerial -> {
+                                        auto_serial.setHint("Engine Number");
+                                        auto_serial.setText(mcSerial.lsEngine);
+                                    });
+                        }
+                    }
+
+                    //purchase date
+                    if (loContract.getdPurchase() != null){
+
+                        //if purchase date is not initialized, display current date, else, display purchase date
+                        if (!loContract.getdPurchase().isEmpty()){
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                tie_purchasedt.setText(LocalDate.parse(loContract.getdPurchase(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+                            }else {
+                                tie_purchasedt.setText(new SimpleDateFormat("MMMM dd, yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(loContract.getdPurchase())));
+                            }
+
+                        }
+
+                    }
+
+                    //dp and monthly
+                    tie_downpay.setText(String.valueOf(loContract.getnDownPaym()));
+                    tie_monthly.setText(String.valueOf(loContract.getnMonAmort()));
+
+                    //loan term
+                    loTerms.entrySet().forEach(new Consumer<Map.Entry<String, String>>() {
+                        @Override
+                        public void accept(Map.Entry<String, String> stringStringEntry) {
+
+                            if (stringStringEntry.getValue().equalsIgnoreCase(String.valueOf(loContract.getnAcctTerm()))){
+                                auto_term.setText(stringStringEntry.getKey(), false);
+                            }
+                        }
+                    });
+
+                    //dr number and remarks
+                    tie_drno.setText(loContract.getDrNo());
+                    tie_remarks.setText(loContract.getsRemarksx());
+
+                    break;
+            }
 
             //CLOSE status
             if (loContract.getcTranStat().equalsIgnoreCase("1")){
@@ -435,60 +515,111 @@ public class Activity_MC_Contract extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        tie_downpay.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        tie_downpay.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
-                if (!hasFocus){
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                    if (tie_downpay.getText() == null || tie_downpay.getText().toString().trim().isEmpty()){
-
-                        InitMessage(0, R.drawable.baseline_error_24, "Please enter downpayment", "Okay", "", new OnMessageButton() {
-                            @Override
-                            public void OnPositive() {}
-
-                            @Override
-                            public void OnNegative() {}
-                        });
-                        return;
-                    }
-
-                    //initialize downpayment
-                    double lnDownPaym = FormatUIText.getParseDouble(tie_downpay.getText().toString());
-                    mViewModel.GetProductModel().setDownPaym(String.valueOf(lnDownPaym));
-
-                    //trigger coputation by downpayment
-                    InitializePayment();
-
+                if (charSequence.length() < 1 || charSequence.toString().equalsIgnoreCase(String.valueOf(loContract.getnDownPaym()))){
+                    mtv_confirmdp.setVisibility(GONE);
+                    return;
                 }
+                mtv_confirmdp.setVisibility(VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        mtv_confirmdp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (tie_downpay.getText() == null || tie_downpay.getText().toString().trim().isEmpty()){
+
+                    InitMessage(0, R.drawable.baseline_error_24, "Please enter downpayment", "Okay", "", new OnMessageButton() {
+                        @Override
+                        public void OnPositive() {}
+
+                        @Override
+                        public void OnNegative() {}
+                    });
+                    return;
+                }
+
+                //initialize downpayment
+                double lnDownPaym = FormatUIText.getParseDouble(tie_downpay.getText().toString());
+                mViewModel.GetProductModel().setDownPaym(String.valueOf(lnDownPaym));
+
+                InitializePayment();
             }
         });
 
-        tie_remarks.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        tie_drno.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
-                if (!hasFocus){
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                    if (tie_remarks.getText() == null || tie_remarks.getText().toString().isEmpty()){
-                        return;
-                    }
-                    loContract.setsRemarksx(tie_remarks.getText().toString());
+                if (charSequence.length() < 1 || charSequence.toString().equalsIgnoreCase(String.valueOf(loContract.getDrNo()))){
+                    mtv_confirmdrno.setVisibility(GONE);
+                    return;
                 }
+                mtv_confirmdrno.setVisibility(VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        mtv_confirmdrno.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                view.setVisibility(GONE);
+
+                if (tie_drno.getText() == null || tie_drno.getText().toString().isEmpty()){
+                    return;
+                }
+                loContract.setDrNo(tie_drno.getText().toString());
+
+                InitDisplay(3);
             }
         });
 
-        tie_drno.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        tie_remarks.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
 
-                if (!hasFocus){
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                    if (tie_drno.getText() == null || tie_drno.getText().toString().isEmpty()){
-                        return;
-                    }
-                    loContract.setDrNo(tie_drno.getText().toString());
+                if (charSequence.length() < 1 || charSequence.toString().equalsIgnoreCase(String.valueOf(loContract.getsRemarksx()))){
+                    mtv_confirmRemarks.setVisibility(GONE);
+                    return;
                 }
+                mtv_confirmRemarks.setVisibility(VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        mtv_confirmRemarks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                view.setVisibility(GONE);
+
+                if (tie_remarks.getText() == null || tie_remarks.getText().toString().isEmpty()){
+                    return;
+                }
+                loContract.setsRemarksx(tie_remarks.getText().toString());
+
+                InitDisplay(4);
             }
         });
 
@@ -535,7 +666,6 @@ public class Activity_MC_Contract extends AppCompatActivity {
                             }
 
                             loContract.setdPurchase(compDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-                            InitDisplay();
 
                         }else {
 
@@ -544,13 +674,13 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
                             //purchase date should be on or after current day
                             if (currentDate.after(compDate)){
-                                Toast.makeText(Activity_MC_Contract.this, "Purchase Date should On or After this day", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Activity_MC_Contract.this, "Purchase Date should be On or After this day", Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
                             loContract.setdPurchase(new SimpleDateFormat("yyyy-MM-dd").format(compDate));
-                            InitDisplay();
                         }
+                        InitDisplay(2);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -719,7 +849,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                 @Override
                 public void OnPositive() {
                     mViewModel.GetProductModel().setDownPaym(String.valueOf(loInstallment.getMinimumDownpayment()));
-                    InitDisplay();
+                    InitDisplay(1);
                 }
 
                 @Override
@@ -732,7 +862,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                 @Override
                 public void OnPositive() {
                     mViewModel.GetProductModel().setDownPaym(String.valueOf(loInstallment.getMinimumDownpayment()));
-                    InitDisplay();
+                    InitDisplay(1);
                 }
 
                 @Override
@@ -756,7 +886,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
                         loContract.setnAcctTerm(Integer.parseInt(mViewModel.GetProductModel().getTermIDxx()));
                         loContract.setnMonAmort(Double.parseDouble(mViewModel.GetProductModel().getnMonthAmr()));
 
-                        InitDisplay();
+                        InitDisplay(1);
                     }
 
                     @Override

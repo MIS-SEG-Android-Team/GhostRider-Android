@@ -21,7 +21,7 @@ public interface DBranchVisitMaster {
     @Query("UPDATE Branch_Visit_Master SET cTranStat = :fStatus WHERE sTransNox = :fsTransNox")
     void UpdateStatus(String fsTransNox, String fStatus);
 
-    @Query("UPDATE Branch_Visit_Master SET sTransNox = :fsTransNox WHERE sTransNox = :fsOldTransNox")
+    @Query("UPDATE Branch_Visit_Master SET sTransNox = :fsTransNox, cSendStat = '1' WHERE sTransNox = :fsOldTransNox")
     void UpdateTransactionNumber(String fsTransNox, String fsOldTransNox);
 
     @Query("SELECT COUNT(*) FROM Branch_Visit_Master")

@@ -34,8 +34,8 @@ public interface DImageInfo {
     @Query("UPDATE Image_Information SET sTransNox = :fsSource WHERE sTransNox = :fsOldTransNox")
     void UpdateTransNox(String fsSource, String fsOldTransNox);
 
-    @Query("UPDATE Image_Information SET sSourceNo = :fsSource WHERE sSourceNo = :fsOldTransNox")
-    void UpdateSourceNo(String fsSource, String fsOldTransNox);
+    @Query("UPDATE Image_Information SET sSourceNo = :fsSource WHERE sSourceNo = :fsOldTransNox AND sSourceCD = :fsSourceCD")
+    void UpdateSourceNo(String fsSource, String fsOldTransNox, String fsSourceCD);
 
     @Query("SELECT COUNT (*) FROM Image_Information")
     int GetRowsCountForID();
@@ -48,8 +48,8 @@ public interface DImageInfo {
 
     @Query("SELECT COUNT(*) FROM Image_Information " +
             "WHERE sSourceNo = :fsSource " +
-            "AND sSourceCD = 'SSDD'")
-    int GetCountPerTransaction(String fsSource);
+            "AND sSourceCD = :fsSourceCD")
+    int GetCountPerTransaction(String fsSource, String fsSourceCD);
 
     /**
      *
@@ -68,9 +68,9 @@ public interface DImageInfo {
     EImageInfo GetImageInfo(String TransNox);
 
     @Query("SELECT * FROM Image_Information " +
-            "WHERE sSourceCD = 'SSDD' " +
+            "WHERE sSourceCD = :fsSourceCD " +
             "AND cSendStat <> '1'")
-    List<EImageInfo> GetSSDDImagesForUpload();
+    List<EImageInfo> GetImagesForUpload(String fsSourceCD);
 
     /**
      *
