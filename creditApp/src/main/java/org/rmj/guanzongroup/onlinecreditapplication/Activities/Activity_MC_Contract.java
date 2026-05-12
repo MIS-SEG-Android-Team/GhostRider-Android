@@ -522,7 +522,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                if (charSequence.length() < 1 || charSequence.toString().equalsIgnoreCase(String.valueOf(loContract.getnDownPaym()))){
+                if (charSequence.length() < 1 || Double.parseDouble(charSequence.toString()) == loContract.getnDownPaym()){
                     mtv_confirmdp.setVisibility(GONE);
                     return;
                 }
@@ -537,7 +537,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (tie_downpay.getText() == null || tie_downpay.getText().toString().trim().isEmpty()){
+                if (tie_downpay.getText() == null || tie_downpay.getText().toString().trim().isEmpty() || Double.parseDouble(tie_downpay.getText().toString()) <= 0.00){
 
                     InitMessage(0, R.drawable.baseline_error_24, "Please enter downpayment", "Okay", "", new OnMessageButton() {
                         @Override
@@ -564,7 +564,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                if (charSequence.length() < 1 || charSequence.toString().equalsIgnoreCase(String.valueOf(loContract.getDrNo()))){
+                if (charSequence.toString().equalsIgnoreCase(String.valueOf(loContract.getDrNo()))){
                     mtv_confirmdrno.setVisibility(GONE);
                     return;
                 }
@@ -582,10 +582,10 @@ public class Activity_MC_Contract extends AppCompatActivity {
                 view.setVisibility(GONE);
 
                 if (tie_drno.getText() == null || tie_drno.getText().toString().isEmpty()){
-                    return;
+                    loContract.setDrNo("");
+                }else {
+                    loContract.setDrNo(tie_drno.getText().toString());
                 }
-                loContract.setDrNo(tie_drno.getText().toString());
-
                 InitDisplay(3);
             }
         });
@@ -597,7 +597,7 @@ public class Activity_MC_Contract extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                if (charSequence.length() < 1 || charSequence.toString().equalsIgnoreCase(String.valueOf(loContract.getsRemarksx()))){
+                if (charSequence.toString().equalsIgnoreCase(String.valueOf(loContract.getsRemarksx()))){
                     mtv_confirmRemarks.setVisibility(GONE);
                     return;
                 }
@@ -615,10 +615,10 @@ public class Activity_MC_Contract extends AppCompatActivity {
                 view.setVisibility(GONE);
 
                 if (tie_remarks.getText() == null || tie_remarks.getText().toString().isEmpty()){
-                    return;
+                    loContract.setsRemarksx("");
+                }else {
+                    loContract.setsRemarksx(tie_remarks.getText().toString());
                 }
-                loContract.setsRemarksx(tie_remarks.getText().toString());
-
                 InitDisplay(4);
             }
         });
@@ -732,6 +732,11 @@ public class Activity_MC_Contract extends AppCompatActivity {
 
                 if (loContract.getdPurchase() == null || loContract.getdPurchase().isEmpty()){
                     Toast.makeText(Activity_MC_Contract.this, "Please enter purchase date", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (loContract.getDrNo() == null || loContract.getDrNo().isEmpty()){
+                    Toast.makeText(Activity_MC_Contract.this, "Please enter DR number", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
