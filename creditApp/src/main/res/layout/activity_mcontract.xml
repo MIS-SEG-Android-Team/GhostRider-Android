@@ -235,7 +235,7 @@
                     app:layout_constraintEnd_toEndOf="@+id/layout_monthly">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        style="@style/TextInputStyle.Edittext"
+                        style="@style/DropdownStyleTheme"
                         android:id="@+id/auto_term"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
