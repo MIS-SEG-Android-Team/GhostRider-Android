@@ -52,8 +52,10 @@ public class GCircleApi extends WebApi {
     private static final String URL_CAS_REQUESTS = "integsys/param/download_approval_requests.php";
     private static final String URL_CAS_MATRIX = "integsys/param/verify_user_approval_matrix.php";
     private static final String URL_CAS_APPROVAL = "integsys/param/update_request_approval.php";
+    private static final String URL_SAVE_CAS_ATTACHMENT = "integsys/param/download_cas_attachments.php";
 
     private static final String URL_SAVE_APPROVAL = "integsys/codeapproval/save_approval.php";
+
     private static final String URL_LOAD_APPLICATION_APPROVAL = "integsys/codeapproval/code_load.php";
     private static final String URL_APPLICATION_APPROVE = "integsys/codeapproval/code_decide.php";
     private static final String URL_DOWNLOAD_DCP = "integsys/dcp/dcp_download.php";
@@ -476,6 +478,15 @@ public class GCircleApi extends WebApi {
         }
         Log.d(TAG, "Initialize api:" + LIVE + URL_SAVE_APPROVAL);
         return LIVE + URL_SAVE_APPROVAL;
+    }
+
+    public String getUrlSaveCASAttachments() {
+        if(isUnitTest()){
+            Log.d(TAG, "Initialize api:" + LOCAL + URL_SAVE_CAS_ATTACHMENT);
+            return LOCAL + URL_SAVE_CAS_ATTACHMENT;
+        }
+        Log.d(TAG, "Initialize api:" + LIVE + URL_SAVE_CAS_ATTACHMENT);
+        return LIVE + URL_SAVE_CAS_ATTACHMENT;
     }
 
     public String getUrlLoadApplicationApproval() {

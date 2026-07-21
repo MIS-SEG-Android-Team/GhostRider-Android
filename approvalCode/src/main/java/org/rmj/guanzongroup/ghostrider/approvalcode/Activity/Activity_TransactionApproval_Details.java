@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,8 +22,6 @@ import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
 import org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel.VMApprovalSelection;
 
-import java.util.Objects;
-
 public class Activity_TransactionApproval_Details extends AppCompatActivity {
 
     private String lsTransNox;
@@ -32,7 +31,7 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
     private MessageBox loMessage;
     private VMApprovalSelection mViewModel;
 
-    private MaterialTextView mtv_transactno, mtv_dtransact, mtv_status, mtv_sourceno, mtv_recipient, mtv_industry, mtv_source, mtv_remarks;
+    private MaterialTextView mtv_transactno, mtv_dtransact, mtv_status, mtv_sourceno, mtv_recipient, mtv_industry, mtv_source, mtv_remarks, btn_view_attachment;
     private MaterialToolbar toolbar;
     private MaterialButton btn_disapprove, btn_approve;
 
@@ -85,6 +84,7 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
         mtv_industry = findViewById(R.id.mtv_industry);
         mtv_source = findViewById(R.id.mtv_source);
         mtv_remarks = findViewById(R.id.mtv_remarks);
+        btn_view_attachment = findViewById(R.id.btn_view_attachment);
 
         btn_disapprove = findViewById(R.id.btn_disapprove);
         btn_approve = findViewById(R.id.btn_approve);
@@ -186,6 +186,31 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
                     }
                 });
 
+                btn_view_attachment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mViewModel.ImportAttachments(ecasRequests, new VMApprovalSelection.OnTransaction() {
+                            @Override
+                            public void OnLoad(String fsTitle, String fsMessage) {
+                                loDialog.initDialog(fsTitle, fsMessage, false);
+                                loDialog.show();
+                            }
+
+                            @Override
+                            public void OnSuccess() {
+                                loDialog.dismiss();
+                                Toast.makeText(Activity_TransactionApproval_Details.this, "Attachments successfully downloaded", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void OnFailed(String fsMessage) {
+                                loDialog.dismiss();
+                                Toast.makeText(Activity_TransactionApproval_Details.this, fsMessage, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+
             }
         });
     }
@@ -201,7 +226,7 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
             @Override
             public void onPositive() {
 
-                mViewModel.updateCASRequest(fsAuthType, fsTransNox, fscTranStat, new VMApprovalSelection.OnApproval() {
+                mViewModel.updateCASRequest(fsAuthType, fsTransNox, fscTranStat, new VMApprovalSelection.OnTransaction() {
                     @Override
                     public void OnLoad(String fsTitle, String fsMessage) {
                         loDialog.initDialog(fsTitle, fsMessage, false);

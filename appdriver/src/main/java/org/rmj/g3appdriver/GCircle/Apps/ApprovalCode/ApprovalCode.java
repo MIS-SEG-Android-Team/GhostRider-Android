@@ -29,9 +29,11 @@ import org.rmj.g3appdriver.GCircle.Account.EmployeeMaster;
 import org.rmj.g3appdriver.GCircle.Api.GCircleApi;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DCASRequests;
+import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DImageInfo;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DSCARqstEmp;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
+import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
@@ -46,6 +48,7 @@ import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.Obj.SystemCode;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.model.SCA;
 import org.rmj.g3appdriver.utils.SQLUtil;
 
+import java.io.File;
 import java.util.List;
 
 public class ApprovalCode {
@@ -55,7 +58,7 @@ public class ApprovalCode {
     private final DCASApprovalCode poCASDao;
     private final DCASRequests poCASReqDao;
     private final DSCARqstEmp poDaoRstEmp;
-
+    private final DImageInfo poImage;
 
     public final EmployeeMaster poMaster;
     private final Application instance;
@@ -66,11 +69,13 @@ public class ApprovalCode {
 
     public ApprovalCode(Application instance) {
         this.instance = instance;
+        this.poImage = GGC_GCircleDB.getInstance(instance).ImageInfoDao();
         this.poDao = GGC_GCircleDB.getInstance(instance).ApprovalDao();
         this.poCASDao = GGC_GCircleDB.getInstance(instance).casapprovalDao();
         this.poCASReqDao = GGC_GCircleDB.getInstance(instance).casrequestsDao();
         this.poDaoRstEmp = GGC_GCircleDB.getInstance(instance).scaRqstEmpDao();
         this.poMaster = new EmployeeMaster(instance);
+
         this.poApi = new GCircleApi(instance);
         this.poHeaders = HttpHeaders.getInstance(instance);
     }
@@ -89,6 +94,88 @@ public class ApprovalCode {
                 return new LoanApproval(instance);
         }
         return null;
+    }
+
+    public LiveData<List<ESCA_Request>> getAuthorizedFeatures(String fsVal){
+
+        EEmployeeInfo loUser = poDao.GetUserInfo();
+
+        String lsSqlQryxx = "SELECT *" +
+                " FROM xxxSCA_Request" +
+                " WHERE cSCATypex = " + SQLUtil.toSQL(fsVal)  +
+                " AND cRecdStat = '1'" +
+                " ORDER BY sSCATitle";
+
+        String lsCondition = "";
+        int lsEmpLvID = loUser.getEmpLevID();
+        String lsDeptIDx = loUser.getDeptIDxx();
+        String lsPostion = loUser.getPositnID();
+
+        /*if (lsEmpLvID == 4 ||
+                lsEmpLvID == 5 ||
+                loUser.getEmployID().equalsIgnoreCase("M00112000440")){
+            lsCondition  = "cAreaHead = '1'";*/
+
+        //todo: replaced the old validation above as requested
+        if (lsEmpLvID == 4 || loUser.getEmployID().equalsIgnoreCase("M00105000084")) {
+            lsCondition  = "cAreaHead = '1'"; //AREA HEAD, LEXTER OCAMPO
+        } else if (lsEmpLvID == 5 || loUser.getEmployID().equalsIgnoreCase("H00220000001")
+                || loUser.getEmployID().equalsIgnoreCase("M00111005387")) {
+            lsCondition  = "cAreaHead = '1'"; //GENERAL MANAGER, Tania Vanessa Cañete, MICHAEL CUISON
+        } else{
+            switch (lsDeptIDx){
+                case "021": //hcm
+                    lsCondition = "cHCMDeptx = '1'"; break;
+                case "022": //css
+                    lsCondition = "cCSSDeptx = '1'"; break;
+                case "034": //cm
+                    lsCondition = "cComplnce = '1'"; break;
+                case "025": //m&p
+                    lsCondition = "cMktgDept = '1'"; break;
+                case "027": //asm
+                    lsCondition = "cASMDeptx = '1'"; break;
+                case "035": //tele
+                    lsCondition = "cTLMDeptx = '1'"; break;
+                case "024": //scm
+                    lsCondition = "cSCMDeptx = '1'"; break;
+                case "026": //mis
+
+                    break;
+                case "015": //sales
+                    if (lsPostion.equals("091") ||
+                            lsPostion.equals("056") ||
+                            lsPostion.equals("299") ||
+                            lsPostion.equals("298")){
+                        //field specialist
+                        lsCondition = "sSCACodex = 'CA'";
+                    } else {
+                        lsCondition = "0=1";
+                    }
+                    break;
+                default: lsCondition = "0=1";
+            }
+        }
+
+        if (!lsCondition.isEmpty()){
+            lsSqlQryxx = MiscUtil.addCondition(lsSqlQryxx, lsCondition);
+        }
+
+        Log.d(TAG, lsSqlQryxx);
+
+        return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
+    }
+
+    public LiveData<List<ECASApprovalCode>> GetCASApprovalCodes(){
+        return poCASDao.getCASApprovalCodes();
+    }
+    public LiveData<List<ECASRequests>> GetCASRequests(String fsSource, String dFrom, String dTo){
+        return poCASReqDao.GetRequests(fsSource, dFrom, dTo);
+    }
+    public LiveData<List<ECASRequests>> GetCASHistory(String fsSource, String dFrom, String dTo){
+        return poCASReqDao.GetHistory(fsSource, dFrom, dTo);
+    }
+    public LiveData<ECASRequests> GetRequestDetail(String sTransNox){
+        return poCASReqDao.GetRequestDetail(sTransNox);
     }
 
     public boolean ImportSCARequest(){
@@ -373,6 +460,66 @@ public class ApprovalCode {
         }
     }
 
+    public boolean ImportCASAttachmentList(String fsSourceCd, String fsSourceNo){
+
+        try{
+            JSONObject params = new JSONObject();
+            params.put("sSourceCD", fsSourceCd);
+            params.put("sSourceNo", fsSourceNo);
+
+            String lsResponse = WebClient.sendRequest(
+                    poApi.getUrlSaveCASAttachments(),
+                    params.toString(),
+                    poHeaders.getHeaders());
+
+            Log.d(TAG, lsResponse);
+            if(lsResponse == null){
+                message = SERVER_NO_RESPONSE;
+                return false;
+            }
+
+            JSONObject loResponse = new JSONObject(lsResponse);
+            String lsResult = loResponse.getString("result");
+
+            if(lsResult.equalsIgnoreCase("error")){
+                JSONObject loError = loResponse.getJSONObject("error");
+                message = getErrorMessage(loError);;
+                return false;
+            }
+
+            //initialize target directory for the attachments
+            String lsDir = instance.getExternalFilesDir(null).getAbsolutePath() + "/CASApproval/0032/" + fsSourceNo + "/";
+            JSONArray laDetail = loResponse.getJSONArray("detail");
+
+            for (int i = 0; i < laDetail.length(); i++) {
+
+                JSONObject loResult = laDetail.getJSONObject(i);
+
+                EImageInfo loImage = new EImageInfo();
+                loImage.setTransNox(loResult.getString("sTransNox"));
+                loImage.setSourceCD(loResult.getString("sSourceCd"));
+                loImage.setSourceNo(loResult.getString("sSourceNo"));
+                loImage.setImageNme(loResult.getString("sFileName"));
+                loImage.setFileLoct(lsDir);
+                loImage.setMD5Hashx(loResult.getString("sMD5Hashx"));
+                loImage.setFileCode(loResult.getString("sFileCode"));
+                loImage.setSendStat("1");
+                loImage.setDtlSrcNo("");
+                loImage.setLatitude("0.00000");
+                loImage.setLongitud("0.00000");
+                loImage.setsClientID(loResult.getString("sClientID"));
+
+                poImage.SaveImageInfo(loImage);
+            }
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return false;
+        }
+
+    }
+
     public boolean VerifyUserMatrix(String fsAuthType, String fsEmployID){
         try{
             JSONObject params = new JSONObject();
@@ -408,6 +555,7 @@ public class ApprovalCode {
     }
 
     public boolean UpdateCASRequest(String fsTransNox, String fsEmployID, String fscTranStat){
+
         try{
             JSONObject params = new JSONObject();
             params.put("sEmployID", fsEmployID);
@@ -419,7 +567,6 @@ public class ApprovalCode {
                     params.toString(),
                     poHeaders.getHeaders());
 
-            System.out.println(lsResponse);
             if(lsResponse == null){
                 message = SERVER_NO_RESPONSE;
                 return false;
@@ -444,91 +591,10 @@ public class ApprovalCode {
         }
     }
 
-    public LiveData<List<ESCA_Request>> getAuthorizedFeatures(String fsVal){
-
-        EEmployeeInfo loUser = poDao.GetUserInfo();
-
-        String lsSqlQryxx = "SELECT *" +
-                " FROM xxxSCA_Request" +
-                " WHERE cSCATypex = " + SQLUtil.toSQL(fsVal)  +
-                " AND cRecdStat = '1'" +
-                " ORDER BY sSCATitle";
-
-        String lsCondition = "";
-        int lsEmpLvID = loUser.getEmpLevID();
-        String lsDeptIDx = loUser.getDeptIDxx();
-        String lsPostion = loUser.getPositnID();
-
-        /*if (lsEmpLvID == 4 ||
-                lsEmpLvID == 5 ||
-                loUser.getEmployID().equalsIgnoreCase("M00112000440")){
-            lsCondition  = "cAreaHead = '1'";*/
-
-        //todo: replaced the old validation above as requested
-        if (lsEmpLvID == 4 || loUser.getEmployID().equalsIgnoreCase("M00105000084")) {
-            lsCondition  = "cAreaHead = '1'"; //AREA HEAD, LEXTER OCAMPO
-        } else if (lsEmpLvID == 5 || loUser.getEmployID().equalsIgnoreCase("H00220000001")
-                || loUser.getEmployID().equalsIgnoreCase("M00111005387")) {
-            lsCondition  = "cAreaHead = '1'"; //GENERAL MANAGER, Tania Vanessa Cañete, MICHAEL CUISON
-        } else{
-            switch (lsDeptIDx){
-                case "021": //hcm
-                    lsCondition = "cHCMDeptx = '1'"; break;
-                case "022": //css
-                    lsCondition = "cCSSDeptx = '1'"; break;
-                case "034": //cm
-                    lsCondition = "cComplnce = '1'"; break;
-                case "025": //m&p
-                    lsCondition = "cMktgDept = '1'"; break;
-                case "027": //asm
-                    lsCondition = "cASMDeptx = '1'"; break;
-                case "035": //tele
-                    lsCondition = "cTLMDeptx = '1'"; break;
-                case "024": //scm
-                    lsCondition = "cSCMDeptx = '1'"; break;
-                case "026": //mis
-
-                    break;
-                case "015": //sales
-                    if (lsPostion.equals("091") ||
-                            lsPostion.equals("056") ||
-                            lsPostion.equals("299") ||
-                            lsPostion.equals("298")){
-                        //field specialist
-                        lsCondition = "sSCACodex = 'CA'";
-                    } else {
-                        lsCondition = "0=1";
-                    }
-                    break;
-                default: lsCondition = "0=1";
-            }
-        }
-
-        if (!lsCondition.isEmpty()){
-            lsSqlQryxx = MiscUtil.addCondition(lsSqlQryxx, lsCondition);
-        }
-
-        Log.d(TAG, lsSqlQryxx);
-
-        return poDao.getAuthorizedFeatures(new SimpleSQLiteQuery(lsSqlQryxx));
-    }
-
-    public LiveData<List<ECASApprovalCode>> GetCASApprovalCodes(){
-        return poCASDao.getCASApprovalCodes();
-    }
-    public LiveData<List<ECASRequests>> GetCASRequests(String fsSource, String dFrom, String dTo){
-        return poCASReqDao.GetRequests(fsSource, dFrom, dTo);
-    }
-    public LiveData<List<ECASRequests>> GetCASHistory(String fsSource, String dFrom, String dTo){
-        return poCASReqDao.GetHistory(fsSource, dFrom, dTo);
-    }
-    public LiveData<ECASRequests> GetRequestDetail(String sTransNox){
-        return poCASReqDao.GetRequestDetail(sTransNox);
-    }
-
     public String GetDescription(String code){
         return poCASDao.getDescription(code);
     }
+
     public String getLatestStamp(){
         return poDaoRstEmp.GetLatestStamp();
     }

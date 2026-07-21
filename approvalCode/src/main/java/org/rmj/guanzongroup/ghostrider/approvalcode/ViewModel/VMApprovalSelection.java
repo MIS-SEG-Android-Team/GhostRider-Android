@@ -11,7 +11,10 @@
 
 package org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -28,6 +31,8 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ESCA_Request;
 
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.ApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
+import org.rmj.g3appdriver.etc.FileUtility;
+import org.rmj.g3appdriver.utils.ConnectionUtil;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
@@ -35,21 +40,30 @@ import org.rmj.g3appdriver.utils.Task.TaskExecutor;
 import java.util.List;
 
 public class VMApprovalSelection extends AndroidViewModel {
+
     public static final String TAG = VMApprovalSelection.class.getSimpleName();
 
+    @SuppressLint("StaticFieldLeak")
+    private final Context poInstance;
+    private final ConnectionUtil poConnection;
     private final EmployeeMaster poMaster;
     private final ApprovalCode poSys;
     private final DSCARqstEmp poDaoRstEmp;
     private final DApprovalCode poUser;
+    private final FileUtility loFile;
+
     private String lomessage;
 
     public VMApprovalSelection(@NonNull Application application) {
         super(application);
 
+        this.poInstance = application;
+        this.poConnection = new ConnectionUtil(application);
         this.poMaster = new EmployeeMaster(application);
         this.poSys = new ApprovalCode(application);
         this.poDaoRstEmp = GGC_GCircleDB.getInstance(application).scaRqstEmpDao();
         this.poUser = GGC_GCircleDB.getInstance(application).ApprovalDao();
+        this.loFile = new FileUtility(application);
     }
 
     public String getDescription(String code){
@@ -76,7 +90,8 @@ public class VMApprovalSelection extends AndroidViewModel {
         return poSys.getLatestStamp();
     }
 
-    public void updateCASRequest(String fsAuthType, String fsTransNox,  String fscTranStat, OnApproval foCallback){
+    public void updateCASRequest(String fsAuthType, String fsTransNox,  String fscTranStat, OnTransaction foCallback){
+
         TaskExecutor.Execute(null, new OnTaskExecuteListener() {
             @Override
             public void OnPreExecute() {
@@ -143,6 +158,52 @@ public class VMApprovalSelection extends AndroidViewModel {
         });
     }
 
+    public void ImportAttachments(ECASRequests foRequest, OnTransaction callback){
+
+        TaskExecutor.Execute(foRequest, new OnTaskExecuteListener() {
+            @Override
+            public void OnPreExecute() {
+                callback.OnLoad("CAS Attachments", "Downloading attachments. Please wait . .");
+            }
+
+            @Override
+            public Object DoInBackground(Object args) {
+
+                if (!poConnection.isDeviceConnected()){
+                    lomessage = poConnection.getMessage();
+                    return false;
+                }
+
+                ECASRequests loRequest = (ECASRequests) args;
+
+                String lsDir = poInstance.getExternalFilesDir(null).getAbsolutePath() + "/CASApproval/0032/" + loRequest.getsSourceNo() + "/";
+                if (!loFile.IsFileExist(lsDir)){
+
+                    if (!loFile.CreateDirectory(lsDir)){
+                        lomessage = "Unable to create directory";
+                        return false;
+                    }
+                }
+
+                if (poSys.ImportCASAttachmentList(loRequest.getsSourceCD(), loRequest.getsSourceNo())){
+                    return true;
+                }
+                lomessage = poSys.getMessage();
+                return false;
+            }
+
+            @Override
+            public void OnPostExecute(Object object) {
+
+                if ((Boolean) object){
+                    callback.OnSuccess();
+                }else {
+                    callback.OnFailed(lomessage);
+                }
+            }
+        });
+    }
+
     public ESCARqstEmp getRqstEmp(String sSCACode){
         return poDaoRstEmp.GetEmpRqst(sSCACode, poUser.GetUserInfo().getEmployID());
     }
@@ -192,7 +253,7 @@ public class VMApprovalSelection extends AndroidViewModel {
         void onFinished(String message);
     }
 
-    public interface OnApproval{
+    public interface OnTransaction {
         void OnLoad(String fsTitle, String fsMessage);
         void OnSuccess();
         void OnFailed(String fsMessage);
