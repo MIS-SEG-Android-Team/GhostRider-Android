@@ -390,6 +390,48 @@ public class RImageInfo {
 
     /**
      *
+     * @param args1 transaction number from downloaded attachment
+     * @param args2 source code
+     * @param args3 source number
+     * @param args4 filename
+     * @param args5 file location
+     * @param args6 md5 hash
+     * @param args7 file code
+     * @param args8 client id
+     * @param args9 detail sourcen oo
+     * @return returns transaction no. if operation succeed, else null if operation fails. Call getMessage() to get error message.
+     */
+    public String SaveCASAttachments(String args1, String args2, String args3, String args4, String args5, String args6, String args7, String args8, String args9){
+
+        try{
+            EImageInfo loImage = new EImageInfo();
+            loImage.setTransNox(args1);
+            loImage.setSourceCD(args2);
+            loImage.setSourceNo(args3);
+            loImage.setImageNme(args4);
+            loImage.setFileLoct(args5);
+            loImage.setMD5Hashx(args6);
+            loImage.setFileCode(args7);
+            loImage.setsClientID(args8);
+            loImage.setDtlSrcNo(args9);
+            loImage.setSendStat("1"); //consider that this method is only used for downloading attachments from cas request
+            loImage.setLatitude("0.00000");
+            loImage.setLongitud("0.00000");
+
+            poDao.SaveImageInfo(loImage);
+            Log.d(TAG, "SSDD Image has been saved.");
+
+            return args1;
+        } catch (Exception e){
+            e.printStackTrace();
+            message = getLocalMessage(e);
+            return null;
+        }
+
+    }
+
+    /**
+     *
      * @param args Branc_Visit_Master Transaction Number
      * @param args1 image file name
      * @param args2 image file location
@@ -535,6 +577,58 @@ public class RImageInfo {
             }
 
             org.json.simple.JSONObject loDownload = WebFile.DownloadFile(lsAccess, loDetail.getFileCode(), loDetail.getDtlSrcNo(), loDetail.getImageNme(), loDetail.getSourceCD(), loDetail.getTransNox(), "");
+            if (loDownload == null){
+                message = "No response from Web Server";
+                return false;
+            }
+            if (loDownload.get("result").equals("success")){
+
+                org.json.simple.JSONObject loResult = (org.json.simple.JSONObject) loDownload.get("payload");
+                if (WebFile.Base64ToFile(loResult.get("data").toString(), loResult.get("hash").toString(), loDetail.getFileLoct().substring(0, loDetail.getFileLoct().lastIndexOf("/") + 1), loDetail.getImageNme() )){
+                    message = "File downloaded successfully";
+                    return true;
+                }
+                message = "Failed to download file";
+                return false;
+            }
+            message = ((org.json.simple.JSONObject) loDownload.get("error")).get("message").toString();
+            return false;
+
+        }catch (Exception e){
+            message = e.getMessage();
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @param fsVal source no of image needed to download.
+     * @return true if operation succeed, else false if operation fails. Call getMessage() to get error message.
+     */
+    public Boolean DownloadImageSource(String fsVal){
+
+        try {
+
+            if(poConfig.getTestStatus()){
+                message = "This feature is not available for testing...";
+                return false;
+            }
+
+            EImageInfo loDetail = poDao.GetImageInfo(fsVal);
+            if(loDetail == null){
+                message = "Unable to find image to download.";
+                return false;
+            }
+
+            //initialize client access, set static token for image to be downloaded BY ANY USERS
+            String lsAccess = getClientToken();
+            if(lsAccess == null){
+                message = "Unable to generate access key";
+                return false;
+            }
+            Log.d("Access Key", lsAccess);
+
+            org.json.simple.JSONObject loDownload = WebFile.DownloadFile(lsAccess, loDetail.getFileCode(), loDetail.getDtlSrcNo(), loDetail.getImageNme(), loDetail.getSourceCD(), loDetail.getSourceNo(), "");
             if (loDownload == null){
                 message = "No response from Web Server";
                 return false;

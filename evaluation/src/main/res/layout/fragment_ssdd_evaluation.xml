@@ -33,7 +33,6 @@
         android:background="@color/zxing_transparent"
         android:scaleType="fitCenter"
         android:src="@drawable/baseline_filter_list_24"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/til_search"
         app:layout_constraintEnd_toEndOf="@+id/rcv_list"
         app:layout_constraintTop_toTopOf="@+id/til_search"

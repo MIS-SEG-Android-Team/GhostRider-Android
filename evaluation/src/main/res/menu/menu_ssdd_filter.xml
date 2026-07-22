@@ -3,15 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_by_download"
+        android:orderInCategory="100"
+        android:title="Download Data"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_by_date"
         android:orderInCategory="100"
-        android:title="By Date"
+        android:title="Filter by Date"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_by_status"
         android:orderInCategory="100"
-        android:title="By Status"
+        android:title="Filter by Status"
         app:showAsAction="never" >
 
         <menu>

@@ -43,27 +43,20 @@ public class VMApprovalSelection extends AndroidViewModel {
 
     public static final String TAG = VMApprovalSelection.class.getSimpleName();
 
-    @SuppressLint("StaticFieldLeak")
-    private final Context poInstance;
-    private final ConnectionUtil poConnection;
     private final EmployeeMaster poMaster;
     private final ApprovalCode poSys;
     private final DSCARqstEmp poDaoRstEmp;
     private final DApprovalCode poUser;
-    private final FileUtility loFile;
 
     private String lomessage;
 
     public VMApprovalSelection(@NonNull Application application) {
         super(application);
 
-        this.poInstance = application;
-        this.poConnection = new ConnectionUtil(application);
         this.poMaster = new EmployeeMaster(application);
         this.poSys = new ApprovalCode(application);
         this.poDaoRstEmp = GGC_GCircleDB.getInstance(application).scaRqstEmpDao();
         this.poUser = GGC_GCircleDB.getInstance(application).ApprovalDao();
-        this.loFile = new FileUtility(application);
     }
 
     public String getDescription(String code){
@@ -139,6 +132,7 @@ public class VMApprovalSelection extends AndroidViewModel {
             }
         });
     }
+
     public void importCASRequests(String fsSrcCd, String fsDtFrom, String fsDto, Boolean fbyHistory, onDownload foCallback){
 
         TaskExecutor.Execute(null, new OnDoBackgroundTaskListener() {
@@ -154,52 +148,6 @@ public class VMApprovalSelection extends AndroidViewModel {
             @Override
             public void OnPostExecute(Object object) {
                 foCallback.onFinished((String) object);
-            }
-        });
-    }
-
-    public void ImportAttachments(ECASRequests foRequest, OnTransaction callback){
-
-        TaskExecutor.Execute(foRequest, new OnTaskExecuteListener() {
-            @Override
-            public void OnPreExecute() {
-                callback.OnLoad("CAS Attachments", "Downloading attachments. Please wait . .");
-            }
-
-            @Override
-            public Object DoInBackground(Object args) {
-
-                if (!poConnection.isDeviceConnected()){
-                    lomessage = poConnection.getMessage();
-                    return false;
-                }
-
-                ECASRequests loRequest = (ECASRequests) args;
-
-                String lsDir = poInstance.getExternalFilesDir(null).getAbsolutePath() + "/CASApproval/0032/" + loRequest.getsSourceNo() + "/";
-                if (!loFile.IsFileExist(lsDir)){
-
-                    if (!loFile.CreateDirectory(lsDir)){
-                        lomessage = "Unable to create directory";
-                        return false;
-                    }
-                }
-
-                if (poSys.ImportCASAttachmentList(loRequest.getsSourceCD(), loRequest.getsSourceNo())){
-                    return true;
-                }
-                lomessage = poSys.getMessage();
-                return false;
-            }
-
-            @Override
-            public void OnPostExecute(Object object) {
-
-                if ((Boolean) object){
-                    callback.OnSuccess();
-                }else {
-                    callback.OnFailed(lomessage);
-                }
             }
         });
     }

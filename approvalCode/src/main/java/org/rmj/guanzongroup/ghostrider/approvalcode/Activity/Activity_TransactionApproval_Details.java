@@ -1,11 +1,11 @@
 package org.rmj.guanzongroup.ghostrider.approvalcode.Activity;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +17,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
+import org.rmj.g3appdriver.etc.FileViewer.FileViewer;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
@@ -189,25 +190,13 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
                 btn_view_attachment.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        mViewModel.ImportAttachments(ecasRequests, new VMApprovalSelection.OnTransaction() {
-                            @Override
-                            public void OnLoad(String fsTitle, String fsMessage) {
-                                loDialog.initDialog(fsTitle, fsMessage, false);
-                                loDialog.show();
-                            }
 
-                            @Override
-                            public void OnSuccess() {
-                                loDialog.dismiss();
-                                Toast.makeText(Activity_TransactionApproval_Details.this, "Attachments successfully downloaded", Toast.LENGTH_SHORT).show();
-                            }
+                        Intent loIntent = new Intent(Activity_TransactionApproval_Details.this, FileViewer.class);
+                        loIntent.putExtra("sSourceCd", ecasRequests.getsSourceCD());
+                        loIntent.putExtra("sSourceNo", ecasRequests.getsSourceNo());
 
-                            @Override
-                            public void OnFailed(String fsMessage) {
-                                loDialog.dismiss();
-                                Toast.makeText(Activity_TransactionApproval_Details.this, fsMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        startActivity(loIntent);
+
                     }
                 });
 

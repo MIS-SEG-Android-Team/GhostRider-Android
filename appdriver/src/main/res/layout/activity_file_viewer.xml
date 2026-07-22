@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardElevation="10dp"
+    tools:context=".etc.FileViewer.FileViewer">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Search Item"
+            android:layout_marginTop="10dp"
+            app:boxBackgroundColor="?attr/colorSurface"
+            android:padding="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="0.8">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tie_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/zxing_transparent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/btn_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:src="@drawable/baseline_filter_list_24"
+            android:backgroundTint="@color/zxing_transparent"
+            android:scaleType="center"
+            app:layout_constraintTop_toTopOf="@+id/til_search"
+            app:layout_constraintBottom_toBottomOf="@+id/til_search"
+            app:layout_constraintStart_toEndOf="@+id/til_search"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/til_search"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/mcv_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:cardElevation="15dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/siv_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -35,6 +35,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.ECASApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESCARqstEmp;
+import org.rmj.g3appdriver.GCircle.room.Repositories.RImageInfo;
 import org.rmj.g3appdriver.dev.Api.WebClient;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECodeApproval;
@@ -58,9 +59,9 @@ public class ApprovalCode {
     private final DCASApprovalCode poCASDao;
     private final DCASRequests poCASReqDao;
     private final DSCARqstEmp poDaoRstEmp;
-    private final DImageInfo poImage;
 
     public final EmployeeMaster poMaster;
+    private final RImageInfo poImage;
     private final Application instance;
     private final GCircleApi poApi;
     private final HttpHeaders poHeaders;
@@ -69,7 +70,6 @@ public class ApprovalCode {
 
     public ApprovalCode(Application instance) {
         this.instance = instance;
-        this.poImage = GGC_GCircleDB.getInstance(instance).ImageInfoDao();
         this.poDao = GGC_GCircleDB.getInstance(instance).ApprovalDao();
         this.poCASDao = GGC_GCircleDB.getInstance(instance).casapprovalDao();
         this.poCASReqDao = GGC_GCircleDB.getInstance(instance).casrequestsDao();
@@ -77,6 +77,7 @@ public class ApprovalCode {
         this.poMaster = new EmployeeMaster(instance);
 
         this.poApi = new GCircleApi(instance);
+        this.poImage = new RImageInfo(instance);
         this.poHeaders = HttpHeaders.getInstance(instance);
     }
 
@@ -495,21 +496,19 @@ public class ApprovalCode {
 
                 JSONObject loResult = laDetail.getJSONObject(i);
 
-                EImageInfo loImage = new EImageInfo();
-                loImage.setTransNox(loResult.getString("sTransNox"));
-                loImage.setSourceCD(loResult.getString("sSourceCd"));
-                loImage.setSourceNo(loResult.getString("sSourceNo"));
-                loImage.setImageNme(loResult.getString("sFileName"));
-                loImage.setFileLoct(lsDir);
-                loImage.setMD5Hashx(loResult.getString("sMD5Hashx"));
-                loImage.setFileCode(loResult.getString("sFileCode"));
-                loImage.setSendStat("1");
-                loImage.setDtlSrcNo("");
-                loImage.setLatitude("0.00000");
-                loImage.setLongitud("0.00000");
-                loImage.setsClientID(loResult.getString("sClientID"));
 
-                poImage.SaveImageInfo(loImage);
+
+                poImage.SaveCASAttachments(
+                        loResult.getString("sTransNox"),
+                        loResult.getString("sSourceCd"),
+                        loResult.getString("sSourceNo"),
+                        loResult.getString("sFileName"),
+                        lsDir,
+                        loResult.getString("sMD5Hashx"),
+                        loResult.getString("sFileCode"),
+                        loResult.getString("sClientID"),
+                        loResult.getString("sDtlSrcNo")
+                );
             }
             return true;
         } catch (Exception e){

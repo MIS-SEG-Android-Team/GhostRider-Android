@@ -266,7 +266,10 @@ public class VMSSDEvaluation extends AndroidViewModel {
                 }
 
                 //download previous transactions
-                if (!loEvaluation.DownloadMasterList(fsDeptIDxx, fsDfrom, fsDto)){
+                if (!loEvaluation.DownloadCategories()){
+                    fsMessage = loEvaluation.GetMessage();
+                    return false;
+                }else if (!loEvaluation.DownloadMasterList(fsDeptIDxx, fsDfrom, fsDto)){
                     fsMessage= loEvaluation.GetMessage();
                     return false;
                 }

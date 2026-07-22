@@ -18,6 +18,9 @@
 
     <application android:usesCleartextTraffic="true">
         <activity
+            android:name=".etc.FileViewer.FileViewer"
+            android:exported="false" />
+        <activity
             android:name=".etc.ImageViewer"
             android:exported="false" />
         <activity

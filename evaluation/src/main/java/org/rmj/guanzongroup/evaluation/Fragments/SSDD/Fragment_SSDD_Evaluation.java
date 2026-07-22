@@ -104,6 +104,126 @@ public class Fragment_SSDD_Evaluation extends Fragment{
         InitFragment();
     }
 
+    private void DownloadData(){
+
+        InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Do you want to download list of " + loBundle == null ? "departments?" : "evaluations?", "No", "Yes", new OnMessageButton() {
+            @Override
+            public void OnPositive() {}
+
+            @Override
+            public void OnNegative() {
+
+                try {
+
+                    if (loBundle == null){
+
+                        //import data for department
+                        mViewModel.DownloadDepartments(new VMSSDEvaluation.OnDownloadCallback() {
+                            @Override
+                            public void OnLoad(String fsTitlexx, String fsMessage) {
+                                poDialog.initDialog(fsTitlexx, fsMessage, false);
+                                poDialog.show();
+                            }
+
+                            @Override
+                            public void OnSuccess() {
+                                poDialog.dismiss();
+                            }
+
+                            @Override
+                            public void OnFailed(String fsMessage) {
+
+                                poDialog.dismiss();
+
+                                InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
+                                    @Override
+                                    public void OnPositive() {
+
+                                    }
+
+                                    @Override
+                                    public void OnNegative() {
+
+                                    }
+                                });
+                            }
+                        });
+                    }else {
+
+                        MaterialDatePicker.Builder<Pair<Long, Long>> loBuilder = MaterialDatePicker.Builder.dateRangePicker();
+                        loBuilder.setTitleText("Select Date Range");
+
+                        MaterialDatePicker<Pair<Long, Long>> loPicker = loBuilder.build();
+                        loPicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
+                            @Override
+                            public void onPositiveButtonClick(Pair<Long, Long> selection) {
+
+                                //set date range parameters for downloading history
+                                lsDfrom = GetDateFormat(selection.first);
+                                lsDto = GetDateFormat(selection.second);
+
+                                //download history
+                                mViewModel.DownloadEvaluation(loBundle.getString("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
+                                    @Override
+                                    public void OnLoad(String fsTitlexx, String fsMessage) {
+                                        poDialog.initDialog(fsTitlexx, fsMessage, false);
+                                        poDialog.show();
+                                    }
+
+                                    @Override
+                                    public void OnSuccess() {
+                                        poDialog.dismiss();
+                                        Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void OnFailed(String fsMessage) {
+                                        poDialog.dismiss();
+                                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
+                                            @Override
+                                            public void OnPositive() {}
+
+                                            @Override
+                                            public void OnNegative() {}
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                        loPicker.show(getParentFragmentManager(), "DATE_RANGE_PICKER");
+                    }
+
+                }catch (Exception e){
+                    mViewModel.SaveError(getClass().getSimpleName(), e.getMessage());
+                }
+
+            }
+        });
+    }
+
+    private String GetFirstQuarter(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            return LocalDate.now().minusMonths(4).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }else {
+            Calendar today = Calendar.getInstance();
+            today.add(Calendar.MONTH, -4);
+            return new SimpleDateFormat("yyyy-MM-dd").format(today.getTime());
+        }
+    }
+
+    private String GetDateToday(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }else {
+            return new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private String GetDateFormat(Long fsDate){
+        return new SimpleDateFormat("yyyy-MM-dd").format(fsDate);
+    }
+
     private void InitFragment(){
 
         try {
@@ -128,9 +248,6 @@ public class Fragment_SSDD_Evaluation extends Fragment{
     private void InitData(){
 
         if (loBundle == null){
-
-            //show filtering option
-            ib_filter.setVisibility(View.GONE);
 
             //show button evaluate
             fbtn_evaluate.setVisibility(View.GONE);
@@ -182,30 +299,7 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                 }
             });
 
-            //ask user to re download data, if no departments found
-            if (laDepartments == null || laDepartments.size() < 1){
-
-                if (mViewModel.CountDepartment() < 1){
-
-                    //if null, ask user to re download data
-                    InitMessage(1, R.drawable.baseline_error_24, "No departments found for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
-                        @Override
-                        public void OnPositive() {
-                            ReDownloadData();
-                        }
-
-                        @Override
-                        public void OnNegative() {}
-                    });
-
-                }
-
-            }
-
         }else {
-
-            //show filtering option
-            ib_filter.setVisibility(View.VISIBLE);
 
             //show button evaluate
             fbtn_evaluate.setVisibility(View.VISIBLE);
@@ -232,21 +326,6 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                             @Override
                             public void OnClick(ESSDDMaster loHistory) {
 
-                                //ask user to download categories if not found, before proceeding to evaluation
-                                if (mViewModel.GetCategoriesNonLive() == null || mViewModel.GetCategoriesNonLive().size() < 1){
-
-                                    InitMessage(1, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
-                                        @Override
-                                        public void OnPositive() {
-                                            ReDownloadData();
-                                        }
-
-                                        @Override
-                                        public void OnNegative() {}
-                                    });
-                                    return;
-                                }
-
                                 //get the selected evaluation
                                 callback.OnSelectEvaluation(loBundle.getString("dept_id"), loHistory);
                             }
@@ -272,14 +351,6 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                     }
                 });
 
-                //ask user to re download data, if no history found
-                if (laMasterlist == null || laMasterlist.size() < 1){
-
-                    if (mViewModel.CountMaster(loBundle.getString("dept_id")) < 1){
-                        ReDownloadData();
-                    }
-                }
-
                 return;
             }
 
@@ -297,6 +368,11 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                 //initialize pop up object, menu object holder
                 PopupMenu loMenu = new PopupMenu(requireContext(), v);
                 loMenu.getMenuInflater().inflate(R.menu.menu_ssdd_filter, loMenu.getMenu());
+
+                //display only what is needed for the screen
+                loMenu.getMenu().findItem(R.id.action_by_date).setVisible(loBundle != null);
+                loMenu.getMenu().findItem(R.id.action_by_status).setVisible(loBundle != null);
+
                 loMenu.show();
 
                 //object listener
@@ -304,35 +380,8 @@ public class Fragment_SSDD_Evaluation extends Fragment{
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
 
-                        if (item.getItemId() == R.id.action_by_date){ //filter by date
-
-                            MaterialDatePicker.Builder<Pair<Long, Long>> loBuilder = MaterialDatePicker.Builder.dateRangePicker();
-                            loBuilder.setTitleText("Select Date Range");
-
-                            MaterialDatePicker<Pair<Long, Long>> loPicker = loBuilder.build();
-                            loPicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
-                                @Override
-                                public void onPositiveButtonClick(Pair<Long, Long> selection) {
-
-                                    //set date range parameters for downloading history
-                                    lsDfrom = GetDateFormat(selection.first);
-                                    lsDto = GetDateFormat(selection.second);
-
-                                    //ask user before downloading
-                                    InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Download transactions from " + lsDfrom + " to " + lsDto + "?",
-                                            "Yes", "No", new OnMessageButton() {
-                                                @Override
-                                                public void OnPositive() {
-                                                    ReDownloadData();
-                                                }
-
-                                                @Override
-                                                public void OnNegative() {}
-                                            });
-                                }
-                            });
-                            loPicker.show(getParentFragmentManager(), "DATE_RANGE_PICKER");
-
+                        if (item.getItemId() == R.id.action_by_download){
+                            DownloadData();
                             return true;
                         }else if (item.getItemId() == R.id.action_item_all){ //filter by status
                             lsTranstat = "cTranStat IN ('0', '1', '3')";
@@ -361,156 +410,49 @@ public class Fragment_SSDD_Evaluation extends Fragment{
             @Override
             public void onClick(View v) {
 
-
-                InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Create a new evaluation?", "Yes", "No", new OnMessageButton() {
+                InitMessage(1, R.drawable.ic_baseline_confirmation_pin_24, "Create a new evaluation?", "No", "Yes", new OnMessageButton() {
                     @Override
                     public void OnPositive() {
 
-                        if (mViewModel.GetCategoriesNonLive() == null || mViewModel.GetCategoriesNonLive().size() < 1){
-
-                            InitMessage(1, R.drawable.baseline_error_24, "Could not find categories for evaluation. Re download data?", "Yes", "No", new OnMessageButton() {
-                                @Override
-                                public void OnPositive() {
-                                    ReDownloadData();
-                                }
-
-                                @Override
-                                public void OnNegative() {}
-                            });
-                            return;
-                        }
-
-                        //return the generated evaluation master
-                        ESSDDMaster loMaster = mViewModel.CreateEvaluation(loBundle.getString("dept_id"), mViewModel.GetCategoriesNonLive());
-                        callback.OnSelectEvaluation(loMaster.getsDeptIDxx(), loMaster);
                     }
 
                     @Override
                     public void OnNegative() {
+
+                        //do not proceed to evaluation if categories not found, download if empty
+                        if (mViewModel.GetCategoriesNonLive().size() < 1){
+
+                            mViewModel.DownloadCategories(new VMSSDEvaluation.OnDownloadCallback() {
+                                @Override
+                                public void OnLoad(String fsTitlexx, String fsMessage) {
+                                    poDialog.initDialog("Categories", "Downloading categories. Please wait. .", false);
+                                    poDialog.show();
+                                }
+
+                                @Override
+                                public void OnSuccess() {
+                                    poDialog.dismiss();
+                                    Toast.makeText(requireActivity(), "Successfully downloaded categories", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void OnFailed(String fsMessage) {
+                                    poDialog.dismiss();
+                                    Toast.makeText(requireActivity(), "No categories found", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }else{
+
+                            //return the generated evaluation master
+                            ESSDDMaster loMaster = mViewModel.CreateEvaluation(loBundle.getString("dept_id"), mViewModel.GetCategoriesNonLive());
+                            callback.OnSelectEvaluation(loMaster.getsDeptIDxx(), loMaster);
+                        }
 
                     }
                 });
             }
         });
 
-    }
-
-    private void ReDownloadData(){
-
-        try {
-
-            if (loBundle == null){
-
-                //import data for department
-                mViewModel.DownloadDepartments(new VMSSDEvaluation.OnDownloadCallback() {
-                    @Override
-                    public void OnLoad(String fsTitlexx, String fsMessage) {
-                        poDialog.initDialog(fsTitlexx, fsMessage, false);
-                        poDialog.show();
-                    }
-
-                    @Override
-                    public void OnSuccess() {
-                        poDialog.dismiss();
-                    }
-
-                    @Override
-                    public void OnFailed(String fsMessage) {
-
-                        poDialog.dismiss();
-
-                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
-                            @Override
-                            public void OnPositive() {
-
-                            }
-
-                            @Override
-                            public void OnNegative() {
-
-                            }
-                        });
-                    }
-                });
-            }else {
-
-                //import data for categories
-                mViewModel.DownloadCategories(new VMSSDEvaluation.OnDownloadCallback() {
-                    @Override
-                    public void OnLoad(String fsTitlexx, String fsMessage) {
-                        poDialog.initDialog(fsTitlexx, fsMessage, false);
-                        poDialog.show();
-                    }
-
-                    @Override
-                    public void OnSuccess() {
-                        poDialog.dismiss();
-                        Toast.makeText(requireActivity(), "Successfully downloaded categories", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void OnFailed(String fsMessage) {
-                        poDialog.dismiss();
-                        Toast.makeText(requireActivity(), "Failed to download categories", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                Thread.sleep(1000);
-
-                //download history
-                mViewModel.DownloadEvaluation(loBundle.getString("dept_id"), lsDfrom, lsDto, new VMSSDEvaluation.OnDownloadCallback() {
-                    @Override
-                    public void OnLoad(String fsTitlexx, String fsMessage) {
-                        poDialog.initDialog(fsTitlexx, fsMessage, false);
-                        poDialog.show();
-                    }
-
-                    @Override
-                    public void OnSuccess() {
-                        poDialog.dismiss();
-                        Toast.makeText(requireActivity(), "Evaluation history imported successfully", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void OnFailed(String fsMessage) {
-                        poDialog.dismiss();
-                        InitMessage(0, R.drawable.baseline_error_24, fsMessage, "Okay", "", new OnMessageButton() {
-                            @Override
-                            public void OnPositive() {}
-
-                            @Override
-                            public void OnNegative() {}
-                        });
-                    }
-                });
-            }
-
-        }catch (Exception e){
-            mViewModel.SaveError(getClass().getSimpleName(), e.getMessage());
-        }
-    }
-
-    private String GetFirstQuarter(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            return LocalDate.now().minusMonths(4).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        }else {
-            Calendar today = Calendar.getInstance();
-            today.add(Calendar.MONTH, -4);
-            return new SimpleDateFormat("yyyy-MM-dd").format(today.getTime());
-        }
-    }
-
-    private String GetDateToday(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        }else {
-            return new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
-        }
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private String GetDateFormat(Long fsDate){
-        return new SimpleDateFormat("yyyy-MM-dd").format(fsDate);
     }
 
     private void InitMessage(int messageType, int statusIcon, String message, String posText, String negText, OnMessageButton callback){

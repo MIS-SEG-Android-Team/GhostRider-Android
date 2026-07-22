@@ -97,6 +97,11 @@ public interface DImageInfo {
     LiveData<List<EImageInfo>> GetTransactionImagesForUpload(String fsSourceNo, String fsSourceCD);
 
     @Query("SELECT * FROM Image_Information " +
+            "WHERE sSourceCD = :fsSourceCD " +
+            "AND sSourceNo = :fsSourceNo")
+    LiveData<List<EImageInfo>> GetTransactionAttachments(String fsSourceCD, String fsSourceNo);
+
+    @Query("SELECT * FROM Image_Information " +
             "WHERE sDtlSrcNo = :sDtlSrcNo AND " +
             "sImageNme = :sImageNme")
     LiveData<EImageInfo> getImageLocation(String sDtlSrcNo, String sImageNme);
