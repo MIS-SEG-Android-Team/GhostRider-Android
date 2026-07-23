@@ -264,9 +264,7 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
             }
 
             @Override
-            public void onNegative() {
-
-            }
+            public void onNegative() {}
         });
     }
 

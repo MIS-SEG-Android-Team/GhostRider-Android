@@ -148,6 +148,7 @@ dependencies {
 
     //Image loader
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0' //for image with zoom features
 
     // Image Slider Dependencies
     implementation 'com.github.smarteist:Android-Image-Slider:1.4.0'

@@ -91,6 +91,7 @@ public class Adapter_File_Viewer extends RecyclerView.Adapter<Adapter_File_Viewe
                     .apply(new RequestOptions()
                             .skipMemoryCache(true)
                             .diskCacheStrategy(DiskCacheStrategy.NONE))
+                    .placeholder(R.drawable.baseline_error_24)
                     .error(R.drawable.baseline_error_24)
                     .into(holder.siv_icon);
 

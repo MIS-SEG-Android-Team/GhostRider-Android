@@ -135,11 +135,15 @@ public class Fragment_Transaction_History extends Fragment {
 
     private void InitTransactionRequests(String lsStartDt, String lsEndDt){
 
+        //clear adapter for an accurate list of data
+        rcv_list.setAdapter(null);
+
         if (lsArgType.equals("3")){
 
             mViewModel.getCASRequests(lsArgCode, lsStartDt, lsEndDt).observe(getViewLifecycleOwner(), new Observer<List<ECASRequests>>() {
                 @Override
                 public void onChanged(List<ECASRequests> ecasRequests) {
+
                     if (ecasRequests != null){
                         InitAdapter(ecasRequests);
                     }

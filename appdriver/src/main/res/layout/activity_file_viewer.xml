@@ -13,6 +13,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/layout_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_search"
             android:layout_width="0dp"
@@ -22,6 +35,7 @@
             app:boxBackgroundColor="?attr/colorSurface"
             android:padding="10dp"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_toolbar"
             app:layout_constraintWidth_percent="0.8">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -65,10 +79,64 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/siv_image"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent">
+
+                <com.github.chrisbanes.photoview.PhotoView
+                    android:id="@+id/siv_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/mtv_close"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Close"
+                        android:textSize="18sp"
+                        android:padding="10dp"
+                        android:gravity="end"
+                        android:background="?attr/colorPrimary"/>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/mtv_filenamne"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="18sp"/>
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/mtv_path"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="N/A"
+                                android:textSize="13sp"/>
+
+                        </LinearLayout>
+
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>
 

@@ -3,7 +3,9 @@ package org.rmj.g3appdriver.etc.FileViewer;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
 import androidx.lifecycle.AndroidViewModel;
@@ -32,11 +35,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textview.MaterialTextView;
 
 import org.jetbrains.annotations.NotNull;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.ApprovalCode;
@@ -58,20 +64,23 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class FileViewer extends AppCompatActivity implements OnSwipeListener {
+public class FileViewer extends AppCompatActivity{
 
     private VMFileViewer mViewModel;
     private LoadDialog poLoad;
     private Adapter_File_Viewer loAdapter;
-    private GestureDetector loDetector;
 
     String lsDfrom, lsDto;
 
+    private MaterialToolbar toolbar;
     private ImageButton btn_filter;
     private TextInputEditText tie_search;
     private RecyclerView rcv_list;
     private MaterialCardView mcv_image;
-    private ShapeableImageView siv_image;
+    private PhotoView siv_image;
+
+    private ConstraintLayout layout_info;
+    private MaterialTextView mtv_close, mtv_filenamne, mtv_path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,13 +90,21 @@ public class FileViewer extends AppCompatActivity implements OnSwipeListener {
 
         mViewModel = new ViewModelProvider(this).get(VMFileViewer.class);
         poLoad = new LoadDialog(this);
-        loDetector = new GestureDetector(FileViewer.this, new GestureListener(FileViewer.this));
 
+        toolbar = findViewById(R.id.toolbar);
         btn_filter = findViewById(R.id.btn_filter);
         tie_search = findViewById(R.id.tie_search);
         rcv_list = findViewById(R.id.rcv_list);
         mcv_image = findViewById(R.id.mcv_image);
         siv_image = findViewById(R.id.siv_image);
+
+        layout_info = findViewById(R.id.layout_info);
+        mtv_close = findViewById(R.id.mtv_close);
+        mtv_filenamne = findViewById(R.id.mtv_filenamne);
+        mtv_path = findViewById(R.id.mtv_path);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         InitListener();
         InitDataReceiver();
@@ -141,6 +158,8 @@ public class FileViewer extends AppCompatActivity implements OnSwipeListener {
             public void OnSuccess() {
                 poLoad.dismiss();
                 Toast.makeText(FileViewer.this, "Attachment successfully downloaded", Toast.LENGTH_SHORT).show();
+
+                InitDataReceiver();
             }
 
             @Override
@@ -172,6 +191,30 @@ public class FileViewer extends AppCompatActivity implements OnSwipeListener {
                 .into(siv_image);
 
         if (mcv_image.getVisibility() == View.GONE) mcv_image.setVisibility(View.VISIBLE);
+        mtv_filenamne.setText(foFile.getName());
+        mtv_path.setText(foFile.getAbsolutePath());
+
+    }
+
+    private void ViewDocument(File foFile){
+
+        try {
+
+            // Use FileProvider to get a safe content URI
+            Uri uri = FileProvider.getUriForFile(
+                    FileViewer.this,
+                    FileViewer.this.getPackageName() + ".provider",
+                    foFile
+            );
+
+            Intent loIntent = new Intent(Intent.ACTION_VIEW);
+            loIntent.setData(uri);
+            loIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            startActivity(Intent.createChooser(loIntent, "Open with"));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(FileViewer.this, "No application found to open this file", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -207,7 +250,13 @@ public class FileViewer extends AppCompatActivity implements OnSwipeListener {
 
                     @Override
                     public void OnDocument(EImageInfo loAttachment) {
-                        DownloadFile(loAttachment.getTransNox());
+
+                        File loFile = new File(loAttachment.getFileLoct() + loAttachment.getImageNme());
+                        if ((loFile.exists() && loFile.isFile() && loFile.canRead())){
+                            ViewDocument(loFile);
+                        }else {
+                            DownloadFile(loAttachment.getTransNox());
+                        }
                     }
                 });
 
@@ -282,27 +331,29 @@ public class FileViewer extends AppCompatActivity implements OnSwipeListener {
             }
         });
 
-        siv_image.setOnTouchListener(new View.OnTouchListener() {
+        siv_image.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return loDetector.onTouchEvent(event);
+            public void onClick(View view) {
+                layout_info.setVisibility(layout_info.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
             }
         });
+
+        mtv_close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mcv_image.getVisibility() == View.VISIBLE) mcv_image.setVisibility(View.GONE);
+            }
+        });
+
     }
 
     @Override
-    public void OnSwipeUp() {}
-
-    @Override
-    public void OnSwipeDown() {
-        if (mcv_image.getVisibility() == View.VISIBLE) mcv_image.setVisibility(View.GONE);
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void OnSwipeLeft() {}
-
-    @Override
-    public void OnSwipeRight() {}
 
     public static class VMFileViewer extends AndroidViewModel{
 
