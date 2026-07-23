@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,12 +18,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_PDFViewer;
+import org.rmj.g3appdriver.etc.FileViewer.Activity.Activity_PDFViewer;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDCategories;
 import org.rmj.g3appdriver.GCircle.room.Entities.ESSDDetail;
@@ -230,6 +228,7 @@ public class Activity_SSDD_Category_Details extends AppCompatActivity implements
                         }
 
                         Intent loIntent = new Intent(Activity_SSDD_Category_Details.this, Activity_PDFViewer.class);
+                        loIntent.putExtra("pdf_type", "stream");
                         loIntent.putExtra("pdf_url", loCategory.getsMemoLink());
                         loIntent.putExtra("pdf_index", loCategory.getnPageNumber());
                         startActivity(loIntent);

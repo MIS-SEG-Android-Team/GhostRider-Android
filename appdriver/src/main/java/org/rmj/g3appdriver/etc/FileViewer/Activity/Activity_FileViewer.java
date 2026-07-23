@@ -1,6 +1,5 @@
-package org.rmj.g3appdriver.etc.FileViewer;
+package org.rmj.g3appdriver.etc.FileViewer.Activity;
 
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.ActivityNotFoundException;
@@ -10,17 +9,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
@@ -40,11 +35,9 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
-import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 
-import org.jetbrains.annotations.NotNull;
 import org.rmj.g3appdriver.GCircle.Apps.ApprovalCode.ApprovalCode;
 import org.rmj.g3appdriver.GCircle.room.DataAccessObject.DImageInfo;
 import org.rmj.g3appdriver.GCircle.room.Entities.EImageInfo;
@@ -52,10 +45,9 @@ import org.rmj.g3appdriver.GCircle.room.GGC_GCircleDB;
 import org.rmj.g3appdriver.GCircle.room.Repositories.RImageInfo;
 import org.rmj.g3appdriver.R;
 import org.rmj.g3appdriver.etc.FileUtility;
+import org.rmj.g3appdriver.etc.FileViewer.Adapter.Adapter_File_Viewer;
 import org.rmj.g3appdriver.etc.LoadDialog;
-import org.rmj.g3appdriver.etc.OnSwipeListener;
 import org.rmj.g3appdriver.utils.ConnectionUtil;
-import org.rmj.g3appdriver.utils.GestureListener;
 import org.rmj.g3appdriver.utils.Task.OnDoBackgroundTaskListener;
 import org.rmj.g3appdriver.utils.Task.OnTaskExecuteListener;
 import org.rmj.g3appdriver.utils.Task.TaskExecutor;
@@ -64,7 +56,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class FileViewer extends AppCompatActivity{
+public class Activity_FileViewer extends AppCompatActivity{
 
     private VMFileViewer mViewModel;
     private LoadDialog poLoad;
@@ -133,21 +125,21 @@ public class FileViewer extends AppCompatActivity{
             @Override
             public void OnSuccess() {
                 poLoad.dismiss();
-                Toast.makeText(FileViewer.this, "Attachments successfully downloaded", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Activity_FileViewer.this, "Attachments successfully downloaded", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void OnFailed(String fsMessage) {
                 poLoad.dismiss();
-                Toast.makeText(FileViewer.this, fsMessage, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Activity_FileViewer.this, fsMessage, Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
-    private void DownloadFile(String fsTransNox){
+    private void DownloadFile(EImageInfo foAttachment){
 
-        mViewModel.DownloadFile(fsTransNox, new VMFileViewer.OnTransaction() {
+        mViewModel.DownloadFile(foAttachment.getTransNox(), new VMFileViewer.OnTransaction() {
             @Override
             public void OnLoad(String fsTitle, String fsMessage) {
                 poLoad.initDialog("Attachment", "Downloading attachment. Please wait. .", false);
@@ -157,15 +149,24 @@ public class FileViewer extends AppCompatActivity{
             @Override
             public void OnSuccess() {
                 poLoad.dismiss();
-                Toast.makeText(FileViewer.this, "Attachment successfully downloaded", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Activity_FileViewer.this, "Attachment successfully downloaded", Toast.LENGTH_SHORT).show();
 
+                //reload attachments
                 InitDataReceiver();
+
+                //auto display the attachment
+                File loAttachment = new File(foAttachment.getFileLoct() + foAttachment.getImageNme());
+                if (loAttachment.getName().contains(".pdf")){
+                    ViewDocument(loAttachment);
+                }else {
+                    DisplayImage(loAttachment);
+                }
             }
 
             @Override
             public void OnFailed(String fsMessage) {
                 poLoad.dismiss();
-                Toast.makeText(FileViewer.this, fsMessage, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Activity_FileViewer.this, fsMessage, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -173,15 +174,21 @@ public class FileViewer extends AppCompatActivity{
 
     private void DisplayImage(File foFile){
 
+        //do not proceed if file is invalid
+        if (!(foFile.exists() || foFile.isFile() || foFile.canRead())){
+            Toast.makeText(Activity_FileViewer.this, "Could not read image properly", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Use FileProvider to get a safe content URI
         Uri uri = FileProvider.getUriForFile(
-                FileViewer.this,
-                FileViewer.this.getPackageName() + ".provider",
+                Activity_FileViewer.this,
+                Activity_FileViewer.this.getPackageName() + ".provider",
                 foFile
         );
 
         //display image
-        Glide.with(FileViewer.this)
+        Glide.with(Activity_FileViewer.this)
                 .asBitmap() // force bitmap decoding
                 .load((foFile.exists() && foFile.isFile() && foFile.canRead()) ? uri : R.drawable.baseline_error_24)  // use safe URI instead of raw path
                 .apply(new RequestOptions()
@@ -200,20 +207,38 @@ public class FileViewer extends AppCompatActivity{
 
         try {
 
+            //do not proceed if file is invalid
+            if (!(foFile.exists() || foFile.isFile() || foFile.canRead())){
+                Toast.makeText(Activity_FileViewer.this, "Could not read document properly", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Use FileProvider to get a safe content URI
             Uri uri = FileProvider.getUriForFile(
-                    FileViewer.this,
-                    FileViewer.this.getPackageName() + ".provider",
+                    Activity_FileViewer.this,
+                    Activity_FileViewer.this.getPackageName() + ".provider",
                     foFile
             );
 
-            Intent loIntent = new Intent(Intent.ACTION_VIEW);
-            loIntent.setData(uri);
-            loIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            //if pdf file, use default pdf view for the app, else. always open an option to view
+            if (foFile.getName().contains(".pdf")){
 
-            startActivity(Intent.createChooser(loIntent, "Open with"));
+                Intent loIntent = new Intent(Activity_FileViewer.this, Activity_PDFViewer.class);
+                loIntent.putExtra("pdf_type", "file");
+                loIntent.putExtra("pdf_url", foFile.getAbsolutePath());
+
+                startActivity(loIntent);
+                overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
+            }else {
+
+                Intent loIntent = new Intent(Intent.ACTION_VIEW);
+                loIntent.setData(uri);
+                loIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                startActivity(Intent.createChooser(loIntent, "Open with"));
+            }
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(FileViewer.this, "No application found to open this file", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Activity_FileViewer.this, "No application found to open this file", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -236,7 +261,7 @@ public class FileViewer extends AppCompatActivity{
                     return;
                 }
 
-                loAdapter = new Adapter_File_Viewer(FileViewer.this, eImageInfos, new Adapter_File_Viewer.OnAttachment() {
+                loAdapter = new Adapter_File_Viewer(Activity_FileViewer.this, eImageInfos, new Adapter_File_Viewer.OnAttachment() {
                     @Override
                     public void OnImageView(EImageInfo loAttachment) {
 
@@ -244,7 +269,7 @@ public class FileViewer extends AppCompatActivity{
                         if ((loFile.exists() && loFile.isFile() && loFile.canRead())){
                             DisplayImage(loFile);
                         }else {
-                            DownloadFile(loAttachment.getTransNox());
+                            DownloadFile(loAttachment);
                         }
                     }
 
@@ -255,13 +280,13 @@ public class FileViewer extends AppCompatActivity{
                         if ((loFile.exists() && loFile.isFile() && loFile.canRead())){
                             ViewDocument(loFile);
                         }else {
-                            DownloadFile(loAttachment.getTransNox());
+                            DownloadFile(loAttachment);
                         }
                     }
                 });
 
                 rcv_list.setAdapter(loAdapter);
-                rcv_list.setLayoutManager(new LinearLayoutManager(FileViewer.this,  LinearLayoutManager.VERTICAL, false));
+                rcv_list.setLayoutManager(new LinearLayoutManager(Activity_FileViewer.this,  LinearLayoutManager.VERTICAL, false));
             }
         });
     }
@@ -289,7 +314,7 @@ public class FileViewer extends AppCompatActivity{
             public void onClick(View view) {
 
                 //initialize pop up object, menu object holder
-                PopupMenu loMenu = new PopupMenu(FileViewer.this, view);
+                PopupMenu loMenu = new PopupMenu(Activity_FileViewer.this, view);
                 loMenu.getMenuInflater().inflate(R.menu.menu_attachment_filter, loMenu.getMenu());
                 loMenu.show();
 

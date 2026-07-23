@@ -144,7 +144,8 @@ dependencies {
     implementation 'com.huawei.hms:maps:4.0.1.302'
     implementation 'com.huawei.hms:location:6.4.0.300'
     implementation 'com.huawei.hms:site:4.0.3.300'
-    implementation 'com.github.mhiew:android-pdf-viewer:3.2.0-beta.3'
+    //implementation 'com.github.mhiew:android-pdf-viewer:3.2.0-beta.3'
+    implementation 'com.github.alamin5g:Alamin5G-PDF-Viewer:v1.0.17'
 
     //Image loader
     implementation 'com.squareup.picasso:picasso:2.71828'

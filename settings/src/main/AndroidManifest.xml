@@ -11,9 +11,6 @@
 
     <application>
         <activity
-            android:name=".Activity.PDFViewer"
-            android:exported="false" />
-        <activity
             android:name=".Activity.Activity_AppVersion"
             android:exported="true"
             android:theme="@style/GhostRiderMaterialTheme.NoActionBar" >

@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -38,6 +37,7 @@ import org.rmj.g3appdriver.GCircle.Etc.PositionCode;
 import org.rmj.g3appdriver.GCircle.room.Entities.EGuides;
 import org.rmj.g3appdriver.R;
 import org.rmj.g3appdriver.etc.FileUtility;
+import org.rmj.g3appdriver.etc.FileViewer.Activity.Activity_PDFViewer;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 
@@ -258,7 +258,9 @@ public class Activity_Manual extends AppCompatActivity {
             public void OnView(EGuides loGuide) {
 
                 Intent loIntent = new Intent(Activity_Manual.this, Activity_PDFViewer.class);
+                loIntent.putExtra("pdf_type", "stream");
                 loIntent.putExtra("pdf_url", loGuide.getsURlxx());
+
                 startActivity(loIntent);
                 overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
             }
@@ -366,7 +368,9 @@ public class Activity_Manual extends AppCompatActivity {
             }
 
             Intent loIntent = new Intent(Activity_Manual.this, Activity_PDFViewer.class);
+            loIntent.putExtra("pdf_type", "stream");
             loIntent.putExtra("pdf_url", sURLxx);
+
             startActivity(loIntent);
             overridePendingTransition(R.anim.anim_intent_slide_in_right, R.anim.anim_intent_slide_out_left);
         }

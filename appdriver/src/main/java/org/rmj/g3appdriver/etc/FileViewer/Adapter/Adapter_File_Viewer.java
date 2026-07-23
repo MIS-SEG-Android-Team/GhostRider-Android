@@ -1,4 +1,4 @@
-package org.rmj.g3appdriver.etc.FileViewer;
+package org.rmj.g3appdriver.etc.FileViewer.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -24,7 +24,6 @@ import org.rmj.g3appdriver.R;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Adapter_File_Viewer extends RecyclerView.Adapter<Adapter_File_Viewer.VH_File_Viewer>{
 

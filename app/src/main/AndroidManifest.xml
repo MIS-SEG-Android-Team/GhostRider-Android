@@ -66,7 +66,7 @@
             android:name="org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_Manual"
             android:exported="false" />
         <activity
-            android:name="org.rmj.g3appdriver.GCircle.Apps.User_Guide.Activitiy.Activity_PDFViewer"
+            android:name="org.rmj.g3appdriver.etc.FileViewer.Activity.Activity_PDFViewer"
             android:exported="false" />
         <activity
             android:name="org.rmj.g3appdriver.GCircle.Apps.CompanyPolicies.Activity.Activity_Menus"

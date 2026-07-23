@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:cardElevation="10dp"
-    tools:context=".etc.FileViewer.FileViewer">
+    tools:context=".etc.FileViewer.Activity.Activity_FileViewer">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

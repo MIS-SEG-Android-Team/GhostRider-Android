@@ -17,7 +17,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
-import org.rmj.g3appdriver.etc.FileViewer.FileViewer;
+import org.rmj.g3appdriver.etc.FileViewer.Activity.Activity_FileViewer;
 import org.rmj.g3appdriver.etc.LoadDialog;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
@@ -191,7 +191,7 @@ public class Activity_TransactionApproval_Details extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
-                        Intent loIntent = new Intent(Activity_TransactionApproval_Details.this, FileViewer.class);
+                        Intent loIntent = new Intent(Activity_TransactionApproval_Details.this, Activity_FileViewer.class);
                         loIntent.putExtra("sSourceCd", ecasRequests.getsSourceCD());
                         loIntent.putExtra("sSourceNo", ecasRequests.getsSourceNo());
 
