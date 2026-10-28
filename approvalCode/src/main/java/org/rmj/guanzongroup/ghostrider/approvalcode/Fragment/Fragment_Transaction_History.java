@@ -156,7 +156,7 @@ public class Fragment_Transaction_History extends Fragment {
 
     private void InitAdapter(List<ECASRequests> faRequests){
 
-        loAdapter = new Adapter_Transaction_History(faRequests, new Adapter_Transaction_History.OnItemClick() {
+        loAdapter = new Adapter_Transaction_History(requireActivity().getApplication(), faRequests, new Adapter_Transaction_History.OnItemClick() {
             @Override
             public void OnClick(ECASRequests loRequest) {
                 Intent loIntent = new Intent(requireContext(), Activity_TransactionApproval_Details.class);

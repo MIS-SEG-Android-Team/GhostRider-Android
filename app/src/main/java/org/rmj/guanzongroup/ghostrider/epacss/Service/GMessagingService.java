@@ -11,10 +11,12 @@
 
 package org.rmj.guanzongroup.ghostrider.epacss.Service;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -27,20 +29,15 @@ import org.rmj.g3appdriver.lib.Notifications.model.iNotification;
 import org.rmj.guanzongroup.ghostrider.notifications.Etc.NotificationUI;
 import org.rmj.guanzongroup.ghostrider.notifications.Etc.iNotificationUI;
 
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class GMessagingService extends FirebaseMessagingService {
     private static final String TAG = GMessagingService.class.getSimpleName();
 
     @Override
-    public void onNewToken(@NonNull String s) {
-        super.onNewToken(s);
-        AppTokenManager poToken = new AppTokenManager(getApplication());
-        poToken.SaveFirebaseToken(s);
-        AppConfigPreference.getInstance(GMessagingService.this).setAppToken(s);
-    }
-
-    @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
+
+        Log.d("FCM_MSG", message + " is received");
 
         iNotification loSys = new NMM(getApplication()).getInstance(message);
 

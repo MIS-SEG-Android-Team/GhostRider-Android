@@ -31,19 +31,42 @@
             app:layout_constraintWidth_percent="0.5"
             app:layout_constraintStart_toEndOf="@+id/mtv_sourceno"/>
 
+        <View
+            android:id="@+id/view_div"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintHeight_percent="0.009"
+            app:layout_constraintTop_toBottomOf="@+id/mtv_sourceno"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/DescriptionHeaderStyle"
+            android:id="@+id/mtv_branch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="N/A"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
+            app:layout_constraintStart_toStartOf="@+id/mtv_sourceno"
+            app:layout_constraintTop_toBottomOf="@+id/view_div"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <com.google.android.material.textview.MaterialTextView
             style="@style/DescriptionHeaderStyle"
             android:id="@+id/mtv_remarks"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Standard Supply and Installation of 100KWP for Honda Bauang La Union"
-            android:textSize="12sp"
+            android:text="N/A"
+            android:textSize="10sp"
             android:paddingHorizontal="10dp"
             android:paddingBottom="5dp"
             android:maxLines="1"
-            app:layout_constraintTop_toBottomOf="@+id/mtv_sourceno"
-            app:layout_constraintStart_toStartOf="@+id/mtv_sourceno"
-            app:layout_constraintEnd_toEndOf="@+id/mtv_transactdt"/>
+            app:layout_constraintTop_toBottomOf="@+id/mtv_branch"
+            app:layout_constraintStart_toStartOf="@+id/mtv_branch"
+            app:layout_constraintEnd_toEndOf="@+id/mtv_branch"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

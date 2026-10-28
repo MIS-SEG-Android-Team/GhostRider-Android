@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import org.rmj.g3appdriver.GCircle.room.Repositories.AppTokenManager;
 import org.rmj.g3appdriver.etc.AppConfigPreference;
 import org.rmj.g3appdriver.etc.AppConstants;
 import org.rmj.g3appdriver.etc.MessageBox;
@@ -77,9 +79,13 @@ public class Activity_SplashScreen extends AppCompatActivity{
         lblVrsion = findViewById(R.id.lbl_versionInfo);
         lblVrsion.setText(BuildConfig.VERSION_NAME);
 
-        FirebaseMessaging.getInstance().register()
+        FirebaseMessaging.getInstance().getToken()
                 .addOnSuccessListener(token -> {
                     Log.e("FCM_DEBUG", "TOKEN = " + token);
+
+                    AppTokenManager poToken = new AppTokenManager(getApplication());
+                    poToken.SaveFirebaseToken(token);
+                    AppConfigPreference.getInstance(this).setAppToken(token);
                 })
                 .addOnFailureListener(e -> {
                     Log.e("FCM_DEBUG", "ERROR", e);

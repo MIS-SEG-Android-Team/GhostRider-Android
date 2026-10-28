@@ -43,6 +43,9 @@ public class ECASRequests {
     @ColumnInfo(name = "sAppSrcNo")
     public String sAppSrcNo;
 
+    @ColumnInfo(name = "nTotal")
+    public String nTotal;
+
     public void setsTransNox(@NonNull String sTransNox) {
         this.sTransNox = sTransNox;
     }
@@ -85,6 +88,10 @@ public class ECASRequests {
 
     public void setsAppSrcNo(String sAppSrcNo) {
         this.sAppSrcNo = sAppSrcNo;
+    }
+
+    public void setnTotal(String nTotal) {
+        this.nTotal = nTotal;
     }
 
     @NonNull
@@ -130,5 +137,9 @@ public class ECASRequests {
 
     public String getsAppSrcNo() {
         return sAppSrcNo;
+    }
+
+    public String getnTotal() {
+        return nTotal;
     }
 }

@@ -1,5 +1,7 @@
 package org.rmj.guanzongroup.ghostrider.approvalcode.Etc;
 
+import android.app.Application;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textview.MaterialTextView;
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
+import org.rmj.g3appdriver.lib.Etc.Branch;
 import org.rmj.guanzongroup.ghostrider.approvalcode.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +21,14 @@ public class Adapter_Transaction_History extends RecyclerView.Adapter<Adapter_Tr
     private OnItemClick foCallback;
     private List<ECASRequests> laData;
     private List<ECASRequests> laDataFiltered;
+    private final Branch loBranch;
 
-    public Adapter_Transaction_History(List<ECASRequests> laData, OnItemClick foCallback) {
+    public Adapter_Transaction_History(Application foInstance, List<ECASRequests> laData, OnItemClick foCallback) {
         this.loFilter = new DataFilter(this);
         this.foCallback = foCallback;
         this.laData = laData;
         this.laDataFiltered = laData;
+        this.loBranch = new Branch(foInstance);
     }
 
     public DataFilter GetFilter(){
@@ -39,9 +44,15 @@ public class Adapter_Transaction_History extends RecyclerView.Adapter<Adapter_Tr
 
     @Override
     public void onBindViewHolder(@NonNull VH_Transaction_History holder, int position) {
+
         holder.mtv_sourceno.setText(laDataFiltered.get(position).getsSourceNo());
         holder.mtv_transactdt.setText(laDataFiltered.get(position).getdTransact());
         holder.mtv_remarks.setText(laDataFiltered.get(position).getsRemarksx());
+
+        String lsBranchNm = loBranch.getBranchInfoNonLive(laDataFiltered.get(position).getsSourceNo().substring(0, 4)) == null ? "N/A" :
+                                loBranch.getBranchInfoNonLive(laDataFiltered.get(position).getsSourceNo().substring(0, 4)).getBranchNm();
+
+        holder.mtv_branch.setText(lsBranchNm);
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,10 +73,11 @@ public class Adapter_Transaction_History extends RecyclerView.Adapter<Adapter_Tr
 
     public class VH_Transaction_History extends RecyclerView.ViewHolder {
 
-        private View view;
-        private MaterialTextView mtv_sourceno;
-        private MaterialTextView mtv_transactdt;
-        private MaterialTextView mtv_remarks;
+        private final View view;
+        private final MaterialTextView mtv_sourceno;
+        private final MaterialTextView mtv_transactdt;
+        private final MaterialTextView mtv_remarks;
+        private final MaterialTextView mtv_branch;
 
         public VH_Transaction_History(@NonNull View itemView) {
             super(itemView);
@@ -73,6 +85,7 @@ public class Adapter_Transaction_History extends RecyclerView.Adapter<Adapter_Tr
             view = itemView;
             mtv_sourceno = itemView.findViewById(R.id.mtv_sourceno);
             mtv_transactdt = itemView.findViewById(R.id.mtv_transactdt);
+            mtv_branch = itemView.findViewById(R.id.mtv_branch);
             mtv_remarks = itemView.findViewById(R.id.mtv_remarks);
         }
     }

@@ -416,6 +416,8 @@ public class ApprovalCode {
                     params.toString(),
                     poHeaders.getHeaders());
 
+            Log.d("CAS REQUEST", lsResponse);
+
             if(lsResponse == null){
                 message = SERVER_NO_RESPONSE;
                 return false;
@@ -450,6 +452,7 @@ public class ApprovalCode {
                 loRequests.setcTranStat(loResult.getString("cTranStat"));
                 loRequests.setdApproved(loResult.getString("dApproved"));
                 loRequests.setsAppSrcNo(loResult.getString("sAppSrcNo"));
+                loRequests.setnTotal(loResult.getString("rqsTotal"));
 
                 poCASReqDao.SaveCASRequest(loRequests);
             }
