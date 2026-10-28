@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -75,6 +76,14 @@ public class Activity_SplashScreen extends AppCompatActivity{
         prgrssBar = findViewById(R.id.progress_splashscreen);
         lblVrsion = findViewById(R.id.lbl_versionInfo);
         lblVrsion.setText(BuildConfig.VERSION_NAME);
+
+        FirebaseMessaging.getInstance().register()
+                .addOnSuccessListener(token -> {
+                    Log.e("FCM_DEBUG", "TOKEN = " + token);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FCM_DEBUG", "ERROR", e);
+                });
 
         new TransparentToolbar(Activity_SplashScreen.this).SetupActionbar();
         startService(new Intent(Activity_SplashScreen.this, GMessagingService.class));
