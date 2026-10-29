@@ -1,5 +1,6 @@
 package org.rmj.guanzongroup.ghostrider.approvalcode.Etc;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -42,17 +43,19 @@ public class Adapter_Transaction_History extends RecyclerView.Adapter<Adapter_Tr
         return new VH_Transaction_History(v);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull VH_Transaction_History holder, int position) {
 
         holder.mtv_sourceno.setText(laDataFiltered.get(position).getsSourceNo());
         holder.mtv_transactdt.setText(laDataFiltered.get(position).getdTransact());
-        holder.mtv_remarks.setText(laDataFiltered.get(position).getsRemarksx());
 
-        String lsBranchNm = loBranch.getBranchInfoNonLive(laDataFiltered.get(position).getsSourceNo().substring(0, 4)) == null ? "N/A" :
+        String lsBranchNm = loBranch.getBranchInfoNonLive(laDataFiltered.get(position).getsSourceNo().substring(0, 4)) == null ? laDataFiltered.get(position).getsSourceNo().substring(0, 4) :
                                 loBranch.getBranchInfoNonLive(laDataFiltered.get(position).getsSourceNo().substring(0, 4)).getBranchNm();
 
-        holder.mtv_branch.setText(lsBranchNm);
+        holder.mtv_branch.setText("Requested By: " + lsBranchNm);
+        holder.mtv_supplier.setText(laDataFiltered.get(position).getxSupplier() == null ? "N/A" : laDataFiltered.get(position).getxSupplier());
+        holder.mtv_amt.setText(laDataFiltered.get(position).getnTotal() == null ? "0.00" : laDataFiltered.get(position).getnTotal());
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,12 +74,13 @@ public class Adapter_Transaction_History extends RecyclerView.Adapter<Adapter_Tr
         void OnClick(ECASRequests loRequest);
     }
 
-    public class VH_Transaction_History extends RecyclerView.ViewHolder {
+    public static class VH_Transaction_History extends RecyclerView.ViewHolder {
 
         private final View view;
         private final MaterialTextView mtv_sourceno;
         private final MaterialTextView mtv_transactdt;
-        private final MaterialTextView mtv_remarks;
+        private final MaterialTextView mtv_supplier;
+        private final MaterialTextView mtv_amt;
         private final MaterialTextView mtv_branch;
 
         public VH_Transaction_History(@NonNull View itemView) {
@@ -86,13 +90,14 @@ public class Adapter_Transaction_History extends RecyclerView.Adapter<Adapter_Tr
             mtv_sourceno = itemView.findViewById(R.id.mtv_sourceno);
             mtv_transactdt = itemView.findViewById(R.id.mtv_transactdt);
             mtv_branch = itemView.findViewById(R.id.mtv_branch);
-            mtv_remarks = itemView.findViewById(R.id.mtv_remarks);
+            mtv_supplier = itemView.findViewById(R.id.mtv_supplier);
+            mtv_amt = itemView.findViewById(R.id.mtv_amt);
         }
     }
 
     public class DataFilter extends Filter {
 
-        private Adapter_Transaction_History loAdapter;
+        private final Adapter_Transaction_History loAdapter;
 
         public DataFilter(Adapter_Transaction_History loAdapter){
             this.loAdapter = loAdapter;
@@ -106,21 +111,25 @@ public class Adapter_Transaction_History extends RecyclerView.Adapter<Adapter_Tr
             if (constraint.length() == 0){
                 laDataFiltered = laData;
             }else {
-                List<ECASRequests> filterSearch = new ArrayList<>();
 
+                List<ECASRequests> filterSearch = new ArrayList<>();
                 for (ECASRequests requests: laData){
 
-                    if (requests.getsRemarksx().toLowerCase().contains(constraint.toString().toLowerCase()) ||
-                            requests.getsSourceNo().toLowerCase().contains(constraint.toString().toLowerCase())){
-                        filterSearch.add(requests);
+                    String lsBranchNm = loBranch.getBranchInfoNonLive(requests.getsSourceNo().substring(0, 4)) == null ? "" :
+                            loBranch.getBranchInfoNonLive(requests.getsSourceNo().substring(0, 4)).getBranchNm();
+
+                    if (requests.getxSupplier().toLowerCase().contains(constraint.toString().toLowerCase()) ||
+                            requests.getsSourceNo().toLowerCase().contains(constraint.toString().toLowerCase()) ||
+                            (lsBranchNm.toLowerCase().contains(constraint.toString().toLowerCase()) && !lsBranchNm.isEmpty()) ){
+
+                            filterSearch.add(requests);
                     }
                 }
-
                 laDataFiltered = filterSearch;
             }
-
             results.values = laDataFiltered;
             results.count = laDataFiltered.size();
+
             return results;
         }
 

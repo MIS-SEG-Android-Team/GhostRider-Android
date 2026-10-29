@@ -274,7 +274,7 @@ import org.rmj.g3appdriver.GCircle.room.Entities.EUncapturedClient;
         EMCContractInfo.class,
         EBranchVisitChecklist.class,
         EBranchVisitMaster.class,
-        EBranchVisitDetail.class}, version = 47,exportSchema = true)
+        EBranchVisitDetail.class}, version = 48,exportSchema = true)
 public abstract class GGC_GCircleDB extends RoomDatabase {
     private static final String TAG = "GhostRider_DB_Manager";
     private static GGC_GCircleDB instance;
@@ -372,7 +372,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
                             GGC_GCircleDB.class, "GGC_ISysDBF.db")
                     .allowMainThreadQueries()
                     .addCallback(roomCallBack)
-                    .addMigrations(MIGRATION_V47)
+                    .addMigrations(MIGRATION_V48)
                     .build();
         }
         return instance;
@@ -407,7 +407,7 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
         }
     }
 
-    static final Migration MIGRATION_V47 = new Migration(46, 47) {
+    static final Migration MIGRATION_V48 = new Migration(47, 48) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
 
@@ -543,6 +543,12 @@ public abstract class GGC_GCircleDB extends RoomDatabase {
             }
             if (!CheckColumnExists(database, "LR_DCP_Collection_Detail", "sEWalletReference")){
                 database.execSQL("ALTER TABLE LR_DCP_Collection_Detail ADD COLUMN sEWalletReference TEXT");
+            }
+            if (!CheckColumnExists(database, "CAS_Requests", "xSupplier")){
+                database.execSQL("ALTER TABLE CAS_Requests ADD COLUMN xSupplier TEXT");
+            }
+            if (!CheckColumnExists(database, "CAS_Requests", "nTotal")){
+                database.execSQL("ALTER TABLE CAS_Requests ADD COLUMN nTotal TEXT");
             }
         }
     };

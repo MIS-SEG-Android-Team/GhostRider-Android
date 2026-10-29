@@ -43,6 +43,9 @@ public class ECASRequests {
     @ColumnInfo(name = "sAppSrcNo")
     public String sAppSrcNo;
 
+    @ColumnInfo(name = "xSupplier")
+    public String xSupplier;
+
     @ColumnInfo(name = "nTotal")
     public String nTotal;
 
@@ -88,6 +91,10 @@ public class ECASRequests {
 
     public void setsAppSrcNo(String sAppSrcNo) {
         this.sAppSrcNo = sAppSrcNo;
+    }
+
+    public void setxSupplier(String sSupplier) {
+        this.xSupplier = sSupplier;
     }
 
     public void setnTotal(String nTotal) {
@@ -137,6 +144,10 @@ public class ECASRequests {
 
     public String getsAppSrcNo() {
         return sAppSrcNo;
+    }
+
+    public String getxSupplier() {
+        return xSupplier;
     }
 
     public String getnTotal() {

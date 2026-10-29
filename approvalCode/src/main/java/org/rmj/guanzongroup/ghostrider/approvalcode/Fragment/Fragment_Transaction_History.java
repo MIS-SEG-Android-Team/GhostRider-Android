@@ -1,14 +1,22 @@
 package org.rmj.guanzongroup.ghostrider.approvalcode.Fragment;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.TransformationMethod;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,10 +28,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textview.MaterialTextView;
+
 import org.rmj.g3appdriver.GCircle.room.Entities.ECASRequests;
+import org.rmj.g3appdriver.etc.FileViewer.Activity.Activity_FileViewer;
 import org.rmj.g3appdriver.etc.MessageBox;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Activity.Activity_TransactionApproval_Details;
 import org.rmj.guanzongroup.ghostrider.approvalcode.Etc.Adapter_Transaction_History;
@@ -48,6 +60,10 @@ public class Fragment_Transaction_History extends Fragment {
     private String lsArgType;
     private String lsArgCode;
     private String lsArgSource;
+
+    private interface OnDialog{
+        void OnSubmit(String fsEntry);
+    }
 
     @Nullable
     @Override
@@ -103,6 +119,7 @@ public class Fragment_Transaction_History extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (loAdapter == null) return;
                 InitFilter(s.toString());
             }
 
@@ -115,20 +132,64 @@ public class Fragment_Transaction_History extends Fragment {
             @Override
             public void onClick(View v) {
 
-                MaterialDatePicker.Builder<Pair<Long, Long>> loBuilder = MaterialDatePicker.Builder.dateRangePicker();
-                loBuilder.setTitleText("Select Date Range");
+                //initialize pop up object, menu object holder
+                PopupMenu loMenu = new PopupMenu(requireActivity(), v);
+                loMenu.getMenuInflater().inflate(org.rmj.g3appdriver.R.menu.menu_cas_approval, loMenu.getMenu());
+                loMenu.show();
 
-                MaterialDatePicker<Pair<Long, Long>> loPicker = loBuilder.build();
-                loPicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
+                loMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
-                    public void onPositiveButtonClick(Pair<Long, Long> selection) {
-                        Long startRange = selection.first;
-                        Long endRange = selection.second;
+                    public boolean onMenuItemClick(MenuItem menuItem) {
 
-                        ImportTransactionRequests(GetDateFormat(startRange), GetDateFormat(endRange));
+                        if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_download){
+
+                            MaterialDatePicker.Builder<Pair<Long, Long>> loBuilder = MaterialDatePicker.Builder.dateRangePicker();
+                            loBuilder.setTitleText("Select Date Range");
+
+                            MaterialDatePicker<Pair<Long, Long>> loPicker = loBuilder.build();
+                            loPicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
+                                @Override
+                                public void onPositiveButtonClick(Pair<Long, Long> selection) {
+                                    Long startRange = selection.first;
+                                    Long endRange = selection.second;
+
+                                    ImportTransactionRequests(GetDateFormat(startRange), GetDateFormat(endRange));
+                                }
+                            });
+                            loPicker.show(getParentFragmentManager(), "DATE_RANGE_PICKER");
+                            
+                        } else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_below) {
+
+                            ShowDialogEntry("List of Approvals BELOW", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL, new OnDialog() {
+                                @Override
+                                public void OnSubmit(String fsEntry) {
+
+                                }
+                            });
+                            
+                        } else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_between) {
+
+                            ShowDialogEntry("List of Approvals BETWEEN", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL, new OnDialog() {
+                                @Override
+                                public void OnSubmit(String fsEntry) {
+
+                                }
+                            });
+
+                        } else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_above) {
+
+                            ShowDialogEntry("List of Approvals ABOVE", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL, new OnDialog() {
+                                @Override
+                                public void OnSubmit(String fsEntry) {
+
+                                }
+                            });
+
+                        }
+
+                        return false;
                     }
                 });
-                loPicker.show(getParentFragmentManager(), "DATE_RANGE_PICKER");
             }
         });
     }
@@ -181,11 +242,53 @@ public class Fragment_Transaction_History extends Fragment {
     private void InitFilter(String fsFilter){
         try{
             String query = fsFilter.toString();
-
             loAdapter.GetFilter().filter(query);
-            loAdapter.notifyDataSetChanged();
         } catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    private void ShowDialogEntry(String fsTitle, String fsBtn, String fsHint, int fnType, OnDialog foCallback){
+
+        AlertDialog.Builder poBuilder = new AlertDialog.Builder(requireActivity());
+        View view = LayoutInflater.from(requireActivity()).inflate(org.rmj.g3appdriver.R.layout.layout_single_field, null);
+
+        poBuilder.setCancelable(false)
+                .setView(view);
+
+        AlertDialog poDialog = poBuilder.create();
+        poDialog.setCancelable(true);
+
+        MaterialTextView lblTitle = view.findViewById(org.rmj.g3appdriver.R.id.mtv_title);
+        lblTitle.setText(fsTitle);
+
+        TextInputEditText tie_filter = view.findViewById(org.rmj.g3appdriver.R.id.tie_filter);
+        tie_filter.setHint(fsHint);
+        tie_filter.setInputType(fnType);
+
+        MaterialButton btm_submit = view.findViewById(org.rmj.g3appdriver.R.id.btn_submit);
+        btm_submit.setText(fsBtn);
+
+        btm_submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (tie_filter.getText() == null || tie_filter.getText().toString().isEmpty()){
+                    Toast.makeText(requireActivity(), "Field is empty!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                foCallback.OnSubmit(tie_filter.getText().toString());
+                if(poDialog.isShowing()){
+                    poDialog.dismiss();
+                }
+            }
+        });
+
+        if (!poDialog.isShowing()){
+            poDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            poDialog.getWindow().getAttributes().windowAnimations = org.rmj.g3appdriver.R.style.PopupAnimation;
+            poDialog.show();
         }
     }
 

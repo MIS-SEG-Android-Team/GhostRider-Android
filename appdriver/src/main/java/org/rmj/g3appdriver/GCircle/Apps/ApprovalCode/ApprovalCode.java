@@ -452,6 +452,7 @@ public class ApprovalCode {
                 loRequests.setcTranStat(loResult.getString("cTranStat"));
                 loRequests.setdApproved(loResult.getString("dApproved"));
                 loRequests.setsAppSrcNo(loResult.getString("sAppSrcNo"));
+                loRequests.setxSupplier(loResult.getString("xSupplier"));
                 loRequests.setnTotal(loResult.getString("rqsTotal"));
 
                 poCASReqDao.SaveCASRequest(loRequests);

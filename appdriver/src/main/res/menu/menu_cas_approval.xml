@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_filter"
+        android:orderInCategory="100"
+        android:title="Filter"
+        app:showAsAction="never">
+
+        <menu>
+
+            <item
+                android:id="@+id/action_filter_amount"
+                android:orderInCategory="100"
+                android:title="By Amount"
+                app:showAsAction="never">
+
+                <menu>
+
+                    <item
+                        android:id="@+id/action_amount_below"
+                        android:title="Below" />
+
+                    <item
+                        android:id="@+id/action_amount_between"
+                        android:title="Between" />
+
+                    <item
+                        android:id="@+id/action_amount_above"
+                        android:title="Above" />
+
+                </menu>
+
+            </item>
+
+        </menu>
+
+    </item>
+
+    <item
+        android:id="@+id/action_download"
+        android:orderInCategory="100"
+        android:title="Download List"
+        app:showAsAction="never" />
+
+</menu>

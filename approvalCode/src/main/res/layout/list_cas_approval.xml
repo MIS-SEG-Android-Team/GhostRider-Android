@@ -7,37 +7,32 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingVertical="10dp">
 
         <com.google.android.material.textview.MaterialTextView
-            style="@style/HeaderLabelBlack"
             android:id="@+id/mtv_sourceno"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="N/A"
             android:textSize="12sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="10dp"
             app:layout_constraintWidth_percent="0.5"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <com.google.android.material.textview.MaterialTextView
-            style="@style/HeaderLabelBlack"
             android:id="@+id/mtv_transactdt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="1900-00-00"
             android:gravity="end"
             android:textSize="12sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.5"
             app:layout_constraintStart_toEndOf="@+id/mtv_sourceno"/>
-
-        <View
-            android:id="@+id/view_div"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="?attr/colorPrimary"
-            app:layout_constraintHeight_percent="0.009"
-            app:layout_constraintTop_toBottomOf="@+id/mtv_sourceno"/>
 
         <com.google.android.material.textview.MaterialTextView
             style="@style/DescriptionHeaderStyle"
@@ -51,22 +46,70 @@
             android:paddingHorizontal="10dp"
             android:paddingVertical="5dp"
             app:layout_constraintStart_toStartOf="@+id/mtv_sourceno"
-            app:layout_constraintTop_toBottomOf="@+id/view_div"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/mtv_sourceno"
+            app:layout_constraintEnd_toEndOf="@+id/mtv_transactdt"/>
+
+        <View
+            android:id="@+id/view_div"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintHeight_percent="0.009"
+            app:layout_constraintTop_toBottomOf="@+id/mtv_branch"/>
 
         <com.google.android.material.textview.MaterialTextView
             style="@style/DescriptionHeaderStyle"
-            android:id="@+id/mtv_remarks"
+            android:id="@+id/mtv_supplier_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="SUPPLIER:"
+            android:textSize="10sp"
+            android:padding="10dp"
+            android:maxLines="1"
+            app:layout_constraintTop_toBottomOf="@+id/mtv_branch"
+            app:layout_constraintStart_toStartOf="@+id/mtv_sourceno"
+            app:layout_constraintEnd_toEndOf="@+id/mtv_sourceno"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/DescriptionHeaderStyle"
+            android:id="@+id/mtv_supplier"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="N/A"
             android:textSize="10sp"
-            android:paddingHorizontal="10dp"
-            android:paddingBottom="5dp"
+            android:padding="10dp"
             android:maxLines="1"
+            android:gravity="end"
             app:layout_constraintTop_toBottomOf="@+id/mtv_branch"
-            app:layout_constraintStart_toStartOf="@+id/mtv_branch"
-            app:layout_constraintEnd_toEndOf="@+id/mtv_branch"/>
+            app:layout_constraintStart_toStartOf="@+id/mtv_transactdt"
+            app:layout_constraintEnd_toEndOf="@+id/mtv_transactdt"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/DescriptionHeaderStyle"
+            android:id="@+id/mtv_amt_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="ORDER AMOUNT:"
+            android:textSize="10sp"
+            android:paddingHorizontal="10dp"
+            android:maxLines="1"
+            app:layout_constraintTop_toBottomOf="@+id/mtv_supplier_label"
+            app:layout_constraintStart_toStartOf="@+id/mtv_sourceno"
+            app:layout_constraintEnd_toEndOf="@+id/mtv_sourceno"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/DescriptionHeaderStyle"
+            android:id="@+id/mtv_amt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="0.00"
+            android:textSize="10sp"
+            android:paddingHorizontal="10dp"
+            android:maxLines="1"
+            android:gravity="end"
+            app:layout_constraintTop_toBottomOf="@+id/mtv_supplier"
+            app:layout_constraintStart_toStartOf="@+id/mtv_transactdt"
+            app:layout_constraintEnd_toEndOf="@+id/mtv_transactdt"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
