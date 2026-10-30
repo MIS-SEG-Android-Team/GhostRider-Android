@@ -19,16 +19,20 @@
                 <menu>
 
                     <item
+                        android:id="@+id/action_amount_all"
+                        android:title="All" />
+
+                    <item
                         android:id="@+id/action_amount_below"
                         android:title="Below" />
 
                     <item
-                        android:id="@+id/action_amount_between"
-                        android:title="Between" />
-
-                    <item
                         android:id="@+id/action_amount_above"
                         android:title="Above" />
+
+                    <item
+                        android:id="@+id/action_amount_exact"
+                        android:title="Exact" />
 
                 </menu>
 

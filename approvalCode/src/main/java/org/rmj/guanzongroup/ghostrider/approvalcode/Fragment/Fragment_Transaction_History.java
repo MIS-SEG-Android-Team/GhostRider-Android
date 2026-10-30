@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -45,6 +46,7 @@ import org.rmj.guanzongroup.ghostrider.approvalcode.ViewModel.VMApprovalSelectio
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -53,6 +55,10 @@ public class Fragment_Transaction_History extends Fragment {
     private VMApprovalSelection mViewModel;
     private Adapter_Transaction_History loAdapter;
 
+    private String lsStrtDte, lsEndDte;
+    private double lnAmtFilter = 0.00;
+
+    private ConstraintLayout layout_no_data;
     private TextInputEditText tie_search;
     private ImageButton ib_filter;
     private RecyclerView rcv_list;
@@ -73,12 +79,15 @@ public class Fragment_Transaction_History extends Fragment {
         View v = inflater.inflate(R.layout.layout_transaction_history, container, false);
 
         mViewModel = new ViewModelProvider(this).get(VMApprovalSelection.class);
+        lsStrtDte = GetLastMonth();
+        lsEndDte = GetDateToday();
 
+        layout_no_data = v.findViewById(R.id.layout_no_data);
         tie_search = v.findViewById(R.id.tie_search);
         ib_filter = v.findViewById(R.id.ib_filter);
         rcv_list = v.findViewById(R.id.rcv_list);
 
-        ImportTransactionRequests(GetLastMonth(), GetDateToday());
+        ImportTransactionRequests();
         InitListener();
 
         return v;
@@ -98,14 +107,14 @@ public class Fragment_Transaction_History extends Fragment {
         }
     }
 
-    private void ImportTransactionRequests(String fsStartDt, String fsEndDt){
+    private void ImportTransactionRequests(){
 
-        mViewModel.importCASRequests(lsArgCode, fsStartDt, fsEndDt, lsArgType.equals("4"),  new VMApprovalSelection.onDownload() {
+        mViewModel.importCASRequests(lsArgCode, lsStrtDte, lsEndDte, lsArgType.equals("4"),  new VMApprovalSelection.onDownload() {
             @Override
             public void onFinished(String message) {
 
                 Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
-                InitTransactionRequests(fsStartDt, fsEndDt);
+                InitTransactionRequests(lsStrtDte, lsEndDte, 0);
             }
         });
     }
@@ -153,35 +162,45 @@ public class Fragment_Transaction_History extends Fragment {
                                     Long startRange = selection.first;
                                     Long endRange = selection.second;
 
-                                    ImportTransactionRequests(GetDateFormat(startRange), GetDateFormat(endRange));
+                                    lsStrtDte = GetDateFormat(startRange);
+                                    lsEndDte = GetDateFormat(endRange);
+
+                                    ImportTransactionRequests();
                                 }
                             });
                             loPicker.show(getParentFragmentManager(), "DATE_RANGE_PICKER");
                             
+                        }  else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_all) {
+
+                            InitTransactionRequests(lsStrtDte, lsEndDte, 0);
+
                         } else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_below) {
 
-                            ShowDialogEntry("List of Approvals BELOW", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL, new OnDialog() {
+                            ShowDialogEntry("List of Approvals BELOW", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_CLASS_NUMBER, new OnDialog() {
                                 @Override
                                 public void OnSubmit(String fsEntry) {
-
+                                    lnAmtFilter = Double.parseDouble(fsEntry);
+                                    InitTransactionRequests(lsStrtDte, lsEndDte, 1);
                                 }
                             });
                             
-                        } else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_between) {
+                        } else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_above) {
 
-                            ShowDialogEntry("List of Approvals BETWEEN", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL, new OnDialog() {
+                            ShowDialogEntry("List of Approvals ABOVE", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_CLASS_NUMBER, new OnDialog() {
                                 @Override
                                 public void OnSubmit(String fsEntry) {
-
+                                    lnAmtFilter = Double.parseDouble(fsEntry);
+                                    InitTransactionRequests(lsStrtDte, lsEndDte, 2);
                                 }
                             });
 
-                        } else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_above) {
+                        } else if (menuItem.getItemId() == org.rmj.g3appdriver.R.id.action_amount_exact) {
 
-                            ShowDialogEntry("List of Approvals ABOVE", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL, new OnDialog() {
+                            ShowDialogEntry("List of Approvals EXACT", "Filter", "Please enter amount", InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_CLASS_NUMBER, new OnDialog() {
                                 @Override
                                 public void OnSubmit(String fsEntry) {
-
+                                    lnAmtFilter = Double.parseDouble(fsEntry);
+                                    InitTransactionRequests(lsStrtDte, lsEndDte, 3);
                                 }
                             });
 
@@ -194,21 +213,75 @@ public class Fragment_Transaction_History extends Fragment {
         });
     }
 
-    private void InitTransactionRequests(String lsStartDt, String lsEndDt){
+    private void InitTransactionRequests(String lsStartDt, String lsEndDt, int fnFilter){
 
         if (lsArgType.equals("3")){
 
             mViewModel.getCASRequests(lsArgCode, lsStartDt, lsEndDt).observe(getViewLifecycleOwner(), new Observer<List<ECASRequests>>() {
                 @Override
                 public void onChanged(List<ECASRequests> ecasRequests) {
-                    InitAdapter(ecasRequests);
+
+                    if (ecasRequests == null || ecasRequests.size() < 1){
+                        layout_no_data.setVisibility(View.VISIBLE);
+                        rcv_list.setVisibility(View.GONE);
+                        return;
+                    }
+                    layout_no_data.setVisibility(View.GONE);
+                    rcv_list.setVisibility(View.VISIBLE);
+
+                    List<ECASRequests> laRequests = new ArrayList<>();
+                    for (ECASRequests loRqst : ecasRequests){
+
+                        switch (fnFilter){
+                            case 0:
+                                laRequests.add(loRqst);
+                                break;
+                            case 1:
+                                if (Double.parseDouble(loRqst.getnTotal().replace(",", "")) <= lnAmtFilter) laRequests.add(loRqst);
+                                break;
+                            case 2:
+                                if (Double.parseDouble(loRqst.getnTotal().replace(",", "")) >= lnAmtFilter) laRequests.add(loRqst);
+                                break;
+                            case 3:
+                                if (Double.parseDouble(loRqst.getnTotal().replace(",", "")) == lnAmtFilter) laRequests.add(loRqst);
+                                break;
+                        }
+                    }
+                    InitAdapter(laRequests);
                 }
             });
-        }else if (lsArgType.equals("4")){
+        } else if (lsArgType.equals("4")){
 
             mViewModel.GetCASHistory(lsArgCode, lsStartDt, lsEndDt).observe(getViewLifecycleOwner(), new Observer<List<ECASRequests>>() {
                 @Override
                 public void onChanged(List<ECASRequests> ecasRequests) {
+
+                    if (ecasRequests == null || ecasRequests.size() < 1){
+                        layout_no_data.setVisibility(View.VISIBLE);
+                        rcv_list.setVisibility(View.GONE);
+                        return;
+                    }
+                    layout_no_data.setVisibility(View.GONE);
+                    rcv_list.setVisibility(View.VISIBLE);
+
+                    List<ECASRequests> laRequests = new ArrayList<>();
+                    for (ECASRequests loRqst : ecasRequests){
+
+                        switch (fnFilter){
+                            case 0:
+                                laRequests.add(loRqst);
+                                break;
+                            case 1:
+                                if (Double.parseDouble(loRqst.getnTotal().replace(",", "")) <= lnAmtFilter) laRequests.add(loRqst);
+                                break;
+                            case 2:
+                                if (Double.parseDouble(loRqst.getnTotal().replace(",", "")) >= lnAmtFilter) laRequests.add(loRqst);
+                                break;
+                            case 3:
+                                if (Double.parseDouble(loRqst.getnTotal().replace(",", "")) == lnAmtFilter) laRequests.add(loRqst);
+                                break;
+                        }
+                    }
                     InitAdapter(ecasRequests);
                 }
             });
