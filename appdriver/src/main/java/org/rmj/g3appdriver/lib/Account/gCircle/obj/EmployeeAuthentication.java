@@ -65,6 +65,7 @@ public class EmployeeAuthentication implements iAuth {
             JSONObject params = new JSONObject();
             params.put("user",  loInfo.getEmail().trim());
             params.put("pswd", loInfo.getPassword());
+            params.put("appvrsn", poConfig.getVersionCode()); //indicator that app version is already updated
 
             String lsResponse = WebClient.sendRequest(
                     poApi.getUrlAuthEmployee(),

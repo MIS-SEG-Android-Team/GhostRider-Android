@@ -288,7 +288,7 @@
                         android:id="@+id/mtv_version"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Guanzon Circle v4.28.071.096 s"
+                        android:text="Guanzon Circle v4.28.071.098 s"
                         android:gravity="center"
                         android:alpha="0.6"/>
 
